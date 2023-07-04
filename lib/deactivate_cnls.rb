@@ -29,23 +29,24 @@ class DeactivateCnls
   def process_offender(offender_id, offender_index, offender_count)
     nomis_offender = with_retries { HmppsApi::PrisonApi::OffenderApi.get_offender(offender_id, ignore_legal_status: true) }
 
-    unless nomis_offender.sentenced?
-      output = ["- #{offender_index}/#{offender_count}: #{offender_id} is un-sentenced"]
+    return if nomis_offender.sentenced?
+    return if nomis_offender.immigration_case?
 
-      unless dry_run
-        output << ' - de-activating CNL'
+    output = ["- #{offender_index}/#{offender_count}: #{offender_id} is un-sentenced"]
 
-        begin
-          with_retries { HmppsApi::ComplexityApi.inactivate(offender_id) }
-          @inactivated_count += 1
-          output << ' - done'
-        rescue Faraday::ResourceNotFound
-          output << ' - resource not found'
-        end
+    unless dry_run
+      output << ' - de-activating CNL'
+
+      begin
+        with_retries { HmppsApi::ComplexityApi.inactivate(offender_id) }
+        @inactivated_count += 1
+        output << ' - done'
+      rescue Faraday::ResourceNotFound
+        output << ' - resource not found'
       end
-
-      report_info output.join
     end
+
+    report_info output.join
   end
 
   def with_retries(pause_secs: 10, retry_limit: 3)
