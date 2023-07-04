@@ -41,14 +41,14 @@ RSpec.describe 'handover_progress_checklists/edit' do
     it 'renders all checkboxes unticked' do
       aggregate_failures do
         expect(page).not_to have_css('input[name="handover_progress_checklist[reviewed_oasys]"][checked=checked]',
-                                     visible: false)
+                                     visible: :all)
 
         expect(page).not_to have_css('input[name="handover_progress_checklist[contacted_com]"][checked=checked]',
-                                     visible: false)
+                                     visible: :all)
 
         expect(page).not_to have_css('input[name="handover_progress_checklist[sent_handover_report]"]' \
                                      '[checked=checked]',
-                                     visible: false)
+                                     visible: :all)
       end
     end
 
@@ -86,13 +86,13 @@ RSpec.describe 'handover_progress_checklists/edit' do
     it 'renders checkboxes correctly' do
       aggregate_failures do
         expect(page).to have_css('input[name="handover_progress_checklist[reviewed_oasys]"][checked=checked]',
-                                 visible: false)
+                                 visible: :all)
 
         expect(page).to have_css('input[name="handover_progress_checklist[contacted_com]"][checked=checked]',
-                                 visible: false)
+                                 visible: :all)
 
         expect(page).to have_css('input[name="handover_progress_checklist[attended_handover_meeting]"][checked=checked]',
-                                 visible: false)
+                                 visible: :all)
       end
     end
   end
@@ -106,16 +106,16 @@ RSpec.describe 'handover_progress_checklists/edit' do
     it 'only renders 2 checkboxes' do
       aggregate_failures do
         expect(page).to have_css('input[name="handover_progress_checklist[contacted_com]"]',
-                                 visible: false)
+                                 visible: :all)
 
         expect(page).to have_css('input[name="handover_progress_checklist[sent_handover_report]"]',
-                                 visible: false)
+                                 visible: :all)
       end
     end
 
     it 'does not render reviewed_oasys checkbox' do
       expect(page).not_to have_css('input[name="handover_progress_checklist[reviewed_oasys]"]',
-                                   visible: false)
+                                   visible: :all)
     end
   end
 end
