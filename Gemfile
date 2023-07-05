@@ -65,7 +65,6 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'parallel_tests'
   gem 'rubocop-govuk', '~> 4.11'
-  gem 'rubocop-performance', '~> 1.15'
   gem 'rspec-rails', '~> 6.0.3'
   gem 'rswag-specs'
   gem 'spring'
