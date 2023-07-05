@@ -24,6 +24,27 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     stub_const('USE_EVENTS_TO_PUSH_HANDOVER_TO_DELIUS', true)
   end
 
+  context 'when offender\'s case does not have a handover date', use_events: true do
+    let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
+    let(:offender) { OffenderService.get_offender(offender_no) }
+
+    before do
+      stub_offender(nomis_offender)
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), enhanced_handover: true, manual_entry: false)
+      FactoryBot.create(:calculated_handover_date, :before_handover, nomis_offender_id: offender_no)
+      offender # instantiate it after the previous lines
+      allow(HandoverDateService).to receive(:handover).and_return(HandoverDateService::NO_HANDOVER_DATE)
+      allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
+
+      described_class.perform_now(offender_no)
+    end
+
+    it 'does not publish handover.changed domain event', use_events: true, aggregate_failures: true do
+      expect(event).not_to have_received(:publish)
+      expect(HmppsApi::CommunityApi).not_to have_received(:set_handover_dates)
+    end
+  end
+
   context "when the offender exists in both NOMIS and nDelius (happy path)" do
     let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
     let(:offender) { OffenderService.get_offender(offender_no) }
