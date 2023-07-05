@@ -25,7 +25,6 @@ private
         start_date: handover.start_date,
         handover_date: handover.handover_date,
         reason: handover.reason,
-        offender_attributes_to_archive: nomis_offender.attributes_to_archive,
       )
       if handover.community_responsible? &&
         handover.reason.to_sym == :determinate_short &&
@@ -52,6 +51,7 @@ private
       end
 
       if record.changed?
+        record.offender_attributes_to_archive = nomis_offender.attributes_to_archive
         record.save!
         handover_after = record.attributes.except('id', 'created_at', 'updated_at')
 
