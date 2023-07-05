@@ -25,7 +25,6 @@ private
         start_date: handover.start_date,
         handover_date: handover.handover_date,
         reason: handover.reason,
-        offender_attributes_to_archive: nomis_offender.attributes_to_archive,
       )
       if handover.community_responsible? &&
         handover.reason.to_sym == :determinate_short &&
@@ -52,6 +51,7 @@ private
       end
 
       if record.changed?
+        record.offender_attributes_to_archive = nomis_offender.attributes_to_archive
         record.save!
         handover_after = record.attributes.except('id', 'created_at', 'updated_at')
 
@@ -80,9 +80,11 @@ private
     # Don't push if the dates haven't changed
     if record.saved_change_to_start_date? || record.saved_change_to_handover_date?
       if USE_EVENTS_TO_PUSH_HANDOVER_TO_DELIUS
-        event = DomainEvents::EventFactory.build_handover_event(host: Rails.configuration.allocation_manager_host,
-                                                                noms_number: record.nomis_offender_id)
-        event.publish(job: 'recalculate_handover_date')
+        unless record.handover_date.nil?
+          event = DomainEvents::EventFactory.build_handover_event(host: Rails.configuration.allocation_manager_host,
+                                                                  noms_number: record.nomis_offender_id)
+          event.publish(job: 'recalculate_handover_date')
+        end
       else
         PushHandoverDatesToDeliusJob.perform_later record
       end
