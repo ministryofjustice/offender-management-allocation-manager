@@ -53,7 +53,7 @@ RSpec.describe "early_allocations/early_allocations_list", type: :view do
         let(:column_index) { 2 }
 
         context 'when eligible' do
-          let(:early_allocations) { [create(:early_allocation)] }
+          let(:early_allocations) { create_list(:early_allocation, 1) }
 
           it 'shows "Eligible"' do
             message = "Eligible - the community probation team will take responsibility for this case early"
@@ -62,7 +62,7 @@ RSpec.describe "early_allocations/early_allocations_list", type: :view do
         end
 
         context 'when discretionary' do
-          let(:early_allocations) { [create(:early_allocation, :discretionary)] }
+          let(:early_allocations) { create_list(:early_allocation, 1, :discretionary) }
 
           it 'shows "Discretionary"' do
             message = "Discretionary - the community probation team will make a decision"
@@ -71,7 +71,7 @@ RSpec.describe "early_allocations/early_allocations_list", type: :view do
         end
 
         context 'when ineligible' do
-          let(:early_allocations) { [create(:early_allocation, :ineligible)] }
+          let(:early_allocations) { create_list(:early_allocation, 1, :ineligible) }
 
           it 'shows "Not eligible"' do
             message = "Not eligible"

@@ -23,7 +23,7 @@ RSpec.describe "shared/notifications/offender_needs_a_com", type: :view do
 
   context 'when an email has been sent to the LDU' do
     let(:date_sent) { Time.zone.today }
-    let(:email_history) { [create(:email_history, :open_prison_community_allocation, offender: case_info.offender, created_at: date_sent)] }
+    let(:email_history) { create_list(:email_history, 1, :open_prison_community_allocation, offender: case_info.offender, created_at: date_sent) }
 
     it 'says "You may need to contact the community probation office"' do
       expect(title).to eq(I18n.t('views.notifications.offender_needs_a_com.maybe_contact_ldu'))
