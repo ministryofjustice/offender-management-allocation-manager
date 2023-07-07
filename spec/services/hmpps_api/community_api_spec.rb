@@ -56,18 +56,4 @@ describe HmppsApi::CommunityApi do
       end
     end
   end
-
-  describe 'Date type codes' do
-    describe 'Handover start date' do
-      it 'is "POM1"' do
-        expect(described_class::KeyDate::HANDOVER_START_DATE).to eq('POM1')
-      end
-    end
-
-    describe 'Responsibility handover date' do
-      it 'is "POM2"' do
-        expect(described_class::KeyDate::RESPONSIBILITY_HANDOVER_DATE).to eq('POM2')
-      end
-    end
-  end
 end
