@@ -1,1 +1,2 @@
-USE_EVENTS_TO_PUSH_HANDOVER_TO_DELIUS = ENV.fetch('USE_EVENTS_TO_PUSH_HANDOVER_TO_DELIUS', '').strip == '1'
+# Feature Flags # super simple, and they work
+# USE_FEATURE = ENV.fetch('USE_FEATURE', '').strip == '1'
