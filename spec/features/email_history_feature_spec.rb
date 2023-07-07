@@ -4,7 +4,7 @@ feature 'email history' do
   let(:prison) { create(:prison) }
   let(:user) { build(:pom) }
 
-  context 'when offender has less than 10 months left to serve' do
+  context 'when offender has less than 10 months left to serve', :disable_push_to_delius do
     let(:nomis_offender) do
       build(:nomis_offender,
             prisonId: prison.code,
@@ -22,8 +22,6 @@ feature 'email history' do
 
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: user.staff_id, prison: prison.code)
-      # we don't care about setting handover dates in Delius for this test
-      allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
 
       # Ensure that an email history record has been created
       expect {

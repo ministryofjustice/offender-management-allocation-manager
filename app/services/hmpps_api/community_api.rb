@@ -76,34 +76,5 @@ module HmppsApi
       # The API response body isn't useful to us
       true
     end
-
-    # TODO: Rename method and parameters to reflect new domain language for handover date names
-    def self.set_handover_dates(offender_no:, handover_start_date:, responsibility_handover_date:)
-      safe_offender_no = URI.encode_www_form_component(offender_no)
-      base_route = "/offenders/nomsNumber/#{safe_offender_no}/custody/keyDates/"
-
-      # Map dates to the correct `{typeCode}` for the Community API
-      dates = {
-        KeyDate::HANDOVER_START_DATE => handover_start_date,
-        KeyDate::RESPONSIBILITY_HANDOVER_DATE => responsibility_handover_date
-      }
-
-      dates.stringify_keys.each do |code, date|
-        route = base_route + code
-
-        if date.nil?
-          # Delete the date from nDelius
-          client.delete(route)
-        else
-          # Create/update the date in nDelius
-          body = { date: date.strftime('%F') }
-          client.put(route, body)
-        end
-      end
-
-      # So long as the API calls didn't error, return true
-      # The API response bodies aren't useful to us
-      true
-    end
   end
 end

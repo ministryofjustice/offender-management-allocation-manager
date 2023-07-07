@@ -41,9 +41,9 @@ RSpec.configure do |config|
   end
 
   config.before(:each, :disable_push_to_delius) do
-    # Stub the pushing of handover dates to the Community API
-    # Useful when running ProcessDeliusDataJob, which attempts to push to the Community API
-    allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
+    # Stub the publishing handover.changed domain events. Useful when running ProcessDeliusDataJob, which attempts
+    # to push to the Community API when it recalculates handover dates
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish)
   end
 
   config.before(:each, :disable_early_allocation_event) do
