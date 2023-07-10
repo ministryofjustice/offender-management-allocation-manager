@@ -19,7 +19,7 @@
             <%= link_to 'See all handover cases in this prison', url_for,
                         class: %w[govuk-link govuk-link--no-visited-state] %>
           <% else %>
-            <%= link_to 'See your handover cases only ', url_for(params: { pom: '1' }),
+            <%= link_to 'See your handover cases only ', url_for(params: { pom: 'user' }),
                         class: %w[govuk-link govuk-link--no-visited-state] %>
           <% end %>
         <% end %>

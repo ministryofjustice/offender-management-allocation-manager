@@ -39,7 +39,7 @@ private
                                                              prison: @prison,
                                                              current_user_is_pom: current_user_is_pom?,
                                                              current_user_is_spo: current_user_is_spo?,
-                                                             pom_param: params[:pom])
+                                                             for_pom: params[:pom])
 
     if @handover_cases.nil?
       redirect_to '/401'
