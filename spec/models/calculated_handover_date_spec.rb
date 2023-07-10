@@ -1,12 +1,8 @@
-RSpec.describe CalculatedHandoverDate do
+RSpec.describe CalculatedHandoverDate, :disable_push_to_delius do
   subject { build(:calculated_handover_date) }
 
   let(:today) { Time.zone.today }
   let(:offender) { FactoryBot.create(:offender, nomis_offender_id: 'X1111XX') }
-
-  before do
-    allow(HmppsApi::CommunityApi).to receive(:set_handover_dates)
-  end
 
   describe 'validation' do
     it { is_expected.to validate_uniqueness_of(:nomis_offender_id) }
