@@ -10,8 +10,6 @@ class CaseInformation < ApplicationRecord
   belongs_to :local_delivery_unit, -> { enabled }, optional: true, inverse_of: :case_information
   delegate :name, :email_address, to: :local_delivery_unit, prefix: :ldu, allow_nil: true
 
-  before_validation { self[:case_allocation] = enhanced_handover? ? 'NPS' : 'CRC' }
-
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 

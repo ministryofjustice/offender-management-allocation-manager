@@ -155,7 +155,6 @@ ALTER SEQUENCE public.calculated_handover_dates_id_seq OWNED BY public.calculate
 CREATE TABLE public.case_information (
     id bigint NOT NULL,
     tier character varying,
-    case_allocation character varying,
     nomis_offender_id character varying,
     crn character varying,
     mappa_level integer,
@@ -1315,6 +1314,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230412150435'),
 ('20230602102101'),
 ('20230602163929'),
-('20230613125426');
+('20230613125426'),
+('20230712000001');
 
 

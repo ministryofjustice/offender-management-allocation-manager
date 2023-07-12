@@ -75,16 +75,6 @@ RSpec.describe CaseInformation, type: :model do
     end
   end
 
-  it 'ensures legacy NPS/CRC value is always set based on enhanced_handover? flag' do
-    normal_ci = FactoryBot.create :case_information, enhanced_handover: false
-    enhanced_ci = FactoryBot.create :case_information, enhanced_handover: true
-
-    aggregate_failures do
-      expect(normal_ci.case_allocation).to eq 'CRC'
-      expect(enhanced_ci.case_allocation).to eq 'NPS'
-    end
-  end
-
   it 'validates that enhanced_handover is always set to true or false, and not "nil"' do
     aggregate_failures do
       ci = FactoryBot.build :case_information, enhanced_handover: false
