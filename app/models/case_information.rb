@@ -17,7 +17,7 @@ class CaseInformation < ApplicationRecord
   # prisoners it makes sense to have N/A (as this is genuine) but not otherwise
   validates :tier, inclusion: { in: %w[A B C D N/A], message: 'Select the prisoner’s tier' }
 
-  validates :enhanced_handover, inclusion: {
+  validates :enhanced_resourcing, inclusion: {
     in: [true, false],
     message: 'Select the handover type for this case'
   }
@@ -38,5 +38,17 @@ class CaseInformation < ApplicationRecord
 
   def case_allocation=(_)
     raise 'Disabled - use enhanced_handover'
+  end
+
+  def enhanced_handover?
+    enhanced_resourcing?
+  end
+
+  def enhanced_handover
+    enhanced_resourcing
+  end
+
+  def enhanced_handover=(val)
+    self[:enhanced_resourcing] = val
   end
 end
