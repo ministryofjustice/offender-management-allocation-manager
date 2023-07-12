@@ -36,10 +36,6 @@ class CaseInformation < ApplicationRecord
     probation_service == 'Wales'
   end
 
-  def case_allocation=(_)
-    raise 'Disabled - use enhanced_handover'
-  end
-
   def enhanced_handover?
     enhanced_resourcing?
   end
