@@ -74,7 +74,7 @@ private
         local_delivery_unit: map_ldu(ldu_code),
         ldu_code: ldu_code,
         team_name: delius_com_info.fetch('team_name'),
-        enhanced_handover: delius_record.fetch('enhanced_handover?'),
+        enhanced_resourcing: delius_record.fetch('enhanced_resourcing'),
         probation_service: map_probation_service(ldu_code),
         mappa_level: map_mappa_level(delius_record['mappa_levels']),
         active_vlo: delius_record['active_vlo']

@@ -57,7 +57,7 @@ class OffenderService
         noms_no: nomis_offender_id,
         tier: community_info.fetch(:currentTier),
         crn: community_info.dig(:otherIds, :crn),
-        enhanced_handover?: enhanced_resourcing,
+        enhanced_resourcing: enhanced_resourcing,
         offender_manager: com.dig(:staff, :unallocated) ? nil : "#{com.dig(:staff, :surname)}, #{com.dig(:staff, :forenames)}",
         team_name: com.dig(:team, :description),
         ldu_code: com.dig(:team, :localDeliveryUnit, :code),

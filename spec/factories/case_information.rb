@@ -14,7 +14,7 @@ FactoryBot.define do
 
     probation_service { 'Wales' }
 
-    enhanced_handover { false }
+    enhanced_resourcing { false }
 
     trait :welsh do
       probation_service { 'Wales' }

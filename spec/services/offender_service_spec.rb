@@ -84,7 +84,7 @@ describe OffenderService, type: :feature do
                    'mappa_levels' => [],
                    'noms_no' => nomis_offender_id,
                    'offender_manager' => "TestUpdate01Surname, TestUpdate01Forname",
-                   'enhanced_handover?' => true,
+                   'enhanced_resourcing' => true,
                    'team_name' => "OMU A",
                    'tier' => "B-2",
                    'active_vlo' => false)
@@ -97,7 +97,7 @@ describe OffenderService, type: :feature do
       end
 
       describe 'enhanced_handover? attr:' do
-        subject(:value) { described_class.get_community_data(nomis_offender_id).fetch(:enhanced_handover?) }
+        subject(:value) { described_class.get_community_data(nomis_offender_id).fetch(:enhanced_resourcing) }
 
         before do
           # Transitioning from mocking of APIs to stubbing using mocks
@@ -185,7 +185,7 @@ describe OffenderService, type: :feature do
                        'tier' => 'A',
                        'crn' => 'X5657657',
                        'offender_manager' => nil,
-                       'enhanced_handover?' => true,
+                       'enhanced_resourcing' => true,
                        'mappa_levels' => [],
                        'team_name' => 'Thing',
                        'ldu_code' => 'LDU123',
