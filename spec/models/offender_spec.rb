@@ -101,4 +101,39 @@ RSpec.describe Offender, type: :model do
       expect(offender.handover_date).to be_nil
     end
   end
+
+  describe '#handover_type' do
+    before do
+      offender.build_case_information
+      offender.build_calculated_handover_date
+    end
+
+    it 'is "missing" if there is no case information/probation record' do
+      offender.case_information = nil
+      expect(offender.handover_type).to eq 'missing'
+    end
+
+    it 'is "missing" if no handover has been calculated yet' do
+      offender.calculated_handover_date = nil
+      expect(offender.handover_type).to eq 'missing'
+    end
+
+    it 'is always "none" if sentence is short enough to be community responsible immediately' do
+      offender.case_information.enhanced_resourcing = true
+      offender.calculated_handover_date.reason = 'determinate_short'
+      expect(offender.handover_type).to eq 'none'
+    end
+
+    describe 'if sentence is not short enough to be community responsible immediately' do
+      it 'is "standard" if standard resourcing' do
+        offender.case_information.enhanced_resourcing = false
+        expect(offender.handover_type).to eq 'standard'
+      end
+
+      it 'is "enhanced" if enhanced resourcing' do
+        offender.case_information.enhanced_resourcing = true
+        expect(offender.handover_type).to eq 'enhanced'
+      end
+    end
+  end
 end

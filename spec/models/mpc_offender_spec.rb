@@ -10,7 +10,8 @@ RSpec.describe MpcOffender, type: :model do
     instance_double(Offender,
                     id: nomis_offender_id,
                     nomis_offender_id: nomis_offender_id,
-                    case_information: instance_double(CaseInformation))
+                    case_information: instance_double(CaseInformation),
+                    calculated_handover_date: instance_double(CalculatedHandoverDate, handover_date: nil, reason: nil))
   end
   let(:prison) { build(:prison) }
   let(:api_offender) { double(:nomis_offender, offender_no: nomis_offender_id) }
@@ -288,7 +289,7 @@ RSpec.describe MpcOffender, type: :model do
         restricted_patient?
         crn
         manual_entry?
-        enhanced_handover?
+        handover_type
         tier
         mappa_level
         welsh_offender

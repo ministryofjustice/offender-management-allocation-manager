@@ -46,4 +46,16 @@ class Offender < ApplicationRecord
   def handover_progress_task_completion_data
     (handover_progress_checklist || build_handover_progress_checklist).task_completion_data
   end
+
+  def handover_type
+    if case_information.nil? || calculated_handover_date.nil?
+      'missing'
+    elsif calculated_handover_date.reason == 'determinate_short'
+      'none'
+    elsif case_information.enhanced_resourcing?
+      'enhanced'
+    else
+      'standard'
+    end
+  end
 end
