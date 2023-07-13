@@ -16,13 +16,13 @@
       ) %>
 
   <%= form.govuk_collection_radio_buttons(
-        :enhanced_handover,
-        [OpenStruct.new(name: t('.case_allocation.resourcing.enhanced'), value: 'true'),
-         OpenStruct.new(name: t('.case_allocation.resourcing.normal'), value: 'false')],
+        :enhanced_resourcing,
+        [OpenStruct.new(name: t('.resourcing.labels.enhanced'), value: 'true'),
+         OpenStruct.new(name: t('.resourcing.labels.standard'), value: 'false')],
         :value,
         :name,
-        legend: { text: t('.case_allocation.legend') },
-        hint: { text: t('.case_allocation.hint') },
+        legend: { text: t('.resourcing.legend') },
+        hint: { text: t('.resourcing.hint') },
       ) %>
 
   <%= form.govuk_collection_radio_buttons(

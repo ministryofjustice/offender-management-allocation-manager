@@ -39,7 +39,8 @@ context 'when NOMIS is missing information' do
           stub_offenders_for_prison(prison_code, stub_offenders)
 
           create(:allocation_history, prison: prison_code,  nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
-          create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), enhanced_handover: true)
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_no),
+                                    enhanced_resourcing: true)
         end
 
         it 'does not error' do
@@ -68,7 +69,7 @@ context 'when NOMIS is missing information' do
         stub_offender(offender)
 
         create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
-        create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), enhanced_handover: true)
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), enhanced_resourcing: true)
       end
 
       it 'does not error' do
@@ -124,7 +125,7 @@ context 'when NOMIS is missing information' do
         create(
           :case_information,
           offender: build(:offender, nomis_offender_id: offender_no),
-          enhanced_handover: true,
+          enhanced_resourcing: true,
           probation_service: welsh == 'Yes' ? 'Wales' : 'England'
         )
       end

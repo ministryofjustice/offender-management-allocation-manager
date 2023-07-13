@@ -6,7 +6,7 @@ class HandoverProgressChecklist < ApplicationRecord
 
   belongs_to :offender, foreign_key: :nomis_offender_id
 
-  delegate :enhanced_handover?, to: :offender
+  delegate :handover_type, to: :offender
 
   def progress_data
     {
@@ -26,7 +26,7 @@ class HandoverProgressChecklist < ApplicationRecord
 private
 
   def task_fields
-    enhanced_handover? ? ENHANCED_HANDOVER_TASK_FIELDS : NORMAL_HANDOVER_TASK_FIELD
+    handover_type == 'enhanced' ? ENHANCED_HANDOVER_TASK_FIELDS : NORMAL_HANDOVER_TASK_FIELD
   end
 
   def task_attributes

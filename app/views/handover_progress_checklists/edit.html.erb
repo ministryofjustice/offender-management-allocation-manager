@@ -36,7 +36,7 @@
       <div class="app-task-list">
         <ul class="app-task-list__items">
 
-          <% if @handover_progress_checklist.enhanced_handover? %>
+          <% if @handover_progress_checklist.handover_type == 'enhanced' %>
             <li class="app-task-list__item with-divider">
               <div class="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
@@ -72,7 +72,7 @@
             </div>
           </li>
 
-          <% if @handover_progress_checklist.enhanced_handover? %>
+          <% if @handover_progress_checklist.handover_type == 'enhanced' %>
             <li class="app-task-list__item with-divider">
               <div class="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">

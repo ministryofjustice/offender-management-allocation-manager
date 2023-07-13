@@ -86,7 +86,7 @@ private
 
   def case_information_params
     params.require(:case_information)
-      .permit(:nomis_offender_id, :tier, :enhanced_handover, :probation_service)
+      .permit(:nomis_offender_id, :tier, :enhanced_resourcing, :probation_service)
   end
 
   def parole_review_date_params

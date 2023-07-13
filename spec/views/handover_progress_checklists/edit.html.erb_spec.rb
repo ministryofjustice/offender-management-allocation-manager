@@ -19,7 +19,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
       reviewed_oasys: false,
       contacted_com: false,
       sent_handover_report: false)
-    allow(model).to receive(:enhanced_handover?).and_return(true)
+    allow(model).to receive_messages(handover_type: 'enhanced')
     model
   end
   let(:page) { Capybara::Node::Simple.new(rendered) }
@@ -99,7 +99,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
 
   describe 'when case type is CRC' do
     before do
-      allow(handover_progress_checklist).to receive(:enhanced_handover?).and_return(false)
+      allow(handover_progress_checklist).to receive_messages(handover_type: 'standard')
       render
     end
 

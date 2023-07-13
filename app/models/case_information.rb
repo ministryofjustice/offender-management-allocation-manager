@@ -35,16 +35,4 @@ class CaseInformation < ApplicationRecord
   def welsh_offender
     probation_service == 'Wales'
   end
-
-  def enhanced_handover?
-    enhanced_resourcing?
-  end
-
-  def enhanced_handover
-    enhanced_resourcing
-  end
-
-  def enhanced_handover=(val)
-    self[:enhanced_resourcing] = val
-  end
 end

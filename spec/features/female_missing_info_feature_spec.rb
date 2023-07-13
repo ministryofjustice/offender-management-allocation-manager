@@ -66,7 +66,7 @@ feature "womens missing info journey" do
 
         # There are some subtleties here - the first field has been renamed (e.g) case-information-welsh-offender-field-error
         # so pick the second one to avoid the noise
-        find('label[for=case-information-enhanced-handover-false-field]').click
+        find('label[for=case-information-enhanced-resourcing-false-field]').click
         find('label[for=case-information-tier-b-field]').click
         click_button 'Update'
         wait_for { page.current_path == missing_information_prison_prisoners_path(prison.code) }
@@ -115,7 +115,7 @@ feature "womens missing info journey" do
       end
 
       find('label[for=case-information-probation-service-england-field]').click
-      find('label[for=case-information-enhanced-handover-true-field]').click
+      find('label[for=case-information-enhanced-resourcing-true-field]').click
       find('label[for=case-information-tier-a-field]').click
       click_button 'Update'
       wait_for { page.current_path == missing_information_prison_prisoners_path(prison.code) }
@@ -153,7 +153,7 @@ feature "womens missing info journey" do
 
     def fill_in_missing_case_information
       find('label[for=case-information-probation-service-england-field]').click
-      find('label[for=case-information-enhanced-handover-true-field]').click
+      find('label[for=case-information-enhanced-resourcing-true-field]').click
       find('label[for=case-information-tier-a-field]').click
 
       click_button 'Update'

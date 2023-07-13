@@ -13,7 +13,7 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
   let(:date_of_birth) { Date.new(1980, 1, 6).to_s }
   let(:offender_name) { "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}" }
   let!(:prison) { create(:prison).code }
-  let!(:case_information) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), enhanced_handover: true) }
+  let!(:case_information) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
 
   before do
     create(:allocation_history, prison: prison, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
@@ -31,6 +31,8 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
 
     visit prison_staff_caseload_cases_path(prison, nomis_staff_id)
 
+    allow_any_instance_of(MpcOffender).to receive_messages(handover_type: 'enhanced')
+
     # assert that our setup created a caseload record
     expect(page.text).to match(/Showing 1 to 1 of 1 results/)
   end
@@ -40,7 +42,7 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
       let(:release_date) { Time.zone.today }
 
       before do
-        case_information.update! enhanced_handover: false
+        allow_any_instance_of(MpcOffender).to receive_messages(handover_type: 'standard')
       end
 
       it 'does not show the section' do
