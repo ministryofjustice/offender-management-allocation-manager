@@ -12,11 +12,11 @@ RSpec.feature 'Handovers feature:' do
       handover_progress_task_completion_data: {},
       allocated_com_email: nil,
       allocated_com_name: nil,
-      model: double(:model, calculated_handover_date: nil, handover_date: Faker::Date.backward), # TODO: CHD hack
       ldu_name: nil,
       ldu_email_address: nil,
       handover_progress_complete?: false,
       case_information: double(enhanced_handover?: false),
+      handover_type: 'enhanced',
     }
   end
   let(:offender) { sneaky_instance_double AllocatedOffender, **offender_attrs }

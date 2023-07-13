@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe "allocation_staff/index", type: :view do
   let(:next_year) { (Time.zone.today + 1.year).year }
-  let(:case_info) { build(:case_information, enhanced_handover: false) }
+  let(:case_info) { build(:case_information, enhanced_resourcing: false) }
   let(:api_offender) do
     build(:hmpps_api_offender,
           sentence: attributes_for(:sentence_detail, conditionalReleaseDate: Date.new(next_year + 1, 1, 28)),

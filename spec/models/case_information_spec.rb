@@ -75,15 +75,15 @@ RSpec.describe CaseInformation, type: :model do
     end
   end
 
-  it 'validates that enhanced_handover is always set to true or false, and not "nil"' do
+  it 'validates that enhanced_resourcing is always set to true or false, and not "nil"' do
     aggregate_failures do
-      ci = FactoryBot.build :case_information, enhanced_handover: false
+      ci = FactoryBot.build :case_information, enhanced_resourcing: false
       expect(ci.valid?).to eq true
 
-      ci = FactoryBot.build :case_information, enhanced_handover: true
+      ci = FactoryBot.build :case_information, enhanced_resourcing: true
       expect(ci.valid?).to eq true
 
-      ci = FactoryBot.build :case_information, enhanced_handover: nil
+      ci = FactoryBot.build :case_information, enhanced_resourcing: nil
       expect(ci.valid?).to eq false
     end
   end

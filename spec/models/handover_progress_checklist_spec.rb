@@ -2,7 +2,7 @@ RSpec.describe HandoverProgressChecklist do
   subject(:checklist) { described_class.new offender: FactoryBot.build(:offender) }
 
   before do
-    allow(checklist.offender).to receive(:enhanced_handover?).and_return(true)
+    allow(checklist.offender).to receive_messages(handover_type: 'enhanced')
   end
 
   describe '#progress_data' do
@@ -21,9 +21,9 @@ RSpec.describe HandoverProgressChecklist do
       end
     end
 
-    describe 'when normal handover case' do
+    describe 'when standard handover case' do
       before do
-        allow(checklist.offender).to receive(:enhanced_handover?).and_return(false)
+        allow(checklist.offender).to receive_messages(handover_type: 'standard')
         checklist.attributes = {
           reviewed_oasys: true, # ignored
           contacted_com: false,
@@ -56,7 +56,7 @@ RSpec.describe HandoverProgressChecklist do
       let(:expected_data) { { 'contacted_com' => false, 'sent_handover_report' => true } }
 
       before do
-        allow(checklist.offender).to receive(:enhanced_handover?).and_return(false)
+        allow(checklist.offender).to receive_messages(handover_type: 'standard')
         checklist.attributes = expected_data.merge(reviewed_oasys: true) # extra field should be ignored
       end
 
@@ -89,7 +89,7 @@ RSpec.describe HandoverProgressChecklist do
 
     describe 'when normal handover case' do
       before do
-        allow(checklist.offender).to receive(:enhanced_handover?).and_return(false)
+        allow(checklist.offender).to receive_messages(handover_type: 'standard')
       end
 
       it 'is false when all tasks are not complete' do

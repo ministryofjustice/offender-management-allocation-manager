@@ -37,13 +37,23 @@ class Offender < ApplicationRecord
 
   has_one :handover_progress_checklist, foreign_key: :nomis_offender_id
 
-  delegate :enhanced_handover?, to: :case_information, allow_nil: true
-
   delegate :handover_progress_complete?, to: :handover_progress_checklist, allow_nil: true
 
   delegate :handover_date, to: :calculated_handover_date, allow_nil: true
 
   def handover_progress_task_completion_data
     (handover_progress_checklist || build_handover_progress_checklist).task_completion_data
+  end
+
+  def handover_type
+    if case_information.nil? || calculated_handover_date.nil?
+      'missing'
+    elsif calculated_handover_date.reason == 'determinate_short'
+      'none'
+    elsif case_information.enhanced_resourcing?
+      'enhanced'
+    else
+      'standard'
+    end
   end
 end

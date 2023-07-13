@@ -17,7 +17,7 @@ RSpec.describe "allocations/show", type: :view do
                     manual_entry?: false,
                     handover_start_date: nil,
                     responsibility_handover_date: nil,
-                    model: double(:model, calculated_handover_date: nil) # TODO: CHD hack
+                    handover_type: 'missing',
                    ).as_null_object
   end
 

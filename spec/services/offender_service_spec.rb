@@ -27,13 +27,13 @@ describe OffenderService, type: :feature do
     it "gets a single offender", vcr: { cassette_name: 'prison_api/offender_service_single_offender_spec' } do
       nomis_offender_id = 'G7266VD'
 
-      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'C', enhanced_handover: false, probation_service: 'Wales')
+      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'C', enhanced_resourcing: false, probation_service: 'Wales')
       offender = described_class.get_offender(nomis_offender_id)
 
       expect(offender.tier).to eq 'C'
       expect(offender.conditional_release_date).to eq(Date.new(2040, 1, 27))
       expect(offender.main_offence).to eq 'Robbery'
-      expect(offender.enhanced_handover?).to eq false
+      expect(offender.handover_type).to eq 'missing'
     end
 
     it "returns nil if offender record not found", vcr: { cassette_name: 'prison_api/offender_service_single_offender_not_found_spec' } do
@@ -84,7 +84,7 @@ describe OffenderService, type: :feature do
                    'mappa_levels' => [],
                    'noms_no' => nomis_offender_id,
                    'offender_manager' => "TestUpdate01Surname, TestUpdate01Forname",
-                   'enhanced_handover?' => true,
+                   'enhanced_resourcing' => true,
                    'team_name' => "OMU A",
                    'tier' => "B-2",
                    'active_vlo' => false)
@@ -97,7 +97,7 @@ describe OffenderService, type: :feature do
       end
 
       describe 'enhanced_handover? attr:' do
-        subject(:value) { described_class.get_community_data(nomis_offender_id).fetch(:enhanced_handover?) }
+        subject(:value) { described_class.get_community_data(nomis_offender_id).fetch(:enhanced_resourcing) }
 
         before do
           # Transitioning from mocking of APIs to stubbing using mocks
@@ -185,7 +185,7 @@ describe OffenderService, type: :feature do
                        'tier' => 'A',
                        'crn' => 'X5657657',
                        'offender_manager' => nil,
-                       'enhanced_handover?' => true,
+                       'enhanced_resourcing' => true,
                        'mappa_levels' => [],
                        'team_name' => 'Thing',
                        'ldu_code' => 'LDU123',

@@ -38,7 +38,7 @@ class CaseInformationController < PrisonsApplicationController
       nomis_offender_id: case_information_params[:nomis_offender_id],
       tier: case_information_params[:tier],
       probation_service: case_information_params[:probation_service],
-      enhanced_handover: case_information_params[:enhanced_handover],
+      enhanced_resourcing: case_information_params[:enhanced_resourcing],
       manual_entry: true
     )
 
@@ -86,7 +86,7 @@ private
 
   def case_information_params
     params.require(:case_information)
-      .permit(:nomis_offender_id, :tier, :enhanced_handover, :probation_service)
+      .permit(:nomis_offender_id, :tier, :enhanced_resourcing, :probation_service)
   end
 
   def parole_review_date_params

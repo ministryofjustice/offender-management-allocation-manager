@@ -54,11 +54,11 @@ FactoryBot.define do
     nomis_offender_id
 
     trait :enhanced_handover do
-      case_information { create(:case_information, enhanced_handover: true) }
+      case_information { create(:case_information, enhanced_resourcing: true) }
     end
 
     trait :normal_handover do
-      case_information { create(:case_information, enhanced_handover: false) }
+      case_information { create(:case_information, enhanced_resourcing: false) }
     end
   end
 

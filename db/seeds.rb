@@ -52,7 +52,7 @@ ldu3 = LocalDeliveryUnit.find_or_create_by!(
 Offender.find_or_create_by!(nomis_offender_id: 'G7658UL') do |p|
   p.build_case_information(
     tier: 'A',
-    enhanced_handover: true,
+    enhanced_resourcing: true,
     manual_entry: true,
     local_delivery_unit:ldu1,
     probation_service: "Wales")
@@ -61,7 +61,7 @@ end
 Offender.find_or_create_by!(nomis_offender_id: 'G7517GF') do |p|
   p.build_case_information(
     tier: 'B',
-    enhanced_handover: true,
+    enhanced_resourcing: true,
     manual_entry:true,
     local_delivery_unit:ldu2,
     probation_service: "Wales")
@@ -71,7 +71,7 @@ end
 ['G1176UT', 'G0228VG', 'G1289UN'].each do |offender_no|
   Offender.find_or_create_by!(nomis_offender_id: offender_no) do |p|
     p.build_case_information(tier: 'B',
-                              enhanced_handover: false,
+                              enhanced_resourcing: false,
                               probation_service: 'Wales',
                               manual_entry: true,
                               local_delivery_unit: ldu2)
@@ -82,7 +82,7 @@ end
 ['G2407UH', 'G5884GU'].each do |offender_no|
   Offender.find_or_create_by!(nomis_offender_id: offender_no) do |p|
     p.build_case_information(tier: 'B',
-                              enhanced_handover: true,
+                              enhanced_resourcing: true,
                               probation_service: 'Wales',
                               manual_entry: true,
                               local_delivery_unit: ldu2)
@@ -92,7 +92,7 @@ end
 # test offender > 18 months before release (20/12/2023)
 Offender.find_or_create_by!(nomis_offender_id: 'G7281UH') do |p|
   p.build_case_information(tier: 'B',
-                            enhanced_handover: true,
+                            enhanced_resourcing: true,
                             probation_service: 'Wales',
                             manual_entry: true,
                             local_delivery_unit: ldu2)
@@ -101,7 +101,7 @@ end
 Offender.find_or_create_by!(nomis_offender_id: 'G3536UF') do |p|
   p.build_case_information(
     tier:'A',
-    enhanced_handover: true,
+    enhanced_resourcing: true,
     manual_entry: true,
     local_delivery_unit: ldu2,
     probation_service: "England")
@@ -110,7 +110,7 @@ end
 Offender.find_or_create_by!(nomis_offender_id: 'G2260UO') do |p|
   p.build_case_information(
     tier: 'B',
-    enhanced_handover: true,
+    enhanced_resourcing: true,
     manual_entry: true,
     local_delivery_unit: ldu3,
     probation_service: "England")

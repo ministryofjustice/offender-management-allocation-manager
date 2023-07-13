@@ -6,7 +6,7 @@ RSpec.describe "shared/notifications/offender_needs_a_com", type: :view do
   let(:com_warning) { page.css('#com_warning') }
   let(:ldu_warning) { page.css('#ldu_warning') }
 
-  let(:case_info) { build(:case_information, enhanced_handover: true, local_delivery_unit: ldu, manual_entry: ldu.nil?) }
+  let(:case_info) { build(:case_information, enhanced_resourcing: true, local_delivery_unit: ldu, manual_entry: ldu.nil?) }
   let(:ldu) { build(:local_delivery_unit) }
   let(:email_history) { [] }
   let(:prison) { build(:prison) }

@@ -77,7 +77,7 @@ private
                       ComplexityForm.new(session[complexity_session_key])
                     else
                       prisoner = Offender.find_by! nomis_offender_id: params.fetch(:prisoner_id)
-                      prisoner.build_case_information(session[case_info_session_key].merge(manual_entry: true).except('case_allocation')) # TODO: this needs removing after the case_allocation field goes away
+                      prisoner.build_case_information(session[case_info_session_key].merge(manual_entry: true))
                     end
   end
 
@@ -85,7 +85,7 @@ private
     if step == :complexity_level
       params.fetch(:complexity_form, {}).permit(:complexity_level)
     else
-      params.fetch(:case_information, {}).permit(:enhanced_handover, :probation_service, :tier)
+      params.fetch(:case_information, {}).permit(:enhanced_resourcing, :probation_service, :tier)
     end
   end
 

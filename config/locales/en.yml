@@ -203,10 +203,10 @@ en:
 
   case_information:
     form:
-      case_allocation:
-        resourcing:
+      resourcing:
+        labels:
           enhanced: 'Retained/Enhanced Resourcing'
-          normal: 'Allocated/Normal Resourcing'
+          standard: 'Allocated/Standard Resourcing'
         legend: 'What case allocation decision has been made for this prisoner?'
         hint: |
           You can find this on NDelius by opening someone’s most recent event and then choosing case allocation
