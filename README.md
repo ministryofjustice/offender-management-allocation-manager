@@ -164,7 +164,7 @@ A simple custom templating system has been built to manage these files. For now 
 jobs.
 
 Modify the relevant template in deploy/templates/, add the file to generate to the relevant job in
-lib/tasks/deployment.rake, and run the rake task.
+lib/tasks/deployment.rake, and run the rake task `bin/rake deployment:generate_jobs`.
 
 It should not be made any more complex - if more complexity is required, stop requiring it. Simplicity is genius.
 
