@@ -93,12 +93,6 @@ namespace :deployment do
         '0 3 * * *',
         'bundle exec rake recalculate_handover_dates',
       ],
-      [
-        'production',
-        'repush-all-handover-dates-to-delius-job',
-        '0 6 * * 1',
-        'bundle exec rake repush_all_handover_dates_to_delius',
-      ],
     ].each do |env, name, schedule, command|
       warn "Generating #{env}/#{name}, schedule='#{schedule}', command: #{command}"
       target = "deploy/#{env}/cron-#{name}.yaml"
