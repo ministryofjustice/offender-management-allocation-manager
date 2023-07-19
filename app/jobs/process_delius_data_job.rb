@@ -26,11 +26,21 @@ private
   def import_data(nomis_offender_id)
     probation_record = OffenderService.get_probation_record(nomis_offender_id)
 
-    return logger.error("[DELIUS] Failed to retrieve probation record for #{nomis_offender_id}") if probation_record.nil?
+    if probation_record.nil?
+      return logger.error(
+        "nomis_offender_id=#{nomis_offender_id},job=process_delius_data_job,event=missing_probation_record|" \
+        'Failed to retrieve probation record'
+      )
+    end
 
     offender = OffenderService.get_offender(nomis_offender_id)
 
-    return logger.error("[DELIUS] Failed to retrieve NOMIS record #{nomis_offender_id}") if offender.nil?
+    if offender.nil?
+      return logger.error(
+        "nomis_offender_id=#{nomis_offender_id},job=process_delius_data_job,event=missing_offender_record|" \
+        'Failed to retrieve NOMIS offender record'
+      )
+    end
 
     process_record(probation_record, nomis_offender_id) if offender.inside_omic_policy?
   end
