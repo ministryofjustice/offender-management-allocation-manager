@@ -53,7 +53,6 @@ private
 
   def map_delius_to_case_info(probation_record)
     ldu_code = probation_record.dig(:manager, :team, :local_delivery_unit, :code)
-    # case_allocation_map = { 'ENHANCED' => 'NPS', 'NORMAL' => 'CRC' }
 
     find_case_info(probation_record).tap do |case_info|
       case_info.assign_attributes(
@@ -65,11 +64,10 @@ private
         local_delivery_unit: map_ldu(ldu_code),
         ldu_code: ldu_code,
         team_name: probation_record.dig(:manager, :team, :description),
-        # case_allocation: case_allocation_map[probation_record.fetch(:resourcing)],
-        enhanced_resourcing: delius_record.fetch('enhanced_resourcing'),
+        enhanced_resourcing: probation_record.fetch(:resourcing).upcase == 'ENHANCED',
         probation_service: map_probation_service(ldu_code),
         mappa_level: probation_record.fetch(:mappa_level),
-        active_vlo: false # FIXME: we need this
+        active_vlo: probation_record.fetch(:vlo_assigned)
       )
     end
   end

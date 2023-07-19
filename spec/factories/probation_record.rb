@@ -10,6 +10,7 @@ FactoryBot.define do
       tier { 'A' }
       resourcing { 'ENHANCED' }
       mappa_level { 0 }
+      vlo_assigned { false }
       team_code { 'A000BCD' }
       team_description { 'A team description' }
       ldu_code { 'LDU123' }
@@ -27,6 +28,7 @@ FactoryBot.define do
       h[:tier] = evaluator.tier
       h[:resourcing] = evaluator.resourcing
       h[:mappa_level] = evaluator.mappa_level
+      h[:vlo_assigned] = evaluator.vlo_assigned
       h[:manager][:team][:code] = evaluator.team_code
       h[:manager][:team][:description] = evaluator.team_description
       h[:manager][:team][:local_delivery_unit][:code] = evaluator.ldu_code

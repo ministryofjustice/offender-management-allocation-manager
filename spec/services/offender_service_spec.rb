@@ -420,7 +420,8 @@ describe OffenderService, type: :feature do
           },
           email: manager_email
         },
-        mappaLevel: mappa_level
+        mappaLevel: mappa_level,
+        vloAssigned: true
       }
     end
 
@@ -459,7 +460,8 @@ describe OffenderService, type: :feature do
             },
             email: manager_email
           },
-          mappa_level: mappa_level
+          mappa_level: mappa_level,
+          vlo_assigned: true
         }
       end
 
