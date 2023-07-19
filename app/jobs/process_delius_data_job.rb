@@ -36,14 +36,26 @@ private
   end
 
   def process_record(probation_record, nomis_offender_id)
-    case_information = map_delius_to_case_info(probation_record)
+    prisoner = Offender.find_by!(nomis_offender_id: nomis_offender_id)
+    case_information_before = prisoner.case_information || prisoner.build_case_information
+    case_information_after = map_delius_to_case_info(probation_record, case_information_before)
 
-    if case_information.changed?
-      if case_information.save
+    if case_information_after.changed?
+      if case_information_after.save
         # Recalculate the offender's handover dates
         RecalculateHandoverDateJob.perform_later(nomis_offender_id)
+
+        AuditEvent.publish(
+          nomis_offender_id: nomis_offender_id,
+          tags: %w[job process_delius_data_job case_information changed],
+          system_event: true,
+          data: {
+            'before' => case_information_before.attributes.except('id', 'created_at', 'updated_at'),
+            'after' => case_information_after.attributes.except('id', 'created_at', 'updated_at')
+          }
+        )
       else
-        case_information.errors.each do |error|
+        case_information_after.errors.each do |error|
           DeliusImportError.create! nomis_offender_id: nomis_offender_id,
                                     error_type: error_type(error.attribute)
         end
@@ -51,10 +63,10 @@ private
     end
   end
 
-  def map_delius_to_case_info(probation_record)
+  def map_delius_to_case_info(probation_record, orig_case_information)
     ldu_code = probation_record.dig(:manager, :team, :local_delivery_unit, :code)
 
-    find_case_info(probation_record).tap do |case_info|
+    orig_case_information.tap do |case_info|
       case_info.assign_attributes(
         manual_entry: false,
         com_name: com_name(probation_record),
@@ -84,11 +96,6 @@ private
   # map the LDU regardless of enabled switch, but only expose it from offender when enabled
   def map_ldu(ldu_code)
     LocalDeliveryUnit.find_by(code: ldu_code)
-  end
-
-  def find_case_info(probation_record)
-    prisoner = Offender.find_by!(nomis_offender_id: probation_record[:noms_id])
-    prisoner.case_information || prisoner.build_case_information
   end
 
   def map_probation_service(ldu_code)
