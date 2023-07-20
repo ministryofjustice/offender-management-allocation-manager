@@ -395,6 +395,31 @@ workflows:
           requires: [build_and_push_docker_image]
           filters: { branches: { only: [preprod] } }
           context: [offender-management-shared, offender-management-preprod]
+          
+  staging:
+    jobs:
+      - install_dependencies:
+          filters: { branches: { only: [staging] } }
+      - fetch_secrets:
+          filters: { branches: { only: [staging] } }
+          context: [offender-management-shared, offender-management-staging]
+
+      - build_and_push_docker_image:
+          requires: [install_dependencies, fetch_secrets]
+          filters: { branches: { only: [staging] } }
+          context: [offender-management-shared, offender-management-staging]
+      - rubocop:
+          requires: [install_dependencies]
+          filters: { branches: { only: [staging] } }
+      - test:
+          requires: [install_dependencies, fetch_secrets]
+          filters: { branches: { only: [staging] } }
+          context: [offender-management-shared, offender-management-staging]
+
+      - deploy:
+          requires: [build_and_push_docker_image, rubocop, test]
+          filters: { branches: { only: [staging] } }
+          context: [offender-management-shared, offender-management-staging]
 
   staging_and_production:
     jobs:
