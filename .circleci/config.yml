@@ -339,20 +339,20 @@ workflows:
   feature_branch:
     jobs:
       - install_dependencies:
-          filters: { branches: { ignore: [main, preprod, test, test2] } }
+          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
       - fetch_secrets:
-          filters: { branches: { ignore: [main, preprod, test, test2] } }
+          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
           context: [offender-management-shared, offender-management-staging]
 
       - rubocop:
           requires: [install_dependencies]
-          filters: { branches: { ignore: [main, preprod, test, test2] } }
+          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
       - test:
           requires: [install_dependencies, fetch_secrets]
-          filters: { branches: { ignore: [main, preprod, test, test2] } }
+          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
           context: [offender-management-shared, offender-management-staging]
       - verify_docker_image_builds:
-          filters: { branches: { ignore: [main, preprod, test, test2] } }
+          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
 
   test_env:
     jobs:
