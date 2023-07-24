@@ -46,7 +46,7 @@ class Offender < ApplicationRecord
   end
 
   def handover_type
-    if case_information.nil? || calculated_handover_date.nil?
+    if case_information.nil? || calculated_handover_date.nil? || case_information.enhanced_resourcing.nil?
       'missing'
     elsif calculated_handover_date.reason == 'determinate_short'
       'none'

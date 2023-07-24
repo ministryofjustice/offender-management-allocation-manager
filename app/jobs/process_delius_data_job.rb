@@ -86,7 +86,7 @@ private
         local_delivery_unit: map_ldu(ldu_code),
         ldu_code: ldu_code,
         team_name: probation_record.dig(:manager, :team, :description),
-        enhanced_resourcing: probation_record.fetch(:resourcing).upcase == 'ENHANCED',
+        enhanced_resourcing: enhanced_resourcing(probation_record.fetch(:resourcing)),
         probation_service: map_probation_service(ldu_code),
         mappa_level: probation_record.fetch(:mappa_level),
         active_vlo: probation_record.fetch(:vlo_assigned)
@@ -123,5 +123,11 @@ private
       local_delivery_unit: DeliusImportError::MISSING_LDU,
       team: DeliusImportError::MISSING_TEAM
     }.fetch(field)
+  end
+
+  def enhanced_resourcing(value)
+    return nil if value.blank?
+
+    value.upcase == 'ENHANCED'
   end
 end
