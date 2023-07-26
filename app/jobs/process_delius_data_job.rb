@@ -47,8 +47,10 @@ private
 
   def process_record(probation_record, nomis_offender_id)
     prisoner = Offender.find_by!(nomis_offender_id: nomis_offender_id)
-    case_information_before = prisoner.case_information || prisoner.build_case_information
-    case_information_after = map_delius_to_case_info(probation_record, case_information_before)
+    case_info = prisoner.case_information || prisoner.build_case_information
+    atts_to_ignore = %w[id created_at updated_at]
+    case_info_atts_before = case_info.attributes.except(*atts_to_ignore)
+    case_information_after = map_delius_to_case_info(probation_record, case_info)
 
     if case_information_after.changed?
       if case_information_after.save
@@ -60,8 +62,8 @@ private
           tags: %w[job process_delius_data_job case_information changed],
           system_event: true,
           data: {
-            'before' => case_information_before.attributes.except('id', 'created_at', 'updated_at'),
-            'after' => case_information_after.attributes.except('id', 'created_at', 'updated_at')
+            'before' => case_info_atts_before,
+            'after' => case_information_after.attributes.except(*atts_to_ignore)
           }
         )
       else
@@ -73,11 +75,11 @@ private
     end
   end
 
-  def map_delius_to_case_info(probation_record, orig_case_information)
+  def map_delius_to_case_info(probation_record, case_info)
     ldu_code = probation_record.dig(:manager, :team, :local_delivery_unit, :code)
 
-    orig_case_information.tap do |case_info|
-      case_info.assign_attributes(
+    case_info.tap do |ci|
+      ci.assign_attributes(
         manual_entry: false,
         com_name: com_name(probation_record),
         com_email: probation_record.dig(:manager, :email),
@@ -99,6 +101,8 @@ private
 
     forename = probation_record.dig(:manager, :name, :forename)
     surname = probation_record.dig(:manager, :name, :surname)
+
+    return nil if surname.blank? && forename.blank?
 
     "#{surname}, #{forename}"
   end

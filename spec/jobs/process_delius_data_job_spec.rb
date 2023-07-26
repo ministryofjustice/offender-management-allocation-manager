@@ -36,6 +36,24 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
                              com_email: com_email
   end
 
+  let(:new_case_information_attributes) do
+    {
+      enhanced_resourcing: true,
+      crn: "X362207",
+      manual_entry: false,
+      mappa_level: 0,
+      nomis_offender_id: nomis_offender_id,
+      probation_service: "England",
+      local_delivery_unit_id: ldu.id,
+      ldu_code: ldu.code,
+      team_name: team_name,
+      com_name: "#{com_surname}, #{com_forename}",
+      com_email: com_email,
+      tier: "A",
+      active_vlo: false
+    }
+  end
+
   before do
     stub_auth_token
 
@@ -43,7 +61,26 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       .and_return(mock_probation_record)
   end
 
-  context 'when on the happy path' do
+  shared_examples 'audit event' do
+    before do
+      allow(RecalculateHandoverDateJob).to receive(:perform_later).and_return(nil)
+    end
+
+    let(:audit_event) { AuditEvent.last }
+
+    it 'creates an audit event' do
+      expect {
+        described_class.perform_now nomis_offender_id
+      }.to change(AuditEvent, :count).by(1)
+    end
+
+    it 'includes the CaseInformation attribute diffs in the audit event data' do
+      described_class.perform_now nomis_offender_id
+      expect(audit_event.data).to eq(expected_data)
+    end
+  end
+
+  context 'when case_information not present' do
     before do
       stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
     end
@@ -54,19 +91,30 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       }.to change(CaseInformation, :count).by(1)
 
       expect(case_info.attributes.symbolize_keys.except(:created_at, :id, :updated_at, :parole_review_date, :prisoner_id, :welsh_offender))
-          .to eq(enhanced_resourcing: true,
-                 crn: "X362207",
-                 manual_entry: false,
-                 mappa_level: 0,
-                 nomis_offender_id: "G4281GV",
-                 probation_service: "England",
-                 local_delivery_unit_id: ldu.id,
-                 ldu_code: ldu.code,
-                 team_name: team_name,
-                 com_name: "#{com_surname}, #{com_forename}",
-                 com_email: com_email,
-                 tier: "A",
-                 active_vlo: false)
+          .to eq(new_case_information_attributes)
+    end
+
+    include_examples 'audit event' do
+      let(:expected_data) do
+        {
+          'before' => {
+            'crn' => nil,
+            'tier' => nil,
+            'com_name' => nil,
+            'ldu_code' => nil,
+            'com_email' => nil,
+            'team_name' => nil,
+            'active_vlo' => false,
+            'mappa_level' => nil,
+            'manual_entry' => nil,
+            'nomis_offender_id' => nomis_offender_id,
+            'probation_service' => nil,
+            'enhanced_resourcing' => nil,
+            'local_delivery_unit_id' => nil
+          },
+          'after' => new_case_information_attributes.stringify_keys
+        }
+      end
     end
   end
 
@@ -203,11 +251,21 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
     let!(:c1) { create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
     let(:tier) { 'C' }
 
-    it 'does not creates case information' do
+    it 'does not create case information' do
       expect {
         described_class.perform_now nomis_offender_id
       }.not_to change(CaseInformation, :count)
-      expect(c1.reload.tier).to eq('C')
+
+      expect(c1.reload.tier).to eq(tier)
+    end
+
+    include_examples 'audit event' do
+      let(:expected_data) do
+        {
+          'before' => c1.attributes.except('id', 'created_at', 'updated_at'),
+          'after' => (new_case_information_attributes.tap { |a| a[:tier] = tier }).stringify_keys
+        }
+      end
     end
   end
 
