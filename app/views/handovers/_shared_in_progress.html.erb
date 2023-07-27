@@ -1,10 +1,9 @@
-<h2 class="govuk-heading-l">
-  <%= heading %>
-</h2>
+<%= content_tag(local_assigns[:heading_tag] || :h2, heading, class: local_assigns[:heading_class] || 'govuk_heading_l') %>
 
 <p><%= description %></p>
 
 <%= handover_list_table(table_class: [table_class],
+                        anchor: local_assigns[:anchor],
                         headers: [
                           { sort: 'offender_last_name', body: 'Prisoner details' },
                           @pom_view ? nil : { sort: 'staff_member_last_name', body: 'POM' },
@@ -12,13 +11,14 @@
                           { sort: 'handover_date', body: 'COM responsible' },
                           { sort: 'earliest_release_date', body: 'Earliest release date' },
                           { sort: 'tier', body: 'Tier' },
-                          { body: 'Handover progress', class: ['handover-progress'] },
+                          local_assigns[:com_allocation_view] ? { sort: 'com_allocation_days_overdue', body: 'Days overdue', class: %w[days-overdue] } : nil,
+                          local_assigns[:com_allocation_view] ? { body: 'LDU details', class: %w[ldu-details govuk-!-width-one-quarter] } : nil,
+                          local_assigns[:com_allocation_view] ? nil : { body: 'Handover progress', class: ['handover-progress'] }
                         ].compact) do %>
 
-  <% @filtered_handover_cases.each do |handover_case| %>
+  <% (local_assigns[:handover_data] || @filtered_handover_cases).each do |handover_case| %>
     <tr class="govuk-table__row allocated-offender">
-      <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: handover_case.offender %>
-
+      <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: handover_case.offender, anchor: local_assigns[:anchor] %>
       <%= render 'handovers/cells/staff_member', staff_member: handover_case.offender.staff_member unless @pom_view %>
 
       <%= render 'handovers/cells/com_details', offender: handover_case.offender,
@@ -28,18 +28,22 @@
                  show_highlight: show_handover_date_highlight %>
 
       <%= render 'handovers/cells/earliest_release_date', handover_case: handover_case %>
-
       <%= render 'handovers/cells/tier', offender: handover_case.offender %>
 
-      <%= render 'handovers/cells/handover_progress', prison_id: @prison_id, offender: handover_case.offender %>
+      <% if local_assigns[:com_allocation_view] %>
+        <%= render 'handovers/cells/days_overdue', days_overdue: handover_case.com_allocation_days_overdue %>
+        <%= render 'handovers/cells/ldu_details', offender: handover_case.offender %>
+      <% else %>
+        <%= render 'handovers/cells/handover_progress', prison_id: @prison_id, offender: handover_case.offender %>
+      <% end %>
     </tr>
   <% end %>
 <% end %>
 
-<% if @filtered_handover_cases.size == 0 %>
+<% if (local_assigns[:handover_data] || @filtered_handover_cases).size == 0 %>
   <p><%= no_cases_message %></p>
 <% else %>
-  <%= render partial: 'shared/pagination', locals: { data: @filtered_handover_cases } %>
+  <%= render partial: 'shared/pagination', locals: { data: (local_assigns[:handover_data] || @filtered_handover_cases) } %>
 <% end %>
 
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>

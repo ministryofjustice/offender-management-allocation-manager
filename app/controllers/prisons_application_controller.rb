@@ -80,4 +80,9 @@ private
   def store_referrer_in_session
     session[:referrer] = request.referer
   end
+
+  def filtered_handover_cases(cases)
+    sorted_cases = sort_collection cases, default_sort: :handover_date, default_direction: :asc
+    Kaminari.paginate_array(sorted_cases).page(page)
+  end
 end

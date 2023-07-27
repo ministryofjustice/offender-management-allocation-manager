@@ -49,9 +49,4 @@ private
     @prison_id = active_prison_id
     flash[:current_handovers_url] = request.original_url
   end
-
-  def filtered_handover_cases(cases)
-    sorted_cases = sort_collection cases, default_sort: :handover_date, default_direction: :asc
-    Kaminari.paginate_array(sorted_cases).page(page)
-  end
 end

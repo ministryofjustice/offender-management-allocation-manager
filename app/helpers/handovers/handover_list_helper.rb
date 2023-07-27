@@ -2,8 +2,9 @@ module Handovers
   module HandoverListHelper
     def handover_list_table(headers:,
                             table_class: [],
+                            anchor: nil,
                             &block)
-      thead = handover_list_thead(headers)
+      thead = handover_list_thead(headers, anchor)
       tbody = tag.tbody(class: 'govuk-table__body') { capture(&block) }
       tag.table(class: ['govuk-table'] + table_class,
                 data: { module: 'moj-sortable-table' }) do
@@ -17,19 +18,19 @@ module Handovers
 
   private
 
-    def handover_list_thead(headers)
+    def handover_list_thead(headers, anchor)
       tag.thead(class: 'govuk-table__head') do
         tag.tr(class: 'govuk-table__row') do
-          headers.each_with_index.map { |hcol, index| handover_list_th(hcol, index) }.join("\n").html_safe
+          headers.each_with_index.map { |hcol, index| handover_list_th(hcol, index, anchor) }.join("\n").html_safe
         end
       end
     end
 
-    def handover_list_th(col, index)
+    def handover_list_th(col, index, anchor)
       th_class = ['govuk-table__header'] + col.fetch(:class, [])
       tag.th(scope: 'col', class: th_class) do
         if col[:sort]
-          link_to(col.fetch(:body), sort_link(col[:sort]), data: { index: index.to_s }) +
+          link_to(col.fetch(:body), sort_link(col[:sort], anchor: anchor), data: { index: index.to_s }) +
           sort_arrow(col[:sort])
         else
           col.fetch(:body)

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PomsController < PrisonStaffApplicationController
+  include Sorting
+
   before_action :ensure_spo_user
 
   before_action :load_pom_staff_member, only: [:show, :edit, :update]
@@ -13,7 +15,13 @@ class PomsController < PrisonStaffApplicationController
 
   def show
     @tab = params[:tab] || 'overview'
+    @prison_id = @prison.code
     pom_allocations_summary
+    @upcoming_handovers = filtered_handover_cases(@handover_cases.upcoming)
+    @in_progress_handovers = filtered_handover_cases(@handover_cases.in_progress)
+    @overdue_tasks = filtered_handover_cases(@handover_cases.overdue_tasks)
+    @overdue_com_allocations = filtered_handover_cases(@handover_cases.com_allocation_overdue)
+    @pom_view = true
   end
 
   # This is for the situation where the user is no longer a POM
