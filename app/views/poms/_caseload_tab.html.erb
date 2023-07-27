@@ -1,5 +1,6 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-l">Caseload</h1>
     <div class="govuk-tabs" data-module="govuk-tabs">
       <h2 class="govuk-tabs__title">
         Choose which cases you want to see
@@ -21,7 +22,10 @@
           </a>
         </li>
       </ul>
+
       <div class="govuk-tabs__panel" id="all-cases">
+        <h3 class="govuk-heading-m">All cases</h3>
+
         <% if @allocations.empty? %>
           <p class="govuk-body">No cases allocated</p>
         <% else %>
@@ -31,7 +35,10 @@
           <%= render partial: 'shared/pagination', locals: { data: @allocations } %>
         <% end %>
       </div>
+
       <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="recent-allocations">
+        <h3 class="govuk-heading-m">Allocated in last 7 days</h3>
+
         <% if @recent_allocations.empty? %>
           <p class="govuk-body">No cases allocated in last 7 days</p>
         <% else %>
@@ -41,7 +48,10 @@
           <%= render partial: 'shared/pagination', locals: { data: @recent_allocations, url_params: { anchor: 'recent-allocations' } } %>
         <% end %>
       </div>
+
       <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="upcoming-releases">
+        <h3 class="govuk-heading-m">Releases in next 4 weeks</h3>
+
         <% if @upcoming_releases.empty? %>
           <p class="govuk-body">No releases in next 4 weeks</p>
         <% else %>
