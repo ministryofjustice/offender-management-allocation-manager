@@ -41,7 +41,7 @@ module HmppsApi
       def payload
         @payload ||= JWT.decode(
           access_token,
-          OpenSSL::PKey::RSA.new(public_key),
+          JwksKey.openssl_public_key,
           true,
           algorithm: 'RS256'
         ).first
@@ -49,14 +49,6 @@ module HmppsApi
 
       def self.from_json(payload)
         Token.new(payload)
-      end
-
-    private
-
-      def public_key
-        @public_key ||= Base64.urlsafe_decode64(
-          Rails.configuration.nomis_oauth_public_key
-        )
       end
     end
   end

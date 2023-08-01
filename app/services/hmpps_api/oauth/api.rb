@@ -6,7 +6,7 @@ module HmppsApi
       include Singleton
 
       class << self
-        delegate :fetch_new_auth_token, to: :instance
+        delegate :fetch_new_auth_token, :fetch_jwks_keys, to: :instance
       end
 
       def initialize
@@ -19,6 +19,11 @@ module HmppsApi
         response = @oauth_client.post(route)
 
         api_deserialiser.deserialise(HmppsApi::Oauth::Token, response)
+      end
+
+      def fetch_jwks_keys
+        route = '/auth/.well-known/jwks.json'
+        @oauth_client.get(route)
       end
 
     private

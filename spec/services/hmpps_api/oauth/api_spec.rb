@@ -13,4 +13,15 @@ describe HmppsApi::Oauth::Api do
 
     expect(token).to be_kind_of(HmppsApi::Oauth::Token)
   end
+
+  describe 'JWKS keys' do
+    it 'are fetched correctly', vcr: { cassette_name: 'prison_api/nomis_oauth_jwks_keys_spec' }, aggregate_failures: true do
+      payload = described_class.fetch_jwks_keys
+      expect(payload.keys).to eq ['keys']
+      keys = payload.fetch('keys')
+      expect(keys.size).to be >= 1
+      key = keys.first
+      expect(key.keys).to include('n', 'e', 'alg', 'kty', 'use')
+    end
+  end
 end
