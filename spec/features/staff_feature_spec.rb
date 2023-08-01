@@ -16,19 +16,9 @@ feature "staff pages" do
     before do
       stub_signin_spo pom, [prison.code]
       stub_offenders_for_prison(prison.code, offenders_in_prison)
-      stub_poms(prison.code, prison_poms)
+      stub_poms(prison.code, (prison_poms + [pom]))
 
-      # FIXME: A stub_ helper probably negates the need for this
-      stub_request(:get, "https://api-dev.prison.service.justice.gov.uk/api/staff/0")
-         .with(
-           headers: {
-             'Authorization' => 'Bearer an-access-token',
-             'Expect' => '',
-             'User-Agent' => 'Faraday v1.10.3'
-           })
-         .to_return(status: 200, body: "{}", headers: {})
-
-      visit prison_pom_path(prison.code, pom)
+      visit prison_pom_path(prison.code, pom.staff_id)
     end
 
     it "has a heading" do
@@ -81,6 +71,60 @@ feature "staff pages" do
 
         it "has a heading" do
           expect(page).to have_css('h3', text: 'Releases in next 4 weeks')
+        end
+      end
+    end
+
+    describe "Handover cases sub-navigation" do
+      before do
+        click_link 'Handover cases'
+      end
+
+      it "has a heading" do
+        expect(page).to have_css('h1', text: 'Handover cases')
+      end
+
+      it "has 4 sub-navigation tab links" do
+        expect(page).to have_css('.govuk-tabs__list-item a', text: 'Upcoming handovers')
+        expect(page).to have_css('.govuk-tabs__list-item a', text: 'Handovers in progress')
+        expect(page).to have_css('.govuk-tabs__list-item a', text: 'Overdue tasks')
+        expect(page).to have_css('.govuk-tabs__list-item a', text: 'COM allocation overdue')
+      end
+
+      describe 'Upcoming handovers tab' do
+        # We're already on this tab
+        it "has a heading" do
+          expect(page).to have_css('h3', text: 'Upcoming handovers')
+        end
+      end
+
+      describe 'Handovers in progress tab' do
+        before do
+          click_link 'Handovers in progress'
+        end
+
+        it "has a heading" do
+          expect(page).to have_css('h3', text: 'Handovers in progress')
+        end
+      end
+
+      describe 'Overdue tasks tab' do
+        before do
+          click_link 'Overdue tasks'
+        end
+
+        it "has a heading" do
+          expect(page).to have_css('h3', text: 'Overdue tasks')
+        end
+      end
+
+      describe 'COM allocation overdue tab' do
+        before do
+          click_link 'COM allocation overdue'
+        end
+
+        it "has a heading" do
+          expect(page).to have_css('h3', text: 'COM allocation overdue')
         end
       end
     end
