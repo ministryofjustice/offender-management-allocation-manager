@@ -19,11 +19,13 @@ module HmppsApi
         @connection.basic_auth(Rails.configuration.hmpps_api_client_id, Rails.configuration.hmpps_api_client_secret)
       end
 
+      def get(route)
+        request(:get, route)
+      end
+
       def post(route)
         request(:post, route)
       end
-
-    private
 
       def request(method, route)
         response = @connection.send(method) do |req|

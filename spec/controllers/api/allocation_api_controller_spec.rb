@@ -11,10 +11,8 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
     let(:primary_pom) { build(:pom) }
     let(:secondary_pom) { build(:pom) }
 
-    let(:rsa_public) { Base64.strict_encode64(rsa_private.public_key.to_s) }
-
     before do
-      allow(Rails.configuration).to receive(:nomis_oauth_public_key).and_return(rsa_public)
+      allow(JwksKey).to receive(:openssl_public_key).and_return(rsa_private.public_key)
       accepts_bearer_tokens
       stub_pom(primary_pom)
       stub_pom(secondary_pom)

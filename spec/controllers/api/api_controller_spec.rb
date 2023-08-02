@@ -2,11 +2,10 @@ require 'rails_helper'
 
 RSpec.describe Api::ApiController, type: :controller do
   let(:rsa_private) { OpenSSL::PKey::RSA.generate 2048 }
-  let(:rsa_public) { Base64.strict_encode64(rsa_private.public_key.to_s) }
   let(:ok_message) { { 'status' => 'ok' } }
 
   before do
-    allow(Rails.configuration).to receive(:nomis_oauth_public_key).and_return(rsa_public)
+    allow(JwksKey).to receive(:openssl_public_key).and_return(rsa_private.public_key)
   end
 
   it 'blocks access for missing tokens' do
