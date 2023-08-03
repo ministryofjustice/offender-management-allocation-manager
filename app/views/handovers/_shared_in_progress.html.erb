@@ -34,7 +34,8 @@
         <%= render 'handovers/cells/days_overdue', days_overdue: handover_case.com_allocation_days_overdue %>
         <%= render 'handovers/cells/ldu_details', offender: handover_case.offender %>
       <% else %>
-        <%= render 'handovers/cells/handover_progress', prison_id: @prison_id, offender: handover_case.offender %>
+        <%= render 'handovers/cells/handover_progress', prison_id: @prison_id, offender: handover_case.offender,
+                   hide_record_progress_link: local_assigns[:hide_record_progress_link] %>
       <% end %>
     </tr>
   <% end %>
