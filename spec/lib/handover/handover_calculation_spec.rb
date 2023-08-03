@@ -61,6 +61,16 @@ RSpec.describe Handover::HandoverCalculation do
                                                            is_early_allocation: true)
           expect(result).to eq [Date.new(2024, 10, 1), :early_allocation]
         end
+
+        example 'then the 15 month rule overrides the determinate-with-parole (extended determinate) rule' do
+          result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
+                                                           earliest_release_date: Date.new(2026, 1, 1),
+                                                           is_determinate_parole: true,
+                                                           is_indeterminate: false,
+                                                           in_open_conditions: false,
+                                                           is_early_allocation: true)
+          expect(result).to eq [Date.new(2024, 10, 1), :early_allocation]
+        end
       end
     end
 
