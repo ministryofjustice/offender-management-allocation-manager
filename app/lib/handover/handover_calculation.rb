@@ -12,12 +12,11 @@ module Handover::HandoverCalculation
                                 in_open_conditions:)
       if is_indeterminate
         [earliest_release_date - 8.months, in_open_conditions ? :indeterminate_open : :indeterminate]
-      elsif is_determinate_parole
-        [earliest_release_date - 8.months, :determinate_parole]
       else
         calculate_determinate_handover_date(sentence_start_date: sentence_start_date,
                                             earliest_release_date: earliest_release_date,
-                                            is_early_allocation: is_early_allocation)
+                                            is_early_allocation: is_early_allocation,
+                                            is_determinate_parole: is_determinate_parole)
       end
     end
 
@@ -87,11 +86,14 @@ module Handover::HandoverCalculation
 
     def calculate_determinate_handover_date(sentence_start_date:,
                                             earliest_release_date:,
-                                            is_early_allocation:)
+                                            is_early_allocation:,
+                                            is_determinate_parole:)
       if sentence_start_date + 10.months >= earliest_release_date
         [nil, :determinate_short]
       elsif is_early_allocation
         [earliest_release_date - 15.months, :early_allocation]
+      elsif is_determinate_parole
+        [earliest_release_date - 8.months, :determinate_parole]
       else
         [earliest_release_date - 8.months - 14.days, :determinate]
       end
