@@ -39,7 +39,7 @@ private
                                                              prison: @prison,
                                                              current_user_is_pom: current_user_is_pom?,
                                                              current_user_is_spo: current_user_is_spo?,
-                                                             pom_param: params[:pom])
+                                                             for_pom: params[:pom])
 
     if @handover_cases.nil?
       redirect_to '/401'
@@ -48,10 +48,5 @@ private
 
     @prison_id = active_prison_id
     flash[:current_handovers_url] = request.original_url
-  end
-
-  def filtered_handover_cases(cases)
-    sorted_cases = sort_collection cases, default_sort: :handover_date, default_direction: :asc
-    Kaminari.paginate_array(sorted_cases).page(page)
   end
 end

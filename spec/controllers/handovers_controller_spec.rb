@@ -1,7 +1,7 @@
 RSpec.describe HandoversController, type: :controller do
   let(:prison_code) { 'DBG' }
   let(:prison) { instance_double Prison, :prison, code: prison_code }
-  let(:default_params) { { prison_id: prison_code, pom: pom_param, sort: 'offender_last_name+asc' } }
+  let(:default_params) { { prison_id: prison_code, pom: for_pom, sort: 'offender_last_name+asc' } }
   let(:staff_id) { 456_987 }
   let(:staff_member) { instance_double StaffMember, :staff_member, staff_id: staff_id }
   let(:handover_cases) do
@@ -10,7 +10,7 @@ RSpec.describe HandoversController, type: :controller do
                             overdue_tasks: double(:overdue_tasks),
                             com_allocation_overdue: double(:com_allocation_overdue)
   end
-  let(:pom_param) { 'pom_param' }
+  let(:for_pom) { 'for_pom' }
   let(:pom_view_flag) { double :pom_view_flag }
   let(:current_user_is_pom_stub) { double :current_user_is_pom_stub }
   let(:current_user_is_spo_stub) { double :current_user_is_spo_stub }
@@ -56,7 +56,7 @@ RSpec.describe HandoversController, type: :controller do
         prison: prison,
         current_user_is_pom: current_user_is_pom_stub,
         current_user_is_spo: current_user_is_spo_stub,
-        pom_param: pom_param,
+        for_pom: for_pom,
       )
     end
   end

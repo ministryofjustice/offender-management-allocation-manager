@@ -12,7 +12,7 @@
       </li>
     <% end %>
   </ul>
-  <% if @pom_view %>
+  <% if @pom_view && !local_assigns[:hide_record_progress_link] %>
     <p><%= handover_record_progress_link(prison_id, offender.offender_no) %></p>
   <% end %>
 </td>

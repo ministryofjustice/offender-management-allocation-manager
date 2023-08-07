@@ -1,0 +1,93 @@
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-l">Handover cases</h1>
+    <div class="govuk-tabs" data-module="govuk-tabs">
+      <h2 class="govuk-tabs__title">
+        Choose which cases you want to see
+      </h2>
+      <ul class="govuk-tabs__list">
+        <li class="govuk-tabs__list-item govuk-tabs__list-item">
+          <a class="govuk-tabs__tab" href="#upcoming-handovers">
+            <%= "Upcoming handovers (#{@summary.fetch(:pending_handover_count)})" %>
+          </a>
+        </li>
+        <li class="govuk-tabs__list-item">
+          <a class="govuk-tabs__tab" href="#in-progress-handovers">
+            <%= "Handovers in progress (#{@summary.fetch(:in_progress_handover_count)})" %>
+          </a>
+        </li>
+        <li class="govuk-tabs__list-item">
+          <a class="govuk-tabs__tab" href="#overdue-tasks">
+            <%= "Overdue tasks (#{@summary.fetch(:overdue_task_count)})" %>
+          </a>
+        </li>
+        <li class="govuk-tabs__list-item">
+          <a class="govuk-tabs__tab" href="#overdue-com-allocations">
+            <%= "COM allocation overdue (#{@summary.fetch(:com_allocation_overdue_count)})" %>
+          </a>
+        </li>
+      </ul>
+
+      <div class="govuk-tabs__panel" id="upcoming-handovers">
+        <%= render 'handovers/shared_in_progress',
+              anchor: 'upcoming-handovers',
+              heading: 'Upcoming handovers',
+              heading_tag: :h3,
+              heading_class: 'govuk-heading-m',
+              description: 'A COM will be allocated in the next 8 weeks. The POM should start getting ready to hand the case over to the community.',
+              handover_data: @upcoming_handovers,
+              table_class: 'upcoming-handovers',
+              no_cases_message: 'No upcoming handovers at the moment',
+              hide_com_details: true,
+              show_handover_date_highlight: :due_soon,
+              hide_record_progress_link: true %>
+      </div>
+
+      <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="in-progress-handovers">
+        <%= render 'handovers/shared_in_progress',
+              anchor: 'in-progress-handovers',
+              heading: 'Handovers in progress',
+              heading_tag: :h3,
+              heading_class: 'govuk-heading-m',
+              description: 'The POM should start sharing information about the case with the COM, highlighting any pre-release or pre-parole needs they have identified.',
+              handover_data: @in_progress_handovers,
+              table_class: 'in-progress-handovers',
+              no_cases_message: 'No in-progress handovers at the moment',
+              hide_com_details: false,
+              show_handover_date_highlight: nil,
+              hide_record_progress_link: true %>
+      </div>
+
+      <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overdue-tasks">
+        <%= render 'handovers/shared_in_progress',
+              anchor: 'overdue-tasks',
+              heading: 'Overdue tasks',
+              heading_tag: :h3,
+              heading_class: 'govuk-heading-m',
+              description: 'Responsibility for these cases has transferred to the community, but some handover tasks are still recorded as incomplete.',
+              handover_data: @overdue_tasks,
+              table_class: 'overdue-tasks',
+              no_cases_message: 'No overdue tasks at the moment',
+              hide_com_details: false,
+              show_handover_date_highlight: nil,
+              hide_record_progress_link: true %>
+      </div>
+
+      <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overdue-com-allocations">
+        <%= render 'handovers/shared_in_progress',
+              anchor: 'overdue-com-allocations',
+              heading: 'COM allocation overdue',
+              heading_tag: :h3,
+              heading_class: 'govuk-heading-m',
+              description: 'These cases have passed their handover date and are missing COM details on NDelius.',
+              handover_data: @overdue_com_allocations,
+              table_class: 'overdue-com-allocation',
+              no_cases_message: 'No overdue COM allocations at the moment',
+              hide_com_details: true,
+              com_allocation_view: true,
+              show_handover_date_highlight: nil,
+              hide_record_progress_link: true %>
+      </div>
+    </div>
+  </div>
+</div>

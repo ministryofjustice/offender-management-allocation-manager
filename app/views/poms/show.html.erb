@@ -10,17 +10,24 @@
 <nav class="moj-sub-navigation" aria-label="Sub navigation">
   <ul class="moj-sub-navigation__list">
     <li class="moj-sub-navigation__item">
-      <% if @tab == 'caseload' %>
-        <%= link_to 'Overview', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :overview), class: 'moj-sub-navigation__link' %>
-      <% else %>
+      <% if @tab == 'overview' %>
         <%= link_to 'Overview', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :overview), class: 'moj-sub-navigation__link', aria: { current: "page" } %>
+      <% else %>
+        <%= link_to 'Overview', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :overview), class: 'moj-sub-navigation__link' %>
       <% end %>
     </li>
     <li class="moj-sub-navigation__item">
       <% if @tab == 'caseload' %>
-        <%= link_to 'Caseload', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :caseload), class: 'moj-sub-navigation__link', aria: { current: "page" } %>
+        <%= link_to "Caseload (#{@summary[:total_cases]})", prison_show_pom_tab_path(@prison.code, @pom.staff_id, :caseload), class: 'moj-sub-navigation__link', aria: { current: "page" } %>
       <% else %>
-        <%= link_to 'Caseload', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :caseload), class: 'moj-sub-navigation__link' %>
+        <%= link_to "Caseload (#{@summary[:total_cases]})", prison_show_pom_tab_path(@prison.code, @pom.staff_id, :caseload), class: 'moj-sub-navigation__link' %>
+      <% end %>
+    </li>
+    <li class="moj-sub-navigation__item">
+      <% if @tab == 'handover' %>
+        <%= link_to "Handover cases (#{@summary[:in_progress_handover_count]})", prison_show_pom_tab_path(@prison.code, @pom.staff_id, :handover), class: 'moj-sub-navigation__link', aria: { current: "page" } %>
+      <% else %>
+        <%= link_to "Handover cases (#{@summary[:in_progress_handover_count]})", prison_show_pom_tab_path(@prison.code, @pom.staff_id, :handover), class: 'moj-sub-navigation__link' %>
       <% end %>
     </li>
   </ul>
@@ -28,6 +35,8 @@
 
 <% if @tab == 'caseload' %>
   <%= render 'caseload_tab' %>
+<% elsif @tab == 'handover' %>
+  <%= render 'handover_tab' %>
 <% else %>
   <%= render 'overview_tab' %>
 <% end %>

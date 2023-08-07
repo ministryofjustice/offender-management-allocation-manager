@@ -20,6 +20,11 @@ private
   def sort_allocations(allocations)
     field, direction = sort_params(default_sort: :last_name)
 
+    # Ignore the allocation sort for these 3 fields. They indicate we're sorting
+    # the handover lists as opposed to the allocations list. The allocation and handover lists
+    # are on the same page - ooops.
+    return allocations if %i[com_allocation_days_overdue offender_last_name handover_date].include?(field)
+
     case field
     when :location
       cell_location_sort(allocations, direction)
@@ -74,9 +79,12 @@ private
         a.earliest_release_date.present? &&
           a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
       end,
+      last_allocated_date: @allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date,
       pending_handover_count: @handover_cases.upcoming.count,
+      in_progress_handover_count: @handover_cases.in_progress.count,
       pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count,
-      last_allocated_date: @allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date
+      overdue_task_count: @handover_cases.overdue_tasks.count,
+      com_allocation_overdue_count: @handover_cases.com_allocation_overdue.count
     }
   end
 
