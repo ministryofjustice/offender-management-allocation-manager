@@ -48,7 +48,6 @@ feature "womens missing info journey" do
               [
                 "Select yes if the prisoner’s last known address was in Wales",
                 "Select the prisoner’s tier",
-                "Select the handover type for this case",
               ])
         end
 
@@ -60,7 +59,6 @@ feature "womens missing info journey" do
             .to match_array(
               [
                 "Select the prisoner’s tier",
-                "Select the handover type for this case",
               ])
         end
 

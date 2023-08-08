@@ -27,9 +27,23 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
                                                                  localDeliveryUnit: { code: ldu.code } })]))
 
       stub_get_all_offender_managers(offender_no, [build(:community_all_offender_managers_datum,
-                                                         forenames: 'F1', surname: 'S1', email: 'E1',
+                                                         forenames: com_forename, surname: com_surname, email: com_email,
                                                          team_name: 'Team1', ldu_code: ldu.code)])
       stub_keyworker(prison_code, offender_no, build(:keyworker))
+
+      allow(OffenderService).to receive(:get_probation_record).with(offender_no)
+        .and_return(mock_probation_record)
+    end
+
+    let(:com_forename) { 'F1' }
+    let(:com_surname) { 'S1' }
+    let(:com_email) { 'E1' }
+
+    let(:mock_probation_record) do
+      build :probation_record, offender_no: offender_no,
+                               com_forename: com_forename,
+                               com_surname: com_surname,
+                               com_email: com_email
     end
 
     it "imports from Delius and creates case information" do
@@ -54,7 +68,7 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
       expect(page.find(:css, '#service-provider-row')).not_to have_content('Change')
       expect(page.find(:css, '#tier-row')).not_to have_content('Change')
 
-      expect(Offender.find(offender_no).case_information.values_at(:com_name, :com_email)).to eq ['S1, F1', 'E1']
+      expect(Offender.find(offender_no).case_information.values_at(:com_name, :com_email)).to eq ["#{com_surname}, #{com_forename}", com_email]
     end
   end
 end

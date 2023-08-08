@@ -19,6 +19,7 @@ class CaseInformation < ApplicationRecord
 
   validates :enhanced_resourcing, inclusion: {
     in: [true, false],
+    allow_nil: true,
     message: 'Select the handover type for this case'
   }
 

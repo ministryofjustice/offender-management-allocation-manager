@@ -373,4 +373,101 @@ describe OffenderService, type: :feature do
       expect(result[:start_date]).to eq(Date.new(2021, 1, 27))
     end
   end
+
+  describe 'get_probation_record' do
+    before do
+      allow(HmppsApi::ManagePomCasesAndDeliusApi).to receive(:get_probation_record)
+        .and_return(probation_record)
+    end
+
+    let(:result) { described_class.get_probation_record(nomis_offender_id) }
+
+    let(:crn) { 'ABC123' }
+    let(:nomis_offender_id) { 'ZY000X' }
+    let(:tier) { 'A' }
+    let(:resourcing) { 'NORMAL' }
+    let(:team_code) { 'TC000' }
+    let(:team_description) { 'A team description' }
+    let(:ldu_code) { 'LDU000' }
+    let(:ldu_description) { 'An LDU description' }
+    let(:manager_code) { 'M000' }
+    let(:manager_forename) { 'Borris' }
+    let(:manager_middle_name) { 'Brian' }
+    let(:manager_surname) { 'Beckker' }
+    let(:manager_email) { 'borris@beckker.me' }
+    let(:mappa_level) { 0 }
+
+    let(:probation_record) do
+      {
+        crn: crn,
+        nomsId: nomis_offender_id,
+        currentTier: tier,
+        resourcing: resourcing,
+        manager: {
+          team: {
+            code: team_code,
+            description: team_description,
+            localDeliveryUnit: {
+              code: ldu_code,
+              description: ldu_description
+            }
+          },
+          code: manager_code,
+          name: {
+            forename: manager_forename,
+            middleName: manager_middle_name,
+            surname: manager_surname
+          },
+          email: manager_email
+        },
+        mappaLevel: mappa_level,
+        vloAssigned: true
+      }
+    end
+
+    context 'when not found' do
+      before do
+        allow(HmppsApi::ManagePomCasesAndDeliusApi).to receive(:get_probation_record)
+          .and_raise(Faraday::ResourceNotFound.new(nil))
+      end
+
+      it 'returns nil' do
+        expect(result).to eq(nil)
+      end
+    end
+
+    context 'when found' do
+      let(:expected_hash) do
+        {
+          crn: crn,
+          noms_id: nomis_offender_id,
+          tier: tier,
+          resourcing: resourcing,
+          manager: {
+            team: {
+              code: team_code,
+              description: team_description,
+              local_delivery_unit: {
+                code: ldu_code,
+                description: ldu_description
+              }
+            },
+            code: manager_code,
+            name: {
+              forename: manager_forename,
+              middle_name: manager_middle_name,
+              surname: manager_surname
+            },
+            email: manager_email
+          },
+          mappa_level: mappa_level,
+          vlo_assigned: true
+        }
+      end
+
+      it 'returns expected hash' do
+        expect(result).to eq(expected_hash)
+      end
+    end
+  end
 end

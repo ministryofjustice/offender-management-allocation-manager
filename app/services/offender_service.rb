@@ -109,6 +109,38 @@ class OffenderService
       nil_details
     end
 
+    def get_probation_record(offender_no)
+      result = HmppsApi::ManagePomCasesAndDeliusApi.get_probation_record(offender_no).with_indifferent_access
+
+      {
+        crn: result[:crn],
+        noms_id: result[:nomsId],
+        tier: result[:currentTier],
+        resourcing: result[:resourcing],
+        manager: {
+          team: {
+            code: result.dig(:manager, :team, :code),
+            description: result.dig(:manager, :team, :description),
+            local_delivery_unit: {
+              code: result.dig(:manager, :team, :localDeliveryUnit, :code),
+              description: result.dig(:manager, :team, :localDeliveryUnit, :description),
+            },
+          },
+          code: result.dig(:manager, :code),
+          name: {
+            forename: result.dig(:manager, :name, :forename),
+            middle_name: result.dig(:manager, :name, :middleName),
+            surname: result.dig(:manager, :name, :surname),
+          },
+          email: result.dig(:manager, :email)
+        },
+        mappa_level: result[:mappaLevel],
+        vlo_assigned: result[:vloAssigned]
+      }
+    rescue Faraday::ResourceNotFound
+      nil
+    end
+
   private
 
     def find_or_create_offenders(nomis_ids)

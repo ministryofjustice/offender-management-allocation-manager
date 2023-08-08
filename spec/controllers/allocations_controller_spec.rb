@@ -185,10 +185,11 @@ RSpec.describe AllocationsController, type: :controller do
         let(:create_time) { 3.days.ago }
         let(:create_date) { create_time.to_date }
         let(:yesterday) { 1.day.ago.to_date }
+        let(:mock_probation_record) { build :probation_record, :nil_ldu, offender_no: offender_no }
 
         before do
           stub_community_offender(offender_no, build(:community_data))
-          allow(OffenderService).to receive(:get_com).and_return({ 'name' => 'Jones, Ruth Mary', 'ldu_code' => nil, 'team_name' => nil })
+          allow(OffenderService).to receive(:get_probation_record).and_return(mock_probation_record)
         end
 
         context 'when create, delius, update' do

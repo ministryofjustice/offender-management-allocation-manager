@@ -58,6 +58,7 @@ module OffenderManagementAllocationClient
     config.complexity_api_host = ENV['COMPLEXITY_API_HOST']&.strip
     config.assessment_api_host = ENV['ASSESSMENT_API_HOST']&.strip
     config.assess_risks_and_needs_api_host = ENV['ASSESS_RISKS_AND_NEEDS_API_HOST']&.strip
+    config.manage_pom_cases_and_delius_host = ENV['MANAGE_POM_CASES_AND_DELIUS_HOST']&.strip
 
     config.hmpps_oauth_client_id = ENV['HMPPS_OAUTH_CLIENT_ID']&.strip
     config.hmpps_oauth_client_secret = ENV['HMPPS_OAUTH_CLIENT_SECRET']&.strip

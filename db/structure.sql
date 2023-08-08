@@ -168,7 +168,7 @@ CREATE TABLE public.case_information (
     ldu_code character varying,
     com_email character varying,
     active_vlo boolean DEFAULT false,
-    enhanced_resourcing boolean NOT NULL
+    enhanced_resourcing boolean
 );
 
 
@@ -611,8 +611,8 @@ ALTER SEQUENCE public.pom_details_id_seq OWNED BY public.pom_details.id;
 --
 
 CREATE TABLE public.prisons (
-    prison_type character varying NOT NULL,
     code character varying NOT NULL,
+    prison_type character varying NOT NULL,
     name character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -1316,6 +1316,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230602163929'),
 ('20230613125426'),
 ('20230712000001'),
-('20230712000002');
+('20230712000002'),
+('20230724141335');
 
 
