@@ -23,6 +23,7 @@ spec:
       labels:
         app: allocation-manager
     spec:
+      serviceAccountName: 'offender-management-allocation-manager'
       containers:
         - name: allocation-manager
           image: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/offender-management/offender-management-allocation-manager:latest
