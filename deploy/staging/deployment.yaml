@@ -57,6 +57,8 @@ spec:
                 name: allocation-manager-secrets
             - secretRef:
                 name: hmpps-auth-secrets
+            - secretRef:
+                name: domain-events
           env:
             - name: POSTGRES_HOST
               valueFrom:
