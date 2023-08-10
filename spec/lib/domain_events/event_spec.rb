@@ -136,4 +136,11 @@ RSpec.describe DomainEvents::Event do
       expect { invalid_event.publish(now: now) }.to raise_error(JSON::Schema::ValidationError, %r{#/version})
     end
   end
+
+  describe 'for events from other apps' do
+    it 'does not prefix offender-management. to the type' do
+      described_class.new(event_type: 'otherapp.test-domain.changed', version: 77, external_event: true).publish
+      expect(published_message.fetch('eventType')).to eq 'otherapp.test-domain.changed'
+    end
+  end
 end

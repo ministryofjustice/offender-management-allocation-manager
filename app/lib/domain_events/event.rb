@@ -6,8 +6,9 @@ class DomainEvents::Event
                  description: nil,
                  detail_url: nil,
                  additional_information: nil,
-                 noms_number: nil)
-    full_event_type = "#{EVENT_TYPE_PREFIX}#{event_type}"
+                 noms_number: nil,
+                 external_event: false)
+    full_event_type = external_event ? event_type : "#{EVENT_TYPE_PREFIX}#{event_type}"
 
     @noms_number = noms_number
     @short_event_type = event_type
@@ -28,6 +29,8 @@ class DomainEvents::Event
       'personReference' => noms_number ? { 'identifiers' => [{ 'type' => 'NOMS', 'value' => noms_number }] } : nil,
     }.compact
   end
+
+  attr_reader :noms_number, :message
 
   def publish(now: Time.zone.now.utc, job: nil)
     full_message = @message.merge('occurredAt' => now.iso8601)
