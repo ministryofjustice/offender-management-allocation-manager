@@ -55,6 +55,8 @@ gem 'wicked'
 gem 'rails-i18n'
 gem 'business_time'
 gem 'matrix' # App does not use it directly but it has to be explicitly declared otherwise build breaks
+gem 'shoryuken', '~> 6.0'
+gem 'aws-sdk-sqs', '~> 1.55'
 
 gem 'activeadmin'
 
