@@ -4,10 +4,10 @@ class DomainEventsConsumer
   shoryuken_options queue: ENV.fetch('DOMAIN_EVENTS_SQS_QUEUE_NAME', 'undefined'), auto_delete: true
 
   def perform(sqs_msg, sns_msg_raw)
-    Rails.logger.info "event=domain_event_consume_start,sqs_message_id=#{sqs_msg.message_id}"
+    Shoryuken::Logging.logger.info "event=domain_event_consume_start,sqs_message_id=#{sqs_msg.message_id}"
     begin
       sns_msg = ActiveSupport::JSON.decode(sns_msg_raw)
-      Rails.logger.info "event=domain_event_consume_decoded,sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}|#{ActiveSupport::JSON.encode(sns_msg)}"
+      Shoryuken::Logging.logger.info "event=domain_event_consume_decoded,sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}|#{ActiveSupport::JSON.encode(sns_msg)}"
       event_raw = ActiveSupport::JSON.decode(sns_msg.fetch('Message'))
       event = DomainEvents::Event.new(
         event_type: event_raw.fetch('eventType'),
@@ -19,15 +19,20 @@ class DomainEventsConsumer
         external_event: true,
       )
       consume(event)
-      Rails.logger.info "event=domain_event_consume_success,sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}"
+      Shoryuken::Logging.logger.info "event=domain_event_consume_success,sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}"
     rescue StandardError
-      Rails.logger.info "event=domain_event_consume_error|raw_sqs_msg: #{sqs_msg.inspect}, sns_msg_raw: #{sns_msg_raw.inspect}"
+      Shoryuken::Logging.logger.info "event=domain_event_consume_error|raw_sqs_msg: #{sqs_msg.inspect}, sns_msg_raw: #{sns_msg_raw.inspect}"
       raise
     end
   end
 
-  def consume(_message)
-    # TODO: some way to add hooks to be called based on event types received
+  def consume(event)
+    handler_class_str = Rails.configuration.domain_event_handlers[event.event_type]
+    return unless handler_class_str
+
+    handler_class = handler_class_str.constantize
+    handler = handler_class.new
+    handler.handle(event)
   end
 
 private

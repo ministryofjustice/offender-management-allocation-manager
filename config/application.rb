@@ -94,5 +94,7 @@ module OffenderManagementAllocationClient
     ]
 
     config.action_mailer.observers = %w[MailPublishAuditEventObserver]
+
+    config.domain_event_handlers = {}
   end
 end

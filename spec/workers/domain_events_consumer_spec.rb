@@ -1,15 +1,12 @@
 RSpec.describe DomainEventsConsumer do
-  let(:consumer) do
-    consumer = described_class.new
-    consumer.class_eval do
-      attr_accessor :consumed_event
+  subject(:consumer) { described_class.new }
 
-      def consume(event)
-        self.consumed_event = event
-      end
-    end
+  before(:all) do # rubocop:disable RSpec/BeforeAfterAll
+    Rails.configuration.domain_event_handlers['testapp.domain.action'] = 'DomainEventTestHandler'
+  end
 
-    consumer
+  before do
+    DomainEventTestHandler.clear_handled_events
   end
 
   it 'processes a full domain event' do
@@ -43,7 +40,8 @@ RSpec.describe DomainEventsConsumer do
     }.to_json
 
     consumer.perform(sqs_msg, sns_msg_raw)
-    event = consumer.consumed_event
+    event = DomainEventTestHandler.handled_events.fetch(0)
+
     aggregate_failures do
       expect(event.noms_number).to eq 'X1111XX'
       expect(event.message['eventType']).to eq 'testapp.domain.action'
@@ -78,17 +76,9 @@ RSpec.describe DomainEventsConsumer do
       'UnsubscribeURL' => '',
     }.to_json
 
-    consumer = described_class.new
-    consumer.class_eval do
-      attr_accessor :consumed_event
-
-      def consume(event)
-        self.consumed_event = event
-      end
-    end
-
     consumer.perform(sqs_msg, sns_msg_raw)
-    event = consumer.consumed_event
+    event = DomainEventTestHandler.handled_events.fetch(0)
+
     aggregate_failures do
       expect(event.noms_number).to eq nil
       expect(event.message['eventType']).to eq 'testapp.domain.action'
@@ -97,5 +87,21 @@ RSpec.describe DomainEventsConsumer do
       expect(event.message['description']).to eq nil
       expect(event.message['detailUrl']).to eq nil
     end
+  end
+
+  it 'does not handle unsupported events' do
+    sqs_msg = instance_double(Shoryuken::Message, message_id: 'sqs_msg_id')
+    sns_msg_raw = {
+      'Type' => 'Notification',
+      'MessageId' => 'sns_msg_id',
+      'Message' => {
+        'eventType' => 'testapp.domain.unsupported-action',
+        'version' => '1',
+        'occurredAt' => '2023-08-10T12:15:30.598418329',
+      }.to_json,
+    }.to_json
+
+    consumer.perform(sqs_msg, sns_msg_raw)
+    expect(DomainEventTestHandler.handled_events).to eq []
   end
 end
