@@ -32,6 +32,22 @@ class DomainEvents::Event
 
   attr_reader :noms_number, :message
 
+  def event_type
+    @message.fetch('eventType')
+  end
+
+  def additional_information
+    @message['additionalInformation']
+  end
+
+  def description
+    @message['description']
+  end
+
+  def detail_url
+    @message['detailUrl']
+  end
+
   def publish(now: Time.zone.now.utc, job: nil)
     full_message = @message.merge('occurredAt' => now.iso8601)
     self.class.json_validate!(full_message)

@@ -1,6 +1,15 @@
 RSpec.describe DomainEvents::Event do
   subject(:basic_event) { described_class.new(event_type: 'test-domain.changed', version: 77) }
 
+  let(:full_event) do
+    described_class.new(event_type: 'test-domain.full-event',
+                        version: 8,
+                        noms_number: 'X1111XX',
+                        additional_information: { 'key1' => 'value1' },
+                        description: 'event_description',
+                        detail_url: 'https://example.com/event_detail_url')
+  end
+
   let(:now) { Time.new(2022, 6, 16, 15, 1, 44, 'Z') }
   let(:mock_env) { { 'DOMAIN_EVENTS_TOPIC_ARN' => topic_arn } }
   let(:aws_region) { "xx-regn-1" }
@@ -141,6 +150,32 @@ RSpec.describe DomainEvents::Event do
     it 'does not prefix offender-management. to the type' do
       described_class.new(event_type: 'otherapp.test-domain.changed', version: 77, external_event: true).publish
       expect(published_message.fetch('eventType')).to eq 'otherapp.test-domain.changed'
+    end
+  end
+
+  describe 'interface' do
+    it 'has #noms_number', :aggregate_failures do
+      expect(basic_event.noms_number).to eq nil
+      expect(full_event.noms_number).to eq 'X1111XX'
+    end
+
+    it 'has #event_type' do
+      expect(full_event.event_type).to eq 'offender-management.test-domain.full-event'
+    end
+
+    it 'has #additional_information', :aggregate_failures do
+      expect(basic_event.additional_information).to eq nil
+      expect(full_event.additional_information).to eq({ 'key1' => 'value1' })
+    end
+
+    it 'has #description', :aggregate_failures do
+      expect(basic_event.description).to eq nil
+      expect(full_event.description).to eq('event_description')
+    end
+
+    it 'has #detail_url', :aggregate_failures do
+      expect(basic_event.detail_url).to eq nil
+      expect(full_event.detail_url).to eq('https://example.com/event_detail_url')
     end
   end
 end
