@@ -4,6 +4,8 @@ module Api
   class ApiController < ApplicationController
     before_action :verify_token
 
+    API_ROLE = 'ROLE_VIEW_POM_ALLOCATIONS'
+
     def index
       render json: { status: 'ok' }
     end
@@ -22,7 +24,7 @@ module Api
       access_token = parse_access_token(request.headers['AUTHORIZATION'])
 
       token = HmppsApi::Oauth::Token.new(access_token: access_token)
-      unless token.valid_token_with_scope?('read')
+      unless token.valid_token_with_scope?('read', role: API_ROLE)
         render_error('Valid authorisation token required')
       end
     end
