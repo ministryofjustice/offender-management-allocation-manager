@@ -51,7 +51,7 @@ class SsoIdentity
   end
 
   def allowed?
-    roles.include?('ROLE_ALLOC_MGR') || roles.include?('ROLE_ALLOC_CASE_MGR')
+    roles.include?(SPO_ROLE) || roles.include?(POM_ROLE)
   end
 
   def session_expired?
