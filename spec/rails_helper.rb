@@ -146,3 +146,5 @@ FactoryBot.define do
     "T#{number}A#{letter}"
   end
 end
+
+Shoryuken::Logging.logger = Rails.logger
