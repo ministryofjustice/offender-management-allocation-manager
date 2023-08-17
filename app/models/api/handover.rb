@@ -23,7 +23,7 @@ class Api::Handover
   end
 
   def handover_start_date
-    (handover_date == @db_model.start_date) ? nil : @db_model.start_date
+    @db_model.start_date
   end
 
   def responsibility
@@ -38,7 +38,7 @@ class Api::Handover
     {
       'nomsNumber' => noms_number,
       'handoverDate' => handover_date.iso8601,
-      'handoverStartDate' => handover_start_date&.iso8601,
+      'handoverStartDate' => handover_start_date.iso8601,
       'responsibility' => responsibility,
     }.compact
   end

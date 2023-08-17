@@ -34,14 +34,15 @@ RSpec.describe Api::Handover do
     end
 
     describe 'when no handover window' do
-      it 'has no handover start date' do
-        expect(handover.handover_start_date).to eq nil
+      it 'handover start date is same as handover date' do
+        expect(handover.handover_start_date).to eq handover.handover_date
       end
 
       it 'serialises to JSON' do
         expect(handover.as_json).to eq({
           'nomsNumber' => nomis_offender_id,
           'handoverDate' => '2021-02-01',
+          'handoverStartDate' => '2021-02-01',
           'responsibility' => 'POM',
         })
       end
