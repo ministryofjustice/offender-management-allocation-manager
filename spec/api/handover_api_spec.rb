@@ -44,6 +44,7 @@ describe 'Handover API', vcr: { cassette_name: 'prison_api/handover_api' } do
           let(:body) do
             {
               'nomsNumber' => nomsNumber,
+              'handoverStartDate' => '2021-12-01',
               'handoverDate' => '2021-12-01',
               'responsibility' => 'COM'
             }
