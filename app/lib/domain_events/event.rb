@@ -6,8 +6,9 @@ class DomainEvents::Event
                  description: nil,
                  detail_url: nil,
                  additional_information: nil,
-                 noms_number: nil)
-    full_event_type = "#{EVENT_TYPE_PREFIX}#{event_type}"
+                 noms_number: nil,
+                 external_event: false)
+    full_event_type = external_event ? event_type : "#{EVENT_TYPE_PREFIX}#{event_type}"
 
     @noms_number = noms_number
     @short_event_type = event_type
@@ -27,6 +28,24 @@ class DomainEvents::Event
       'additionalInformation' => additional_information,
       'personReference' => noms_number ? { 'identifiers' => [{ 'type' => 'NOMS', 'value' => noms_number }] } : nil,
     }.compact
+  end
+
+  attr_reader :noms_number, :message
+
+  def event_type
+    @message.fetch('eventType')
+  end
+
+  def additional_information
+    @message['additionalInformation']
+  end
+
+  def description
+    @message['description']
+  end
+
+  def detail_url
+    @message['detailUrl']
   end
 
   def publish(now: Time.zone.now.utc, job: nil)
