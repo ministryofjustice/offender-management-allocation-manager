@@ -124,6 +124,40 @@ RSpec.describe MpcOffender, type: :model do
     end
   end
 
+  describe '#prison_timeline' do
+    context 'when API returns a value' do
+      before do
+        allow(HmppsApi::PrisonTimelineApi).to receive(:get_prison_timeline).and_return(timeline)
+      end
+
+      let(:timeline) { {} }
+
+      it 'returns nil' do
+        expect(subject.prison_timeline).to eq(timeline)
+      end
+    end
+
+    context 'when API returns 404' do
+      before do
+        allow(HmppsApi::PrisonTimelineApi).to receive(:get_prison_timeline).and_raise(Faraday::ResourceNotFound.new(nil))
+      end
+
+      it 'returns nil' do
+        expect(subject.prison_timeline).to eq(nil)
+      end
+    end
+
+    context 'when API returns 500' do
+      before do
+        allow(HmppsApi::PrisonTimelineApi).to receive(:get_prison_timeline).and_raise(Faraday::ServerError.new(nil))
+      end
+
+      it 'returns nil' do
+        expect(subject.prison_timeline).to eq(nil)
+      end
+    end
+  end
+
   describe '#rosh_summary' do
     before do
       allow_any_instance_of(described_class).to receive(:crn).and_return('ABC123')
