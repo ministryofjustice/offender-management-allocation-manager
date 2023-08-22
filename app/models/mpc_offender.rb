@@ -178,9 +178,9 @@ class MpcOffender
   def prison_timeline
     @prison_timeline ||= HmppsApi::PrisonTimelineApi.get_prison_timeline(offender_no)
 
-  # Temp fix while Prison API prison timeline sometimes returns 500
+  # Temp fix while Prison API prison timeline sometimes returns 500 and 404
   # for some offenders
-  rescue Faraday::ServerError
+  rescue Faraday::ServerError, Faraday::ResourceNotFound
     nil
   end
 
