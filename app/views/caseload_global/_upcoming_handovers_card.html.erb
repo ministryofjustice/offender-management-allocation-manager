@@ -5,7 +5,7 @@
 
 <div class="card--caseload card-total">
   <% if local_assigns[:with_link] %>
-    <%= link_to information, upcoming_prison_handovers_path(@prison.code, pom: 1), class: 'govuk-link--no-visited-state' %>
+    <%= link_to information, upcoming_prison_handovers_path(@prison.code, pom: 'user'), class: 'govuk-link--no-visited-state' %>
   <% else %>
     <%= information %>
   <% end %>

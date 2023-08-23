@@ -22,7 +22,7 @@ module HandoverHelper
 
   def handover_tab_navigation_link(action, title, pom_view)
     link_params = {}
-    link_params[:pom] = '1' if pom_view
+    link_params[:pom] = 'user' if pom_view
     url = send("#{action}_prison_handovers_path", link_params)
     aria = (controller.action_name == action) ? { current: 'page' } : nil
     link_to title, url,
