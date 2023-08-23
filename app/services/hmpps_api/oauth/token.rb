@@ -33,8 +33,6 @@ module HmppsApi
         return false unless payload['scope'].include? scope
 
         if role && !payload.fetch('authorities', []).include?(role)
-          Rails.logger = Logger.new($stdout) if Rails.env.production?
-
           Rails.logger.error(
             "event=api_access_blocked,token_user_name=#{payload['user_name']},token_client_id=" \
             "#{payload['client_id']},missing_role=#{role}|API access blocked due to missing role"
