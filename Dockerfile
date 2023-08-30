@@ -14,6 +14,7 @@ RUN mkdir -p /home/appuser && \
 
 RUN \
   set -ex \
+  && mkdir -p /etc/apt/keyrings \
   && apt-get update \
   && apt-get full-upgrade -y --no-install-recommends \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends locales \
@@ -40,6 +41,8 @@ RUN \
     postgresql-client \
     libjemalloc-dev \
     unzip \
+    ca-certificates \
+    gnupg \
   && timedatectl set-timezone Europe/London || true \
   && gem install bundler -v 2.2.29 --no-document \
   && apt-get clean
@@ -53,10 +56,15 @@ RUN \
   && /tmp/awscliv2/aws/install
 
 # Install Node.js and Yarn
-RUN (curl -fsSL https://deb.nodesource.com/setup_16.x | bash -) \
+RUN set -ex ; \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | \
+        gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" | \
+        tee /etc/apt/sources.list.d/nodesource_nodejs16.list \
+    && apt-get update \
     && apt-get install -y nodejs \
-    && npm --global install yarn \
-    && apt-get clean
+    && apt-get clean \
+    && npm --global install yarn
 
 # Highly cachable layers. These statements are rarely expected to invalidate the cache.
 
