@@ -17,10 +17,19 @@ class PomsController < PrisonStaffApplicationController
     @tab = params[:tab] || 'overview'
     @prison_id = @prison.code
     pom_allocations_summary
-    @upcoming_handovers = filtered_handover_cases(@handover_cases.upcoming)
-    @in_progress_handovers = filtered_handover_cases(@handover_cases.in_progress)
-    @overdue_tasks = filtered_handover_cases(@handover_cases.overdue_tasks)
-    @overdue_com_allocations = filtered_handover_cases(@handover_cases.com_allocation_overdue)
+
+    if @tab == 'handover'
+      @upcoming_handovers = sort_and_paginate(@handover_cases.upcoming)
+      @in_progress_handovers = sort_and_paginate(@handover_cases.in_progress)
+      @overdue_tasks = sort_and_paginate(@handover_cases.overdue_tasks)
+      @overdue_com_allocations = sort_and_paginate(@handover_cases.com_allocation_overdue)
+    else
+      @upcoming_handovers = @handover_cases.upcoming
+      @in_progress_handovers = @handover_cases.in_progress
+      @overdue_tasks = @handover_cases.overdue_tasks
+      @overdue_com_allocations = @handover_cases.com_allocation_overdue
+    end
+
     @pom_view = true
   end
 

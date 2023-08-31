@@ -5,18 +5,75 @@ feature "staff pages" do
     let(:prison) { create(:prison) }
     let(:pom) { build(:pom) }
     let(:prison_poms) { build_list(:pom, 8, :prison_officer, status: 'inactive') }
+    let(:offender_count) { 6 }
 
     let(:offenders_in_prison) do
-      build_list(:nomis_offender, 14,
+      build_list(:nomis_offender, offender_count,
                  prisonId: prison.code,
                  category: attributes_for(:offender_category),
                  sentence: attributes_for(:sentence_detail))
     end
 
+    let(:handover_cases) do
+      sneaky_instance_double(Handover::CategorisedHandoverCasesForPom, upcoming: [],
+                                                                       in_progress: [],
+                                                                       overdue_tasks: [],
+                                                                       com_allocation_overdue: [])
+    end
+
+    let(:offender_attrs) do
+      {
+        full_name: 'Surname1, Firstname1',
+        last_name: 'Surname1',
+        offender_no: 'X1111XX',
+        tier: 'A',
+        handover_progress_task_completion_data: {},
+        allocated_com_email: nil,
+        allocated_com_name: nil,
+        ldu_name: nil,
+        ldu_email_address: nil,
+        handover_progress_complete?: false,
+        case_information: double(enhanced_handover?: false),
+        handover_type: 'enhanced',
+        earliest_release_for_handover: { name: 'Bobbins', date: Time.zone.today + 100 }
+      }
+    end
+
+    let(:offender) { sneaky_instance_double AllocatedOffender, **offender_attrs }
+
     before do
       stub_signin_spo pom, [prison.code]
       stub_offenders_for_prison(prison.code, offenders_in_prison)
       stub_poms(prison.code, (prison_poms + [pom]))
+
+      offenders_in_prison.each do |offender|
+        nomis_offender_id = offender[:prisonerNumber]
+
+        create(
+          :allocation_history,
+          :primary,
+          prison: prison.code,
+          nomis_offender_id: nomis_offender_id,
+          primary_pom_nomis_id: pom.staff_id,
+          recommended_pom_type: 'prison'
+        )
+
+        create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
+      end
+
+      # We need couple of handovers to fully test these pages (handover count is shown)
+      allow_any_instance_of(Handover::CategorisedHandoverCases).to receive(:in_progress).and_return(
+        [
+          Handover::HandoverCase.new(
+            offender,
+            CalculatedHandoverDate.new(nomis_offender_id: 'X1111XX', handover_date: Time.zone.today + 5)
+          ),
+          Handover::HandoverCase.new(
+            offender,
+            CalculatedHandoverDate.new(nomis_offender_id: 'X1111XX', handover_date: Time.zone.today + 5)
+          )
+        ]
+      )
 
       visit prison_pom_path(prison.code, pom.staff_id)
     end
@@ -55,6 +112,15 @@ feature "staff pages" do
         # We're already on this tab
         it "has a heading" do
           expect(page).to have_css('h3', text: 'All cases')
+        end
+
+        it 'has a list of cases' do
+          expect(page).to have_css('#all-cases .govuk-table__body .govuk-table__row', count: offender_count)
+        end
+
+        it 'can sort' do
+          # To regression test a sorting bug Aug 2023
+          find('#all-cases a', text: 'Role').click
         end
       end
 
