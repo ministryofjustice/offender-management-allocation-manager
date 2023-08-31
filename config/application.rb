@@ -96,7 +96,8 @@ module OffenderManagementAllocationClient
     config.action_mailer.observers = %w[MailPublishAuditEventObserver]
 
     config.domain_event_handlers = {
-      'offender-management.noop' => 'DomainEvents::Handlers::NoopHandler'
+      'offender-management.noop' => 'DomainEvents::Handlers::NoopHandler',
+      'prisoner-offender-search.prisoner.updated' => 'DomainEvents::Handlers::PrisonerUpdatedHandler',
     }
   end
 end
