@@ -1,2 +1,4 @@
-# Feature Flags # super simple, and they work
+# Feature Flags - super simple, they are just constants - it works
 # USE_FEATURE = ENV.fetch('USE_FEATURE', '').strip == '1'
+
+ENABLE_EVENT_BASED_HANDOVER_CALCULATION = ENV.fetch('ENABLE_EVENT_BASED_HANDOVER_CALCULATION', '').strip == '1'
