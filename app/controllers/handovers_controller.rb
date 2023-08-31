@@ -8,19 +8,19 @@ class HandoversController < PrisonsApplicationController
   before_action :check_prerequisites_and_prepare_variables
 
   def upcoming
-    @filtered_handover_cases = filtered_handover_cases(@handover_cases.upcoming)
+    @filtered_handover_cases = sort_and_paginate(@handover_cases.upcoming)
   end
 
   def in_progress
-    @filtered_handover_cases = filtered_handover_cases(@handover_cases.in_progress)
+    @filtered_handover_cases = sort_and_paginate(@handover_cases.in_progress)
   end
 
   def overdue_tasks
-    @filtered_handover_cases = filtered_handover_cases(@handover_cases.overdue_tasks)
+    @filtered_handover_cases = sort_and_paginate(@handover_cases.overdue_tasks)
   end
 
   def com_allocation_overdue
-    @filtered_handover_cases = filtered_handover_cases(@handover_cases.com_allocation_overdue)
+    @filtered_handover_cases = sort_and_paginate(@handover_cases.com_allocation_overdue)
   end
 
 private
