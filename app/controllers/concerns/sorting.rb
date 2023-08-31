@@ -17,12 +17,10 @@ module Sorting
 private
 
   def sort_with_public_send(items, field, direction)
-    if field.nil?
-      items
-    else
-      items.sort do |x, y|
-        compare_via_public_send field, direction, x, y
-      end
+    return items if field.nil?
+
+    items.sort do |x, y|
+      compare_via_public_send field, direction, x, y
     end
   end
 

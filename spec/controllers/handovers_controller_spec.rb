@@ -22,7 +22,7 @@ RSpec.describe HandoversController, type: :controller do
     allow(controller).to receive_messages(current_user_is_pom?: current_user_is_pom_stub,
                                           current_user_is_spo?: current_user_is_spo_stub,
                                           page: page)
-    allow(controller).to receive(:filtered_handover_cases) { |arg| arg }
+    allow(controller).to receive(:sort_and_paginate) { |arg| arg }
   end
 
   shared_examples 'handover cases list page' do |case_type|
