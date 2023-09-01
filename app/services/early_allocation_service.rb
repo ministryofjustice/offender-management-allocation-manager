@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class EarlyAllocationEventService
+class EarlyAllocationService
   class << self
     def send_early_allocation(early_allocation_status)
       sns_topic.publish(

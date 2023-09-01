@@ -171,7 +171,7 @@ class MpcOffender
                   end
     if calc_status.changed?
       calc_status.save!
-      EarlyAllocationEventService.send_early_allocation(calc_status)
+      EarlyAllocationService.send_early_allocation(calc_status)
     end
   end
 

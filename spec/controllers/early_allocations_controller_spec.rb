@@ -109,7 +109,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
       before do
         create(:calculated_early_allocation_status, nomis_offender_id: nomis_offender_id, eligible: false)
-        allow(EarlyAllocationEventService).to receive(:sns_topic).and_return(topic)
+        allow(EarlyAllocationService).to receive(:sns_topic).and_return(topic)
       end
 
       it 'updates the updated_by_ fields' do

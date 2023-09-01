@@ -1,4 +1,4 @@
-describe EarlyAllocationEventService do
+describe EarlyAllocationService do
   let!(:calc_status) { create(:calculated_early_allocation_status, eligible: true) }
 
   # Stub AWS SNS client
