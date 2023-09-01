@@ -163,18 +163,6 @@ class MpcOffender
     end
   end
 
-  def trigger_early_allocation_event
-    calc_status = if @offender.calculated_early_allocation_status.present?
-                    @offender.calculated_early_allocation_status.tap { |ea| ea.assign_attributes(eligible: early_allocation?) }
-                  else
-                    @offender.build_calculated_early_allocation_status(eligible: early_allocation?)
-                  end
-    if calc_status.changed?
-      calc_status.save!
-      EarlyAllocationService.send_early_allocation(calc_status)
-    end
-  end
-
   def prison_timeline
     @prison_timeline ||= HmppsApi::PrisonTimelineApi.get_prison_timeline(offender_no)
 

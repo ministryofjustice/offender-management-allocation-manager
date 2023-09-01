@@ -29,6 +29,16 @@ class EarlyAllocationService
       )
     end
 
+    def process_eligibility_change(offender)
+      ea_status = CalculatedEarlyAllocationStatus.find_or_initialize_by(nomis_offender_id: offender.nomis_offender_id)
+      ea_status.eligible = offender.early_allocation?
+
+      if ea_status.changed?
+        ea_status.save!
+        send_early_allocation(ea_status)
+      end
+    end
+
   private
 
     def sns_topic

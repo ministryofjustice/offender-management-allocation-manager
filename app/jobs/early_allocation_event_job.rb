@@ -3,6 +3,6 @@ class EarlyAllocationEventJob < ApplicationJob
 
   def perform(offender_id)
     offender = OffenderService.get_offender(offender_id)
-    offender.trigger_early_allocation_event unless offender.nil?
+    EarlyAllocationService.process_eligibility_change(offender) unless offender.nil?
   end
 end

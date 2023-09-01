@@ -21,6 +21,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
   let(:offender) { build(:nomis_offender, prisonId: prison, sentence: attributes_for(:sentence_detail, sentenceStartDate: Time.zone.today - 9.months,  conditionalReleaseDate: release_date)) }
   let!(:db_offender) { Offender.find_or_create_by!(nomis_offender_id: nomis_offender_id) }
+  let!(:case_info) { create(:case_information, offender: db_offender) }
   let(:nomis_offender_id) { offender.fetch(:prisonerNumber) }
   let(:mpc_offender) { OffenderService.get_offender(nomis_offender_id) }
 
@@ -40,7 +41,6 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   end
 
   context 'with some assessments' do
-    let(:case_info) { create(:case_information, offender: db_offender) }
     let!(:early_allocations) do
       # Create 5 Early Allocation records with different creation dates
       [
@@ -112,12 +112,12 @@ RSpec.describe EarlyAllocationsController, type: :controller do
       let(:early_allocation) { assigns(:early_allocation) }
       let(:early_allocation_datum) { CalculatedEarlyAllocationStatus.find(nomis_offender_id) }
 
-      it 'updates the updated_by_ fields' do
+      it 'updates the updated_by_ fields and processes the eligibility change' do
         put :update, params: { prison_id: prison, prisoner_id: nomis_offender_id, early_allocation: { community_decision: true } }
         aggregate_failures do
           expect(early_allocation.updated_by_firstname).to eq(first_pom.firstName)
           expect(early_allocation.updated_by_lastname).to eq(first_pom.lastName)
-          expect(EarlyAllocationService).to have_received(:process_eligibility_change).with(mock_offender)
+          expect(EarlyAllocationService).to have_received(:process_eligibility_change).with(mpc_offender)
         end
       end
     end
@@ -128,7 +128,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
     context 'with no ldu email address' do
       before do
-        create(:case_information, offender: db_offender, local_delivery_unit: nil)
+        mpc_offender.model.case_information.update!(local_delivery_unit: nil)
       end
 
       it 'goes to the dead end' do
@@ -141,10 +141,6 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   end
 
   describe '#create', :disable_early_allocation_event do
-    before do
-      create(:case_information, offender: db_offender)
-    end
-
     context 'when on eligible screen' do
       let(:eligible_params) do
         { "oasys_risk_assessment_date" => valid_date,
