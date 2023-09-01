@@ -20,21 +20,27 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   end
 
   let(:offender) { build(:nomis_offender, prisonId: prison, sentence: attributes_for(:sentence_detail, sentenceStartDate: Time.zone.today - 9.months,  conditionalReleaseDate: release_date)) }
-
+  let!(:db_offender) { Offender.find_or_create_by!(nomis_offender_id: nomis_offender_id) }
   let(:nomis_offender_id) { offender.fetch(:prisonerNumber) }
+  let(:mpc_offender) { OffenderService.get_offender(nomis_offender_id) }
 
   before do
     stub_signed_in_pom(prison, first_pom.staffId)
     stub_pom(first_pom)
 
     stub_offender(offender)
+    mpc_offender # Use above API stubs to return a valid MpcOffender for let(:mpc_offender)
+    allow(OffenderService).to receive(:get_offender).and_raise(NotImplementedError)
+    allow(OffenderService).to receive(:get_offender).with(nomis_offender_id).and_return(mpc_offender)
+
     stub_poms(prison, poms)
     stub_offenders_for_prison(prison, [offender])
+    allow(EarlyAllocationService).to receive(:process_eligibility_change)
     create(:allocation_history, prison: prison, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
   end
 
   context 'with some assessments' do
-    let(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
+    let(:case_info) { create(:case_information, offender: db_offender) }
     let!(:early_allocations) do
       # Create 5 Early Allocation records with different creation dates
       [
@@ -104,37 +110,14 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
     describe '#update' do
       let(:early_allocation) { assigns(:early_allocation) }
-      let(:topic) { double("topic", publish: nil) }
       let(:early_allocation_datum) { CalculatedEarlyAllocationStatus.find(nomis_offender_id) }
-
-      before do
-        create(:calculated_early_allocation_status, nomis_offender_id: nomis_offender_id, eligible: false)
-        allow(EarlyAllocationService).to receive(:sns_topic).and_return(topic)
-      end
 
       it 'updates the updated_by_ fields' do
         put :update, params: { prison_id: prison, prisoner_id: nomis_offender_id, early_allocation: { community_decision: true } }
         aggregate_failures do
           expect(early_allocation.updated_by_firstname).to eq(first_pom.firstName)
           expect(early_allocation.updated_by_lastname).to eq(first_pom.lastName)
-
-          expect(topic).to have_received(:publish).with(
-            message: { offenderNo: nomis_offender_id, eligibilityStatus: true }.to_json,
-            message_attributes: hash_including(
-              eventType: {
-                string_value: 'community-early-allocation-eligibility.status.changed',
-                data_type: 'String',
-              },
-              version: {
-                string_value: 1.to_s,
-                data_type: 'Number',
-              },
-              detailURL: {
-                string_value: "http://localhost:3000/api/offenders/#{nomis_offender_id}",
-                data_type: 'String',
-              }
-            )
-          )
+          expect(EarlyAllocationService).to have_received(:process_eligibility_change).with(mock_offender)
         end
       end
     end
@@ -145,7 +128,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
     context 'with no ldu email address' do
       before do
-        create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), local_delivery_unit: nil)
+        create(:case_information, offender: db_offender, local_delivery_unit: nil)
       end
 
       it 'goes to the dead end' do
@@ -159,7 +142,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
   describe '#create', :disable_early_allocation_event do
     before do
-      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
+      create(:case_information, offender: db_offender)
     end
 
     context 'when on eligible screen' do
