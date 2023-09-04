@@ -1,4 +1,8 @@
 describe EarlyAllocationService do
+  before do
+    stub_const('ENABLE_EVENT_BASED_HANDOVER_CALCULATION', true)
+  end
+
   describe '::send_early_allocation' do
     let!(:calc_status) { create(:calculated_early_allocation_status, eligible: true) }
 
@@ -44,6 +48,8 @@ describe EarlyAllocationService do
 
     before do
       allow(described_class).to receive(:send_early_allocation)
+      allow(RecalculateHandoverDateJob).to receive(:perform_now)
+      expect(RecalculateHandoverDateJob).not_to receive(:perform_later)
     end
 
     describe 'when status has never been calculated before' do
@@ -58,6 +64,10 @@ describe EarlyAllocationService do
       it 'publishes event' do
         expect(described_class).to have_received(:send_early_allocation)
                                      .with(offender_model.reload.calculated_early_allocation_status)
+      end
+
+      it 'invokes job to recalculate handover date in case that changed too' do
+        expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id)
       end
     end
 
@@ -75,6 +85,10 @@ describe EarlyAllocationService do
         expect(described_class).to have_received(:send_early_allocation)
                                      .with(offender_model.reload.calculated_early_allocation_status)
       end
+
+      it 'invokes job to recalculate handover date in case that changed too' do
+        expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id)
+      end
     end
 
     describe 'when status did not change' do
@@ -85,6 +99,10 @@ describe EarlyAllocationService do
 
       it 'does not publish event' do
         expect(described_class).not_to have_received(:send_early_allocation)
+      end
+
+      it 'does not invoke job to recalculate handover date' do
+        expect(RecalculateHandoverDateJob).not_to have_received(:perform_now)
       end
     end
   end

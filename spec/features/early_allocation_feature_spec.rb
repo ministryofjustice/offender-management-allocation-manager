@@ -32,6 +32,10 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
     visit prison_staff_caseload_cases_path(prison, nomis_staff_id)
 
     allow_any_instance_of(MpcOffender).to receive_messages(handover_type: 'enhanced')
+    allow(EarlyAllocationService).to receive(:send_early_allocation)
+    allow(RecalculateHandoverDateJob).to receive(:perform_now)
+    allow(RecalculateHandoverDateJob).to receive(:perform_later)
+    stub_const('ENABLE_EVENT_BASED_HANDOVER_CALCULATION', true)
 
     # assert that our setup created a caseload record
     expect(page.text).to match(/Showing 1 to 1 of 1 results/)
@@ -125,6 +129,10 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
             # Can view the assessment
             click_link 'View assessment'
             expect(page).to have_text 'View previous early allocation assessment'
+
+            expect(EarlyAllocationService).to have_received(:send_early_allocation).with(
+              CalculatedEarlyAllocationStatus.find_by_nomis_offender_id(nomis_offender_id))
+            expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id)
           end
 
           scenario 'displaying the PDF' do

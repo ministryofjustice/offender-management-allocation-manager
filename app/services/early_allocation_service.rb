@@ -36,6 +36,7 @@ class EarlyAllocationService
       if ea_status.changed?
         ea_status.save!
         send_early_allocation(ea_status)
+        RecalculateHandoverDateJob.perform_now(offender.nomis_offender_id) if ENABLE_EVENT_BASED_HANDOVER_CALCULATION
       end
     end
 
