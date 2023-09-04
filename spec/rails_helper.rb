@@ -47,7 +47,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each, :disable_early_allocation_event) do
-    allow(EarlyAllocationEventService).to receive(:send_early_allocation)
+    allow(EarlyAllocationService).to receive(:send_early_allocation)
   end
 
   config.before(:each) do

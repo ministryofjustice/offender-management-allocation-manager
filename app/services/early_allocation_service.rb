@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-class EarlyAllocationEventService
+class EarlyAllocationService
   class << self
     def send_early_allocation(early_allocation_status)
-      sns_topic&.publish(
+      sns_topic.publish(
         message: {
           offenderNo: early_allocation_status.nomis_offender_id,
           eligibilityStatus: early_allocation_status.eligible,
@@ -29,19 +29,21 @@ class EarlyAllocationEventService
       )
     end
 
+    def process_eligibility_change(offender)
+      ea_status = CalculatedEarlyAllocationStatus.find_or_initialize_by(nomis_offender_id: offender.nomis_offender_id)
+      ea_status.eligible = offender.early_allocation?
+
+      if ea_status.changed?
+        ea_status.save!
+        send_early_allocation(ea_status)
+        RecalculateHandoverDateJob.perform_now(offender.nomis_offender_id) if ENABLE_EVENT_BASED_HANDOVER_CALCULATION
+      end
+    end
+
   private
 
-    # storing the topic like this will make it used across threads. Hopefully it's thread-safe
-    # :nocov:
     def sns_topic
-      @sns_topic ||= if sns_topic_arn.present?
-                       Aws::SNS::Resource.new(region: 'eu-west-2').topic(sns_topic_arn)
-                     end
+      DomainEvents::Event.sns_topic
     end
-
-    def sns_topic_arn
-      ENV['DOMAIN_EVENTS_TOPIC_ARN']
-    end
-    # :nocov:
   end
 end
