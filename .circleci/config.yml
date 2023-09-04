@@ -106,33 +106,19 @@ references:
 version: 2.1
 
 orbs:
-  browser-tools: circleci/browser-tools@1.1.3
+  browser-tools: circleci/browser-tools@1.4.4
   aws-cli: circleci/aws-cli@2.0.3
 
 commands:
   install_firefox:
     description: Install Firefox and Geckodriver
     steps:
+      - browser-tools/install-firefox
+      - browser-tools/install-geckodriver
       - run:
-          name: Ensure local bin directory exists
-          command: mkdir -p ~/.local/bin
-      - browser-tools/install-firefox:
-          install-dir: /home/circleci/.local/bin
-      - run:
-          name: Firefox post-install tasks
+          name: Check install
           command: |
-            # If a new Firefox binary was installed
-            if [ -e /usr/local/bin/firefox ]; then
-              # Move Firefox symlink to the local bin (so it gets persisted to cache)
-              sudo mv /usr/local/bin/firefox ~/.local/bin/firefox
-              # Change ownership of Firefox (since this is the circleci user's bin directory)
-              sudo chown -hR circleci:circleci ~/.local/bin/firefox*
-            fi
-
-            # Remove old Firefox installations (all but the most recent)
-            ls -trd ~/.local/bin/firefox-* | head -n -1 | xargs --no-run-if-empty rm -r
-      - browser-tools/install-geckodriver:
-          install-dir: /home/circleci/.local/bin
+            firefox --version
 
 jobs:
   noop:
