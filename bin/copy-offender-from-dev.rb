@@ -15,12 +15,12 @@ end
 OffenderService.get_offender(nomis_offender_id)
 offender = Offender.find(nomis_offender_id)
 
-dev_data_json = `kubectl -n offender-management-staging exec -qit service/allocation-manager -- bin/rails r '
+dev_data_json = `kubectl -n offender-management-staging exec -qi service/allocation-manager -- bin/rails r '
   Rails.logger.level = Logger::ERROR;
   ci = CaseInformation.find_by(nomis_offender_id: "#{nomis_offender_id}").attributes;
   chd = CalculatedHandoverDate.find_by(nomis_offender_id: "#{nomis_offender_id}").attributes;
   puts({"case_information" => ci, "calc_handover_date" => chd}.to_json)
-'`
+' 2>/dev/null`
 
 raise 'case_information already exists' if offender.case_information
 raise 'calculated_handover_date already exists' if offender.calculated_handover_date
