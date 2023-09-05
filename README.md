@@ -82,6 +82,37 @@ The first time you run the specs you'll need to record the VCR cassettes:
 VCR=1 bundle exec rspec
 ```
 
+## Localstack
+
+If you want to locally test functionality with AWS services, you have to use a tool called Localstack to emulate it. If
+you are not testing the use of AWS locally, you do not have to do this - the vast majority of the application functions
+without having to talk to AWS.
+
+Install it:
+
+    brew install localstack/tap/localstack-cli
+
+Start it:
+
+    localstack start
+
+Configure a fake local profile. Enter anything (e.g. `fake`) for the key ID and access key. Enter `eu-west-2` for
+region, and `json` for output:
+
+    aws configure --profile local
+
+Copy the localstack lines from `.env.example` into your `.env` file (search for 'localstack' in .env.example)
+
+Create the domain events SNS topic:
+
+    PAGER= AWS_PROFILE=local aws --endpoint-url=http://localhost:4566 sns create-topic --name domain-events
+
+Test it in a bin/rails console:
+
+DomainEvents::Event.new(event_type: "noop", version: 1).publish
+
+If no errors are shown, it works!
+
 ## Secrets
 
 Secrets are stored in the `secret/allocation-manager-secrets` item in each K8s namespace.
