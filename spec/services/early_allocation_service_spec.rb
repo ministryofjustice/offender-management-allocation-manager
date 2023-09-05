@@ -69,6 +69,11 @@ describe EarlyAllocationService do
       it 'invokes job to recalculate handover date in case that changed too' do
         expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id)
       end
+
+      it 'audits the change', :aggregate_failures do
+        expect(AuditEvent.tags('early_allocation', 'eligibility_updated').count).to eq 1
+        expect(AuditEvent.first.data).to eq({ 'before' => { 'eligible' => nil }, 'after' => { 'eligible' => true } })
+      end
     end
 
     describe 'when status has changed' do
@@ -89,6 +94,11 @@ describe EarlyAllocationService do
       it 'invokes job to recalculate handover date in case that changed too' do
         expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id)
       end
+
+      it 'audits the change', :aggregate_failures do
+        expect(AuditEvent.tags('early_allocation', 'eligibility_updated').count).to eq 1
+        expect(AuditEvent.first.data).to eq({ 'before' => { 'eligible' => false }, 'after' => { 'eligible' => true } })
+      end
     end
 
     describe 'when status did not change' do
@@ -103,6 +113,10 @@ describe EarlyAllocationService do
 
       it 'does not invoke job to recalculate handover date' do
         expect(RecalculateHandoverDateJob).not_to have_received(:perform_now)
+      end
+
+      it 'does not audit anything' do
+        expect(AuditEvent.count).to eq 0
       end
     end
   end
