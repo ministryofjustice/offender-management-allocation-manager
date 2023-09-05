@@ -34,8 +34,20 @@ class EarlyAllocationService
       ea_status.eligible = offender.early_allocation?
 
       if ea_status.changed?
+        changes = ea_status.changes.fetch('eligible')
         ea_status.save!
-        send_early_allocation(ea_status)
+        AuditEvent.transaction do
+          send_early_allocation(ea_status)
+          AuditEvent.publish(
+            nomis_offender_id: offender.nomis_offender_id,
+            tags: %w[early_allocation eligibility_updated],
+            system_event: true,
+            data: {
+              'before' => { 'eligible' => changes[0] },
+              'after' => { 'eligible' => changes[1] },
+            }
+          )
+        end
         RecalculateHandoverDateJob.perform_now(offender.nomis_offender_id) if ENABLE_EVENT_BASED_HANDOVER_CALCULATION
       end
     end
