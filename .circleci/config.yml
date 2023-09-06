@@ -29,7 +29,7 @@ references:
         environment:
           POSTGRES_USER: ubuntu
           POSTGRES_PASSWORD: ""
-          POSTGRES_DB: offender-management-allocation-manager_test
+          POSTGRES_DB: offender-management_test
       - image: cimg/redis:7.0
 
   configure_k8s: &configure_k8s
@@ -61,18 +61,14 @@ references:
     run:
       name: Build allocation-manager docker image - quick mode
       command: |
-        set -euo pipefail
-        env_name="${K8S_NAMESPACE#offender-management-}"
-        . ~/env/"${env_name}"-ecr-secrets.sh
-
+        set -xeuo pipefail
         export BUILD_DATE=$(date -Is) >> $BASH_ENV
         source $BASH_ENV
 
-        ecr_host="$(echo "${ECR_ENDPOINT}" | cut -f1 -d/)"
-        aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "${ecr_host}"
-        
-        docker pull "${ECR_ENDPOINT}:latest"
-        docker tag "${ECR_ENDPOINT}:latest" offender-management-allocation-manager:latest
+        docker login --username "${QUAYIO_USERNAME}" --password "${QUAYIO_PASSWORD}" quay.io
+
+        docker pull "${QUAYIO_REPO}:latest"
+        docker tag "${QUAYIO_REPO}:latest" offender-management:latest
 
         docker build \
           --build-arg VERSION_NUMBER=${CIRCLE_BUILD_NUM} \
@@ -86,22 +82,16 @@ references:
     run:
       name: Push allocation-manager docker image
       command: |
-        set -euo pipefail
-        env_name="${K8S_NAMESPACE#offender-management-}"
-        . ~/env/"${env_name}"-ecr-secrets.sh
-
-        set -x # doing -x earlier displays sensitive credentials
-        ecr_host="$(echo "${ECR_ENDPOINT}" | cut -f1 -d/)"
-        aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "${ecr_host}"
-        docker tag app "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
-        docker push "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
+        set -xeuo pipefail
+        docker login --username "${QUAYIO_USERNAME}" --password "${QUAYIO_PASSWORD}" quay.io
+        docker tag app "${QUAYIO_REPO}:${CIRCLE_SHA1}"
+        docker push "${QUAYIO_REPO}:${CIRCLE_SHA1}"
         if [ "${CIRCLE_BRANCH}" == "main" ]; then
-          docker tag app "${ECR_ENDPOINT}:latest"
-          docker push "${ECR_ENDPOINT}:latest"
+          docker tag app "${QUAYIO_REPO}:latest"
+          docker push "${QUAYIO_REPO}:latest"
         fi
       environment:
         <<: *github_team_name_slug
-        REPONAME: offender-management-allocation-manager
 
 version: 2.1
 
@@ -199,13 +189,6 @@ jobs:
 
             apk add jq
 
-            kubectl -n "${K8S_NAMESPACE}" get secrets ecr-repo-allocation-manager -o json > /tmp/ecr-secrets.json
-            > ~/env/"${env_name}"-ecr-secrets.sh
-            echo "export AWS_ACCESS_KEY_ID='$(jq -r .data.access_key_id /tmp/ecr-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-ecr-secrets.sh
-            echo "export AWS_SECRET_ACCESS_KEY='$(jq -r .data.secret_access_key /tmp/ecr-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-ecr-secrets.sh
-            echo "export ECR_ENDPOINT='$(jq -r .data.repo_url /tmp/ecr-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-ecr-secrets.sh
-            rm /tmp/ecr-secrets.json
-            
             kubectl -n "${K8S_NAMESPACE}" get secrets hmpps-auth-secrets -o json > /tmp/hmpps-secrets.json
             > ~/env/"${env_name}"-hmpps-secrets.sh
             echo "export HMPPS_API_CLIENT_ID='$(jq -r .data.HMPPS_API_CLIENT_ID /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
@@ -342,11 +325,7 @@ workflows:
 
   test_env:
     jobs:
-      - fetch_secrets:
-          filters: { branches: { only: [test] } }
-          context: [offender-management-shared, offender-management-test]
       - build_and_push_docker_image:
-          requires: [fetch_secrets]
           filters: { branches: { only: [test] } }
           context: [offender-management-shared, offender-management-test]
       - deploy:
@@ -356,11 +335,7 @@ workflows:
 
   test2_env:
     jobs:
-      - fetch_secrets:
-          filters: { branches: { only: [test2] } }
-          context: [offender-management-shared, offender-management-test2]
       - build_and_push_docker_image:
-          requires: [fetch_secrets]
           filters: { branches: { only: [test2] } }
           context: [offender-management-shared, offender-management-test2]
       - deploy:
@@ -370,11 +345,7 @@ workflows:
 
   preprod:
     jobs:
-      - fetch_secrets:
-          filters: { branches: { only: [preprod] } }
-          context: [offender-management-shared, offender-management-preprod]
       - build_and_push_docker_image:
-          requires: [fetch_secrets]
           filters: { branches: { only: [preprod] } }
           context: [offender-management-shared, offender-management-preprod]
       - deploy:
@@ -391,7 +362,7 @@ workflows:
           context: [offender-management-shared, offender-management-staging]
 
       - build_and_push_docker_image:
-          requires: [install_dependencies, fetch_secrets]
+          requires: [install_dependencies]
           filters: { branches: { only: [staging] } }
           context: [offender-management-shared, offender-management-staging]
       - rubocop:
@@ -412,19 +383,18 @@ workflows:
       - install_dependencies:
           filters: { branches: { only: [main] } }
       - fetch_secrets:
-          name: 'fetch_staging_secrets'
           filters: { branches: { only: [main] } }
           context: [offender-management-shared, offender-management-staging]
 
       - build_and_push_docker_image:
-          requires: [install_dependencies, fetch_staging_secrets]
+          requires: [install_dependencies]
           filters: { branches: { only: [main] } }
           context: [offender-management-shared, offender-management-staging]
       - rubocop:
           requires: [install_dependencies]
           filters: { branches: { only: [main] } }
       - test:
-          requires: [install_dependencies, fetch_staging_secrets]
+          requires: [install_dependencies, fetch_secrets]
           filters: { branches: { only: [main] } }
           context: [offender-management-shared, offender-management-staging]
 

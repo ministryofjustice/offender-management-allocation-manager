@@ -75,7 +75,10 @@ class DomainEvents::Event
     unless @sns_topic
       topic_arn = ENV.fetch('DOMAIN_EVENTS_TOPIC_ARN')
       aws_region = extract_region(topic_arn)
-      @sns_topic = Aws::SNS::Resource.new(region: aws_region).topic(topic_arn)
+      localstack_url = ENV['LOCALSTACK_URL']
+      client = Aws::SNS::Client.new(endpoint: localstack_url, region: aws_region) if localstack_url
+      resource_params = { region: aws_region, client: client }.compact
+      @sns_topic = Aws::SNS::Resource.new(**resource_params).topic(topic_arn)
     end
 
     @sns_topic
