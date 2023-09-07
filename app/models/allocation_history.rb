@@ -43,7 +43,9 @@ class AllocationHistory < ApplicationRecord
   scope :active_pom_allocations, lambda { |nomis_staff_id, prison|
     secondaries = where(secondary_pom_nomis_id: nomis_staff_id)
 
-    where(primary_pom_nomis_id: nomis_staff_id).or(secondaries).where(prison: prison)
+    where(primary_pom_nomis_id: nomis_staff_id).or(secondaries)
+    .where.not(primary_pom_nomis_id: nil)
+    .where(prison: prison)
   }
 
   scope :active_allocations_for_prison, ->(prison) { where.not(primary_pom_nomis_id: nil).where(prison: prison) }
