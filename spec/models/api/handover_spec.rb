@@ -73,13 +73,18 @@ RSpec.describe Api::Handover do
     end
   end
 
-  describe 'when the DB model has no handover date' do
+  describe 'when the DB model has no handover dates' do
     before do
-      allow(db_handover_model).to receive_messages(handover_date: nil)
+      allow(db_handover_model).to receive_messages(handover_date: nil, start_date: nil)
     end
 
-    it 'the constructor returns nil' do
-      expect(handover).to eq nil
+    it 'responds with nil for those fields' do
+      expect(handover.as_json).to eq({
+        'nomsNumber' => nomis_offender_id,
+        'handoverDate' => nil,
+        'handoverStartDate' => nil,
+        'responsibility' => 'POM',
+      })
     end
   end
 

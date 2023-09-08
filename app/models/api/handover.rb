@@ -7,7 +7,7 @@ class Api::Handover
 
   def self.[](noms_number)
     db_model = CalculatedHandoverDate.find_by_nomis_offender_id(noms_number)
-    if db_model && db_model.handover_date && db_model.responsibility
+    if db_model && db_model.responsibility
       new(db_model)
     else
       nil
@@ -37,9 +37,9 @@ class Api::Handover
   def as_json
     {
       'nomsNumber' => noms_number,
-      'handoverDate' => handover_date.iso8601,
-      'handoverStartDate' => handover_start_date.iso8601,
+      'handoverDate' => handover_date&.iso8601,
+      'handoverStartDate' => handover_start_date&.iso8601,
       'responsibility' => responsibility,
-    }.compact
+    }
   end
 end
