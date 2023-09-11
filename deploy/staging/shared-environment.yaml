@@ -8,7 +8,7 @@ data:
   RAILS_SERVE_STATIC_FILES: "true"
   RAILS_WEB_CONCURRENCY: "5"
   SENTRY_CURRENT_ENV: "staging"
-  PRISON_API_HOST: "https://api-dev.prison.service.justice.gov.uk"
+  PRISON_API_HOST: "https://prison-api-dev.prison.service.justice.gov.uk"
   PRISONER_SEARCH_HOST: "https://prisoner-offender-search-dev.prison.service.justice.gov.uk"
   COMMUNITY_API_HOST: "https://community-api-secure.test.delius.probation.hmpps.dsd.io"
   COMPLEXITY_API_HOST: "https://complexity-of-need-staging.hmpps.service.justice.gov.uk"
