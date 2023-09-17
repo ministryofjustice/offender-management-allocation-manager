@@ -1,5 +1,0 @@
-#!/bin/bash
-
-set -euo pipefail
-
-bundle exec shoryuken start --rails --concurrency=1 --queues "${DOMAIN_EVENTS_SQS_QUEUE_NAME}"
