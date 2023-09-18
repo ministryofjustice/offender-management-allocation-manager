@@ -74,7 +74,7 @@ class DomainEvents::Event
   def self.sns_topic
     unless @sns_topic
       topic_arn = ENV.fetch('DOMAIN_EVENTS_TOPIC_ARN')
-      aws_region = extract_region(topic_arn)
+      aws_region = Utils::AwsUtils.extract_region_from_arn(topic_arn)
       localstack_url = ENV['LOCALSTACK_URL']
       client = Aws::SNS::Client.new(endpoint: localstack_url, region: aws_region) if localstack_url
       resource_params = { region: aws_region, client: client }.compact
@@ -82,13 +82,6 @@ class DomainEvents::Event
     end
 
     @sns_topic
-  end
-
-  def self.extract_region(topic_arn)
-    matches = /\Aarn:aws:sns:([a-z0-9-]+):/.match(topic_arn)
-    raise ArgumentError, "bad topic #{topic_arn}" unless matches
-
-    matches[1]
   end
 
   def self.json_validate!(data)

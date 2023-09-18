@@ -92,9 +92,9 @@ Install it:
 
     brew install localstack/tap/localstack-cli
 
-Start it:
+Start it in the background:
 
-    localstack start
+    localstack start -d
 
 Configure a fake local profile. Enter anything (e.g. `fake`) for the key ID and access key. Enter `eu-west-2` for
 region, and `json` for output:
@@ -103,15 +103,20 @@ region, and `json` for output:
 
 Copy the localstack lines from `.env.example` into your `.env` file (search for 'localstack' in .env.example)
 
-Create the domain events SNS topic:
+Create the domain events SNS topic and SQS queue and its subscription to the former:
 
     PAGER= AWS_PROFILE=local aws --endpoint-url=http://localhost:4566 sns create-topic --name domain-events
+    PAGER= AWS_PROFILE=local aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name domain-events
+
+Start the consumer in another terminal/tab:
+
+    bin/rake shoryuken:start
 
 Test it in a bin/rails console:
 
-DomainEvents::Event.new(event_type: "noop", version: 1).publish
+    DomainEvents::Event.new(event_type: "noop", version: 1).publish
 
-If no errors are shown, it works!
+If no exceptions are raised, it works.
 
 ## Secrets
 
