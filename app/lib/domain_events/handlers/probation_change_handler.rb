@@ -14,16 +14,13 @@ module DomainEvents
 
         return unless registration_event_types.include?(event.additional_information['registerTypeCode'])
 
-        offender_no = to_offender_no(event.crn_number)
-        Shoryuken::Logging.logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type},nomis_offender_id=#{offender_no}"
-        ProcessDeliusDataJob.perform_now offender_no
-        Shoryuken::Logging.logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type},nomis_offender_id=#{offender_no}"
+        Shoryuken::Logging.logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
+        ProcessDeliusDataJob.perform_now(event.crn_number, identifier_type: :crn)
+        Shoryuken::Logging.logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
       end
 
-      def to_offender_no(_crn)
-        # Pending EITHER NOMIS offender no. being added to the events OR an endpoint
-        # to convert CRN to NOMIS offender no. being added
-        'FIXME'
+      def handle_tier_change(event)
+        _tier_info = HmppsApi::TieringApi.get_calculation(event.crn_number, event.additional_information['calculationId'])
       end
     end
   end

@@ -269,6 +269,29 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
     end
   end
 
+  context 'when using CRN as the identifier' do
+    before do
+      stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
+      allow(OffenderService).to receive(:get_probation_record).with(crn).and_return(mock_probation_record)
+      allow(Rails.logger).to receive(:error)
+      described_class.perform_now(crn, identifier_type: :crn)
+    end
+
+    context 'when the probation record has a NOMIS offender ID' do
+      it 'does not log an error' do
+        expect(Rails.logger).not_to have_received(:error)
+      end
+    end
+
+    context 'when the probation record does not have a NOMIS offender ID' do
+      let(:nomis_offender_id) { nil }
+
+      it 'logs an error' do
+        expect(Rails.logger).to have_received(:error).once
+      end
+    end
+  end
+
   describe 'pushing handover dates into nDelius' do
     let(:offender) { build(:nomis_offender, prisonId: prison.code) }
     let(:offender_no) { offender.fetch(:prisonerNumber) }
