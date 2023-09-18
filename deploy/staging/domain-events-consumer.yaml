@@ -76,3 +76,16 @@ spec:
                 secretKeyRef:
                   name: hmpps-domain-events-topic
                   key: topic_arn
+        - name: domain-events-consumer-metrics
+          image: quay.io/hmpps/offender-management:latest
+          imagePullPolicy: Always
+          command: ['sh', '-c', "bundle exec prometheus_exporter --bind 0.0.0.0"]
+          ports:
+            - containerPort: 9394
+          resources:
+            limits:
+              memory: "200Mi"
+              cpu: "50m"
+            requests:
+              memory: "100Mi"
+              cpu: "10m"
