@@ -107,6 +107,7 @@ Create the domain events SNS topic and SQS queue and its subscription to the for
 
     PAGER= AWS_PROFILE=local aws --endpoint-url=http://localhost:4566 sns create-topic --name domain-events
     PAGER= AWS_PROFILE=local aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name domain-events
+    PAGER= AWS_PROFILE=local aws --endpoint-url=http://localhost:4566 sns subscribe --topic-arn arn:aws:sns:eu-west-2:000000000000:domain-events --protocol sqs --notification-endpoint arn:aws:sqs:eu-west-2:000000000000:domain-events
 
 Start the consumer in another terminal/tab:
 
@@ -116,7 +117,7 @@ Test it in a bin/rails console:
 
     DomainEvents::Event.new(event_type: "noop", version: 1).publish
 
-If no exceptions are raised, it works.
+If no exceptions are raised, check the output of the consumer in the other terminal. If you see output, it works.
 
 ## Secrets
 

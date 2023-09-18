@@ -1,5 +1,5 @@
-rails: true
 concurrency: 1
 pidfile: ./tmp/shoryuken.pid
 queues:
   - '<%= ENV.fetch('DOMAIN_EVENTS_SQS_QUEUE_NAME') %>'
+require: 'domain_events_consumer'

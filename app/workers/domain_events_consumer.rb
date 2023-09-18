@@ -7,7 +7,7 @@ class DomainEventsConsumer
     Shoryuken::Logging.logger.info "event=domain_event_consume_start,sqs_message_id=#{sqs_msg.message_id}"
     begin
       sns_msg = ActiveSupport::JSON.decode(sns_msg_raw)
-      Shoryuken::Logging.logger.info "event=domain_event_consume_decoded,sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}|#{ActiveSupport::JSON.encode(sns_msg)}"
+      Shoryuken::Logging.logger.info "event=domain_event_consume_decoded,sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}"
       event_raw = ActiveSupport::JSON.decode(sns_msg.fetch('Message'))
       event = DomainEvents::Event.new(
         event_type: event_raw.fetch('eventType'),
@@ -20,8 +20,8 @@ class DomainEventsConsumer
       )
       consume(event)
       Shoryuken::Logging.logger.info "event=domain_event_consume_success,sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}"
-    rescue StandardError
-      Shoryuken::Logging.logger.info "event=domain_event_consume_error|raw_sqs_msg: #{sqs_msg.inspect}, sns_msg_raw: #{sns_msg_raw.inspect}"
+    rescue StandardError => e
+      Shoryuken::Logging.logger.info "event=domain_event_consume_error|#{e.inspect},#{e.backtrace.join(',')}"
       raise
     end
   end
