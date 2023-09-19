@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
-
 RSpec.describe Offender, type: :model do
   let(:offender) { create(:offender) }
 
@@ -116,6 +114,11 @@ RSpec.describe Offender, type: :model do
     it 'is "missing" if no handover has been calculated yet' do
       offender.calculated_handover_date = nil
       expect(offender.handover_type).to eq 'missing'
+    end
+
+    it 'is "enhanced" if enhanced resourcing field from case information is missing' do
+      offender.case_information.enhanced_resourcing = nil
+      expect(offender.handover_type).to eq 'enhanced'
     end
 
     it 'is always "none" if sentence is short enough to be community responsible immediately' do
