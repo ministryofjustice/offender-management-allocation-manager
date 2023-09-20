@@ -121,10 +121,18 @@ RSpec.describe Offender, type: :model do
       expect(offender.handover_type).to eq 'enhanced'
     end
 
-    it 'is always "none" if sentence is short enough to be community responsible immediately' do
-      offender.case_information.enhanced_resourcing = true
-      offender.calculated_handover_date.reason = 'determinate_short'
-      expect(offender.handover_type).to eq 'none'
+    describe 'when sentence is short enough to be community responsible immediately' do
+      it 'is "none" regardless of enhanced resourcing' do
+        offender.case_information.enhanced_resourcing = true
+        offender.calculated_handover_date.reason = 'determinate_short'
+        expect(offender.handover_type).to eq 'none'
+      end
+
+      it 'is "none" even if enhanced resourcing field from case information is missing' do
+        offender.case_information.enhanced_resourcing = nil
+        offender.calculated_handover_date.reason = 'determinate_short'
+        expect(offender.handover_type).to eq 'none'
+      end
     end
 
     describe 'if sentence is not short enough to be community responsible immediately' do

@@ -48,11 +48,9 @@ class Offender < ApplicationRecord
   def handover_type
     if case_information.nil? || calculated_handover_date.nil?
       'missing'
-    elsif case_information.enhanced_resourcing.nil?
-      'enhanced'
     elsif calculated_handover_date.reason == 'determinate_short'
       'none'
-    elsif case_information.enhanced_resourcing?
+    elsif case_information.enhanced_resourcing.nil? || case_information.enhanced_resourcing?
       'enhanced'
     else
       'standard'
