@@ -33,7 +33,7 @@ RSpec.describe DomainEvents::Handlers::ProbationChangeHandler do
 
       it 'updates case information' do
         handler.handle(event)
-        expect(ProcessDeliusDataJob).to have_received(:perform_now).with('FIXME')
+        expect(ProcessDeliusDataJob).to have_received(:perform_now).with(crn, identifier_type: :crn)
       end
     end
 
