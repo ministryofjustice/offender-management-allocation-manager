@@ -46,4 +46,14 @@ RSpec.describe DomainEvents::Handlers::ProbationChangeHandler do
       end
     end
   end
+
+  context 'with event type OFFENDER_MANAGER_CHANGED' do
+    let(:event_type) { 'OFFENDER_MANAGER_CHANGED' }
+    let(:additional_information) { {} }
+
+    it 'updates case information' do
+      handler.handle(event)
+      expect(ProcessDeliusDataJob).to have_received(:perform_now).with(crn, identifier_type: :crn)
+    end
+  end
 end
