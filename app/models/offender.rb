@@ -45,6 +45,9 @@ class Offender < ApplicationRecord
     (handover_progress_checklist || build_handover_progress_checklist).task_completion_data
   end
 
+  # This logic follows the rules defined here: https://dsdmoj.atlassian.net/wiki/spaces/OCM/pages/4524311161/Handover+Type+Calculation
+  # Please first work through that document with a domain expert, make sure it is correct and readable, and then
+  # update this algorithm to reflect it. Direct changes here without keeping that doc in sync will not be appreciated.
   def handover_type
     if case_information.nil? || calculated_handover_date.nil?
       'missing'
