@@ -1,14 +1,14 @@
 module DomainEvents
   module Handlers
     class TierChangeHandler
-      def handle(event)
+      def handle(event, logger: Shoryuken::Logging.logger)
         return unless ENABLE_EVENT_BASED_PROBATION_CHANGE
 
-        Shoryuken::Logging.logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
+        logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
         case_info = CaseInformation.find_by_crn(event.crn_number)
 
         if case_info.nil?
-          Shoryuken::Logging.logger.error "event=domain_event_handle_failure,domain_event_type=#{event.event_type}," \
+          logger.error "event=domain_event_handle_failure,domain_event_type=#{event.event_type}," \
             "crn=#{event.crn_number}|Case information not found for this CRN"
 
           return
@@ -29,9 +29,9 @@ module DomainEvents
             }
           )
 
-          Shoryuken::Logging.logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
+          logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
         else
-          Shoryuken::Logging.logger.error "event=domain_event_handle_failure,domain_event_type=#{event.event_type}," \
+          logger.error "event=domain_event_handle_failure,domain_event_type=#{event.event_type}," \
             "crn=#{event.crn_number},new_tier=#{case_info.tier}"
         end
       end

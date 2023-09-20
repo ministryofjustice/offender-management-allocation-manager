@@ -26,20 +26,24 @@ private
     probation_record = OffenderService.get_probation_record(identifier)
 
     if probation_record.nil?
-      return logger.error(
+      logger.error(
         "#{identifier_type}=#{identifier},job=process_delius_data_job,event=missing_probation_record|" \
         'Failed to retrieve probation record'
       )
+
+      return
     end
 
     if identifier_type == :crn
       nomis_offender_id = probation_record.fetch(:noms_id)
 
       if nomis_offender_id.blank?
-        return logger.error(
+        logger.error(
           "crn=#{identifier},job=process_delius_data_job,event=missing_offender_id|" \
           'Probation record does not have a NOMIS ID'
         )
+
+        return
       end
     else
       nomis_offender_id = identifier
@@ -48,10 +52,12 @@ private
     offender = OffenderService.get_offender(nomis_offender_id)
 
     if offender.nil?
-      return logger.error(
+      logger.error(
         "nomis_offender_id=#{nomis_offender_id},job=process_delius_data_job,event=missing_offender_record|" \
         'Failed to retrieve NOMIS offender record'
       )
+
+      return
     end
 
     process_record(probation_record, nomis_offender_id) if offender.inside_omic_policy?

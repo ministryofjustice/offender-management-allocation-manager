@@ -28,7 +28,7 @@ class DomainEvents::Event
       'description' => description,
       'detailUrl' => detail_url,
       'additionalInformation' => additional_information,
-      'personReference' => presonal_reference
+      'personReference' => person_reference
     }.compact
   end
 
@@ -94,10 +94,11 @@ class DomainEvents::Event
 
 private
 
-  def presonal_reference
-    return { 'identifiers' => [{ 'type' => 'NOMS', 'value' => noms_number }] } if noms_number
-    return { 'identifiers' => [{ 'type' => 'CRN', 'value' => crn_number }] } if crn_number
+  def person_reference
+    identifiers = []
+    identifiers << { 'type' => 'NOMS', 'value' => noms_number } if noms_number
+    identifiers << { 'type' => 'CRN', 'value' => crn_number } if crn_number
 
-    nil
+    { 'identifiers' => identifiers } if identifiers.any?
   end
 end

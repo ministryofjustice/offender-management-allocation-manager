@@ -5,6 +5,7 @@ RSpec.describe DomainEvents::Event do
     described_class.new(event_type: 'test-domain.full-event',
                         version: 8,
                         noms_number: 'X1111XX',
+                        crn_number: 'X08769',
                         additional_information: { 'key1' => 'value1' },
                         description: 'event_description',
                         detail_url: 'https://example.com/event_detail_url')
@@ -98,7 +99,8 @@ RSpec.describe DomainEvents::Event do
                                   description: 'Test event',
                                   detail_url: 'https://example.com/r/1',
                                   additional_information: { 'dataA' => 'valueX' },
-                                  noms_number: 'X1111XX')
+                                  noms_number: 'X1111XX',
+                                  crn_number: 'X08769')
       event.publish(now: now, job: 'test_job')
     end
 
@@ -116,9 +118,12 @@ RSpec.describe DomainEvents::Event do
       expect(published_message.fetch('additionalInformation')).to eq('dataA' => 'valueX')
     end
 
-    it 'is published with the given NOMS number in the person reference' do
+    it 'is published with the given NOMS number and CRN in the person reference' do
       expect(published_message.fetch('personReference'))
-        .to eq('identifiers' => [{ 'type' => 'NOMS', 'value' => 'X1111XX' }])
+        .to eq('identifiers' => [
+          { 'type' => 'NOMS', 'value' => 'X1111XX' },
+          { 'type' => 'CRN', 'value' => 'X08769' }
+        ])
     end
 
     it 'produces an audit event when published with sensible tag names including job name, nomis_offender_id' do
@@ -157,6 +162,11 @@ RSpec.describe DomainEvents::Event do
     it 'has #noms_number', :aggregate_failures do
       expect(basic_event.noms_number).to eq nil
       expect(full_event.noms_number).to eq 'X1111XX'
+    end
+
+    it 'has #crn_number', :aggregate_failures do
+      expect(basic_event.crn_number).to eq nil
+      expect(full_event.crn_number).to eq 'X08769'
     end
 
     it 'has #event_type' do
