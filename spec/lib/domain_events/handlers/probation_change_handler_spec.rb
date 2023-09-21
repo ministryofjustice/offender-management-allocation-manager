@@ -2,9 +2,9 @@ RSpec.describe DomainEvents::Handlers::ProbationChangeHandler do
   subject!(:handler) { described_class.new }
 
   before do
-    stub_const('ENABLE_EVENT_BASED_PROBATION_CHANGE', true)
     allow(ProcessDeliusDataJob).to receive(:perform_now)
     expect(ProcessDeliusDataJob).not_to receive(:perform_later)
+    allow(Shoryuken::Logging.logger).to receive(:info).and_return(nil)
   end
 
   let(:event) do
@@ -21,39 +21,61 @@ RSpec.describe DomainEvents::Handlers::ProbationChangeHandler do
 
   let(:crn) { 'X08769' }
 
-  context 'with event type probation-case.registration.*' do
-    let(:event_type) { 'probation-case.registration.added' }
+  context 'when feature flag set' do
+    before { stub_const('ENABLE_EVENT_BASED_PROBATION_CHANGE', true) }
 
-    let(:additional_information) do
-      { 'registerTypeCode' => register_type }
+    context 'with event type probation-case.registration.*' do
+      let(:event_type) { 'probation-case.registration.added' }
+
+      let(:additional_information) do
+        { 'registerTypeCode' => register_type }
+      end
+
+      context 'with cases whose registration type includes MAPP, DASO, INVI' do
+        let(:register_type) { 'MAPP' }
+
+        it 'updates case information' do
+          handler.handle(event)
+          expect(ProcessDeliusDataJob).to have_received(:perform_now).with(crn, identifier_type: :crn)
+        end
+      end
+
+      context 'with cases whose registration type does not includes MAPP, DASO, INVI' do
+        let(:register_type) { 'BOBBINS' }
+
+        it 'does not update case information' do
+          handler.handle(event)
+          expect(ProcessDeliusDataJob).not_to have_received(:perform_now)
+        end
+      end
     end
 
-    context 'with cases whose registration type includes MAPP, DASO, INVI' do
-      let(:register_type) { 'MAPP' }
+    context 'with event type OFFENDER_MANAGER_CHANGED' do
+      let(:event_type) { 'OFFENDER_MANAGER_CHANGED' }
+      let(:additional_information) { {} }
 
       it 'updates case information' do
         handler.handle(event)
         expect(ProcessDeliusDataJob).to have_received(:perform_now).with(crn, identifier_type: :crn)
       end
     end
-
-    context 'with cases whose registration type does not includes MAPP, DASO, INVI' do
-      let(:register_type) { 'BOBBINS' }
-
-      it 'does not update case information' do
-        handler.handle(event)
-        expect(ProcessDeliusDataJob).not_to have_received(:perform_now).with('FIXME')
-      end
-    end
   end
 
-  context 'with event type OFFENDER_MANAGER_CHANGED' do
-    let(:event_type) { 'OFFENDER_MANAGER_CHANGED' }
+  context 'when feature flag not set' do
+    before do
+      stub_const('ENABLE_EVENT_BASED_PROBATION_CHANGE', false)
+      handler.handle(event)
+    end
+
+    let(:event_type) { 'probation-case.registration.added' }
     let(:additional_information) { {} }
 
-    it 'updates case information' do
-      handler.handle(event)
-      expect(ProcessDeliusDataJob).to have_received(:perform_now).with(crn, identifier_type: :crn)
+    it 'emits a skip log info message' do
+      expect(Shoryuken::Logging.logger).to have_received(:info).with(/domain_event_handle_skip/).once
+    end
+
+    it 'does not emit a start log info message' do
+      expect(Shoryuken::Logging.logger).not_to have_received(:info).with(/domain_event_handle_start/)
     end
   end
 end
