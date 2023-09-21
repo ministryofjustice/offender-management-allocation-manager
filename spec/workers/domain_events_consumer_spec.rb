@@ -22,10 +22,12 @@ RSpec.describe DomainEventsConsumer do
         'description' => 'test_description',
         'detailUrl' => 'https://example.com/detail',
         'occurredAt' => '2023-08-10T12:15:30.598418329',
-        'identifiers' => [
-          { 'type' => 'NOMS', 'value' => 'X1111XX' },
-          { 'type' => 'CRN', 'value' => 'CRN001' },
-        ],
+        'personReference' => {
+          'identifiers' => [
+            { 'type' => 'NOMS', 'value' => 'X1111XX' },
+            { 'type' => 'CRN', 'value' => 'CRN001' },
+          ]
+        }
       }.to_json,
       'MessageAttributes' => {
         'eventType' => {
