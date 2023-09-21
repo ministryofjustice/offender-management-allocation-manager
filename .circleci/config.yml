@@ -300,7 +300,7 @@ jobs:
             set -x
             shopt -s nullglob
             env_name="${K8S_NAMESPACE#offender-management-}"
-            sed -i -e "s/:latest/:${CIRCLE_SHA1}/" deploy/"${env_name}"/deployment.yaml deploy/"${env_name}"/domain-events-consumer.yaml deploy/"${env_name}"/cron-*.yaml
+            sed -i -e "s/:latest/:${CIRCLE_SHA1}/" deploy/"${env_name}"/deployment.yaml deploy/"${env_name}"/domain-events-consumer.yaml* deploy/"${env_name}"/cron-*.yaml
             kubectl -n "${K8S_NAMESPACE}" annotate deployments/allocation-manager kubernetes.io/change-cause="${CIRCLE_BUILD_URL}"
             kubectl apply --record=false -f ./deploy/"${env_name}"
 
