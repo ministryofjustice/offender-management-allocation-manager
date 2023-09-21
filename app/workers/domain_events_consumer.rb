@@ -16,7 +16,8 @@ class DomainEventsConsumer
         description: event_raw['description'],
         detail_url: event_raw['detailUrl'],
         additional_information: event_raw['additionalInformation'],
-        noms_number: extract_noms_number(event_raw),
+        noms_number: extract_identifier(event_raw, 'NOMS'),
+        crn_number: extract_identifier(event_raw, 'CRN'),
         external_event: true,
       )
       consume(event)
@@ -38,8 +39,8 @@ class DomainEventsConsumer
 
 private
 
-  def extract_noms_number(event_raw)
-    event_raw.fetch('identifiers', []).each { |i| return i.fetch('value') if i.fetch('type') == 'NOMS' }
+  def extract_identifier(event_raw, identifier_type)
+    event_raw.fetch('identifiers', []).each { |i| return i.fetch('value') if i.fetch('type') == identifier_type }
     nil
   end
 end

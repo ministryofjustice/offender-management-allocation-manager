@@ -24,6 +24,7 @@ RSpec.describe DomainEventsConsumer do
         'occurredAt' => '2023-08-10T12:15:30.598418329',
         'identifiers' => [
           { 'type' => 'NOMS', 'value' => 'X1111XX' },
+          { 'type' => 'CRN', 'value' => 'CRN001' },
         ],
       }.to_json,
       'MessageAttributes' => {
@@ -44,6 +45,7 @@ RSpec.describe DomainEventsConsumer do
 
     aggregate_failures do
       expect(event.noms_number).to eq 'X1111XX'
+      expect(event.crn_number).to eq 'CRN001'
       expect(event.message['eventType']).to eq 'testapp.domain.action'
       expect(event.message['additionalInformation']).to eq({ 'foo' => 'bar' })
       expect(event.message['version']).to eq '2'
