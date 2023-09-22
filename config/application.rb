@@ -97,7 +97,7 @@ module OffenderManagementAllocationClient
 
     config.domain_event_handlers = {
       'offender-management.noop' => 'DomainEvents::Handlers::NoopHandler',
-      'prisoner-offender-search.prisoner.updated' => 'DomainEvents::Handlers::PrisonerUpdatedHandler',
+      # 'prisoner-offender-search.prisoner.updated' => 'DomainEvents::Handlers::PrisonerUpdatedHandler',
     }
   end
 end
