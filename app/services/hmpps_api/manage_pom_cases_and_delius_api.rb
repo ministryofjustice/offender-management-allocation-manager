@@ -5,8 +5,8 @@ module HmppsApi
       HmppsApi::Client.new(host)
     end
 
-    def self.get_probation_record(offender_no)
-      route = "/case-records/#{offender_no}"
+    def self.get_probation_record(offender_no_or_crn)
+      route = "/case-records/#{offender_no_or_crn}"
       client.get(route)
     end
   end

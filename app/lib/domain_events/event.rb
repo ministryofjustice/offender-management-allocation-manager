@@ -7,10 +7,12 @@ class DomainEvents::Event
                  detail_url: nil,
                  additional_information: nil,
                  noms_number: nil,
+                 crn_number: nil,
                  external_event: false)
     full_event_type = external_event ? event_type : "#{EVENT_TYPE_PREFIX}#{event_type}"
 
     @noms_number = noms_number
+    @crn_number = crn_number
     @short_event_type = event_type
 
     @message_attributes = {
@@ -26,11 +28,11 @@ class DomainEvents::Event
       'description' => description,
       'detailUrl' => detail_url,
       'additionalInformation' => additional_information,
-      'personReference' => noms_number ? { 'identifiers' => [{ 'type' => 'NOMS', 'value' => noms_number }] } : nil,
+      'personReference' => person_reference
     }.compact
   end
 
-  attr_reader :noms_number, :message
+  attr_reader :noms_number, :crn_number, :message
 
   def event_type
     @message.fetch('eventType')
@@ -88,5 +90,15 @@ class DomainEvents::Event
     @schema ||= ActiveSupport::JSON.decode(File.read(Rails.root.join('config', 'domain_events_message_schema.json')))
 
     JSON::Validator.validate!(@schema, data)
+  end
+
+private
+
+  def person_reference
+    identifiers = []
+    identifiers << { 'type' => 'NOMS', 'value' => noms_number } if noms_number
+    identifiers << { 'type' => 'CRN', 'value' => crn_number } if crn_number
+
+    { 'identifiers' => identifiers } if identifiers.any?
   end
 end

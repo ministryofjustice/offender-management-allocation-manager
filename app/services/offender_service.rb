@@ -109,8 +109,8 @@ class OffenderService
       nil_details
     end
 
-    def get_probation_record(offender_no)
-      result = HmppsApi::ManagePomCasesAndDeliusApi.get_probation_record(offender_no).with_indifferent_access
+    def get_probation_record(offender_no_or_crn)
+      result = HmppsApi::ManagePomCasesAndDeliusApi.get_probation_record(offender_no_or_crn).with_indifferent_access
 
       {
         crn: result[:crn],

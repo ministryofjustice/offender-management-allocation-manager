@@ -59,6 +59,7 @@ module OffenderManagementAllocationClient
     config.assessment_api_host = ENV['ASSESSMENT_API_HOST']&.strip
     config.assess_risks_and_needs_api_host = ENV['ASSESS_RISKS_AND_NEEDS_API_HOST']&.strip
     config.manage_pom_cases_and_delius_host = ENV['MANAGE_POM_CASES_AND_DELIUS_HOST']&.strip
+    config.tiering_api_host = ENV['TIERING_API_HOST']&.strip
 
     config.hmpps_oauth_client_id = ENV['HMPPS_OAUTH_CLIENT_ID']&.strip
     config.hmpps_oauth_client_secret = ENV['HMPPS_OAUTH_CLIENT_SECRET']&.strip
@@ -96,8 +97,15 @@ module OffenderManagementAllocationClient
     config.action_mailer.observers = %w[MailPublishAuditEventObserver]
 
     config.domain_event_handlers = {
+      # event_type               => handler class (as a string)
       'offender-management.noop' => 'DomainEvents::Handlers::NoopHandler',
       'prisoner-offender-search.prisoner.updated' => 'DomainEvents::Handlers::PrisonerUpdatedHandler',
+      'probation-case.registration.added' => 'DomainEvents::Handlers::ProbationChangeHandler',
+      'probation-case.registration.deleted' => 'DomainEvents::Handlers::ProbationChangeHandler',
+      'probation-case.registration.deregistered' => 'DomainEvents::Handlers::ProbationChangeHandler',
+      'probation-case.registration.updated' => 'DomainEvents::Handlers::ProbationChangeHandler',
+      'tier.calculation.complete' => 'DomainEvents::Handlers::TierChangeHandler',
+      'OFFENDER_MANAGER_CHANGED' => 'DomainEvents::Handlers::ProbationChangeHandler',
     }
   end
 end
