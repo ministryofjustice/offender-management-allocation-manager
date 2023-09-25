@@ -2,6 +2,8 @@
 
 desc 'Recalculate handover dates for all known offenders, and push changes into nDelius'
 task recalculate_handover_dates: :environment do |_task|
+  next if ENABLE_EVENT_BASED_HANDOVER_CALCULATION
+
   Rails.logger = Logger.new($stdout) if Rails.env.production?
 
   Rails.logger.info('Queueing RecalculateHandoverDateJob for all offenders')
