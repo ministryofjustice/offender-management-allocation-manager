@@ -18,10 +18,10 @@ RSpec.describe DomainEventsConsumer do
       'Message' => {
         'eventType' => 'testapp.domain.action',
         'additionalInformation' => { 'foo' => 'bar' },
-        'version' => '2',
+        'version' => 2,
         'description' => 'test_description',
         'detailUrl' => 'https://example.com/detail',
-        'occurredAt' => '2023-08-10T12:15:30.598418329',
+        'occurredAt' => '2023-08-10T12:15:30.59Z',
         'personReference' => {
           'identifiers' => [
             { 'type' => 'NOMS', 'value' => 'X1111XX' },
@@ -50,7 +50,7 @@ RSpec.describe DomainEventsConsumer do
       expect(event.crn_number).to eq 'CRN001'
       expect(event.message['eventType']).to eq 'testapp.domain.action'
       expect(event.message['additionalInformation']).to eq({ 'foo' => 'bar' })
-      expect(event.message['version']).to eq '2'
+      expect(event.message['version']).to eq 2
       expect(event.message['description']).to eq 'test_description'
       expect(event.message['detailUrl']).to eq 'https://example.com/detail'
     end
@@ -64,8 +64,8 @@ RSpec.describe DomainEventsConsumer do
       'TopicArn' => 'arn:::::',
       'Message' => {
         'eventType' => 'testapp.domain.action',
-        'version' => '3',
-        'occurredAt' => '2023-08-10T12:15:30.598418329',
+        'version' => 3,
+        'occurredAt' => '2023-08-10T12:15:30.59Z',
       }.to_json,
       'MessageAttributes' => {
         'eventType' => {
@@ -87,7 +87,7 @@ RSpec.describe DomainEventsConsumer do
       expect(event.noms_number).to eq nil
       expect(event.message['eventType']).to eq 'testapp.domain.action'
       expect(event.message['additionalInformation']).to eq(nil)
-      expect(event.message['version']).to eq '3'
+      expect(event.message['version']).to eq 3
       expect(event.message['description']).to eq nil
       expect(event.message['detailUrl']).to eq nil
     end
@@ -100,12 +100,27 @@ RSpec.describe DomainEventsConsumer do
       'MessageId' => 'sns_msg_id',
       'Message' => {
         'eventType' => 'testapp.domain.unsupported-action',
-        'version' => '1',
-        'occurredAt' => '2023-08-10T12:15:30.598418329',
+        'version' => 1,
+        'occurredAt' => '2023-08-10T12:15:30.59Z',
       }.to_json,
     }.to_json
 
     consumer.perform(sqs_msg, sns_msg_raw)
+    expect(DomainEventTestHandler.handled_events).to eq []
+  end
+
+  it 'skips events if they have no eventType' do
+    sqs_msg = instance_double(Shoryuken::Message, message_id: 'sqs_msg_id')
+    sns_msg_raw = {
+      'Type' => 'Notification',
+      'MessageId' => 'sns_msg_id',
+      'Message' => {
+        'version' => 1,
+        'occurredAt' => '2023-08-10T12:15:30.59Z',
+      }.to_json,
+    }.to_json
+
+    expect { consumer.perform(sqs_msg, sns_msg_raw) }.not_to raise_error
     expect(DomainEventTestHandler.handled_events).to eq []
   end
 end
