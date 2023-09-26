@@ -8,6 +8,13 @@ class DomainEventsConsumer
     begin
       sns_msg = ActiveSupport::JSON.decode(sns_msg_raw)
       event_raw = ActiveSupport::JSON.decode(sns_msg.fetch('Message'))
+
+      if event_raw['eventType'].blank?
+        Shoryuken::Logging.logger.info('event=domain_event_consume_skip,reason=missing_event_type' \
+                                       "sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}")
+        return
+      end
+
       Shoryuken::Logging.logger.info "event=domain_event_consume_decoded,sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}," \
                                      "event_type=#{event_raw['eventType']}"
       event = DomainEvents::Event.new(
@@ -24,7 +31,8 @@ class DomainEventsConsumer
       Shoryuken::Logging.logger.info "event=domain_event_consume_success,sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}," \
                                      "event_type=#{event_raw['eventType']}"
     rescue StandardError => e
-      Shoryuken::Logging.logger.info "event=domain_event_consume_error|#{e.inspect},#{e.backtrace.join(',')}"
+      Shoryuken::Logging.logger.info 'event=domain_event_consume_error,reason=exception|' \
+                                     "#{e.inspect},#{e.backtrace.join(',')}"
       raise
     end
   end
