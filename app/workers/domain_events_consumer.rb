@@ -10,7 +10,7 @@ class DomainEventsConsumer
       event_raw = ActiveSupport::JSON.decode(sns_msg.fetch('Message'))
 
       if event_raw['eventType'].blank?
-        Shoryuken::Logging.logger.info('event=domain_event_consume_skip,reason=missing_event_type' \
+        Shoryuken::Logging.logger.info('event=domain_event_consume_skip,reason=missing_event_type,' \
                                        "sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}")
         return
       end
