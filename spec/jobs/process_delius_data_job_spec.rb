@@ -78,6 +78,11 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       described_class.perform_now nomis_offender_id
       expect(audit_event.data).to eq(expected_data)
     end
+
+    it 'includes the word batch in the tags' do
+      described_class.perform_now nomis_offender_id
+      expect(audit_event.tags).to include('batch')
+    end
   end
 
   context 'when case_information not present' do

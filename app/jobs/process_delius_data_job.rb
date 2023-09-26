@@ -12,17 +12,18 @@ class ProcessDeliusDataJob < ApplicationJob
   include ApplicationHelper
 
   # identifier_type can be :nomis_offender_id (default), or :crn
-  def perform(identifier, identifier_type: :nomis_offender_id)
+  # trigger_method can be :batch (default), or :event
+  def perform(identifier, identifier_type: :nomis_offender_id, trigger_method: :batch)
     ApplicationRecord.transaction do
       logger.info("#{identifier_type}=#{identifier},job=process_delius_data_job,event=started")
-      import_data(identifier, identifier_type: identifier_type)
+      import_data(identifier, identifier_type, trigger_method)
       logger.info("#{identifier_type}=#{identifier},job=process_delius_data_job,event=finished")
     end
   end
 
 private
 
-  def import_data(identifier, identifier_type:)
+  def import_data(identifier, identifier_type, trigger_method)
     probation_record = OffenderService.get_probation_record(identifier)
 
     if probation_record.nil?
@@ -60,10 +61,10 @@ private
       return
     end
 
-    process_record(probation_record, nomis_offender_id) if offender.inside_omic_policy?
+    process_record(probation_record, nomis_offender_id, trigger_method) if offender.inside_omic_policy?
   end
 
-  def process_record(probation_record, nomis_offender_id)
+  def process_record(probation_record, nomis_offender_id, trigger_method)
     DeliusImportError.where(nomis_offender_id: nomis_offender_id).destroy_all
     prisoner = Offender.find_by!(nomis_offender_id: nomis_offender_id)
     case_info = prisoner.case_information || prisoner.build_case_information
@@ -75,10 +76,12 @@ private
       if case_information_after.save
         # Recalculate the offender's handover dates
         RecalculateHandoverDateJob.perform_later(nomis_offender_id)
+        tags = %w[job process_delius_data_job case_information changed]
+        tags << trigger_method.to_s
 
         AuditEvent.publish(
           nomis_offender_id: nomis_offender_id,
-          tags: %w[job process_delius_data_job case_information changed],
+          tags: tags,
           system_event: true,
           data: {
             'before' => case_info_atts_before,

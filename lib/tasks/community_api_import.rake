@@ -3,8 +3,6 @@
 namespace :community_api do
   desc 'Import data from Community API'
   task import: :environment do |_task|
-    next if ENABLE_EVENT_BASED_PROBATION_CHANGE
-
     Rails.logger = Logger.new($stdout) if Rails.env.production?
 
     # Avoid filling up the in-memory SQL query cache – we're going to be reading lots of database records
