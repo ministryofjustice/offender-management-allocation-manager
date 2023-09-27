@@ -9,8 +9,14 @@ RSpec.describe DomainEventsConsumer do
     DomainEventTestHandler.clear_handled_events
   end
 
+  let(:sqs_msg) do
+    instance_double(Shoryuken::Message,
+                    message_id: 'sqs_msg_id',
+                    attributes: { 'ApproximateReceiveCount' => '1' }
+                   )
+  end
+
   it 'processes a full domain event' do
-    sqs_msg = instance_double(Shoryuken::Message, message_id: 'sqs_msg_id')
     sns_msg_raw = {
       'Type' => 'Notification',
       'MessageId' => 'sns_msg_id',
@@ -57,7 +63,6 @@ RSpec.describe DomainEventsConsumer do
   end
 
   it 'processes a minimal domain event' do
-    sqs_msg = instance_double(Shoryuken::Message, message_id: 'sqs_msg_id')
     sns_msg_raw = {
       'Type' => 'Notification',
       'MessageId' => 'sns_msg_id',
@@ -94,7 +99,6 @@ RSpec.describe DomainEventsConsumer do
   end
 
   it 'does not handle unsupported events' do
-    sqs_msg = instance_double(Shoryuken::Message, message_id: 'sqs_msg_id')
     sns_msg_raw = {
       'Type' => 'Notification',
       'MessageId' => 'sns_msg_id',
@@ -110,7 +114,6 @@ RSpec.describe DomainEventsConsumer do
   end
 
   it 'skips events if they have no eventType' do
-    sqs_msg = instance_double(Shoryuken::Message, message_id: 'sqs_msg_id')
     sns_msg_raw = {
       'Type' => 'Notification',
       'MessageId' => 'sns_msg_id',
