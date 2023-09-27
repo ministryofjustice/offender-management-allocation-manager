@@ -4,6 +4,7 @@ RSpec.describe DomainEvents::Handlers::TierChangeHandler do
   before do
     allow(Shoryuken::Logging.logger).to receive(:info).and_return(nil)
     allow(Shoryuken::Logging.logger).to receive(:error).and_return(nil)
+    allow(AuditEvent).to receive(:publish).and_return(nil)
     allow(HmppsApi::TieringApi).to receive(:get_calculation).and_return({ tier: tier_from_api })
   end
 
@@ -26,9 +27,22 @@ RSpec.describe DomainEvents::Handlers::TierChangeHandler do
     before { stub_const('ENABLE_EVENT_BASED_PROBATION_CHANGE', true) }
 
     context 'when local case information found' do
-      let!(:case_information) { create(:case_information, crn: crn) }
+      let!(:case_information) { create(:case_information, crn: crn, tier: tier) }
+      let(:tier) { 'A' }
 
       before { handler.handle(event) }
+
+      context 'when tier has not changed' do
+        let(:tier) { 'D' }
+
+        it 'emits a log noop message' do
+          expect(Shoryuken::Logging.logger).to have_received(:info).with(/domain_event_handle_noop/)
+        end
+
+        it 'emits no audit event' do
+          expect(AuditEvent).not_to have_received(:publish)
+        end
+      end
 
       context 'when case information update successful' do
         it 'updates tier with first char of new value' do
@@ -37,6 +51,10 @@ RSpec.describe DomainEvents::Handlers::TierChangeHandler do
 
         it 'emits a log info message' do
           expect(Shoryuken::Logging.logger).to have_received(:info).at_least(2).times
+        end
+
+        it 'emits an audit event' do
+          expect(AuditEvent).to have_received(:publish).once
         end
       end
 
