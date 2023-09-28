@@ -58,14 +58,14 @@ private
     nil
   end
 
-  def log(sqs_msg, log_event_name, append: '', brief: false)
-    message_parts = [].tap do |m|
-      m << "event=domain_event_consume_#{log_event_name}"
-      m << "sqs_message_id=#{sqs_msg.message_id}" unless brief
-      m << "sqs_message_receive_count=#{sqs_msg.attributes['ApproximateReceiveCount']}" unless brief
-      m << append
-    end
+  def log(sqs_msg, log_event_name, append: nil, brief: false)
+    message_parts = [
+      "event=domain_event_consume_#{log_event_name}",
+      brief ? nil : "sqs_message_id=#{sqs_msg.message_id}",
+      brief ? nil : "sqs_message_receive_count=#{sqs_msg.attributes['ApproximateReceiveCount']}",
+      append
+    ]
 
-    Shoryuken::Logging.logger.info message_parts.join(',')
+    Shoryuken::Logging.logger.info message_parts.compact.join(',')
   end
 end
