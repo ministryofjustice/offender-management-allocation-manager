@@ -260,15 +260,27 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       expect {
         described_class.perform_now nomis_offender_id
       }.not_to change(CaseInformation, :count)
+    end
 
-      expect(c1.reload.tier).to eq(tier)
+    it 'does not update tier' do
+      described_class.perform_now nomis_offender_id
+
+      expect(c1.reload.tier).to eq('B')
+    end
+
+    it 'updates other attributes' do
+      described_class.perform_now nomis_offender_id
+
+      expect(c1.reload.team_name).to eq(team_name)
+      expect(c1.reload.com_email).to eq(com_email)
+      expect(c1.reload.local_delivery_unit).to eq(ldu)
     end
 
     include_examples 'audit event' do
       let(:expected_data) do
         {
           'before' => c1.attributes.except('id', 'created_at', 'updated_at'),
-          'after' => (new_case_information_attributes.tap { |a| a[:tier] = tier }).stringify_keys
+          'after' => (new_case_information_attributes.tap { |a| a[:tier] = c1.tier }).stringify_keys
         }
       end
     end

@@ -18,9 +18,18 @@ module DomainEvents
           return
         end
 
-        tier_info = HmppsApi::TieringApi.get_calculation(event.crn_number, event.additional_information['calculationId'])
+        api_tier_info = HmppsApi::TieringApi.get_calculation(event.crn_number, event.additional_information['calculationId'])
+        new_tier = api_tier_info[:tier][0]
         old_tier = case_info.tier
-        case_info.tier = tier_info[:tier][0]
+
+        if new_tier == old_tier
+          logger.info "event=domain_event_handle_noop,domain_event_type=#{event.event_type},crn=#{event.crn_number}" \
+                      '|Tier value has not changed'
+
+          return
+        end
+
+        case_info.tier = new_tier
 
         if case_info.save
           AuditEvent.publish(
@@ -29,7 +38,7 @@ module DomainEvents
             system_event: true,
             data: {
               'before' => old_tier,
-              'after' => case_info.tier
+              'after' => new_tier
             }
           )
 

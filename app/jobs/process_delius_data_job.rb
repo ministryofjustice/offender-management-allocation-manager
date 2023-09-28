@@ -100,13 +100,17 @@ private
   def map_delius_to_case_info(probation_record, case_info)
     ldu_code = probation_record.dig(:manager, :team, :local_delivery_unit, :code)
 
+    # We only populate tier if it's a new record because this is subsequently
+    # updated by TierChangeHandler
+    tier = case_info.persisted? ? case_info.tier : map_tier(probation_record.fetch(:tier))
+
     case_info.tap do |ci|
       ci.assign_attributes(
         manual_entry: false,
         com_name: com_name(probation_record),
         com_email: probation_record.dig(:manager, :email),
         crn: probation_record.fetch(:crn),
-        tier: map_tier(probation_record.fetch(:tier)),
+        tier: tier,
         local_delivery_unit: map_ldu(ldu_code),
         ldu_code: ldu_code,
         team_name: probation_record.dig(:manager, :team, :description),
