@@ -49,6 +49,8 @@ en:
     missing: 'Unknown'
     none: 'None'
 
+  service_name: 'POM cases'
+
   activemodel:
     errors:
       models:

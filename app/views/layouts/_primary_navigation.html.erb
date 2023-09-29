@@ -3,7 +3,7 @@
     <div class="moj-primary-navigation__nav">
       <nav class="moj-primary-navigation" aria-label="Primary navigation">
         <ul class="moj-primary-navigation__list">
-          <%= render 'layouts/nav_link', text: 'Home', path: prison_dashboard_index_path(@prison.code) %>
+          <%= render 'layouts/nav_link', text: t('service_name'), path: prison_dashboard_index_path(@prison.code) %>
           <% if @is_spo %>
             <%= render 'layouts/controller_nav_link',
                        text: 'Allocations',
