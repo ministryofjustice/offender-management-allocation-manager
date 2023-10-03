@@ -1,22 +1,24 @@
 class DomainEventsConsumer
   include Shoryuken::Worker
 
-  shoryuken_options queue: ENV.fetch('DOMAIN_EVENTS_SQS_QUEUE_NAME', 'undefined'), auto_delete: true
+  shoryuken_options queue: ENV.fetch('DOMAIN_EVENTS_SQS_QUEUE_NAME', 'undefined'),
+                    auto_delete: true,
+                    retry_intervals: [15.minutes, 1.hour]
 
   def perform(sqs_msg, sns_msg_raw)
-    Shoryuken::Logging.logger.info "event=domain_event_consume_start,sqs_message_id=#{sqs_msg.message_id}"
+    log sqs_msg, 'start'
+
     begin
       sns_msg = ActiveSupport::JSON.decode(sns_msg_raw)
       event_raw = ActiveSupport::JSON.decode(sns_msg.fetch('Message'))
 
       if event_raw['eventType'].blank?
-        Shoryuken::Logging.logger.info('event=domain_event_consume_skip,reason=missing_event_type,' \
-                                       "sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}")
+        log sqs_msg, 'skip', append: "reason=missing_event_type,sns_message_id=#{sns_msg['MessageId']}"
         return
       end
 
-      Shoryuken::Logging.logger.info "event=domain_event_consume_decoded,sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}," \
-                                     "event_type=#{event_raw['eventType']}"
+      log sqs_msg, 'decoded', append: "sns_message_id=#{sns_msg['MessageId']},event_type=#{event_raw['eventType']}"
+
       event = DomainEvents::Event.new(
         event_type: event_raw.fetch('eventType'),
         version: event_raw.fetch('version'),
@@ -27,12 +29,12 @@ class DomainEventsConsumer
         crn_number: extract_identifier(event_raw, 'CRN'),
         external_event: true,
       )
+
       consume(event)
-      Shoryuken::Logging.logger.info "event=domain_event_consume_success,sqs_message_id=#{sqs_msg.message_id},sns_message_id=#{sns_msg['MessageId']}," \
-                                     "event_type=#{event_raw['eventType']}"
+
+      log sqs_msg, 'success', append: "sns_message_id=#{sns_msg['MessageId']},event_type=#{event_raw['eventType']}"
     rescue StandardError => e
-      Shoryuken::Logging.logger.info 'event=domain_event_consume_error,reason=exception|' \
-                                     "#{e.inspect},#{e.backtrace.join(',')}"
+      log sqs_msg, 'error', append: "reason=exception|#{e.inspect},#{e.backtrace.join(',')}", brief: true
       raise
     end
   end
@@ -54,5 +56,16 @@ private
     end
 
     nil
+  end
+
+  def log(sqs_msg, log_event_name, append: nil, brief: false)
+    message_parts = [
+      "event=domain_event_consume_#{log_event_name}",
+      brief ? nil : "sqs_message_id=#{sqs_msg.message_id}",
+      brief ? nil : "sqs_message_receive_count=#{sqs_msg.attributes['ApproximateReceiveCount']}",
+      append
+    ]
+
+    Shoryuken::Logging.logger.info message_parts.compact.join(',')
   end
 end

@@ -15,7 +15,7 @@ feature 'Navigation' do
       end
 
       it 'has an SPO menu' do
-        expect(nav_links.map(&:text)).to eq(["Home", "Allocations", "Handover", "Staff"])
+        expect(nav_links.map(&:text)).to eq([I18n.t('service_name'), "Allocations", "Handover", "Staff"])
       end
     end
 
@@ -26,7 +26,7 @@ feature 'Navigation' do
       end
 
       it 'has a POM menu' do
-        expect(nav_links.map(&:text)).to eq(["Home", "Caseload", "Handover"])
+        expect(nav_links.map(&:text)).to eq([I18n.t('service_name'), "Caseload", "Handover"])
       end
     end
 
@@ -37,7 +37,7 @@ feature 'Navigation' do
       end
 
       it 'has a POM/SPO menu' do
-        expect(nav_links.map(&:text)).to eq(["Home", "Allocations", "Caseload", "Handover", "Staff"])
+        expect(nav_links.map(&:text)).to eq([I18n.t('service_name'), "Allocations", "Caseload", "Handover", "Staff"])
       end
 
       it 'highlights the current page via the nav links' do
