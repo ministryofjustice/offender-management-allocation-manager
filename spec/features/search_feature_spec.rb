@@ -13,7 +13,7 @@ feature 'Search for offenders' do
     it 'Can search from the dashboard', vcr: { cassette_name: 'prison_api/dashboard_search_feature' } do
       visit root_path
 
-      expect(page).to have_text('Dashboard')
+      expect(page).to have_text(I18n.t('service_name'))
       fill_in 'q', with: 'Cal'
       click_on('search-button')
 
