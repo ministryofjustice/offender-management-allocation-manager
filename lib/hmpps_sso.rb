@@ -46,13 +46,7 @@ module OmniAuth
 
       # :nocov:
       def decode_roles
-        decoded_token = JWT.decode(
-          access_token.token,
-          JwksKey.openssl_public_key,
-          true,
-          algorithm: 'RS256'
-        )
-
+        decoded_token = JwksDecoder.decode_token(access_token.token)
         decoded_token.first.fetch('authorities', [])
       end
       # :nocov:

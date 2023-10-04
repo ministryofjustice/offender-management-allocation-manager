@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe 'GET /status', type: :request do
-  let(:authorization) { { Authorization: "Bearer #{generate_jwt_token}" } }
+  let(:authorization) { { Authorization: "Bearer xxxxxxxxxxxxxxxxxxxxxxxx" } }
 
   it 'get the Postgres version' do
     get '/status', headers: authorization

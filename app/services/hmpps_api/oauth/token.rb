@@ -48,12 +48,7 @@ module HmppsApi
       end
 
       def payload
-        @payload ||= JWT.decode(
-          access_token,
-          JwksKey.openssl_public_key,
-          true,
-          algorithm: 'RS256'
-        ).first
+        @payload ||= JwksDecoder.decode_token(access_token).first
       end
 
       def self.from_json(payload)

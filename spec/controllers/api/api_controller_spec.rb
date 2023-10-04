@@ -1,12 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Api::ApiController, type: :controller do
-  let(:rsa_private) { OpenSSL::PKey::RSA.generate 2048 }
   let(:ok_message) { { 'status' => 'ok' } }
-
-  before do
-    allow(JwksKey).to receive(:openssl_public_key).and_return(rsa_private.public_key)
-  end
 
   it 'blocks access for missing tokens' do
     get :index
@@ -35,7 +30,8 @@ RSpec.describe Api::ApiController, type: :controller do
 
   it 'blocks bearer tokens without an expiry date' do
     payload = {
-      user_name: 'hello'
+      user_name: 'hello',
+      exp: nil,
     }
 
     request_header(payload)
@@ -86,25 +82,24 @@ RSpec.describe Api::ApiController, type: :controller do
   end
 
   it 'accepts bearer tokens that are not expired with a read scope' do
-    payload = {
-      user_name: 'hello',
-      scope: ['read'],
-      exp: 4.hours.from_now.to_i
-    }
+    allow_any_instance_of(HmppsApi::Oauth::Token).to receive(:valid_token_with_scope?).and_return(true)
 
-    request_header(payload)
+    request_header
     get :index
 
     expect(response).to have_http_status(:ok)
     expect(JSON.parse(response.body)).to eq(ok_message)
   end
 
-  def encode_payload(payload)
-    JWT.encode(payload, OpenSSL::PKey::RSA.new(rsa_private), 'RS256')
-  end
-
-  def request_header(payload)
-    token = encode_payload(payload)
-    request.headers['AUTHORIZATION'] = "Bearer #{token}"
+  def request_header(payload = {})
+    allow(JwksDecoder).to receive(:decode_token).and_return(
+      [
+        {
+          scope: %w[read write],
+          exp: 4.hours.from_now.to_i,
+        }.merge(payload)
+      ]
+    )
+    request.headers['AUTHORIZATION'] = "Bearer xxxxxxx"
   end
 end
