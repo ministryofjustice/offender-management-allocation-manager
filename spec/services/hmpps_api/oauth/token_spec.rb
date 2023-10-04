@@ -1,22 +1,32 @@
 require 'rails_helper'
 
 describe HmppsApi::Oauth::Token do
+  def mock_jwt_token(options = {})
+    payload = {
+      'internal_user' => false,
+      'scope' => %w[read write],
+      'exp' => 4.hours.from_now.to_i,
+      'client_id' => 'offender-management-allocation-manager',
+    }.merge(options)
+    allow(JwksDecoder).to receive(:decode_token).and_return([payload])
+  end
+
   it 'can confirm if it is not expired' do
-    access_token = generate_jwt_token
+    access_token = mock_jwt_token
     token = described_class.new(access_token: access_token, expires_in: 4.hours)
 
     expect(token.needs_refresh?).to be(false)
   end
 
   it 'can confirm if it is expired' do
-    access_token = generate_jwt_token('exp' => 4.hours.ago.to_i)
+    access_token = mock_jwt_token('exp' => 4.hours.ago.to_i)
     token = described_class.new(access_token: access_token, expires_in: -4.hours)
 
     expect(token.needs_refresh?).to be(true)
   end
 
   it 'can retrieve the payload directly' do
-    access_token = generate_jwt_token('exp' => 4.hours.from_now.to_i)
+    access_token = mock_jwt_token('exp' => 4.hours.from_now.to_i)
     token = described_class.new(access_token: access_token, expires_in: 4.hours)
 
     expect(token.needs_refresh?).to be(false)
@@ -28,7 +38,7 @@ describe HmppsApi::Oauth::Token do
 
     let(:token) do
       described_class.new(
-        access_token: generate_jwt_token(options),
+        access_token: mock_jwt_token(options),
         expires_in: 4.hours
       )
     end

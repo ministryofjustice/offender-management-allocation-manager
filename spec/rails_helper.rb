@@ -71,7 +71,6 @@ RSpec.configure do |config|
   end
 
   config.include ActiveSupport::Testing::TimeHelpers
-  config.include JWTHelper
   config.include FeaturesHelper
   config.include AuthHelper
   config.include ApiHelper

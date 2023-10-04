@@ -2,7 +2,6 @@ require 'rails_helper'
 
 RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
   describe '#show' do
-    let(:rsa_private) { OpenSSL::PKey::RSA.generate 2048 }
     let(:prison) { create(:prison) }
     let!(:co_working_allocation) do
       create(:allocation_history, :co_working, prison: prison.code, primary_pom_nomis_id: primary_pom.staff_id,
@@ -12,8 +11,8 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
     let(:secondary_pom) { build(:pom) }
 
     before do
-      allow(JwksKey).to receive(:openssl_public_key).and_return(rsa_private.public_key)
-      accepts_bearer_tokens
+      allow(controller).to receive(:verify_token)
+
       stub_pom(primary_pom)
       stub_pom(secondary_pom)
       stub_offender(offender)
@@ -60,23 +59,5 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
         end
       end
     end
-  end
-
-  def accepts_bearer_tokens
-    payload = {
-      user_name: 'Sally600',
-      scope: ['read'],
-      exp: 4.hours.from_now.to_i
-    }
-    request_header(payload)
-  end
-
-  def encode_payload(payload)
-    JWT.encode(payload, OpenSSL::PKey::RSA.new(rsa_private), 'RS256')
-  end
-
-  def request_header(payload)
-    token = encode_payload(payload)
-    request.headers['AUTHORIZATION'] = "Bearer #{token}"
   end
 end
