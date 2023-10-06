@@ -118,6 +118,11 @@ RSpec.configure do |config|
   config.before(:each, type: lambda { |_v, m| m[:push_pom_to_delius] != true } ) do
     allow(PushPomToDeliusJob).to receive(:perform_later)
   end
+
+  config.before(:each, type: :feature) do |example|
+    stub_const('ENABLE_DPS_HEADER_FOOTER', true)
+    stub_dps_header_footer unless example.metadata[:skip_dps_header_footer_stubbing].present?
+  end
 end
 
 Shoulda::Matchers.configure do |config|

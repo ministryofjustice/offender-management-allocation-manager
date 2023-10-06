@@ -47,6 +47,11 @@ module FeaturesHelper
       .to_return(body: [].to_json)
   end
 
+  def stub_dps_header_footer(html: '<f>', css: [], javascript: [])
+    stub_request(:get, "#{Rails.configuration.dps_frontend_components_api_host}/footer")
+      .to_return(body: { 'html' => html, css: css, javascript: javascript }.to_json)
+  end
+
   def wait_for(maximum_wait_in_seconds = 10, &block)
     Selenium::WebDriver::Wait.new(timeout: maximum_wait_in_seconds).until(&block)
   end
