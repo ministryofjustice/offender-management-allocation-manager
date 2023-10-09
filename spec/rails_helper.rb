@@ -119,9 +119,13 @@ RSpec.configure do |config|
     allow(PushPomToDeliusJob).to receive(:perform_later)
   end
 
-  config.before(:each, type: :feature) do |example|
+  config.before(:each) do |example|
     stub_const('ENABLE_DPS_HEADER_FOOTER', true)
-    stub_dps_header_footer unless example.metadata[:skip_dps_header_footer_stubbing].present?
+    if [:feature, :controller].include?(example.metadata[:type]) and
+      example.metadata[:skip_dps_header_footer_stubbing].blank?
+
+      stub_dps_header_footer
+    end
   end
 end
 
