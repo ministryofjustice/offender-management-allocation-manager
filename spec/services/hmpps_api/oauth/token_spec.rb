@@ -44,7 +44,7 @@ describe HmppsApi::Oauth::Token do
     end
 
     before do
-      allow(Rails.logger).to receive(:warn)
+      allow(Rails.logger).to receive(:error)
     end
 
     context 'with required role' do
@@ -52,9 +52,9 @@ describe HmppsApi::Oauth::Token do
         { 'authorities' => [role] }
       end
 
-      it 'Emits no log warning' do
+      it 'Emits no log error' do
         token.valid_token_with_scope?(scope, role: role)
-        expect(Rails.logger).not_to have_received(:warn)
+        expect(Rails.logger).not_to have_received(:error)
       end
 
       it 'Returns true' do
@@ -67,13 +67,13 @@ describe HmppsApi::Oauth::Token do
         {}
       end
 
-      it 'Emits a log warning' do
+      it 'Emits a log error' do
         token.valid_token_with_scope?(scope, role: role)
-        expect(Rails.logger).to have_received(:warn)
+        expect(Rails.logger).to have_received(:error)
       end
 
-      it 'Returns true' do
-        expect(token.valid_token_with_scope?(scope, role: role)).to be(true)
+      it 'Returns false' do
+        expect(token.valid_token_with_scope?(scope, role: role)).to be(false)
       end
     end
   end
