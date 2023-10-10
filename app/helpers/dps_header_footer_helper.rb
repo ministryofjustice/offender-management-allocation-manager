@@ -7,6 +7,10 @@ module DpsHeaderFooterHelper
     dps_header_footer_enabled? ? dps_header_all.fetch('css').map { |link| stylesheet_link_tag link }.join("\n").html_safe : ''
   end
 
+  def dps_header_js
+    dps_header_footer_enabled? ? dps_header_all.fetch('javascript').map { |source| javascript_include_tag source }.join("\n").html_safe : ''
+  end
+
   def dps_header_all
     @dps_header_all ||= HmppsApi::DpsFrontendComponentsApi.header
   end
@@ -17,6 +21,10 @@ module DpsHeaderFooterHelper
 
   def dps_footer_css
     dps_header_footer_enabled? ? dps_footer_all.fetch('css').map { |link| stylesheet_link_tag link }.join("\n").html_safe : ''
+  end
+
+  def dps_footer_js
+    dps_header_footer_enabled? ? dps_footer_all.fetch('javascript').map { |source| javascript_include_tag source }.join("\n").html_safe : ''
   end
 
   def dps_footer_all
