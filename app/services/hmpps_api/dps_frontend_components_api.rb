@@ -6,16 +6,24 @@ require 'typhoeus/adapters/faraday'
 module HmppsApi
   class DpsFrontendComponentsApi
     class << self
+      def header
+        get_component('header')
+      end
+
       def footer
+        get_component('footer')
+      end
+
+    private
+
+      def get_component(type)
         raw_response = connection.get do |req|
-          req.url("#{root}/footer")
-          req.headers['x-user-token'] = token.access_token
+          req.url("#{root}/#{type}")
+          req.headers['X-User-Token'] = token.access_token
         end
 
         ActiveSupport::JSON.decode(raw_response.body)
       end
-
-    private
 
       def connection
         Faraday.new do |faraday|
