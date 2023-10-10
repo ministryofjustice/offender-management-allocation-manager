@@ -171,7 +171,7 @@ jobs:
             - .local/bin
             - .bundle/config
 
-  fetch_secrets:
+  fetch_env_vars:
     <<: *defaults
     <<: *deploy_container_config
     steps:
@@ -185,8 +185,7 @@ jobs:
 
             env_name="${K8S_NAMESPACE#offender-management-}"
             
-            rm -rf ~/env/
-            mkdir ~/env
+            mkdir -p ~/env
 
             apk add jq
 
@@ -195,6 +194,9 @@ jobs:
             echo "export HMPPS_API_CLIENT_ID='$(jq -r .data.HMPPS_API_CLIENT_ID /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
             echo "export HMPPS_API_CLIENT_SECRET='$(jq -r .data.HMPPS_API_CLIENT_SECRET /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
             rm /tmp/hmpps-secrets.json
+
+            # Takes all vars ending with '_HOST' in the 'shared-environment' configmap and puts them in a file with the format: export VAR='value'
+            kubectl -n "${K8S_NAMESPACE}" get configmap/shared-environment -o json | jq -Mr '.data | to_entries[] | select(.key|endswith("_HOST")) | "export \(.key)='\''\(.value)'\''"' > ~/env/"${env_name}-shared-env.sh"
       - persist_to_workspace:
           root: ~/
           paths:
@@ -228,6 +230,7 @@ jobs:
           name: Run tests
           command: |
             env_name="${K8S_NAMESPACE#offender-management-}"
+            . ~/env/"${env_name}-shared-env.sh"
             . ~/env/"${env_name}"-hmpps-secrets.sh
             export SPEC_STATUS_PATH=~/spec_status
             bundle exec parallel_test -t rspec -- -t ~flaky --format progress -- spec || \
@@ -310,7 +313,7 @@ workflows:
     jobs:
       - install_dependencies:
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-      - fetch_secrets:
+      - fetch_env_vars:
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
           context: [offender-management-shared, offender-management-staging]
 
@@ -318,7 +321,7 @@ workflows:
           requires: [install_dependencies]
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
       - test:
-          requires: [install_dependencies, fetch_secrets]
+          requires: [install_dependencies, fetch_env_vars]
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
           context: [offender-management-shared, offender-management-staging]
       - verify_docker_image_builds:
@@ -358,7 +361,7 @@ workflows:
     jobs:
       - install_dependencies:
           filters: { branches: { only: [staging] } }
-      - fetch_secrets:
+      - fetch_env_vars:
           filters: { branches: { only: [staging] } }
           context: [offender-management-shared, offender-management-staging]
 
@@ -370,7 +373,7 @@ workflows:
           requires: [install_dependencies]
           filters: { branches: { only: [staging] } }
       - test:
-          requires: [install_dependencies, fetch_secrets]
+          requires: [install_dependencies, fetch_env_vars]
           filters: { branches: { only: [staging] } }
           context: [offender-management-shared, offender-management-staging]
 
@@ -383,7 +386,7 @@ workflows:
     jobs:
       - install_dependencies:
           filters: { branches: { only: [main] } }
-      - fetch_secrets:
+      - fetch_env_vars:
           filters: { branches: { only: [main] } }
           context: [offender-management-shared, offender-management-staging]
 
@@ -395,7 +398,7 @@ workflows:
           requires: [install_dependencies]
           filters: { branches: { only: [main] } }
       - test:
-          requires: [install_dependencies, fetch_secrets]
+          requires: [install_dependencies, fetch_env_vars]
           filters: { branches: { only: [main] } }
           context: [offender-management-shared, offender-management-staging]
 

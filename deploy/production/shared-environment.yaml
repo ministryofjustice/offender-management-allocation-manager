@@ -18,3 +18,4 @@ data:
   ASSESS_RISKS_AND_NEEDS_API_HOST: "https://assess-risks-and-needs.hmpps.service.justice.gov.uk"
   MANAGE_POM_CASES_AND_DELIUS_HOST: "https://manage-pom-cases-and-delius.hmpps.service.justice.gov.uk"
   TIERING_API_HOST: https://hmpps-tier.hmpps.service.justice.gov.uk
+  DPS_FRONTEND_COMPONENTS_API_HOST: "https://frontend-components.hmpps.service.justice.gov.uk"
