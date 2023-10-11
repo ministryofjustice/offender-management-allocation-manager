@@ -47,9 +47,12 @@ module FeaturesHelper
       .to_return(body: [].to_json)
   end
 
-  def stub_dps_header_footer(html: '<f>', css: [], javascript: [])
+  def stub_dps_header_footer
+    stub_request(:get, "#{Rails.configuration.dps_frontend_components_api_host}/header")
+      .to_return(body: { 'html' => '<header>', css: [], javascript: [] }.to_json)
+
     stub_request(:get, "#{Rails.configuration.dps_frontend_components_api_host}/footer")
-      .to_return(body: { 'html' => html, css: css, javascript: javascript }.to_json)
+      .to_return(body: { 'html' => '<footer>', css: [], javascript: [] }.to_json)
   end
 
   def wait_for(maximum_wait_in_seconds = 10, &block)
