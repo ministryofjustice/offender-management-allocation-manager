@@ -4,25 +4,46 @@ RSpec.describe AllocationHistory, type: :model do
   let(:nomis_staff_id) { 456_789 }
   let(:nomis_offender_id) { 'A3434LK' }
   let(:another_nomis_offender_id) { 654_321 }
+  let(:fake_domain_event) { double(DomainEvents::Event, publish: nil) }
+
+  before do
+    allow(DomainEvents::Event).to receive(:new).and_return(fake_domain_event)
+  end
 
   describe '#without_ldu_emails' do
     let!(:crc_without_email) do
       case_info = create(:case_information, enhanced_resourcing: false, local_delivery_unit: nil)
-      create(:allocation_history, prison: build(:prison).code, nomis_offender_id: case_info.nomis_offender_id)
+
+      create(
+        :allocation_history,
+        prison: build(:prison).code,
+        nomis_offender_id: case_info.nomis_offender_id
+      )
     end
 
     let!(:enhanced_handover_without_email) do
       case_info = create(:case_information, enhanced_resourcing: true, local_delivery_unit: nil)
-      create(:allocation_history, prison: build(:prison).code, nomis_offender_id: case_info.nomis_offender_id)
+
+      create(
+        :allocation_history,
+        prison: build(:prison).code,
+        nomis_offender_id: case_info.nomis_offender_id
+      )
     end
 
     let!(:enhanced_handover_with_email) do
       case_info = create(:case_information, enhanced_resourcing: true)
-      create(:allocation_history, prison: build(:prison).code, nomis_offender_id: case_info.nomis_offender_id)
+
+      create(
+        :allocation_history,
+        prison: build(:prison).code,
+        nomis_offender_id: case_info.nomis_offender_id
+      )
     end
 
     it 'picks up enhanced handover allocations without emails' do
-      expect(described_class.without_ldu_emails).to match_array([enhanced_handover_without_email])
+      expect(described_class.without_ldu_emails)
+        .to match_array([enhanced_handover_without_email])
     end
   end
 
@@ -36,7 +57,13 @@ RSpec.describe AllocationHistory, type: :model do
     it { is_expected.to validate_uniqueness_of :nomis_offender_id }
 
     context 'when the same POM is Primary and Secondary' do
-      let(:allocation) { build(:allocation_history, prison: create(:prison).code, nomis_offender_id: nomis_offender_id) }
+      let(:allocation) do
+        build(
+          :allocation_history,
+          prison: create(:prison).code,
+          nomis_offender_id: nomis_offender_id
+        )
+      end
 
       before do
         allocation.primary_pom_nomis_id = nomis_staff_id
@@ -45,7 +72,8 @@ RSpec.describe AllocationHistory, type: :model do
 
       it 'is invalid' do
         expect(allocation).not_to be_valid
-        expect(allocation.errors[:primary_pom_nomis_id]).to eq ['Primary POM cannot be the same as co-working POM']
+        expect(allocation.errors[:primary_pom_nomis_id])
+          .to eq(['Primary POM cannot be the same as co-working POM'])
       end
     end
   end
@@ -120,7 +148,10 @@ RSpec.describe AllocationHistory, type: :model do
       let(:nomis_offender_id) { 'G2911GD' }
       let(:prison_code) { create(:prison).code }
       let(:poms) { [build(:pom, staffId: 485_833)] }
-      let(:offender) { build(:nomis_offender, prisonId: prison_code, prisonerNumber: nomis_offender_id) }
+
+      let(:offender) do
+        build(:nomis_offender, prisonId: prison_code, prisonerNumber: nomis_offender_id)
+      end
 
       it 'removes the primary pom details in an Offender\'s allocation' do
         create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
@@ -237,7 +268,8 @@ RSpec.describe AllocationHistory, type: :model do
       end
 
       it 'returns both primary and secondary allocations' do
-        expect(described_class.active_pom_allocations(nomis_staff_id, allocation.prison)).to match_array [secondary_allocation, allocation]
+        expect(described_class.active_pom_allocations(nomis_staff_id, allocation.prison))
+          .to match_array([secondary_allocation, allocation])
       end
     end
 
@@ -266,56 +298,79 @@ RSpec.describe AllocationHistory, type: :model do
     end
   end
 
-  describe 'automate pushing the primary pom to ndelius', :push_pom_to_delius do
+  describe 'publishing a domain event', :push_pom_to_delius do
     let(:prison_code) { create(:prison).code }
 
-    context 'when a new allocation is created and a POM is set' do
-      before do
-        expect(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:staff_detail).with(nomis_staff_id).and_return build(:pom, firstName: 'Bill', lastName: 'Jones')
-        expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison_code, forename: 'Bill', surname: 'Jones'
-      end
+    shared_examples 'publish count' do |count|
+      it 'publishes domain event' do
+        expect(DomainEvents::Event).to have_received(:new).exactly(count).times.with(
+          event_type: 'offender-management.pom.changed',
+          version: 1,
+          description: "A POM allocation has changed",
+          detail_url: "http://localhost:3000/api/allocation/#{nomis_offender_id}/primary_pom",
+          noms_number: nomis_offender_id,
+          additional_information: {
+            'staffCode' => anything,
+            'prisonId' => prison_code
+          }
+        )
 
-      it 'pushes the POM name to Ndelius' do
-        create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: prison_code, primary_pom_nomis_id: nomis_staff_id)
+        expect(fake_domain_event).to have_received(:publish).exactly(count).times
       end
     end
 
-    context 'with an existing allocation' do
+    # With these following examples, the initial creation of AllocationHistory
+    # will cause the publishing of a domain event, so in some cases we'll expect
+    # 2 to be published
+    context 'when a new allocation is created and a POM is set' do
       before do
-        expect(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:staff_detail).with(nomis_staff_id).and_return build(:pom, firstName: 'Bill', lastName: 'Jones')
-        expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison_code, forename: 'Bill', surname: 'Jones'
-        create(:allocation_history, :primary, nomis_offender_id: nomis_offender_id, prison: prison_code, primary_pom_nomis_id: nomis_staff_id)
+        create(
+          :allocation_history,
+          :primary,
+          nomis_offender_id: nomis_offender_id,
+          prison: prison_code,
+          primary_pom_nomis_id: nomis_staff_id
+        )
       end
 
-      let(:allocation) { described_class.last }
+      it_behaves_like 'publish count', 1
+    end
 
-      describe 'updating secondary POM' do
-        it 'doesnt update delius' do
+    context 'with an existing allocation' do
+      let!(:allocation) do
+        create(
+          :allocation_history,
+          :primary,
+          nomis_offender_id: nomis_offender_id,
+          prison: prison_code,
+          primary_pom_nomis_id: nomis_staff_id
+        )
+      end
+
+      context 'when updating secondary POM' do
+        before do
           allocation.update!(secondary_pom_nomis_id: 24_689)
         end
+
+        it_behaves_like 'publish count', 1
       end
 
-      describe 'de-allocated POM' do
+      context 'when de-allocating primary POM' do
         before do
-          expect(HmppsApi::CommunityApi).to receive(:unset_pom).with nomis_offender_id
-        end
-
-        it 'deletes the POM from Ndelius' do
           allocation.update!(primary_pom_nomis_id: nil)
         end
+
+        it_behaves_like 'publish count', 2
       end
 
-      describe 're-allocated POM ' do
+      context 'when re-allocating primary POM ' do
         before do
-          expect(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:staff_detail).with(updated_nomis_staff_id).and_return build(:pom, firstName: 'Sally', lastName: 'Albright')
-          expect(HmppsApi::CommunityApi).to receive(:set_pom).with offender_no: nomis_offender_id, prison: prison_code, forename: 'Sally', surname: 'Albright'
+          allocation.update!(primary_pom_nomis_id: updated_nomis_staff_id)
         end
 
         let(:updated_nomis_staff_id) { 146_890 }
 
-        it 'updates the POM in Ndelius' do
-          allocation.update!(primary_pom_nomis_id: updated_nomis_staff_id)
-        end
+        it_behaves_like 'publish count', 2
       end
     end
   end
