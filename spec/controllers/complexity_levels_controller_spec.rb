@@ -7,6 +7,7 @@ RSpec.describe ComplexityLevelsController, type: :controller do
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
 

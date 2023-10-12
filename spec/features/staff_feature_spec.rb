@@ -1,6 +1,10 @@
 require "rails_helper"
 
 feature "staff pages" do
+  before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
+  end
+
   feature "POM page" do
     let(:prison) { create(:prison) }
     let(:pom) { build(:pom) }

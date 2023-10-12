@@ -24,6 +24,7 @@ RSpec.describe "allocations/show", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     assign(:prison, prison)
     assign(:pom, build(:pom))
     assign(:prisoner, offender)

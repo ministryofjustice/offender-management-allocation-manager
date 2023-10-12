@@ -68,6 +68,7 @@ feature 'Case History' do
   let(:transfer_date) { today - 5.days }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     Timecop.travel Time.zone.local 2021, 2, 28, 11, 25, 35
     stub_auth_token
   end

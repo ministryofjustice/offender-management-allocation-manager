@@ -8,6 +8,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
   let(:new_secondary_pom) { build(:pom) }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_sso_data(prison)
     stub_offender(offender)
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))

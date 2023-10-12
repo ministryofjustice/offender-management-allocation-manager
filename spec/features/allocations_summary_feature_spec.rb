@@ -4,6 +4,7 @@ require 'rails_helper'
 
 feature 'summary summary feature' do
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     signin_spo_user
   end
 

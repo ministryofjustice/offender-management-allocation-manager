@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe ResponsibilitiesController, type: :controller do
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     offender = create(:case_information, local_delivery_unit: build(:local_delivery_unit))
     create(:responsibility, nomis_offender_id: offender.nomis_offender_id)
 

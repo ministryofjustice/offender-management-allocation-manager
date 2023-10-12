@@ -307,7 +307,7 @@ RSpec.describe AllocationHistory, type: :model do
           event_type: 'offender-management.pom.changed',
           version: 1,
           description: "A POM allocation has changed",
-          detail_url: "http://localhost:3000/api/allocation/#{nomis_offender_id}/primary_pom",
+          detail_url: /\/api\/allocation\/#{nomis_offender_id}\/primary_pom/,
           noms_number: nomis_offender_id,
           additional_information: {
             'staffCode' => anything,

@@ -24,6 +24,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
   end
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_offenders_for_prison(prison.code, [nomis_offender])
     stub_keyworker(prison.code, nomis_offender_id, build(:keyworker))
 

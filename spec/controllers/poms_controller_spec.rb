@@ -11,6 +11,7 @@ RSpec.describe PomsController, type: :controller do
   let(:na_offenders) { build_list(:nomis_offender, 5) }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_sso_data(prison.code)
     inactive = create(:pom_detail, :inactive, prison_code: prison.code)
     active = create(:pom_detail, :active, prison_code: prison.code)

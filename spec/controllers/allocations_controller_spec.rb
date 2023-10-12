@@ -17,6 +17,7 @@ RSpec.describe AllocationsController, type: :controller do
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_poms(prison_code, poms)
     stub_offender(offender)
     stub_movements_for offender_no, [attributes_for(:movement)]

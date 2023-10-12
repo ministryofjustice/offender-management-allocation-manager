@@ -6,6 +6,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_poms(prison.code, poms)
     stub_signed_in_pom(prison.code, pom.staffId, 'Alice')
     stub_sso_data(prison.code)

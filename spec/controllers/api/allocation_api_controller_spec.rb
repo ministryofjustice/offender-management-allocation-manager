@@ -30,6 +30,7 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
     stub_pom(secondary_pom)
     stub_offender(offender)
     stub_auth_token
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
   end
 
   describe '#show' do

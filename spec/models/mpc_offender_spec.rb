@@ -5,6 +5,10 @@ RSpec.describe MpcOffender, type: :model do
     described_class.new(prison: prison, offender: offender_model, prison_record: api_offender)
   end
 
+  before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
+  end
+
   let(:nomis_offender_id) { FactoryBot.generate :nomis_offender_id }
   let(:offender_model) do
     instance_double(Offender,

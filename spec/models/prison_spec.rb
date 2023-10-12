@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe Prison do
+  before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
+  end
+
   describe '#active' do
     before do
       create(:allocation_history, prison: p1.code)

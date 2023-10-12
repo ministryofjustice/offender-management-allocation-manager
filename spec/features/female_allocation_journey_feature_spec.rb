@@ -18,6 +18,7 @@ feature "womens allocation journey" do
   let(:tiers) { ['A', 'B', 'C', 'D', 'N/A'].cycle.take(offenders.size) }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     create(:pom_detail, :inactive, prison_code: prison.code, nomis_staff_id: inactive_prison_pom.staff_id)
     create(:pom_detail, :part_time, prison_code: prison.code, nomis_staff_id: probation_pom.staff_id)
     create(:pom_detail, prison_code: prison.code, nomis_staff_id: probation_pom2.staff_id)

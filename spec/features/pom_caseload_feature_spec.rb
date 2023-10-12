@@ -77,6 +77,7 @@ feature "view POM's caseload" do
 
   # create 21 allocations for prisoners named A-K so that we can verify that default sorted paging works
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     poms =
       [
         build(:pom,

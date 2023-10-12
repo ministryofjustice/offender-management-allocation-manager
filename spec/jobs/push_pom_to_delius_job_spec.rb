@@ -8,6 +8,7 @@ RSpec.describe PushPomToDeliusJob, type: :job, versioning: true do
   before do
     stub_auth_token
     stub_pom(pom)
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
   end
 
   describe 'when a Primary POM is allocated' do

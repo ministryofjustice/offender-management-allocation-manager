@@ -5,6 +5,10 @@ describe MovementService, type: :feature do
   let(:new_offender_nil) { build(:movement, offenderNo: 'G4273GI', fromAgency: nil)   }
   let(:transfer_out) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'TRN')   }
 
+  before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
+  end
+
   it "can get recent movements",
      vcr: { cassette_name: 'prison_api/movement_service_recent_spec' }  do
     movements = described_class.movements_on(Date.iso8601('2019-02-20'))

@@ -17,6 +17,9 @@ feature 'admin urls' do
   #     expect(page).to have_http_status(:unauthorized)
   #   end
   # end
+  before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
+  end
 
   let(:prison_code) { create(:prison).code }
   let(:admin_urls) do

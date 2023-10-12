@@ -20,6 +20,7 @@ RSpec.describe CaseloadController, type: :controller do
   let(:pom) { poms.first }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_poms(prison.code, poms)
     stub_signed_in_pom(prison.code, pom.staffId, 'alice')
   end

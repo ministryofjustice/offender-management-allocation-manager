@@ -19,25 +19,26 @@ RSpec.describe HandoverFollowUpJob, type: :job do
 
     let(:case_info) { build(:case_information, offender: build(:offender, nomis_offender_id: offender_no)) }
 
-    let!(:allocation) do
-      create(:allocation_history,
-             prison: active_prison.code,
-             nomis_offender_id: offender_no,
-             primary_pom_nomis_id: pom.staff_id,
-             primary_pom_name: pom.full_name)
-    end
-
     let(:today) { Time.zone.today }
 
     before do
       Timecop.travel today
 
       allow_any_instance_of(Prison).to receive(:get_single_pom).and_return(pom)
+      allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
 
       allow(OffenderService).to receive(:get_offender).and_return(offender)
 
       # Create an unrelated allocation so that active_prison counts as active
       create(:allocation_history, prison: active_prison.code)
+    end
+
+    let!(:allocation) do
+      create(:allocation_history,
+             prison: active_prison.code,
+             nomis_offender_id: offender_no,
+             primary_pom_nomis_id: pom.staff_id,
+             primary_pom_name: pom.full_name)
     end
 
     after do

@@ -71,6 +71,7 @@ RSpec.describe EmailService do
   let(:offender_name) { "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}" }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
     stub_auth_token
     create(:case_information, offender: build(:offender, nomis_offender_id: 'G2911GD'))

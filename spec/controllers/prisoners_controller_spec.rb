@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe PrisonersController, type: :controller do
+  before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
+  end
+
   context 'with a womens prison' do
     let(:prison) { create(:womens_prison) }
 

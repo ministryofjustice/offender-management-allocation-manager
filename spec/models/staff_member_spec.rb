@@ -14,6 +14,7 @@ RSpec.describe StaffMember, type: :model do
   end
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_auth_token
     stub_offenders_for_prison(prison.code, offenders)
     offenders.each do |offender|

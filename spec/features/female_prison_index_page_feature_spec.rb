@@ -4,6 +4,7 @@ require "rails_helper"
 
 feature "female prison index page" do
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_signin_spo(pom, [prison.code])
     stub_offenders_for_prison(prison.code, offenders)
     stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)

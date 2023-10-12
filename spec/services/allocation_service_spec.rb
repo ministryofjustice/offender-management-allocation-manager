@@ -4,6 +4,7 @@ describe AllocationService do
   let(:nomis_offender_id) { 'G7266VD' }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     # needed as create_or_update calls a NOMIS API
     signin_spo_user
   end

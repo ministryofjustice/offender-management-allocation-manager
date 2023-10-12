@@ -8,6 +8,8 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
 
   shared_context 'with expected behaviour' do
     before do
+      allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
+
       # Need to freeze the date so that CRDs don't end up 29th of June - subtracting 4 months is then
       # tricky (as 29th Feb doesn't exist) resulting in inconsistent test results(+- 1 day) as the date changes
       Timecop.travel Date.new(2020, 11, 5)

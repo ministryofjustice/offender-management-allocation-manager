@@ -26,6 +26,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   let(:mpc_offender) { OffenderService.get_offender(nomis_offender_id) }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_signed_in_pom(prison, first_pom.staffId)
     stub_pom(first_pom)
 

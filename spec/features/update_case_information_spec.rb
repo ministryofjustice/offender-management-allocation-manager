@@ -9,6 +9,7 @@ RSpec.feature "Update case information", type: :feature do
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_offenders_for_prison(prison.code, offenders)
     stub_signin_spo(spo, [prison.code])
     stub_poms(prison.code, [pom, spo])

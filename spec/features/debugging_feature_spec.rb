@@ -5,6 +5,7 @@ feature 'Provide debugging information for our team to use' do
   let(:prison) { Prison.find 'LEI' }
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     signin_global_admin_user
   end
 

@@ -27,6 +27,7 @@ RSpec.describe CaseloadGlobalController, type: :controller do
   before do
     stub_poms(prison.code, poms)
     stub_signed_in_pom(prison.code, pom.staffId, 'alice')
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
   end
 
   context 'with 3 offenders' do

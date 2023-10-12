@@ -6,6 +6,10 @@ context 'when NOMIS is missing information' do
   let(:stub_keyworker_host) { Rails.configuration.keyworker_api_host }
   let(:staff_id) { 123_456 }
 
+  before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
+  end
+
   describe 'when logged in as a POM' do
     before do
       stub_poms = [{ staffId: staff_id, position: RecommendationService::PRISON_POM }]

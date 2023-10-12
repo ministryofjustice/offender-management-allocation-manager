@@ -16,6 +16,7 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
   end
 
   before do
+    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     case_info = create(:case_information, offender: build(:offender, nomis_offender_id: api_offender.offender_no))
     offender = build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender)
     allow(OffenderService).to receive(:get_offender).and_return(offender)
