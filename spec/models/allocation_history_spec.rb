@@ -304,7 +304,7 @@ RSpec.describe AllocationHistory, type: :model do
     shared_examples 'publish count' do |count|
       it 'publishes domain event' do
         expect(DomainEvents::Event).to have_received(:new).exactly(count).times.with(
-          event_type: 'offender-management.pom.changed',
+          event_type: 'allocation.changed',
           version: 1,
           description: "A POM allocation has changed",
           detail_url: /\/api\/allocation\/#{nomis_offender_id}\/primary_pom/,

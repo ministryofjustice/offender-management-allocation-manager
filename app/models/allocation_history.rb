@@ -179,7 +179,7 @@ private
     return unless saved_change_to_primary_pom_nomis_id?
 
     DomainEvents::Event.new(
-      event_type: 'offender-management.pom.changed',
+      event_type: 'allocation.changed',
       version: 1,
       description: 'A POM allocation has changed',
       detail_url: "#{Rails.configuration.allocation_manager_host}/api/allocation/#{nomis_offender_id}/primary_pom",
