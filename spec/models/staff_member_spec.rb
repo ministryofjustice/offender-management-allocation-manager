@@ -14,7 +14,6 @@ RSpec.describe StaffMember, type: :model do
   end
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_auth_token
     stub_offenders_for_prison(prison.code, offenders)
     offenders.each do |offender|
@@ -22,7 +21,7 @@ RSpec.describe StaffMember, type: :model do
     end
   end
 
-  context 'when checking allocations' do
+  context 'when checking allocations', :disable_allocation_change_publish do
     before do
       # # Allocate all of the offenders to this POM
       offenders.each do |offender|
@@ -42,7 +41,7 @@ RSpec.describe StaffMember, type: :model do
     end
   end
 
-  describe '#unreleased_allocations' do
+  describe '#unreleased_allocations', :disable_allocation_change_publish do
     let(:unreleased_offenders) { offenders }
     let(:released_offenders) do
       [
@@ -79,7 +78,7 @@ RSpec.describe StaffMember, type: :model do
     end
   end
 
-  context 'when a POM has new and old allocations' do
+  context 'when a POM has new and old allocations', :disable_allocation_change_publish do
     let(:old) { 8.days.ago }
 
     let(:old_primary_alloc) do

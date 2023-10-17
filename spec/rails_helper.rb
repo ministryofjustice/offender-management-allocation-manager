@@ -46,6 +46,10 @@ RSpec.configure do |config|
     allow_any_instance_of(DomainEvents::Event).to receive(:publish)
   end
 
+  config.before(:each, :disable_allocation_change_publish) do
+    allow_any_instance_of(AllocationHistory).to receive(:publish_allocation_changed_event)
+  end
+
   config.before(:each, :disable_early_allocation_event) do
     allow(EarlyAllocationService).to receive(:send_early_allocation)
   end

@@ -16,7 +16,6 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
   end
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     case_info = create(:case_information, offender: build(:offender, nomis_offender_id: api_offender.offender_no))
     offender = build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender)
     allow(OffenderService).to receive(:get_offender).and_return(offender)
@@ -39,7 +38,7 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
       create(:allocation_history, prison: prison.code, nomis_offender_id: api_offender.offender_no, primary_pom_nomis_id: pom.staff_id, primary_pom_name: pom.full_name)
     end
 
-    context 'when form created outside of the referral window (more than 18 months to release)' do
+    context 'when form created outside of the referral window (more than 18 months to release)', :disable_allocation_change_publish do
       context 'when form outcome is ineligible' do
         let(:release_date) { Time.zone.today + 28.months }
 

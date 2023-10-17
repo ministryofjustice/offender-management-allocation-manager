@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe TasksController, :allocation, type: :controller do
+RSpec.describe TasksController, :disable_allocation_change_publish, :allocation, type: :controller do
   let(:prison) { create(:prison).code }
   let(:staff_id) { 123 }
   let(:pom) do
@@ -27,7 +27,6 @@ RSpec.describe TasksController, :allocation, type: :controller do
     stub_poms(prison, pom)
     stub_signed_in_pom(prison, staff_id)
     stub_offenders_for_prison(prison, offenders)
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
   end
 
   context 'when an SPO' do

@@ -5,10 +5,6 @@ describe MovementService, type: :feature do
   let(:new_offender_nil) { build(:movement, offenderNo: 'G4273GI', fromAgency: nil)   }
   let(:transfer_out) { build(:movement, offenderNo: 'G4273GI', directionCode: 'OUT', movementType: 'TRN')   }
 
-  before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
-  end
-
   it "can get recent movements",
      vcr: { cassette_name: 'prison_api/movement_service_recent_spec' }  do
     movements = described_class.movements_on(Date.iso8601('2019-02-20'))
@@ -35,7 +31,7 @@ describe MovementService, type: :feature do
     expect(processed).to be false
   end
 
-  describe "processing an offender transfer" do
+  describe "processing an offender transfer", :disable_allocation_change_publish do
     let(:transfer_adm_no_to_agency) { build(:movement, offenderNo: 'G7266VD', toAgency: 'COURT')   }
     let(:transfer_in) { build(:movement, offenderNo: 'G7266VD', directionCode: 'IN', movementType: 'ADM', fromAgency: 'VEI', toAgency: 'CFI')   }
     let(:admission) { build(:movement, offenderNo: 'G7266VD', toAgency: 'LEI', fromAgency: 'COURT')   }
@@ -148,7 +144,7 @@ describe MovementService, type: :feature do
       expect(mailer).to receive(:deliver_later)
     end
 
-    context 'with a valid release movement' do
+    context 'with a valid release movement', :disable_allocation_change_publish do
       let(:updated_allocation) { AllocationHistory.find_by(nomis_offender_id: valid_release.offender_no) }
       let(:processed) { described_class.process_movement(valid_release) }
 
@@ -204,7 +200,7 @@ describe MovementService, type: :feature do
       end
     end
 
-    context 'with invalid release movements' do
+    context 'with invalid release movements', :disable_allocation_change_publish do
       let(:invalid_release1) { build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'LEI')   }
       let(:invalid_release2) { build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', fromAgency: 'COURT')   }
       let(:invalid_release3) { build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', fromAgency: 'BASDON')   }
@@ -234,7 +230,7 @@ describe MovementService, type: :feature do
                        movementType: movement_type, fromAgency: from_agency, toAgency: to_agency)
     end
 
-    context 'when movement is a transfer' do
+    context 'when movement is a transfer', :disable_allocation_change_publish do
       let(:case_info) { create(:case_information, nomis_offender_id: 'G7266VD') }
 
       context 'when the from_agency is MHI' do
@@ -300,7 +296,7 @@ describe MovementService, type: :feature do
       end
     end
 
-    context 'when movement is a release' do
+    context 'when movement is a release', :disable_allocation_change_publish do
       context 'when offender moving to an immigration centre' do
         context 'when the from_agency is MHI' do
           let(:from_agency) { 'MHI' }

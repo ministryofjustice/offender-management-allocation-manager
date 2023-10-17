@@ -24,7 +24,6 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
   end
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_offenders_for_prison(prison.code, [nomis_offender])
     stub_keyworker(prison.code, nomis_offender_id, build(:keyworker))
 
@@ -126,7 +125,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
     include_examples 'update PRD behaviour'
   end
 
-  context 'when user is a POM' do
+  context 'when user is a POM', :disable_allocation_change_publish do
     before do
       # Stub the user to be a POM
       stub_auth_token

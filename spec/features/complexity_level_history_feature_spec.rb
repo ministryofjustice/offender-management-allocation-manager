@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Case history with complexity level' do
+feature 'Case history with complexity level', :disable_allocation_change_publish do
   before do
     stub_request(:get, "https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/offender-no/#{offender_no}/history")
       .to_return(body: history.to_json)
@@ -14,8 +14,6 @@ feature 'Case history with complexity level' do
 
     stub_request(:get, "#{ApiHelper::T3}/users/user")
       .to_return(body: { staffId: pom.staff_id, firstName: pom.first_name, lastName: pom.last_name }.to_json)
-
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
 
     create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no,
                                 allocated_at_tier: case_info.tier,

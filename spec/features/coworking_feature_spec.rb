@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Co-working' do
+feature 'Co-working', :disable_allocation_change_publish do
   let(:nomis_offender_id) { 'G4273GI' }
   let(:prison_pom) do
     {
@@ -32,7 +32,6 @@ feature 'Co-working' do
   let(:prisoner_name_forwards) { "#{offender.fetch(:firstName)} #{offender.fetch(:lastName)}" }
 
   before(:each) do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_auth_token
     stub_poms(prison.code, poms)
     stub_offenders_for_prison prison.code, [offender]

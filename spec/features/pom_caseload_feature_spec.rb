@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-feature "view POM's caseload" do
+feature "view POM's caseload", :disable_allocation_change_publish do
   let(:nomis_staff_id) { 485_926 }
   let(:nomis_offender_id) { 'G4273GI' }
   let(:tomorrow) { Date.tomorrow }
@@ -77,7 +77,6 @@ feature "view POM's caseload" do
 
   # create 21 allocations for prisoners named A-K so that we can verify that default sorted paging works
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     poms =
       [
         build(:pom,

@@ -5,10 +5,6 @@ require 'swagger_helper'
 describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } do
   let(:Authorization) { "Bearer TEST_TOKEN" }
 
-  before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
-  end
-
   path '/api/allocation/{nomsNumber}' do
     get 'Retrieves the current allocation for an offender' do
       tags 'Allocations'
@@ -25,7 +21,7 @@ describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } d
         end
       end
 
-      describe 'when authorised' do
+      describe 'when authorised', :disable_allocation_change_publish do
         before do
           allow_any_instance_of(Api::AllocationApiController).to receive(:verify_token)
         end

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature "early allocation", :disable_early_allocation_event, type: :feature do
+feature "early allocation", :disable_early_allocation_event, :disable_allocation_change_publish, type: :feature do
   let(:nomis_staff_id) { 485_926 }
   # any date less than 3 months
   let(:valid_date) { Time.zone.today - 2.months }
@@ -16,7 +16,6 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
   let!(:case_information) { create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     create(:allocation_history, prison: prison, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
 
     stub_auth_token

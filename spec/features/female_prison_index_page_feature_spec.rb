@@ -4,7 +4,6 @@ require "rails_helper"
 
 feature "female prison index page" do
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_signin_spo(pom, [prison.code])
     stub_offenders_for_prison(prison.code, offenders)
     stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
@@ -42,7 +41,7 @@ feature "female prison index page" do
     ]
   end
 
-  describe 'missing details page' do
+  describe 'missing details page', :disable_allocation_change_publish do
     before do
       visit missing_information_prison_prisoners_path(prison.code)
     end

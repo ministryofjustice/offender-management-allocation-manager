@@ -4,7 +4,6 @@ require 'rails_helper'
 
 RSpec.describe ResponsibilitiesController, type: :controller do
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     offender = create(:case_information, local_delivery_unit: build(:local_delivery_unit))
     create(:responsibility, nomis_offender_id: offender.nomis_offender_id)
 
@@ -53,7 +52,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
       end
     end
 
-    context 'with an allocation' do
+    context 'with an allocation', :disable_allocation_change_publish do
       before do
         create(:allocation_history, prison: prison.code, nomis_offender_id: responsibility.nomis_offender_id, primary_pom_nomis_id: pom.staffId)
         stub_poms(prison.code, [pom])

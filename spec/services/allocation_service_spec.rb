@@ -4,12 +4,11 @@ describe AllocationService do
   let(:nomis_offender_id) { 'G7266VD' }
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     # needed as create_or_update calls a NOMIS API
     signin_spo_user
   end
 
-  describe '#allocate_secondary', :queueing do
+  describe '#allocate_secondary', :queueing, :disable_allocation_change_publish do
     let(:moic_test_id) { 485_758 }
     let(:ross_id) { 485_926 }
     let(:primary_pom_id) { ross_id }
@@ -47,7 +46,7 @@ describe AllocationService do
     end
   end
 
-  describe '#create_or_update' do
+  describe '#create_or_update', :disable_allocation_change_publish do
     context 'without an existing' do
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
@@ -105,7 +104,7 @@ describe AllocationService do
     end
   end
 
-  describe '#allocation_history_pom_emails' do
+  describe '#allocation_history_pom_emails', :disable_allocation_change_publish do
     it 'can retrieve all the POMs email addresses for ', vcr: { cassette_name: 'prison_api/allocation_service_history_spec' } do
       previous_primary_pom_nomis_id = 485_637
       updated_primary_pom_nomis_id = 485_926

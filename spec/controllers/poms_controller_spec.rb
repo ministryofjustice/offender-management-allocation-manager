@@ -11,7 +11,6 @@ RSpec.describe PomsController, type: :controller do
   let(:na_offenders) { build_list(:nomis_offender, 5) }
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_sso_data(prison.code)
     inactive = create(:pom_detail, :inactive, prison_code: prison.code)
     active = create(:pom_detail, :active, prison_code: prison.code)
@@ -42,7 +41,7 @@ RSpec.describe PomsController, type: :controller do
 
   render_views
 
-  context 'with an extra unsentenced offender' do
+  context 'with an extra unsentenced offender', :disable_allocation_change_publish do
     before do
       # This guy doesn't turn up in Prison#offenders, and hence doesn't show up on caseload or stats
       missing_offender = create(:case_information)

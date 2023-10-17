@@ -1,8 +1,7 @@
 require 'rails_helper'
 
-feature 'male prisoners summary navigation tabs' do
+feature 'male prisoners summary navigation tabs', :disable_allocation_change_publish do
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     signin_spo_user([prison.code, 'AGI'])
     stub_signin_spo(pom, [prison.code, 'AGI'])
     stub_offenders_for_prison(prison.code, offenders)

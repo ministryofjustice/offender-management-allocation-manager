@@ -4,7 +4,6 @@ require 'rails_helper'
 
 feature 'Search for offenders' do
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     signin_spo_user [prison_code]
   end
 
@@ -51,7 +50,7 @@ feature 'Search for offenders' do
     end
   end
 
-  context 'with a single allocation' do
+  context 'with a single allocation', :disable_allocation_change_publish do
     before do
       create(:case_information, offender: build(:offender, nomis_offender_id: 'G5359UP'))
       create(:allocation_history, prison: prison_code, nomis_offender_id: 'G5359UP')

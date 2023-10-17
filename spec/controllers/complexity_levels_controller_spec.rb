@@ -1,4 +1,4 @@
-RSpec.describe ComplexityLevelsController, type: :controller do
+RSpec.describe ComplexityLevelsController, :disable_allocation_change_publish, type: :controller do
   let(:offender) { build(:nomis_offender, complexityLevel: 'medium', prisonId: womens_prison.code, firstName: 'Sally', lastName: 'Albright') }
   let(:womens_prison) { create(:womens_prison) }
   let(:offenders) { [offender] }
@@ -7,7 +7,6 @@ RSpec.describe ComplexityLevelsController, type: :controller do
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
 

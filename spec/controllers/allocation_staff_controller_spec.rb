@@ -17,7 +17,6 @@ RSpec.describe AllocationStaffController, type: :controller do
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_poms(prison_code, poms)
     stub_offender(offender)
     stub_movements_for offender_no, [attributes_for(:movement)]
@@ -31,7 +30,7 @@ RSpec.describe AllocationStaffController, type: :controller do
     describe '#index' do
       let(:alice) { poms.first }
 
-      context 'with previous allocations for this POM' do
+      context 'with previous allocations for this POM', :disable_allocation_change_publish do
         before do
           { a: 5, b: 4, c: 3, d: 2 }.each do |tier, quantity|
             0.upto(quantity - 1) do
@@ -85,7 +84,7 @@ RSpec.describe AllocationStaffController, type: :controller do
         end
       end
 
-      context 'when the offender has been allocated before' do
+      context 'when the offender has been allocated before', :disable_allocation_change_publish do
         let!(:allocation) do
           create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.last.staff_id)
         end
@@ -114,7 +113,7 @@ RSpec.describe AllocationStaffController, type: :controller do
         end
       end
 
-      context 'when newly transferred from a different prison' do
+      context 'when newly transferred from a different prison', :disable_allocation_change_publish do
         let(:previous_prison_code) { create(:prison).code }
 
         let(:previous_pom) { build(:pom, :probation_officer) }

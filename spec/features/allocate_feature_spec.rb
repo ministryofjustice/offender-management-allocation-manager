@@ -37,12 +37,11 @@ feature 'Allocation' do
     allow(OffenderService).to receive(:get_community_data).and_return({ crn: 12_345 })
     allow_any_instance_of(StaffMember).to receive(:email_address).and_return('pom@example.com')
     allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
 
     signin_spo_user
   end
 
-  context 'when a journey begins on the "Make allocations" page' do
+  context 'when a journey begins on the "Make allocations" page', :disable_allocation_change_publish do
     let(:start_page) { unallocated_prison_prisoners_path('LEI') }
 
     before do
@@ -187,7 +186,7 @@ feature 'Allocation' do
     expect(page).to have_content('This reason cannot be more than 175 characters')
   end
 
-  scenario 're-allocating', vcr: { cassette_name: 'prison_api/re_allocate_feature' } do
+  scenario 're-allocating', :disable_allocation_change_publish, vcr: { cassette_name: 'prison_api/re_allocate_feature' } do
     create(
       :allocation_history,
       prison: 'LEI',
@@ -234,7 +233,7 @@ feature 'Allocation' do
     expect(AllocationHistory.find_by(nomis_offender_id: nomis_offender_id).event).to eq("reallocate_primary_pom")
   end
 
-  context 'with a community override' do
+  context 'with a community override', :disable_allocation_change_publish do
     before do
       create(
         :allocation_history,

@@ -5,11 +5,10 @@ feature 'Provide debugging information for our team to use' do
   let(:prison) { Prison.find 'LEI' }
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     signin_global_admin_user
   end
 
-  context 'when debugging an individual offender' do
+  context 'when debugging an individual offender', :disable_allocation_change_publish do
     it 'returns information for an offender', vcr: { cassette_name: 'prison_api/debugging_allocated_offender_feature' } do
       create(:allocation_history,
              prison: 'LEI',

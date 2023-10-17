@@ -23,10 +23,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
 
     before do
       Timecop.travel today
-
       allow_any_instance_of(Prison).to receive(:get_single_pom).and_return(pom)
-      allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
-
       allow(OffenderService).to receive(:get_offender).and_return(offender)
 
       # Create an unrelated allocation so that active_prison counts as active
@@ -45,7 +42,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       Timecop.return
     end
 
-    context 'when the offender does not exist in NOMIS' do
+    context 'when the offender does not exist in NOMIS', :disable_allocation_change_publish do
       let(:offender) { nil }
       let(:offender_no) do
         # Use offender factory to give a 'realistic' offender number
@@ -58,7 +55,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       end
     end
 
-    context 'when the offender exists in NOMIS' do
+    context 'when the offender exists in NOMIS', :disable_allocation_change_publish do
       context 'when the offender is un-sentenced' do
         let(:api_offender) do
           build_api_offender(sentence_type: :determinate, ard_crd_release: nil, ted: nil)

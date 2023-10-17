@@ -18,7 +18,6 @@ feature "womens allocation journey" do
   let(:tiers) { ['A', 'B', 'C', 'D', 'N/A'].cycle.take(offenders.size) }
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     create(:pom_detail, :inactive, prison_code: prison.code, nomis_staff_id: inactive_prison_pom.staff_id)
     create(:pom_detail, :part_time, prison_code: prison.code, nomis_staff_id: probation_pom.staff_id)
     create(:pom_detail, prison_code: prison.code, nomis_staff_id: probation_pom2.staff_id)
@@ -56,7 +55,7 @@ feature "womens allocation journey" do
       # Now on 'Choose a POM' page
     end
 
-    scenario 'accepting recommendation' do
+    scenario 'accepting recommendation', :disable_allocation_change_publish do
       within "tr#pom-#{probation_pom2.staffId}" do
         # allocate to the second person in the list
         click_link 'Allocate'
@@ -83,7 +82,7 @@ feature "womens allocation journey" do
                suitability_detail: nil)
     end
 
-    scenario 'rejecting recommendation' do
+    scenario 'rejecting recommendation', :disable_allocation_change_publish do
       # Choose the one non-recommended POM
       within "tr#pom-#{prison_pom.staffId}" do
         click_link 'Allocate'
@@ -147,7 +146,7 @@ feature "womens allocation journey" do
       stub_community_offender(offender_id, build(:community_data))
     end
 
-    scenario 'accepting recommendation' do
+    scenario 'accepting recommendation', :disable_allocation_change_publish do
       click_link 'Reallocate'
       # Now on Review case page
 

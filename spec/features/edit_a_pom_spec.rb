@@ -51,7 +51,6 @@ feature "edit a POM's details" do
     let(:pom) { build(:pom) }
 
     before do
-      allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
       signin_spo_user
 
       create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
@@ -124,7 +123,7 @@ feature "edit a POM's details" do
       end
     end
 
-    context 'when a POM is made inactive' do
+    context 'when a POM is made inactive', :disable_allocation_change_publish do
       before do
         # create an allocation with the POM as the primary POM
         create(

@@ -17,10 +17,6 @@ feature 'admin urls' do
   #     expect(page).to have_http_status(:unauthorized)
   #   end
   # end
-  before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
-  end
-
   let(:prison_code) { create(:prison).code }
   let(:admin_urls) do
     [
@@ -64,7 +60,7 @@ feature 'admin urls' do
     end
   end
 
-  context 'when a global admin' do
+  context 'when a global admin', :disable_allocation_change_publish do
     before do
       signin_global_admin_user
       stub_auth_token

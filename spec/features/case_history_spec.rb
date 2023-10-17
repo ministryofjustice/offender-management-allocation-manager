@@ -68,7 +68,6 @@ feature 'Case History' do
   let(:transfer_date) { today - 5.days }
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     Timecop.travel Time.zone.local 2021, 2, 28, 11, 25, 35
     stub_auth_token
   end
@@ -97,7 +96,7 @@ feature 'Case History' do
       stub_agencies(HmppsApi::PrisonApi::AgenciesApi::HOSPITAL_AGENCY_TYPE)
     end
 
-    context 'when on the allocation history page' do
+    context 'when on the allocation history page', :disable_allocation_change_publish do
       before do
         # create a plausible timeline involving 3 prisons over a period of several days
         current_date = first_arrival_date
@@ -429,7 +428,7 @@ feature 'Case History' do
     "#{history.updated_at.strftime("#{history.updated_at.day.ordinalize} %B %Y")} (#{history.updated_at.strftime('%R')})"
   end
 
-  context 'with a simple case' do
+  context 'with a simple case', :disable_allocation_change_publish do
     before do
       stub_user(username: 'MOIC_POM', staff_id: pom.staff_id)
       stub_offenders_for_prison(open_prison.code, [nomis_offender])

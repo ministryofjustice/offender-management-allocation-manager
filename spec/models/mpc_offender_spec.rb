@@ -5,10 +5,6 @@ RSpec.describe MpcOffender, type: :model do
     described_class.new(prison: prison, offender: offender_model, prison_record: api_offender)
   end
 
-  before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
-  end
-
   let(:nomis_offender_id) { FactoryBot.generate :nomis_offender_id }
   let(:offender_model) do
     instance_double(Offender,
@@ -403,7 +399,7 @@ RSpec.describe MpcOffender, type: :model do
   end
 
   describe '#to_allocated_offender' do
-    describe 'when allocation history exists' do
+    describe 'when allocation history exists', :disable_allocation_change_publish do
       it 'build an AllocatedOffender' do
         alloc_history = FactoryBot.create :allocation_history, :primary, nomis_offender_id: offender.offender_no,
                                                                          prison: offender.prison.code

@@ -4,7 +4,6 @@ require 'rails_helper'
 
 feature 'summary summary feature' do
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     signin_spo_user
   end
 
@@ -26,7 +25,7 @@ feature 'summary summary feature' do
       expect(page).to have_content('Add missing details')
     end
 
-    context 'with allocations' do
+    context 'with allocations', :disable_allocation_change_publish do
       let(:first) { 'G7806VO' }
       let(:last) { 'G6951VK' }
       let(:prison) { 'LEI' }

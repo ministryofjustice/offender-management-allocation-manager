@@ -6,7 +6,6 @@ RSpec.describe BuildAllocationsController, type: :controller do
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_poms(prison.code, poms)
     stub_signed_in_pom(prison.code, pom.staffId, 'Alice')
     stub_sso_data(prison.code)
@@ -41,7 +40,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
       end
     end
 
-    context 'when re-allocating' do
+    context 'when re-allocating', :disable_allocation_change_publish do
       before do
         create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no,
                                     primary_pom_nomis_id: pom.staffId)
@@ -81,7 +80,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
     end
   end
 
-  describe '#update' do
+  describe '#update', :disable_allocation_change_publish do
     # Tried making this a let but the `put :update` added
     # :additional_notes to it. The code adds this to the session as
     # part of the update, so it may be due to some odd interaction

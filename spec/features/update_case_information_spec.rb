@@ -9,7 +9,6 @@ RSpec.feature "Update case information", type: :feature do
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_offenders_for_prison(prison.code, offenders)
     stub_signin_spo(spo, [prison.code])
     stub_poms(prison.code, [pom, spo])
@@ -38,7 +37,7 @@ RSpec.feature "Update case information", type: :feature do
     end
   end
 
-  context 'when there is an existing allocation' do
+  context 'when there is an existing allocation', :disable_allocation_change_publish do
     before do
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: pom.staff_id,  prison: prison.code)
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
@@ -59,7 +58,7 @@ RSpec.feature "Update case information", type: :feature do
     end
   end
 
-  context 'when reallocating a POM on an existing allocation' do
+  context 'when reallocating a POM on an existing allocation', :disable_allocation_change_publish do
     before do
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: pom.staff_id,  prison: prison.code)
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))

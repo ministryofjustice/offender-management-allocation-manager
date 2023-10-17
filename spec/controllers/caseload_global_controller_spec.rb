@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe CaseloadGlobalController, type: :controller do
+RSpec.describe CaseloadGlobalController, :disable_allocation_change_publish, type: :controller do
   let(:staff_id) { 456_987 }
   let(:other_staff_id) { 767_584 }
   let(:not_signed_in) { 123_456 }
@@ -27,7 +27,6 @@ RSpec.describe CaseloadGlobalController, type: :controller do
   before do
     stub_poms(prison.code, poms)
     stub_signed_in_pom(prison.code, pom.staffId, 'alice')
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
   end
 
   context 'with 3 offenders' do

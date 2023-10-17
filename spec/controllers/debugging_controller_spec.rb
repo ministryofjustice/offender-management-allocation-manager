@@ -8,10 +8,9 @@ RSpec.describe DebuggingController, type: :controller do
 
   before do
     stub_sso_data(prison_id, roles: [SsoIdentity::SPO_ROLE, SsoIdentity::ADMIN_ROLE])
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
   end
 
-  context 'when debugging an offender' do
+  context 'when debugging an offender', :disable_allocation_change_publish do
     let(:offender_no) { 'G7806VO' }
     let(:pom_staff_id) { 543_453 }
     let(:primary_pom_name) { 'Jenae Sporer' }
