@@ -1,5 +1,5 @@
 module DpsHeaderFooterHelper
-  def dps_components_retrieved_successfully
+  def dps_components_retrieved_successfully?
     dps_header_footer.fetch('status') == 'ok'
   end
 

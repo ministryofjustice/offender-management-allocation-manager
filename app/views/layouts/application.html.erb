@@ -11,7 +11,7 @@
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
 
-    <% if ENABLE_DPS_HEADER_FOOTER && dps_components_retrieved_successfully %>
+    <% if ENABLE_DPS_HEADER_FOOTER && dps_components_retrieved_successfully? %>
       <%= dps_component_css('header') %>
       <%= dps_component_js('header') %>
       <%= dps_component_css('footer') %>
