@@ -4,19 +4,32 @@ module Api
   class AllocationApiController < Api::ApiController
     def show
       render_404('Not ready for allocation') && return if allocation.nil?
+      render_404('Not allocated') && return unless offender_allocated?
 
-      offender = OffenderService.get_offender(offender_number)
+      render json: both_poms
+    end
 
-      if offender.nil? || !allocation.active? || !offender.inside_omic_policy?
-        return render_404('Not allocated')
-      end
+    def primary_pom
+      render_404('Not ready for allocation') && return if allocation.nil?
+      render_404('Not allocated') && return unless offender_allocated?
 
-      render json: allocation_as_json
+      staff = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(allocation.primary_pom_nomis_id)
+
+      render json: {
+        manager: {
+          code: staff.staff_id,
+          forename: staff.first_name,
+          surname: staff.last_name
+        },
+        prison: {
+          code: allocation.prison
+        }
+      }
     end
 
   private
 
-    def allocation_as_json
+    def both_poms
       {
         primary_pom: primary_pom_details,
         secondary_pom: secondary_pom_details
@@ -39,8 +52,16 @@ module Api
       }
     end
 
+    def offender_allocated?
+      offender.present? && offender.inside_omic_policy? && allocation.active?
+    end
+
     def allocation
       @allocation ||= AllocationHistory.find_by(nomis_offender_id: offender_number)
+    end
+
+    def offender
+      @offender ||= OffenderService.get_offender(offender_number)
     end
 
     def offender_number

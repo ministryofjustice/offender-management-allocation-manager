@@ -167,10 +167,12 @@ Rails.application.routes.draw do
 
   namespace :api do
     get('/' => 'api#index')
-    resources :allocation, only: [:show], param: :offender_no, controller: 'allocation_api', path_names: { show: ':offender_no' }
     resources :offenders, only: [:show], param: :nomis_offender_id
     resources :handovers, only: [:show], controller: :handovers_api
   end
+
+  get '/api/allocation/:offender_no/primary_pom', to: 'api/allocation_api#primary_pom'
+  get '/api/allocation/:offender_no', to: 'api/allocation_api#show'
 
   # '/admin' is already taken by ActiveAdmin
   namespace :manage do

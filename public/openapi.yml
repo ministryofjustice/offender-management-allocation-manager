@@ -80,6 +80,56 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Status"
+  "/api/allocation/{nomsNumber}/primary_pom":
+    get:
+      summary: Retrieves the primary POM for an offender
+      tags:
+      - Allocations
+      parameters:
+      - name: nomsNumber
+        in: path
+        schema:
+          "$ref": "#/components/schemas/NomsNumber"
+        required: true
+      security:
+      - Bearer: []
+      responses:
+        '401':
+          description: Request is not authorised
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Status"
+        '200':
+          description: Offender is allocated
+          content:
+            application/json:
+              schema:
+                required:
+                - manager
+                - prison
+                type: object
+                properties:
+                  manager:
+                    type: object
+                    properties:
+                      code:
+                        type: integer
+                      forename:
+                        type: string
+                      surname:
+                        type: string
+                  prison:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+        '404':
+          description: Allocation for offender not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Status"
   "/api/handovers/{nomsNumber}":
     get:
       summary: Retrieves the handover information for an offender
