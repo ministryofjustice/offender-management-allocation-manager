@@ -8,10 +8,22 @@ module HmppsApi
     class << self
       def header
         get_component('header')
+      rescue Faraday::ServerError, Faraday::ResourceNotFound
+        if block_given?
+          yield
+        else
+          raise
+        end
       end
 
       def footer
         get_component('footer')
+      rescue Faraday::ServerError, Faraday::ResourceNotFound
+        if block_given?
+          yield
+        else
+          raise
+        end
       end
 
     private
@@ -27,6 +39,7 @@ module HmppsApi
 
       def connection
         Faraday.new do |faraday|
+          faraday.options.timeout = 3
           faraday.options.params_encoder = Faraday::FlatParamsEncoder
           faraday.request :instrumentation
           # Response middleware is supposed to be registered after request middleware

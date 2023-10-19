@@ -9,11 +9,14 @@
       <meta name="turbolinks-cache-control" content="no-cache">
     <% end %>
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= dps_header_css %>
-    <%= dps_footer_css %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-    <%= dps_header_js %>
-    <%= dps_footer_js %>
+
+    <% if ENABLE_DPS_HEADER_FOOTER && dps_components_retrieved_successfully? %>
+      <%= dps_component_css('header') %>
+      <%= dps_component_js('header') %>
+      <%= dps_component_css('footer') %>
+      <%= dps_component_js('footer') %>
+    <% end %>
   </head>
 
   <body class="govuk-template__body js-enabled">

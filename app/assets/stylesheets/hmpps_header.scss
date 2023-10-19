@@ -1,3 +1,22 @@
+.govuk-header {
+  border-bottom: 10px solid #1d70b8;
+}
+
+.govuk-header--fallback {
+  border: none !important;
+  padding-bottom: 10px;
+}
+
+.govuk-header__container--fallback {
+  border: none !important;
+  margin-bottom: -10px;
+  padding-top: 10px;
+}
+
+.govuk-header__navigation-item a {
+  color: white !important;
+}
+
 .hmpps-header {
   padding-top: 13px;
   padding-bottom: 7px;
@@ -12,6 +31,12 @@
   height: 30px;
   margin-bottom: -2px;
   margin-right: 10px;
+}
+
+.hmpps__logotype-crown {
+  display: inline-block;
+  content: "";
+  fill: white;
 }
 
 .hmpps-header__inner {

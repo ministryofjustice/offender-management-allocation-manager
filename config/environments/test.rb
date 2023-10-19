@@ -68,6 +68,4 @@ Rails.application.configure do
   # ...which means we also need to use a proper cache store, rather than the default null store
   # To avoid leaking global state between tests, we clear this cache after every spec in rails_helper.rb
   config.cache_store = :memory_store, { size: 64.megabytes }
-
-  config.community_api_host = 'https://community-api-secure.test.delius.probation.hmpps.dsd.io'
 end

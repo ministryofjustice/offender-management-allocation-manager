@@ -1,37 +1,31 @@
 module DpsHeaderFooterHelper
-  def dps_header_html
-    dps_header_footer_enabled? ? dps_header_all.fetch('html').html_safe : ''
+  def dps_components_retrieved_successfully?
+    dps_header_footer.fetch('status') == 'ok'
   end
 
-  def dps_header_css
-    dps_header_footer_enabled? ? dps_header_all.fetch('css').map { |link| stylesheet_link_tag link }.join("\n").html_safe : ''
+  def dps_component_html(component)
+    check_component(component)
+
+    dps_header_footer.fetch(component).fetch('html').html_safe
   end
 
-  def dps_header_js
-    dps_header_footer_enabled? ? dps_header_all.fetch('javascript').map { |source| javascript_include_tag source }.join("\n").html_safe : ''
+  def dps_component_css(component)
+    check_component(component)
+
+    dps_header_footer.fetch(component).fetch('css').map { |link|
+      stylesheet_link_tag link, media: 'all', 'data-turbolinks-track': 'reload'
+    }.join("\n").html_safe
   end
 
-  def dps_header_all
-    @dps_header_all ||= HmppsApi::DpsFrontendComponentsApi.header
+  def dps_component_js(component)
+    dps_header_footer.fetch(component).fetch('javascript').map { |link|
+      javascript_include_tag link, 'data-turbolinks-track': 'reload'
+    }.join("\n").html_safe
   end
 
-  def dps_footer_html
-    dps_header_footer_enabled? ? dps_footer_all.fetch('html').html_safe : ''
-  end
+private
 
-  def dps_footer_css
-    dps_header_footer_enabled? ? dps_footer_all.fetch('css').map { |link| stylesheet_link_tag link }.join("\n").html_safe : ''
-  end
-
-  def dps_footer_js
-    dps_header_footer_enabled? ? dps_footer_all.fetch('javascript').map { |source| javascript_include_tag source }.join("\n").html_safe : ''
-  end
-
-  def dps_footer_all
-    @dps_footer_all ||= HmppsApi::DpsFrontendComponentsApi.footer
-  end
-
-  def dps_header_footer_enabled?
-    ENABLE_DPS_HEADER_FOOTER || params[:dps_header_footer].present?
+  def check_component(component)
+    raise ArgumentError, 'Component must be "header" or "footer"' unless ['header', 'footer'].include?(component)
   end
 end

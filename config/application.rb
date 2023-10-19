@@ -49,8 +49,9 @@ module OffenderManagementAllocationClient
     # Sentry environment set with SENTRY_CURRENT_ENV
     config.sentry_dsn = ENV['SENTRY_DSN']&.strip
 
-    config.keyworker_api_host = ENV['KEYWORKER_API_HOST']&.strip
+    config.env_name = ENV.fetch('ENV_NAME', 'dev')&.strip
 
+    config.keyworker_api_host = ENV['KEYWORKER_API_HOST']&.strip
     config.digital_prison_service_host = ENV['DIGITAL_PRISON_SERVICE_HOST']&.strip
     config.nomis_oauth_host = ENV['NOMIS_OAUTH_HOST']&.strip
     config.prison_api_host = ENV['PRISON_API_HOST']&.strip
@@ -61,6 +62,7 @@ module OffenderManagementAllocationClient
     config.manage_pom_cases_and_delius_host = ENV['MANAGE_POM_CASES_AND_DELIUS_HOST']&.strip
     config.tiering_api_host = ENV['TIERING_API_HOST']&.strip
     config.dps_frontend_components_api_host = ENV['DPS_FRONTEND_COMPONENTS_API_HOST']&.strip
+    config.community_api_host = ENV['COMMUNITY_API_HOST']&.strip
 
     config.hmpps_oauth_client_id = ENV['HMPPS_OAUTH_CLIENT_ID']&.strip
     config.hmpps_oauth_client_secret = ENV['HMPPS_OAUTH_CLIENT_SECRET']&.strip
