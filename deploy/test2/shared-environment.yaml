@@ -20,4 +20,4 @@ data:
   MANAGE_POM_CASES_AND_DELIUS_HOST: "https://manage-pom-cases-and-delius-dev.hmpps.service.justice.gov.uk"
   TIERING_API_HOST: https://hmpps-tier-dev.hmpps.service.justice.gov.uk
   DPS_FRONTEND_COMPONENTS_API_HOST: "https://frontend-components-dev.hmpps.service.justice.gov.uk"
-  DIGITAL_PRISON_SERVICES_HOST: "https://digital-dev.prison.service.justice.gov.uk"
+  DIGITAL_PRISON_SERVICE_HOST: "https://digital-dev.prison.service.justice.gov.uk"
