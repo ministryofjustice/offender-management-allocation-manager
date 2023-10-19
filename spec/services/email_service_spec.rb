@@ -120,7 +120,7 @@ RSpec.describe EmailService do
     end
   end
 
-  context 'when offender has been released', :disable_allocation_change_publish do
+  context 'when offender has been released' do
     let(:staff_id) { '485833' }
     let!(:released_allocation) do
       create(:allocation_history,

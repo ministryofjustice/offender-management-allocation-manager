@@ -40,7 +40,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
       end
     end
 
-    context 'when re-allocating', :disable_allocation_change_publish do
+    context 'when re-allocating' do
       before do
         create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no,
                                     primary_pom_nomis_id: pom.staffId)
@@ -80,7 +80,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
     end
   end
 
-  describe '#update', :disable_allocation_change_publish do
+  describe '#update' do
     # Tried making this a let but the `put :update` added
     # :additional_notes to it. The code adds this to the session as
     # part of the update, so it may be due to some odd interaction

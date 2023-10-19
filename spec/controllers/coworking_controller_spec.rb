@@ -17,7 +17,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
     allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
   end
 
-  context 'when there is an existing invalid co-worker', :disable_allocation_change_publish do
+  context 'when there is an existing invalid co-worker' do
     before do
       stub_request(:get, "#{ApiHelper::T3}/staff/#{primary_pom.staffId}")
         .to_return(body: { 'firstName' => 'fred' }.to_json)
@@ -67,7 +67,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
     end
   end
 
-  describe '#destroy', :disable_allocation_change_publish do
+  describe '#destroy' do
     before do
       create(:allocation_history, prison: prison, nomis_offender_id: offender_no,
                                   primary_pom_nomis_id: primary_pom.staffId,

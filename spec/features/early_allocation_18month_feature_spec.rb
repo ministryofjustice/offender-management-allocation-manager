@@ -6,7 +6,7 @@ feature 'early allocation when crossing 18 month threshold' do
   let(:prison) { create(:prison) }
   let(:user) { build(:pom) }
 
-  context 'when early allocation prisoner transitions from > 18 months to < 18 months from release', :disable_allocation_change_publish do
+  context 'when early allocation prisoner transitions from > 18 months to < 18 months from release' do
     let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code) }
     let(:offender_no) { nomis_offender.fetch(:prisonerNumber) }
 

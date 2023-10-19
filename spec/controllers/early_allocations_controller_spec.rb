@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe EarlyAllocationsController, :disable_allocation_change_publish, type: :controller do
+RSpec.describe EarlyAllocationsController, type: :controller do
   # any date less than 3 months in the past
   let(:valid_date) { Time.zone.today - 2.months }
   let(:s1_boolean_param_names) { [:convicted_under_terrorisom_act_2000, :high_profile, :serious_crime_prevention_order, :mappa_level_3, :cppc_case] }

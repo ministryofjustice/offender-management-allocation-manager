@@ -96,7 +96,7 @@ feature 'Case History' do
       stub_agencies(HmppsApi::PrisonApi::AgenciesApi::HOSPITAL_AGENCY_TYPE)
     end
 
-    context 'when on the allocation history page', :disable_allocation_change_publish do
+    context 'when on the allocation history page' do
       before do
         # create a plausible timeline involving 3 prisons over a period of several days
         current_date = first_arrival_date
@@ -428,7 +428,7 @@ feature 'Case History' do
     "#{history.updated_at.strftime("#{history.updated_at.day.ordinalize} %B %Y")} (#{history.updated_at.strftime('%R')})"
   end
 
-  context 'with a simple case', :disable_allocation_change_publish do
+  context 'with a simple case' do
     before do
       stub_user(username: 'MOIC_POM', staff_id: pom.staff_id)
       stub_offenders_for_prison(open_prison.code, [nomis_offender])

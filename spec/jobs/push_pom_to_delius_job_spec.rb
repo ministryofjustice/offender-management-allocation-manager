@@ -11,7 +11,7 @@ RSpec.describe PushPomToDeliusJob, type: :job, versioning: true do
     allow(AuditEvent).to receive(:publish)
   end
 
-  describe 'when a Primary POM is allocated', :disable_allocation_change_publish do
+  describe 'when a Primary POM is allocated' do
     let!(:allocation) do
       create(:allocation_history,
              prison: build(:prison).code,

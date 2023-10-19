@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Prison do
-  describe '#active', :disable_allocation_change_publish do
+  describe '#active' do
     before do
       create(:allocation_history, prison: p1.code)
       create(:allocation_history, prison: p1.code)
@@ -137,7 +137,7 @@ RSpec.describe Prison do
     end
   end
 
-  describe '#primary_allocated_offenders', :disable_allocation_change_publish do
+  describe '#primary_allocated_offenders' do
     let(:prison) { FactoryBot.create :prison }
     let(:allocation_history) { FactoryBot.create_list :allocation_history, 3, :primary, prison: prison.code }
     let(:mpc_offenders) do

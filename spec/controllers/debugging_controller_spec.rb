@@ -10,7 +10,7 @@ RSpec.describe DebuggingController, type: :controller do
     stub_sso_data(prison_id, roles: [SsoIdentity::SPO_ROLE, SsoIdentity::ADMIN_ROLE])
   end
 
-  context 'when debugging an offender', :disable_allocation_change_publish do
+  context 'when debugging an offender' do
     let(:offender_no) { 'G7806VO' }
     let(:pom_staff_id) { 543_453 }
     let(:primary_pom_name) { 'Jenae Sporer' }

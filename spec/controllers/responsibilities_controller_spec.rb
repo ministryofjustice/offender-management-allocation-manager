@@ -52,7 +52,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
       end
     end
 
-    context 'with an allocation', :disable_allocation_change_publish do
+    context 'with an allocation' do
       before do
         create(:allocation_history, prison: prison.code, nomis_offender_id: responsibility.nomis_offender_id, primary_pom_nomis_id: pom.staffId)
         stub_poms(prison.code, [pom])

@@ -399,7 +399,7 @@ RSpec.describe MpcOffender, type: :model do
   end
 
   describe '#to_allocated_offender' do
-    describe 'when allocation history exists', :disable_allocation_change_publish do
+    describe 'when allocation history exists' do
       it 'build an AllocatedOffender' do
         alloc_history = FactoryBot.create :allocation_history, :primary, nomis_offender_id: offender.offender_no,
                                                                          prison: offender.prison.code

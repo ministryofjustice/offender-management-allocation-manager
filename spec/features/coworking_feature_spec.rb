@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Co-working', :disable_allocation_change_publish do
+feature 'Co-working' do
   let(:nomis_offender_id) { 'G4273GI' }
   let(:prison_pom) do
     {

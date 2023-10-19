@@ -27,7 +27,7 @@ context 'when NOMIS is missing information' do
       stub_user(username: 'MOIC_POM', staff_id: staff_id)
     end
 
-    describe 'the caseload page', :disable_allocation_change_publish do
+    describe 'the caseload page' do
       context 'with an NPS offender with a determinate sentence, but no release dates' do
         before do
           stub_offenders = [build(:nomis_offender, prisonerNumber: offender_no,
@@ -50,7 +50,7 @@ context 'when NOMIS is missing information' do
       end
     end
 
-    describe 'the prisoner page', :disable_allocation_change_publish do
+    describe 'the prisoner page' do
       before do
         offender = build(:nomis_offender, prisonId: prison_code, prisonerNumber: offender_no,
                                           sentence: attributes_for(:sentence_detail,
@@ -130,7 +130,7 @@ context 'when NOMIS is missing information' do
         )
       end
 
-      describe 'the pom details page', :disable_allocation_change_publish do
+      describe 'the pom details page' do
         before do
           visit prison_pom_path(prison_code, staff_id)
           click_link 'Caseload'

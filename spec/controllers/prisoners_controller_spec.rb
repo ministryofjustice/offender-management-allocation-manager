@@ -9,7 +9,7 @@ RSpec.describe PrisonersController, type: :controller do
       stub_sso_data(prison.code)
     end
 
-    describe 'buckets', :disable_allocation_change_publish do
+    describe 'buckets' do
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_with_case_info_but_no_complexity_level.fetch(:prisonerNumber)))
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_with_complexity_level_and_case_info.fetch(:prisonerNumber)))
@@ -224,7 +224,7 @@ RSpec.describe PrisonersController, type: :controller do
         end
       end
 
-      describe 'allocated', :disable_allocation_change_publish do
+      describe 'allocated' do
         before do
           create(:case_information, offender: build(:offender, nomis_offender_id: offender_a.fetch(:prisonerNumber)))
           create(:allocation_history, primary_pom_name: pom_one.full_name,  nomis_offender_id: offender_a.fetch(:prisonerNumber), prison: prison.code)
@@ -403,7 +403,7 @@ RSpec.describe PrisonersController, type: :controller do
       end
     end
 
-    context 'when sorting', :disable_allocation_change_publish do
+    context 'when sorting' do
       context 'with allocated offenders' do
         let(:prison) { create(:prison, code: 'BXI').code }
 
@@ -665,7 +665,7 @@ RSpec.describe PrisonersController, type: :controller do
           expect(assigns(:offenders).size).to eq(0)
         end
 
-        context "with 3 offenders", :disable_allocation_change_publish, :allocation do
+        context "with 3 offenders", :allocation do
           let(:first_offender) { build(:nomis_offender, firstName: 'Alice', lastName: 'Bloggs') }
           let(:first_offender_no) { first_offender.fetch(:prisonerNumber) }
           let(:offenders) { build_list(:nomis_offender, 2, lastName: 'Bloggs') }

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-feature "staff pages", :disable_allocation_change_publish do
+feature "staff pages" do
   feature "POM page" do
     let(:prison) { create(:prison) }
     let(:pom) { build(:pom) }

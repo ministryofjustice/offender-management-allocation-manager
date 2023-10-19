@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-feature "view POM's caseload", :disable_allocation_change_publish do
+feature "view POM's caseload" do
   let(:nomis_staff_id) { 485_926 }
   let(:nomis_offender_id) { 'G4273GI' }
   let(:tomorrow) { Date.tomorrow }

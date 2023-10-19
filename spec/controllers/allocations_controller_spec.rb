@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe AllocationsController, :disable_allocation_change_publish, type: :controller do
+RSpec.describe AllocationsController, type: :controller do
   let(:poms) do
     [
       build(:pom, :prison_officer, emails: []),

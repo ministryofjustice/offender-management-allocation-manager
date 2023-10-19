@@ -21,7 +21,7 @@ RSpec.describe StaffMember, type: :model do
     end
   end
 
-  context 'when checking allocations', :disable_allocation_change_publish do
+  context 'when checking allocations' do
     before do
       # # Allocate all of the offenders to this POM
       offenders.each do |offender|
@@ -41,7 +41,7 @@ RSpec.describe StaffMember, type: :model do
     end
   end
 
-  describe '#unreleased_allocations', :disable_allocation_change_publish do
+  describe '#unreleased_allocations' do
     let(:unreleased_offenders) { offenders }
     let(:released_offenders) do
       [
@@ -78,7 +78,7 @@ RSpec.describe StaffMember, type: :model do
     end
   end
 
-  context 'when a POM has new and old allocations', :disable_allocation_change_publish do
+  context 'when a POM has new and old allocations' do
     let(:old) { 8.days.ago }
 
     let(:old_primary_alloc) do

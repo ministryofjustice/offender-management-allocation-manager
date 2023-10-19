@@ -46,10 +46,6 @@ RSpec.configure do |config|
     allow_any_instance_of(DomainEvents::Event).to receive(:publish)
   end
 
-  config.before(:each, :disable_allocation_change_publish) do
-    allow_any_instance_of(AllocationHistory).to receive(:publish_allocation_changed_event)
-  end
-
   config.before(:each, :disable_early_allocation_event) do
     allow(EarlyAllocationService).to receive(:send_early_allocation)
   end
@@ -125,10 +121,15 @@ RSpec.configure do |config|
 
   config.before(:each) do |example|
     stub_const('ENABLE_DPS_HEADER_FOOTER', true)
+
     if [:feature, :controller].include?(example.metadata[:type]) and
       example.metadata[:skip_dps_header_footer_stubbing].blank?
 
       stub_dps_header_footer
+    end
+
+    if example.metadata[:enable_allocation_change_publish].blank?
+      allow_any_instance_of(AllocationHistory).to receive(:publish_allocation_changed_event)
     end
   end
 end

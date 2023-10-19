@@ -60,7 +60,7 @@ feature 'admin urls' do
     end
   end
 
-  context 'when a global admin', :disable_allocation_change_publish do
+  context 'when a global admin' do
     before do
       signin_global_admin_user
       stub_auth_token

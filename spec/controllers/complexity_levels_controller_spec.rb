@@ -1,4 +1,4 @@
-RSpec.describe ComplexityLevelsController, :disable_allocation_change_publish, type: :controller do
+RSpec.describe ComplexityLevelsController, type: :controller do
   let(:offender) { build(:nomis_offender, complexityLevel: 'medium', prisonId: womens_prison.code, firstName: 'Sally', lastName: 'Albright') }
   let(:womens_prison) { create(:womens_prison) }
   let(:offenders) { [offender] }

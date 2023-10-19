@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'Case history with complexity level', :disable_allocation_change_publish do
+feature 'Case history with complexity level' do
   before do
     stub_request(:get, "https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/offender-no/#{offender_no}/history")
       .to_return(body: history.to_json)

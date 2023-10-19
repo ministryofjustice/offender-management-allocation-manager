@@ -26,7 +26,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
       Timecop.return
     end
 
-    context 'with some offenders', :disable_allocation_change_publish do
+    context 'with some offenders' do
       let(:case_info_records) { [case_info1, case_info2, case_info3, case_info4, case_info5, case_info6, case_info7] }
       let(:offenders) { [offender1, offender2, offender3, offender4, offender6, offender7] }
 
@@ -142,7 +142,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
       end
     end
 
-    context 'with no-one in the handover window', :disable_allocation_change_publish do
+    context 'with no-one in the handover window' do
       let(:case_info_records) { [case_info1] }
       let(:offenders) { [offender1] }
 

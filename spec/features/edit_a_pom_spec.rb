@@ -123,7 +123,7 @@ feature "edit a POM's details" do
       end
     end
 
-    context 'when a POM is made inactive', :disable_allocation_change_publish do
+    context 'when a POM is made inactive' do
       before do
         # create an allocation with the POM as the primary POM
         create(

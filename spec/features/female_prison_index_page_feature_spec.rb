@@ -41,7 +41,7 @@ feature "female prison index page" do
     ]
   end
 
-  describe 'missing details page', :disable_allocation_change_publish do
+  describe 'missing details page' do
     before do
       visit missing_information_prison_prisoners_path(prison.code)
     end

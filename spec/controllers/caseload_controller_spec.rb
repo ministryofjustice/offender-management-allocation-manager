@@ -24,7 +24,7 @@ RSpec.describe CaseloadController, type: :controller do
     stub_signed_in_pom(prison.code, pom.staffId, 'alice')
   end
 
-  context 'with 3 offenders', :disable_allocation_change_publish do
+  context 'with 3 offenders' do
     let(:today) { Time.zone.today }
     let(:yesterday) { Time.zone.today - 1.day }
 

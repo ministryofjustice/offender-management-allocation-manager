@@ -37,7 +37,7 @@ RSpec.feature "Update case information", type: :feature do
     end
   end
 
-  context 'when there is an existing allocation', :disable_allocation_change_publish do
+  context 'when there is an existing allocation' do
     before do
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: pom.staff_id,  prison: prison.code)
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
@@ -58,7 +58,7 @@ RSpec.feature "Update case information", type: :feature do
     end
   end
 
-  context 'when reallocating a POM on an existing allocation', :disable_allocation_change_publish do
+  context 'when reallocating a POM on an existing allocation' do
     before do
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: pom.staff_id,  prison: prison.code)
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'complexity level feature', :disable_allocation_change_publish do
+feature 'complexity level feature' do
   let(:offender) { build(:nomis_offender, complexityLevel: 'high', prisonId: womens_prison.code, firstName: 'Sally', lastName: 'Albright') }
   let(:womens_prison) { create(:womens_prison) }
   let(:offenders) { [offender] }

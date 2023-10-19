@@ -30,7 +30,7 @@ RSpec.describe AllocationStaffController, type: :controller do
     describe '#index' do
       let(:alice) { poms.first }
 
-      context 'with previous allocations for this POM', :disable_allocation_change_publish do
+      context 'with previous allocations for this POM' do
         before do
           { a: 5, b: 4, c: 3, d: 2 }.each do |tier, quantity|
             0.upto(quantity - 1) do
@@ -84,7 +84,7 @@ RSpec.describe AllocationStaffController, type: :controller do
         end
       end
 
-      context 'when the offender has been allocated before', :disable_allocation_change_publish do
+      context 'when the offender has been allocated before' do
         let!(:allocation) do
           create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.last.staff_id)
         end
@@ -113,7 +113,7 @@ RSpec.describe AllocationStaffController, type: :controller do
         end
       end
 
-      context 'when newly transferred from a different prison', :disable_allocation_change_publish do
+      context 'when newly transferred from a different prison' do
         let(:previous_prison_code) { create(:prison).code }
 
         let(:previous_pom) { build(:pom, :probation_officer) }

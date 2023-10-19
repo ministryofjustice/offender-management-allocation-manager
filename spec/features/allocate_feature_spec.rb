@@ -41,7 +41,7 @@ feature 'Allocation' do
     signin_spo_user
   end
 
-  context 'when a journey begins on the "Make allocations" page', :disable_allocation_change_publish do
+  context 'when a journey begins on the "Make allocations" page' do
     let(:start_page) { unallocated_prison_prisoners_path('LEI') }
 
     before do
@@ -186,7 +186,7 @@ feature 'Allocation' do
     expect(page).to have_content('This reason cannot be more than 175 characters')
   end
 
-  scenario 're-allocating', :disable_allocation_change_publish, vcr: { cassette_name: 'prison_api/re_allocate_feature' } do
+  scenario 're-allocating', vcr: { cassette_name: 'prison_api/re_allocate_feature' } do
     create(
       :allocation_history,
       prison: 'LEI',
@@ -233,7 +233,7 @@ feature 'Allocation' do
     expect(AllocationHistory.find_by(nomis_offender_id: nomis_offender_id).event).to eq("reallocate_primary_pom")
   end
 
-  context 'with a community override', :disable_allocation_change_publish do
+  context 'with a community override' do
     before do
       create(
         :allocation_history,

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe CaseloadGlobalController, :disable_allocation_change_publish, type: :controller do
+RSpec.describe CaseloadGlobalController, type: :controller do
   let(:staff_id) { 456_987 }
   let(:other_staff_id) { 767_584 }
   let(:not_signed_in) { 123_456 }

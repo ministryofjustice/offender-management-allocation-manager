@@ -41,7 +41,7 @@ RSpec.describe PomsController, type: :controller do
 
   render_views
 
-  context 'with an extra unsentenced offender', :disable_allocation_change_publish do
+  context 'with an extra unsentenced offender' do
     before do
       # This guy doesn't turn up in Prison#offenders, and hence doesn't show up on caseload or stats
       missing_offender = create(:case_information)

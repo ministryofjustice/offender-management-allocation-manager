@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe TasksController, :disable_allocation_change_publish, :allocation, type: :controller do
+RSpec.describe TasksController, :allocation, type: :controller do
   let(:prison) { create(:prison).code }
   let(:staff_id) { 123 }
   let(:pom) do

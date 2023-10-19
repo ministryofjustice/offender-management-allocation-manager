@@ -125,7 +125,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
     include_examples 'update PRD behaviour'
   end
 
-  context 'when user is a POM', :disable_allocation_change_publish do
+  context 'when user is a POM' do
     before do
       # Stub the user to be a POM
       stub_auth_token

@@ -2,7 +2,7 @@
 
 require 'swagger_helper'
 
-describe 'Allocation API', :disable_allocation_change_publish, vcr: { cassette_name: 'prison_api/allocation_api' } do
+describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } do
   let(:Authorization) { "Bearer TEST_TOKEN" }
 
   path '/api/allocation/{nomsNumber}' do
@@ -21,7 +21,7 @@ describe 'Allocation API', :disable_allocation_change_publish, vcr: { cassette_n
         end
       end
 
-      describe 'when authorised', :disable_allocation_change_publish do
+      describe 'when authorised' do
         before do
           allow_any_instance_of(Api::AllocationApiController).to receive(:verify_token)
         end
@@ -95,7 +95,7 @@ describe 'Allocation API', :disable_allocation_change_publish, vcr: { cassette_n
         end
       end
 
-      describe 'when authorised', :disable_allocation_change_publish do
+      describe 'when authorised' do
         before do
           allow_any_instance_of(Api::AllocationApiController).to receive(:verify_token)
         end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature 'male prisoners summary navigation tabs', :disable_allocation_change_publish do
+feature 'male prisoners summary navigation tabs' do
   before do
     signin_spo_user([prison.code, 'AGI'])
     stub_signin_spo(pom, [prison.code, 'AGI'])

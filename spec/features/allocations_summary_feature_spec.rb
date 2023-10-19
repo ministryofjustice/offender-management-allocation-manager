@@ -25,7 +25,7 @@ feature 'summary summary feature' do
       expect(page).to have_content('Add missing details')
     end
 
-    context 'with allocations', :disable_allocation_change_publish do
+    context 'with allocations' do
       let(:first) { 'G7806VO' }
       let(:last) { 'G6951VK' }
       let(:prison) { 'LEI' }

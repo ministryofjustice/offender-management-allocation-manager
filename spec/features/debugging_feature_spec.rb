@@ -8,7 +8,7 @@ feature 'Provide debugging information for our team to use' do
     signin_global_admin_user
   end
 
-  context 'when debugging an individual offender', :disable_allocation_change_publish do
+  context 'when debugging an individual offender' do
     it 'returns information for an offender', vcr: { cassette_name: 'prison_api/debugging_allocated_offender_feature' } do
       create(:allocation_history,
              prison: 'LEI',

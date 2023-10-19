@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe AllocationHistory, type: :model do
+RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :model do
   let(:nomis_staff_id) { 456_789 }
   let(:nomis_offender_id) { 'A3434LK' }
   let(:another_nomis_offender_id) { 654_321 }

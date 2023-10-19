@@ -55,7 +55,7 @@ feature "womens allocation journey" do
       # Now on 'Choose a POM' page
     end
 
-    scenario 'accepting recommendation', :disable_allocation_change_publish do
+    scenario 'accepting recommendation' do
       within "tr#pom-#{probation_pom2.staffId}" do
         # allocate to the second person in the list
         click_link 'Allocate'
@@ -82,7 +82,7 @@ feature "womens allocation journey" do
                suitability_detail: nil)
     end
 
-    scenario 'rejecting recommendation', :disable_allocation_change_publish do
+    scenario 'rejecting recommendation' do
       # Choose the one non-recommended POM
       within "tr#pom-#{prison_pom.staffId}" do
         click_link 'Allocate'
@@ -146,7 +146,7 @@ feature "womens allocation journey" do
       stub_community_offender(offender_id, build(:community_data))
     end
 
-    scenario 'accepting recommendation', :disable_allocation_change_publish do
+    scenario 'accepting recommendation' do
       click_link 'Reallocate'
       # Now on Review case page
 
