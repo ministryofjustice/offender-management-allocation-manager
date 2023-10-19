@@ -17,7 +17,7 @@ class AllocationHistory < ApplicationRecord
   OFFENDER_TRANSFERRED = 1
   OFFENDER_RELEASED = 2
 
-  after_commit :push_pom_to_community_api
+  after_commit :publish_allocation_changed_event
 
   # When adding a new 'event' or 'event trigger'
   # make sure the constant it points to
@@ -175,9 +175,23 @@ private
     PomMailer.with(**mail_params).offender_deallocated.deliver_later
   end
 
-  def push_pom_to_community_api
-    if saved_change_to_primary_pom_nomis_id?
-      PushPomToDeliusJob.perform_later(self)
-    end
+  def publish_allocation_changed_event
+    return unless saved_change_to_primary_pom_nomis_id?
+
+    # This PushPomToDeliusJob call can go when the Delius team are successfully
+    # consuming our allocation.changed event (below)
+    PushPomToDeliusJob.perform_later(self)
+
+    DomainEvents::Event.new(
+      event_type: 'allocation.changed',
+      version: 1,
+      description: 'A POM allocation has changed',
+      detail_url: "#{Rails.configuration.allocation_manager_host}/api/allocation/#{nomis_offender_id}/primary_pom",
+      noms_number: nomis_offender_id,
+      additional_information: {
+        'staffCode' => primary_pom_nomis_id,
+        'prisonId' => prison
+      }
+    ).publish
   end
 end
