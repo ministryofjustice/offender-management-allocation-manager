@@ -11,7 +11,6 @@ RSpec.describe "poms/show", type: :view do
   let(:two_days_ago) { Time.zone.today - 2.days }
 
   before do
-    allow_any_instance_of(DomainEvents::Event).to receive(:publish).and_return(nil)
     stub_auth_token
     stub_poms prison.code, [pom]
 
