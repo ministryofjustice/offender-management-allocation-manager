@@ -3,6 +3,7 @@
 class ApplicationController < ActionController::Base
   helper_method :current_user
   helper_method :caseloads
+  helper_method :dps_header_footer
 
   before_action :set_paper_trail_whodunnit
 
@@ -49,6 +50,26 @@ class ApplicationController < ActionController::Base
   # Instead, only store JSON-safe primitives (i.e. Hash, Array, String, Number, Boolean, Nil) and re-hydrate them yourself.
   def save_to_session(key, record)
     session[key] = record.attributes
+  end
+
+  def dps_header_footer
+    return { 'status' => 'fallback' } if params[:fallback_header_footer].present?
+    return @dps_header_footer if @dps_header_footer
+
+    if ENABLE_DPS_HEADER_FOOTER
+      begin
+        @dps_header_footer ||= {
+          'header' => HmppsApi::DpsFrontendComponentsApi.header,
+          'footer' => HmppsApi::DpsFrontendComponentsApi.footer,
+          'status' => 'ok',
+        }
+      rescue Faraday::ServerError, Faraday::ResourceNotFound => e
+        logger.error "event=dps_header_footer_retrieval_error|#{e.inspect},#{e.backtrace.join(',')}"
+        @dps_header_footer ||= { 'status' => 'fallback' }
+      end
+
+      @dps_header_footer
+    end
   end
 
 private

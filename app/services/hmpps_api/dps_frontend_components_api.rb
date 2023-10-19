@@ -8,10 +8,22 @@ module HmppsApi
     class << self
       def header
         get_component('header')
+      rescue Faraday::ServerError, Faraday::ResourceNotFound
+        if block_given?
+          yield
+        else
+          raise
+        end
       end
 
       def footer
         get_component('footer')
+      rescue Faraday::ServerError, Faraday::ResourceNotFound
+        if block_given?
+          yield
+        else
+          raise
+        end
       end
 
     private

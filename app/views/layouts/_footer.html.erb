@@ -1,7 +1,14 @@
-<%# This file is only here while we need the old footer; when we remove the feature flag, delete this file completely %>
-<% if dps_header_footer_enabled? %>
-  <%= dps_footer_html %>
+<% if ENABLE_DPS_HEADER_FOOTER %>
+  <% if dps_components_retrieved_successfully %>
+    <%= dps_component_html('footer') %>
+  <% else %>
+    <footer class="govuk-footer" role="contentinfo">
+      <div class="govuk-width-container" style="height: 160px">
+      </div>
+    </footer>
+  <% end %>
 <% else %>
+  <%# TODO: Delete me when ENABLE_DPS_HEADER_FOOTER goes away %>
   <footer class="govuk-footer" role="contentinfo">
     <div class="govuk-width-container ">
       <div class="govuk-footer__navigation">
