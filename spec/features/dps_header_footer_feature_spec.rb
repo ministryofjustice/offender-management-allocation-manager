@@ -1,7 +1,12 @@
 # As these tests hit the actual components API, these tests will need updating if service owners change things around,
 # but it seems prudent to test the actual API responses at most once and stub them everywhere else
-feature 'DPS standard header and footer:', :aggregate_failures do
-  scenario 'standard DPS header is used', :skip_dps_header_footer_stubbing,
+feature 'DPS standard header and footer:', :aggregate_failures, :skip_dps_header_footer_stubbing do
+  before :each, :mock_api_error do
+    stub_request(:get, "#{Rails.configuration.dps_frontend_components_api_host}/header").to_return(status: 503)
+    stub_request(:get, "#{Rails.configuration.dps_frontend_components_api_host}/footer").to_return(status: 503)
+  end
+
+  scenario 'standard DPS header is used',
            vcr: { cassette_name: 'dps_header_footer/standard_header' } do
     signin_pom_user
     visit '/'
@@ -13,9 +18,15 @@ feature 'DPS standard header and footer:', :aggregate_failures do
     # expect(page).to have_css('script[src="https://frontend-components-dev.hmpps.service.justice.gov.uk/......."]', visible: :all)
   end
 
-  scenario 'fallback DPS header is used when DPS components API times out', :skip_dps_header_footer_stubbing
+  scenario 'fallback DPS header is used when DPS components API is not available', :mock_api_error,
+           vcr: { cassette_name: 'dps_header_footer/fallback_header' } do
+    signin_pom_user
+    visit '/'
 
-  scenario 'standard DPS footer is used', :skip_dps_header_footer_stubbing,
+    expect(page).to have_css('header.govuk-header--fallback')
+  end
+
+  scenario 'standard DPS footer is used',
            vcr: { cassette_name: 'dps_header_footer/standard_footer' } do
     signin_pom_user
     visit '/'
@@ -27,5 +38,11 @@ feature 'DPS standard header and footer:', :aggregate_failures do
     # expect(page).to have_css('script[src="https://frontend-components-dev.hmpps.service.justice.gov.uk/......."]', visible: :all)
   end
 
-  scenario 'fallback DPS footer is used when DPS components API times out', :skip_dps_header_footer_stubbing
+  scenario 'fallback DPS footer is used when DPS components API is not available', :mock_api_error,
+           vcr: { cassette_name: 'dps_header_footer/fallback_footer' } do
+    signin_pom_user
+    visit '/'
+
+    expect(page).to have_css('footer.govuk-footer--fallback')
+  end
 end

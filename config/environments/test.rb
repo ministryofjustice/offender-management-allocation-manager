@@ -70,4 +70,5 @@ Rails.application.configure do
   config.cache_store = :memory_store, { size: 64.megabytes }
 
   config.community_api_host = 'https://community-api-secure.test.delius.probation.hmpps.dsd.io'
+  config.dps_frontend_components_api_host = 'https://frontend-components-dev.hmpps.service.justice.gov.uk'
 end
