@@ -10,7 +10,7 @@ data:
   ENV_NAME: "production"
   SENTRY_CURRENT_ENV: "production"
   PRISON_API_HOST: "https://api.prison.service.justice.gov.uk"
-  PRISONER_SEARCH_HOST: "https://prisoner-offender-search.prison.service.justice.gov.uk"
+  PRISONER_SEARCH_HOST: "https://prisoner-search.prison.service.justice.gov.uk"
   COMMUNITY_API_HOST: "https://community-api-secure.probation.service.justice.gov.uk"
   COMPLEXITY_API_HOST: "https://complexity-of-need.hmpps.service.justice.gov.uk"
   NOMIS_OAUTH_HOST: "https://sign-in.hmpps.service.justice.gov.uk"
