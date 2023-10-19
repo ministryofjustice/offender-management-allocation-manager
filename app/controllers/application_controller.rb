@@ -63,7 +63,7 @@ class ApplicationController < ActionController::Base
           'footer' => HmppsApi::DpsFrontendComponentsApi.footer,
           'status' => 'ok',
         }
-      rescue Faraday::ServerError, Faraday::ResourceNotFound => e
+      rescue Faraday::ServerError, Faraday::ResourceNotFound, Faraday::TimeoutError => e
         logger.error "event=dps_header_footer_retrieval_error|#{e.inspect},#{e.backtrace.join(',')}"
         @dps_header_footer ||= { 'status' => 'fallback' }
       end

@@ -39,6 +39,7 @@ module HmppsApi
 
       def connection
         Faraday.new do |faraday|
+          faraday.options.timeout = 3
           faraday.options.params_encoder = Faraday::FlatParamsEncoder
           faraday.request :instrumentation
           # Response middleware is supposed to be registered after request middleware
