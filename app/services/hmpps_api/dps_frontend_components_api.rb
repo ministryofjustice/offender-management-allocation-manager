@@ -6,32 +6,20 @@ require 'typhoeus/adapters/faraday'
 module HmppsApi
   class DpsFrontendComponentsApi
     class << self
-      def header
-        get_component('header')
-      rescue Faraday::ServerError, Faraday::ResourceNotFound
-        if block_given?
-          yield
-        else
-          raise
-        end
+      def header(token)
+        get_component('header', token)
       end
 
-      def footer
-        get_component('footer')
-      rescue Faraday::ServerError, Faraday::ResourceNotFound
-        if block_given?
-          yield
-        else
-          raise
-        end
+      def footer(token)
+        get_component('footer', token)
       end
 
     private
 
-      def get_component(type)
+      def get_component(type, token)
         raw_response = connection.get do |req|
           req.url("#{root}/#{type}")
-          req.headers['X-User-Token'] = token.access_token
+          req.headers['X-User-Token'] = token
         end
 
         ActiveSupport::JSON.decode(raw_response.body)
@@ -50,10 +38,6 @@ module HmppsApi
 
       def root
         Rails.configuration.dps_frontend_components_api_host
-      end
-
-      def token
-        HmppsApi::Oauth::TokenService.valid_token
       end
     end
   end

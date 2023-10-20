@@ -2,6 +2,7 @@
 
 module AuthHelper
   ACCESS_TOKEN = Struct.new(:access_token).new('an-access-token')
+  USER_ACCESS_TOKEN = 'fake-user-access-token'
 
   def auth_header
     oauth_client = HmppsApi::Oauth::Client.new(Rails.configuration.nomis_oauth_host)
@@ -28,7 +29,8 @@ module AuthHelper
     session[:sso_data] = { 'expiry' => Time.zone.now + 1.day,
                            'roles' => roles,
                            'caseloads' => [prison],
-                           'username' => username }
+                           'username' => username,
+                           'token' => USER_ACCESS_TOKEN }
     stub_request(:get, "#{ApiHelper::T3}/users/#{username}")
         .to_return(body: { 'staffId': 754_732 }.to_json)
     stub_request(:get, "#{ApiHelper::T3}/staff/754732/emails")

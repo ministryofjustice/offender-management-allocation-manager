@@ -58,6 +58,10 @@ class SsoIdentity
     Time.current > Time.zone.at(@sso_identity.fetch(:expiry))
   end
 
+  def token
+    @sso_identity.fetch(:token)
+  end
+
 private
 
   def roles

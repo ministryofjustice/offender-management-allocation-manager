@@ -34,7 +34,8 @@ module FeaturesHelper
     hmpps_sso_response = {
       'info' => double('user_info', username: username, active_caseload: prisons.first, caseloads: prisons, roles: roles),
       'credentials' => double('credentials', expires_at: Time.zone.local(2030, 1, 1).to_i,
-                                             'authorities': roles)
+                                             authorities: roles,
+                                             token: 'access-token'),
     }
 
     OmniAuth.config.add_mock(:hmpps_sso, hmpps_sso_response)
@@ -48,11 +49,11 @@ module FeaturesHelper
   end
 
   def stub_dps_header_footer
-    stub_request(:get, "#{Rails.configuration.dps_frontend_components_api_host}/header")
-      .to_return(body: { 'html' => '<header>', css: [], javascript: [] }.to_json)
-
-    stub_request(:get, "#{Rails.configuration.dps_frontend_components_api_host}/footer")
-      .to_return(body: { 'html' => '<footer>', css: [], javascript: [] }.to_json)
+    allow_any_instance_of(SsoIdentity).to receive(:token).and_return('fake-user-access-token')
+    allow(HmppsApi::DpsFrontendComponentsApi).to receive_messages(
+      header: { 'html' => '<header>', 'css' => [], 'javascript' => [] },
+      footer: { 'html' => '<footer>', 'css' => [], 'javascript' => [] },
+    )
   end
 
   def wait_for(maximum_wait_in_seconds = 10, &block)
