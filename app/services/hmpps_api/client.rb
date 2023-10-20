@@ -5,8 +5,9 @@ require 'typhoeus/adapters/faraday'
 
 module HmppsApi
   class Client
-    def initialize(root, extra_retry_methods: [])
+    def initialize(root, extra_retry_methods: [], user_token: nil)
       @root = root
+      @user_token = user_token
       @connection = Faraday.new do |faraday|
         faraday.request :retry, max: 3, interval: 0.05,
                                 interval_randomness: 0.5, backoff_factor: 2,
@@ -94,7 +95,7 @@ module HmppsApi
     def send_request(method, route, queryparams:, extra_headers:, body:)
       @connection.send(method) do |req|
         req.url(@root + route)
-        req.headers['Authorization'] = "Bearer #{token.access_token}"
+        req.headers['Authorization'] = "Bearer #{@user_token || token.access_token}"
         req.headers['Content-Type'] = 'application/json' unless body.nil?
         req.headers.merge!(extra_headers)
         req.params.update(queryparams)
