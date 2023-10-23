@@ -91,15 +91,9 @@ private
     prison_id = params[:prison_id]
     return if prison_id.blank?
 
-    host = Rails.configuration.prison_api_host
-    client = HmppsApi::Client.new(host, user_token: sso_identity.token)
-    response = client.get('/api/users/me/caseLoads', cache: false)
-    active_caseload = response.detect { |i| i['currentlyActive'] == true }
-    return if active_caseload.blank?
-
-    active_caseload_id = active_caseload.fetch('caseLoadId')
+    active_caseload_id = HmppsApi::ActiveCaseloadApi.current_user_active_caseload(sso_identity.token)
     if active_caseload_id != params[:prison_id]
-      flash[:notice] = "You know when you've been.... BLObBiED"
+      flash[:notice] = t('views.navigation.enforce_active_caseload')
       session.delete(:sso_data)
       redirect_to prison_dashboard_index_path(prison_id: active_caseload_id)
     end

@@ -29,12 +29,16 @@ feature 'admin urls' do
   let(:username) { 'MOIC_POM' }
   let(:staff_id) { 754_732 }
 
+  before do
+    stub_active_caseload_check
+  end
+
   context 'when pom' do
     before do
       signin_pom_user
     end
 
-    it 'is unauthorised' do
+    it 'is unauthorised', :aggregate_failures do
       admin_urls.each do |admin_url|
         visit(admin_url)
 

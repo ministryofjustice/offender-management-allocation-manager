@@ -56,6 +56,10 @@ module FeaturesHelper
     )
   end
 
+  def stub_active_caseload_check
+    allow_any_instance_of(PrisonsApplicationController).to receive(:check_active_caseload)
+  end
+
   def wait_for(maximum_wait_in_seconds = 10, &block)
     Selenium::WebDriver::Wait.new(timeout: maximum_wait_in_seconds).until(&block)
   end
