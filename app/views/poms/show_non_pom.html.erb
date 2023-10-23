@@ -1,16 +1,12 @@
 <% content_for :title, "Check this POM is still active – Digital Prison Services" %>
 
-<% content_for :switcher do %>
-  <%= render '/layouts/prison_switcher' %>
-<% end %>
-
 <h1 class="govuk-heading-l">Check this POM is still active</h1>
 <p class="govuk-body">This person is no longer recorded as a POM in NOMIS or Digital Prison Services.</p>
 <h2 class="govuk-heading-m">If they are still managing cases</h2>
 <p class="govuk-body">Check that:</p>
 <ul>
   <li>
-    <p>they have the right role in Digital Prison Services by <%= link_to  'following these instructions', help_step2_path %></p>
+    <p>they have the right role in Digital Prison Services by <%= link_to 'following these instructions', help_step2_path %></p>
   </li>
   <li>
     <p>their NOMIS account is active and the correct roles are assigned to them – to do this, <%= link_to 'use these instructions', help_step3_path %></p>

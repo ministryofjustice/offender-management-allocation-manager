@@ -1,6 +1,5 @@
 # Feature Flags - super simple, they are just constants - it works
 # USE_FEATURE = ENV.fetch('USE_FEATURE', '').strip == '1'
 
-ENABLE_EVENT_BASED_HANDOVER_CALCULATION = ENV.fetch('ENABLE_EVENT_BASED_HANDOVER_CALCULATION', '').strip == '1'
 ENABLE_EVENT_BASED_PROBATION_CHANGE = ENV.fetch('ENABLE_EVENT_BASED_PROBATION_CHANGE', '').strip == '1'
 ENABLE_DPS_HEADER_FOOTER = ENV.fetch('ENABLE_DPS_HEADER_FOOTER', '').strip == '1'

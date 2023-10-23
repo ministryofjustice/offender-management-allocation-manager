@@ -59,8 +59,8 @@ class ApplicationController < ActionController::Base
     if ENABLE_DPS_HEADER_FOOTER
       begin
         @dps_header_footer ||= {
-          'header' => HmppsApi::DpsFrontendComponentsApi.header,
-          'footer' => HmppsApi::DpsFrontendComponentsApi.footer,
+          'header' => HmppsApi::DpsFrontendComponentsApi.header(sso_identity.token),
+          'footer' => HmppsApi::DpsFrontendComponentsApi.footer(sso_identity.token),
           'status' => 'ok',
         }
       rescue Faraday::ServerError, Faraday::ResourceNotFound, Faraday::TimeoutError => e

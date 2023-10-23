@@ -156,6 +156,7 @@ en:
   views:
     navigation:
       skip_to_main_content: "Skip to main content"
+      enforce_active_caseload: "%{name} selected"
     pagination:
       first: "&laquo; First"
       last: "Last &raquo;"

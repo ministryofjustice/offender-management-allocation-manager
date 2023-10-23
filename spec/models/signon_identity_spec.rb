@@ -10,7 +10,7 @@ describe SignonIdentity, model: true do
            roles: ['ROLE_ALLOC_MGR']
           )
   end
-  let(:credentials) { double('credentials', expires_at: time_stamp) }
+  let(:credentials) { double('credentials', expires_at: time_stamp, token: 'fake-user-token') }
   let(:omniauth_data) do
     { 'info' => user_auth_data, 'credentials' => credentials }
   end
@@ -31,6 +31,7 @@ describe SignonIdentity, model: true do
       active_caseload: 'LEI',
       caseloads: %w[LEI RNI],
       expiry: time_stamp,
+      token: 'fake-user-token',
       roles: ['ROLE_ALLOC_MGR']
     }
 

@@ -5,7 +5,8 @@
 class PrisonsApplicationController < ApplicationController
   include Sorting
 
-  before_action :authenticate_user, :check_prison_access, :load_staff_member, :service_notifications, :load_roles
+  before_action :authenticate_user, :check_prison_access, :load_staff_member, :service_notifications, :load_roles,
+                :check_active_caseload
 
 protected
 
@@ -84,5 +85,17 @@ private
   def sort_and_paginate(cases)
     sorted_cases = sort_collection cases, default_sort: :handover_date, default_direction: :asc
     Kaminari.paginate_array(sorted_cases).page(page)
+  end
+
+  def check_active_caseload
+    prison_id = params[:prison_id]
+    return if prison_id.blank?
+
+    active_caseload_id = HmppsApi::ActiveCaseloadApi.current_user_active_caseload(sso_identity.token)
+    if active_caseload_id != params[:prison_id]
+      flash[:notice] = t('views.navigation.enforce_active_caseload', name: Prison.find_by_code(active_caseload_id).name)
+      session.delete(:sso_data)
+      redirect_to prison_dashboard_index_path(prison_id: active_caseload_id)
+    end
   end
 end

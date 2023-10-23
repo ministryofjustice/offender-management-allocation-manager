@@ -131,6 +131,14 @@ RSpec.configure do |config|
     if example.metadata[:enable_allocation_change_publish].blank?
       allow_any_instance_of(AllocationHistory).to receive(:publish_allocation_changed_event)
     end
+
+    if example.metadata[:skip_active_caseload_check_stubbing].blank?
+      if example.metadata[:type] == :controller
+        allow(controller).to receive(:check_active_caseload) if controller.respond_to?(:check_active_caseload, true)
+      elsif example.metadata[:type] == :feature
+        stub_active_caseload_check
+      end
+    end
   end
 end
 
