@@ -9,9 +9,6 @@ Rails.application.routes.draw do
   get '/handovers/email_preferences', to: 'root#handovers_email_preferences'
 
   resources :prisons, only: [] do
-    # Prison switcher - starting from an existing prison
-    resources :prisons, only: :index
-
     resources :dashboard, only: :index
     resources :handovers, only: [] do # Yeah I know it effing sucks but legacy code goes brrrrrr
       collection do

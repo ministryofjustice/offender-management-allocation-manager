@@ -1,7 +1,3 @@
-<% content_for :switcher do %>
-  <%= render '/layouts/prison_switcher' %>
-<% end %>
-
 <%= form_for(@responsibility,
              url: confirm_prison_responsibilities_path(@prison.code, @responsibility),
              builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>

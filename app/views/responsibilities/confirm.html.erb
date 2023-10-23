@@ -1,7 +1,3 @@
-<% content_for :switcher do %>
-  <%= render '/layouts/prison_switcher' %>
-<% end %>
-
 <%= form_for(@responsibility, url: prison_responsibilities_path(@prison.code, @responsibility)) do |f| %>
   <%= f.hidden_field(:nomis_offender_id) %>
   <%= f.hidden_field(:reason) %>
@@ -38,4 +34,3 @@
   </div>
 
 <% end %>
-

@@ -1,10 +1,6 @@
 <% content_for :title, translate("handovers.page_title.default.#{@pom_view ? 'pom' : 'homd'}") %>
 
 <% content_for :main_content do %>
-  <% content_for :switcher do %>
-    <%= render '/layouts/prison_switcher' %>
-  <% end %>
-
   <%= render 'layouts/notice', notice: flash[:notice] %>
 
   <div class="govuk-grid-row">
