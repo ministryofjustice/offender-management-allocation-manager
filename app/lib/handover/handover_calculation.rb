@@ -11,7 +11,8 @@ module Handover::HandoverCalculation
                                 is_indeterminate:,
                                 in_open_conditions:)
       if is_indeterminate
-        [earliest_release_date - 8.months, in_open_conditions ? :indeterminate_open : :indeterminate]
+        offset = ENABLE_12_MONTH_PAROLE_HO_OFFSET ? 12.months : 8.months
+        [earliest_release_date - offset, in_open_conditions ? :indeterminate_open : :indeterminate]
       else
         calculate_determinate_handover_date(sentence_start_date: sentence_start_date,
                                             earliest_release_date: earliest_release_date,
