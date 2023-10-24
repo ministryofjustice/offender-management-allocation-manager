@@ -15,6 +15,12 @@ end
 
 Capybara.default_max_wait_time = 10
 Capybara.asset_host = 'http://localhost:3000'
+Capybara.register_driver(:rack_test) do |app|
+  Capybara::RackTest::Driver.new(
+    app,
+    redirect_limit: 10,
+  )
+end
 
 begin
   ActiveRecord::Migration.maintain_test_schema!
