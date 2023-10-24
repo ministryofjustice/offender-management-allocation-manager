@@ -85,8 +85,6 @@ RSpec.describe Handover::HandoverCalculation do
       end
 
       context 'with 12m offset enabled' do
-        before { stub_const('ENABLE_12_MONTH_PAROLE_HO_OFFSET', true) }
-
         context 'when open prison' do
           let(:open_conditions) { true }
 
@@ -105,6 +103,8 @@ RSpec.describe Handover::HandoverCalculation do
       end
 
       context 'without 12m offset enabled' do
+        before { stub_const('ENABLE_12_MONTH_PAROLE_HO_OFFSET', false) }
+
         context 'when open prison' do
           let(:open_conditions) { true }
 

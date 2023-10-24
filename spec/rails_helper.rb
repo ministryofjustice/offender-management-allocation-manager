@@ -58,6 +58,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     DatabaseCleaner.strategy = :transaction
+    stub_const('ENABLE_12_MONTH_PAROLE_HO_OFFSET', true)
   end
 
   config.before(:each, js: true) do
