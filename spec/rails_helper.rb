@@ -120,8 +120,6 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do |example|
-    stub_const('ENABLE_DPS_HEADER_FOOTER', true)
-
     if [:feature, :controller].include?(example.metadata[:type]) and
       example.metadata[:skip_dps_header_footer_stubbing].blank?
 

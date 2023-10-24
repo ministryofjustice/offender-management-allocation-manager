@@ -56,20 +56,18 @@ class ApplicationController < ActionController::Base
     return { 'status' => 'fallback' } if params[:fallback_header_footer].present?
     return @dps_header_footer if @dps_header_footer
 
-    if ENABLE_DPS_HEADER_FOOTER
-      begin
-        @dps_header_footer ||= {
-          'header' => HmppsApi::DpsFrontendComponentsApi.header(sso_identity.token),
-          'footer' => HmppsApi::DpsFrontendComponentsApi.footer(sso_identity.token),
-          'status' => 'ok',
-        }
-      rescue Faraday::ServerError, Faraday::ResourceNotFound, Faraday::TimeoutError => e
-        logger.error "event=dps_header_footer_retrieval_error|#{e.inspect},#{e.backtrace.join(',')}"
-        @dps_header_footer ||= { 'status' => 'fallback' }
-      end
-
-      @dps_header_footer
+    begin
+      @dps_header_footer ||= {
+        'header' => HmppsApi::DpsFrontendComponentsApi.header(sso_identity.token),
+        'footer' => HmppsApi::DpsFrontendComponentsApi.footer(sso_identity.token),
+        'status' => 'ok',
+      }
+    rescue Faraday::ServerError, Faraday::ResourceNotFound, Faraday::TimeoutError => e
+      logger.error "event=dps_header_footer_retrieval_error|#{e.inspect},#{e.backtrace.join(',')}"
+      @dps_header_footer ||= { 'status' => 'fallback' }
     end
+
+    @dps_header_footer
   end
 
 private
