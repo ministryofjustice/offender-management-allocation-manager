@@ -131,7 +131,7 @@ RSpec.describe Handover::HandoverCalculation do
                                                          is_indeterminate: false,
                                                          in_open_conditions: false,
                                                          is_early_allocation: false)
-        expect(result).to eq [Date.new(2025, 5, 1), :determinate_parole]
+        expect(result).to eq [Date.new(2025, 1, 1), :determinate_parole]
       end
     end
   end
