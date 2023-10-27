@@ -5,7 +5,8 @@ Rails.application.routes.draw do
   root to: 'root#index'
 
   get '/auth/:provider/callback', to: 'sessions#create'
-  get '/signout', to: 'sessions#destroy'
+  get '/signout', to: 'sessions#destroy' # Legacy signout route
+  get '/sign-out', to: 'sessions#destroy' # DPS header signout route
   get '/handovers/email_preferences', to: 'root#handovers_email_preferences'
 
   resources :prisons, only: [] do
