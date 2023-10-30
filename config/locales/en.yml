@@ -185,6 +185,9 @@ en:
       more_pages:
         display_entries: "Showing %{first}&nbsp;to&nbsp;%{last} of <b>%{total}</b> results"
 
+  global:
+    default_page_title: 'Digital Prison Services'
+
   handovers:
     page_title:
       default:
