@@ -2,7 +2,7 @@
 <html lang="en" class="govuk-template js flexbox">
   <head>
     <%= render 'layouts/gtm/head' %>
-    <title><%= yield(:title).blank? ? "Manage Offenders in Custody" : yield(:title).to_s %></title>
+    <title><%= yield(:title).blank? ? t('global.default_page_title') : yield(:title).to_s %></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <% if yield(:turbolinks_nocache) == 'true' %>
