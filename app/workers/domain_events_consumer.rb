@@ -35,6 +35,11 @@ class DomainEventsConsumer
       log sqs_msg, 'success', append: "sns_message_id=#{sns_msg['MessageId']},event_type=#{event_raw['eventType']}"
     rescue StandardError => e
       log sqs_msg, 'error', append: "reason=exception|#{e.inspect},#{e.backtrace.join(',')}", brief: true
+      Sentry.capture_exception(e,
+                               tags: {
+                                 domain_event: true,
+                                 domain_event_type: event_raw ? event_raw['eventType'] : nil,
+                               })
       raise
     end
   end
