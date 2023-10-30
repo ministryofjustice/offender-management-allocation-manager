@@ -8,7 +8,6 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
 
   before do
     allow(DomainEvents::Event).to receive(:new).and_return(fake_domain_event)
-    allow(PushPomToDeliusJob).to receive(:perform_later)
   end
 
   describe '#without_ldu_emails' do
@@ -317,10 +316,6 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
         )
 
         expect(fake_domain_event).to have_received(:publish).exactly(count).times
-      end
-
-      it 'queues Delius push' do
-        expect(PushPomToDeliusJob).to have_received(:perform_later).exactly(count).times
       end
     end
 

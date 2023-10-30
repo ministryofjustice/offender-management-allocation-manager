@@ -178,10 +178,6 @@ private
   def publish_allocation_changed_event
     return unless saved_change_to_primary_pom_nomis_id?
 
-    # This PushPomToDeliusJob call can go when the Delius team are successfully
-    # consuming our allocation.changed event (below)
-    PushPomToDeliusJob.perform_later(self)
-
     DomainEvents::Event.new(
       event_type: 'allocation.changed',
       version: 1,
