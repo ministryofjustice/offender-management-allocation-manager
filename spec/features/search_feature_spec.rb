@@ -7,10 +7,10 @@ feature 'Search for offenders' do
     signin_spo_user [prison_code]
   end
 
-  context 'when male prison' do
+  context 'when male prison', vcr: { cassette_name: 'prison_api/dashboard_search_feature' } do
     let(:prison_code) { 'LEI' }
 
-    it 'Can search from the dashboard', vcr: { cassette_name: 'prison_api/dashboard_search_feature' } do
+    it 'Can search from the dashboard' do
       visit root_path
 
       expect(page).to have_text(I18n.t('service_name'))
@@ -19,6 +19,22 @@ feature 'Search for offenders' do
 
       expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
       expect(page).to have_css('tbody tr', count: 5)
+    end
+
+    it 'Has valid offender name link' do
+      visit root_path
+      fill_in 'q', with: 'Cal'
+      click_on('search-button')
+
+      # Click on first offender name
+      find('.allocated_offender_row_0 .govuk-table__cell:first a').click
+      expect(page).to have_title "View case information"
+    end
+
+    it 'Has valid Missing details link' do
+      visit root_path
+      fill_in 'q', with: 'Cal'
+      click_on('search-button')
 
       # Just check that link can be clicked on without crashing
       within '.allocated_offender_row_0' do
