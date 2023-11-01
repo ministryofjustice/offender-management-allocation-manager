@@ -193,6 +193,16 @@ RSpec.describe MpcOffender, type: :model do
       end
     end
 
+    context 'when API forbidden' do
+      before do
+        allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_raise(Faraday::ForbiddenError.new(nil))
+      end
+
+      it 'returns status unable' do
+        expect(subject.rosh_summary).to eq({ status: :unable })
+      end
+    end
+
     context 'when API error' do
       before do
         allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_raise(Faraday::ServerError.new(nil))

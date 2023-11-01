@@ -207,6 +207,8 @@ class MpcOffender
       risks_summary = risks['summary']
     rescue Faraday::ResourceNotFound
       return { status: :missing }
+    rescue Faraday::ForbiddenError
+      return { status: :unable }
     rescue Faraday::ServerError
       return { status: :unable }
     end
