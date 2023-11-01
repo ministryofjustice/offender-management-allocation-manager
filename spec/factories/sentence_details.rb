@@ -41,35 +41,35 @@ FactoryBot.define do
     # We use PED here (assuming determinate) so that we don't suffer
     # the 15.days / half-month problem is places where we don't care
     trait :handover_in_3_days do
-      paroleEligibilityDate { Time.zone.today + 8.months + 3.days }
+      paroleEligibilityDate { Time.zone.today + 12.months + 3.days }
     end
 
     trait :handover_in_4_days do
-      paroleEligibilityDate { Time.zone.today + 8.months + 4.days }
+      paroleEligibilityDate { Time.zone.today + 12.months + 4.days }
     end
 
     trait :handover_in_8_days do
-      paroleEligibilityDate { Time.zone.today + 8.months + 8.days }
+      paroleEligibilityDate { Time.zone.today + 12.months + 8.days }
     end
 
     trait :handover_in_6_days do
-      paroleEligibilityDate { Time.zone.today + 8.months + 6.days }
+      paroleEligibilityDate { Time.zone.today + 12.months + 6.days }
     end
 
     trait :handover_in_46_days do
-      paroleEligibilityDate { Time.zone.today + 8.months + 46.days }
+      paroleEligibilityDate { Time.zone.today + 12.months + 46.days }
     end
 
     trait :handover_in_28_days do
-      paroleEligibilityDate { Time.zone.today + 8.months + 28.days }
+      paroleEligibilityDate { Time.zone.today + 12.months + 28.days }
     end
 
     trait :handover_in_14_days do
-      paroleEligibilityDate { Time.zone.today + 8.months + 14.days }
+      paroleEligibilityDate { Time.zone.today + 12.months + 14.days }
     end
 
     trait :handover_in_21_days do
-      paroleEligibilityDate { Time.zone.today + 8.months + 21.days }
+      paroleEligibilityDate { Time.zone.today + 12.months + 21.days }
     end
 
     trait :after_handover do
