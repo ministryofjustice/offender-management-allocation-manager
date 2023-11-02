@@ -75,24 +75,51 @@ RSpec.describe Handover::HandoverCalculation do
     end
 
     describe 'for indeterminate case' do
-      example 'handover date for open prison is 8 months before earliest release date' do
-        result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
-                                                         earliest_release_date: Date.new(2026, 1, 1),
-                                                         is_determinate_parole: false,
-                                                         is_indeterminate: true,
-                                                         in_open_conditions: true,
-                                                         is_early_allocation: false)
-        expect(result).to eq [Date.new(2025, 5, 1), :indeterminate_open]
+      let(:result) do
+        described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
+                                                earliest_release_date: Date.new(2026, 1, 1),
+                                                is_determinate_parole: false,
+                                                is_indeterminate: true,
+                                                in_open_conditions: open_conditions,
+                                                is_early_allocation: false)
       end
 
-      example 'handover date for non-open prison is 8 months before earliest release date' do
-        result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
-                                                         earliest_release_date: Date.new(2026, 1, 1),
-                                                         is_determinate_parole: false,
-                                                         is_indeterminate: true,
-                                                         in_open_conditions: false,
-                                                         is_early_allocation: false)
-        expect(result).to eq [Date.new(2025, 5, 1), :indeterminate]
+      context 'with 12m offset enabled' do
+        context 'when open prison' do
+          let(:open_conditions) { true }
+
+          example 'handover date is 12 months before earliest release date' do
+            expect(result).to eq [Date.new(2025, 1, 1), :indeterminate_open]
+          end
+        end
+
+        context 'when non-open prison' do
+          let(:open_conditions) { false }
+
+          example 'handover date is 12 months before earliest release date' do
+            expect(result).to eq [Date.new(2025, 1, 1), :indeterminate]
+          end
+        end
+      end
+
+      context 'without 12m offset enabled' do
+        before { stub_const('ENABLE_12_MONTH_PAROLE_HO_OFFSET', false) }
+
+        context 'when open prison' do
+          let(:open_conditions) { true }
+
+          example 'handover date is 8 months before earliest release date' do
+            expect(result).to eq [Date.new(2025, 5, 1), :indeterminate_open]
+          end
+        end
+
+        context 'when non-open prison' do
+          let(:open_conditions) { false }
+
+          example 'handover date is 8 months before earliest release date' do
+            expect(result).to eq [Date.new(2025, 5, 1), :indeterminate]
+          end
+        end
       end
     end
 
@@ -104,7 +131,7 @@ RSpec.describe Handover::HandoverCalculation do
                                                          is_indeterminate: false,
                                                          in_open_conditions: false,
                                                          is_early_allocation: false)
-        expect(result).to eq [Date.new(2025, 5, 1), :determinate_parole]
+        expect(result).to eq [Date.new(2025, 1, 1), :determinate_parole]
       end
     end
   end

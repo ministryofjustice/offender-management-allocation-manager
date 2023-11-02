@@ -121,7 +121,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
     end
 
     def handover_fields(offset)
-      [today_plus(offset), today_plus(offset), today_plus(8.months + offset)]
+      [today_plus(offset), today_plus(offset), today_plus(8.months + offset + 15.days)]
     end
 
     def offender_csv_fields(offender)

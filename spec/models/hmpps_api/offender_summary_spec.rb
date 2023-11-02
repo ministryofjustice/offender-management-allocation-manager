@@ -358,7 +358,7 @@ describe HmppsApi::Offender do
     let(:case_info) { build(:case_information) }
 
     context 'when the Community is not involved yet' do
-      let(:sentence) { attributes_for(:sentence_detail, :handover_in_8_days) }
+      let(:sentence) { attributes_for(:sentence_detail, paroleEligibilityDate: Time.zone.today + 1.year + 8.days) }
 
       it 'returns false' do
         expect(subject).to be(false)
