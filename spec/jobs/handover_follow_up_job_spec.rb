@@ -2,7 +2,9 @@ require 'rails_helper'
 
 RSpec.describe HandoverFollowUpJob, type: :job do
   shared_context 'with expected behaviour' do
-    let(:offender) { build(:mpc_offender, prison: active_prison, offender: case_info.offender, prison_record: api_offender) }
+    let!(:offender) do
+      build(:mpc_offender, prison: active_prison, offender: case_info.offender, prison_record: api_offender)
+    end
     let(:api_offender) do
       build_api_offender(Time.zone.today + 12.months,
                          sentence_type: :determinate,
@@ -15,10 +17,11 @@ RSpec.describe HandoverFollowUpJob, type: :job do
     let(:pom) { build(:pom) }
 
     # This prison is active because we give it an allocation in the `before` test setup block
-    let(:active_prison) { create(:prison) }
+    let!(:active_prison) { create(:prison) }
 
-    let(:case_info) { build(:case_information, offender: build(:offender, nomis_offender_id: offender_no)) }
+    let!(:case_info) { create(:case_information, offender: create(:offender, nomis_offender_id: offender_no)) }
 
+    let(:real_today) { Time.zone.today }
     let(:today) { Time.zone.today }
 
     before do
@@ -69,7 +72,16 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       end
 
       context 'when the offender already has a COM allocated' do
-        let(:today) { offender.handover_start_date + 1.week }
+        before do
+          CalculatedHandoverDate.create!(
+            nomis_offender_id: offender_no,
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            start_date: today - 1.week,
+            handover_date: today - 1.week,
+            reason: 'determinate'
+          )
+        end
+
         let(:case_info) do
           create(:case_information, :with_com,
                  offender: build(:offender, nomis_offender_id: offender_no))
@@ -96,8 +108,16 @@ RSpec.describe HandoverFollowUpJob, type: :job do
         end
       end
 
-      context 'when start of handover is in the future' do
-        let(:today) { offender.handover_start_date - 1.day }
+      context 'when handover is in the future' do
+        before do
+          CalculatedHandoverDate.create!(
+            nomis_offender_id: offender_no,
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            start_date: today + 1.day,
+            handover_date: today + 1.day,
+            reason: 'determinate'
+          )
+        end
 
         it 'does not send email' do
           expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
@@ -106,7 +126,15 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       end
 
       context 'when handover started less than 1 week ago' do
-        let(:today) { offender.handover_start_date + 6.days }
+        before do
+          CalculatedHandoverDate.create!(
+            nomis_offender_id: offender_no,
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            start_date: today - 6.days,
+            handover_date: today - 6.days,
+            reason: 'determinate'
+          )
+        end
 
         it 'does not send email' do
           expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
@@ -115,7 +143,15 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       end
 
       context 'when handover started more than 1 week ago' do
-        let(:today) { offender.handover_start_date + 8.days }
+        before do
+          CalculatedHandoverDate.create!(
+            nomis_offender_id: offender_no,
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            start_date: today - 8.days,
+            handover_date: today - 8.days,
+            reason: 'determinate'
+          )
+        end
 
         it 'does not send email' do
           expect_any_instance_of(CommunityMailer).not_to receive(:urgent_pipeline_to_community)
@@ -124,7 +160,15 @@ RSpec.describe HandoverFollowUpJob, type: :job do
       end
 
       context 'when handover started exactly 1 week ago' do
-        let(:today) { offender.handover_start_date + 1.week }
+        before do
+          CalculatedHandoverDate.create!(
+            nomis_offender_id: offender_no,
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            start_date: today - 1.week,
+            handover_date: today - 1.week,
+            reason: 'determinate'
+          )
+        end
 
         context 'when the offender does not have a POM allocated' do
           let!(:allocation) { create(:allocation_history, :release, prison: active_prison.code, nomis_offender_id: offender_no) }
@@ -140,7 +184,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
                                            sentence_type: "Determinate",
                                            prison: active_prison.name,
                                            start_date: offender.handover_start_date,
-                                           responsibility_handover_date: offender.responsibility_handover_date,
+                                           responsibility_handover_date: offender.handover_date,
                                            pom_name: "This offender does not have an allocated POM",
                                            pom_email: "")
                                          .and_return(double(urgent_pipeline_to_community: mailer))
@@ -161,7 +205,7 @@ RSpec.describe HandoverFollowUpJob, type: :job do
                                            sentence_type: "Determinate",
                                            prison: active_prison.name,
                                            start_date: offender.handover_start_date,
-                                           responsibility_handover_date: offender.responsibility_handover_date,
+                                           responsibility_handover_date: offender.handover_date,
                                            pom_name: pom.full_name,
                                            pom_email: pom.email_address)
                                          .and_return(double(urgent_pipeline_to_community: mailer))
