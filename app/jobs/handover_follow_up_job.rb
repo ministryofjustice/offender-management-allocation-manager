@@ -36,7 +36,7 @@ class HandoverFollowUpJob < ApplicationJob
         ldu_email: offender.ldu_email_address,
         prison: Prison.find(offender.prison_id).name,
         start_date: offender.handover_start_date,
-        responsibility_handover_date: offender.responsibility_handover_date,
+        responsibility_handover_date: offender.handover_date,
         pom_name: pom_name,
         pom_email: pom_email
       ).urgent_pipeline_to_community.deliver_now

@@ -16,7 +16,7 @@ RSpec.describe "allocations/show", type: :view do
                     tier: 'A',
                     manual_entry?: false,
                     handover_start_date: nil,
-                    responsibility_handover_date: nil,
+                    handover_date: nil,
                     handover_type: 'missing',
                    ).as_null_object
   end

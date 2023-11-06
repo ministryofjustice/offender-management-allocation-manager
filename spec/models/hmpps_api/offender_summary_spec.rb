@@ -128,35 +128,6 @@ describe HmppsApi::Offender do
     end
   end
 
-  describe '#handover_start_date' do
-    context 'when in custody' do
-      let(:api_offender) do
-        build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail,
-                                                            conditionalReleaseDate: nil,
-                                                            automaticReleaseDate: Time.zone.today + 1.year,
-                                                            sentenceStartDate: Time.zone.today))
-      end
-      let(:case_info) { build(:case_information, enhanced_resourcing: true, mappa_level: 0) }
-      let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
-
-      it 'has a value' do
-        expect(offender.handover_start_date).not_to eq(nil)
-      end
-    end
-
-    context 'when COM responsible already' do
-      let(:api_offender) do
-        build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, conditionalReleaseDate: Time.zone.today + 1.week))
-      end
-      let(:case_info) { build(:case_information) }
-      let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
-
-      it 'doesnt has a value' do
-        expect(offender.handover_start_date).to eq(nil)
-      end
-    end
-  end
-
   describe '#pom_responsibility' do
     subject { OffenderManagerResponsibility.new offender.pom_responsible?, offender.pom_supporting? }
 

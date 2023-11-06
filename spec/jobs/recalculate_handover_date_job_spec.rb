@@ -198,7 +198,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
         }.to change(CalculatedHandoverDate, :count).by(1)
 
         expect(record.start_date).to eq(offender.handover_start_date)
-        expect(record.handover_date).to eq(offender.responsibility_handover_date)
+        expect(record.handover_date).to eq(offender.handover_date)
         expect(record.reason_text).to eq(offender.handover_reason)
         expect(record.responsibility).to eq(CalculatedHandoverDate::CUSTODY_ONLY)
       end
@@ -239,25 +239,34 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
           existing_record.reload
           expect(existing_record.start_date).to eq(offender.handover_start_date)
-          expect(existing_record.handover_date).to eq(offender.responsibility_handover_date)
+          expect(existing_record.handover_date).to eq(offender.handover_date)
           expect(existing_record.reason_text).to eq(offender.handover_reason)
         end
       end
 
       describe "when the dates haven't changed" do
-        let(:existing_start_date) { offender.handover_start_date }
-        let(:existing_handover_date) { offender.responsibility_handover_date }
-        let(:existing_reason) { HandoverDateService.handover(offender).reason }
+        let(:existing_start_date) { Date.new(2100, 12, 1) }
+        let(:existing_handover_date) { Date.new(2100, 12, 1) }
+        let(:existing_reason) { 'determinate' }
+
+        before do
+          allow(HandoverDateService).to receive(:handover).and_return(
+            CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+                                       start_date: existing_start_date,
+                                       handover_date: existing_handover_date,
+                                       reason: existing_reason)
+          )
+        end
 
         it "does nothing" do
-          old_updated_at = existing_record.updated_at
+          old_attributes = existing_record.attributes
 
           travel_to(Time.zone.now + 15.minutes) do
             described_class.perform_now(offender_no)
           end
 
-          new_updated_at = existing_record.reload.updated_at
-          expect(new_updated_at).to eq(old_updated_at)
+          new_attributes = existing_record.reload.attributes
+          expect(new_attributes).to eq(old_attributes)
         end
       end
     end

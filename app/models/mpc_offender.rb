@@ -23,8 +23,6 @@ class MpcOffender
   # These fields make sense to be nil when the case information is nil - the others dont
   delegate :ldu_email_address, :team_name, :ldu_name, :active_vlo?, to: :@case_information, allow_nil: true
 
-  delegate :start_date, to: :handover, prefix: true
-
   attr_reader :case_information, :prison
 
   alias_method :nomis_offender_id, :offender_no
@@ -136,10 +134,20 @@ class MpcOffender
 
   # handover methods
 
+  def handover_start_date
+    model.calculated_handover_date&.start_date
+  end
+
+  def handover_date
+    model.calculated_handover_date&.handover_date
+  end
+
   def handover_reason
     handover.reason_text
   end
 
+  # LEGACY - does processing when called to blank out handover date if responsibility is COM. Use #handover_date
+  # which returns the actual handover date on the CalculatedHandoverDate model
   def responsibility_handover_date
     handover.handover_date
   end
