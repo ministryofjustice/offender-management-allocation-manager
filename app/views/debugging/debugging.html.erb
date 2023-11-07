@@ -130,13 +130,13 @@
             <%= probation_field(@offender, :handover_reason) %>
           </td>
         </tr>
-          <tr class="govuk-table__row" id="handover-reason">
-            <td class="govuk-table__cell govuk-!-width-one-half">Release date and type used in handover calculations</td>
-            <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-              <%= values = probation_field(@offender, :earliest_release_for_handover)
-                  values ? "#{format_date(values.date)} (#{values.name})" : 'N/A' %>
-            </td>
-          </tr>
+        <tr class="govuk-table__row" id="release-date-for-handover">
+          <td class="govuk-table__cell govuk-!-width-one-half">Release date and type used in handover calculations</td>
+          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
+            <%= values = probation_field(@offender, :earliest_release_for_handover)
+                values ? "#{format_date(values.date)} (#{values.name})" : 'N/A' %>
+          </td>
+        </tr>
       <% else %>
         <tr class="govuk-table__row" id="outside-omic-policy">
           <td class="govuk-table__cell" colspan="2">
@@ -274,6 +274,12 @@
           <td class="govuk-table__cell govuk-!-width-one-half">Last allocation event</td>
           <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
             <%= last_event(@allocation) %>
+          </td>
+        </tr>
+        <tr class="govuk-table__row" id="is-early-allocation">
+          <td class="govuk-table__cell govuk-!-width-one-half">Early Allocation?</td>
+          <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+            <%= humanized_bool(@offender.early_allocation?) %>
           </td>
         </tr>
         </tbody>
