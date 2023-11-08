@@ -72,6 +72,18 @@ RSpec.describe Handover::HandoverCalculation do
           expect(result).to eq [Date.new(2024, 10, 1), :early_allocation]
         end
       end
+
+      describe 'for extended determinate parole case' do
+        example 'handover date is 8 months before earliest release date' do
+          result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
+                                                           earliest_release_date: Date.new(2026, 1, 1),
+                                                           is_determinate_parole: true,
+                                                           is_indeterminate: false,
+                                                           in_open_conditions: false,
+                                                           is_early_allocation: false)
+          expect(result).to eq [Date.new(2025, 1, 1), :determinate_parole]
+        end
+      end
     end
 
     describe 'for indeterminate case' do
@@ -84,8 +96,8 @@ RSpec.describe Handover::HandoverCalculation do
                                                 is_early_allocation: false)
       end
 
-      context 'with 12m offset enabled' do
-        context 'when open prison' do
+      describe 'with 12m offset enabled' do
+        describe 'when open prison' do
           let(:open_conditions) { true }
 
           example 'handover date is 12 months before earliest release date' do
@@ -93,7 +105,7 @@ RSpec.describe Handover::HandoverCalculation do
           end
         end
 
-        context 'when non-open prison' do
+        describe 'when non-open prison' do
           let(:open_conditions) { false }
 
           example 'handover date is 12 months before earliest release date' do
@@ -102,10 +114,10 @@ RSpec.describe Handover::HandoverCalculation do
         end
       end
 
-      context 'without 12m offset enabled' do
+      describe 'without 12m offset enabled' do
         before { stub_const('ENABLE_12_MONTH_PAROLE_HO_OFFSET', false) }
 
-        context 'when open prison' do
+        describe 'when open prison' do
           let(:open_conditions) { true }
 
           example 'handover date is 8 months before earliest release date' do
@@ -113,7 +125,7 @@ RSpec.describe Handover::HandoverCalculation do
           end
         end
 
-        context 'when non-open prison' do
+        describe 'when non-open prison' do
           let(:open_conditions) { false }
 
           example 'handover date is 8 months before earliest release date' do
@@ -121,17 +133,17 @@ RSpec.describe Handover::HandoverCalculation do
           end
         end
       end
-    end
 
-    describe 'for extended determinate parole case' do
-      example 'handover date is 8 months before earliest release date' do
-        result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
-                                                         earliest_release_date: Date.new(2026, 1, 1),
-                                                         is_determinate_parole: true,
-                                                         is_indeterminate: false,
-                                                         in_open_conditions: false,
-                                                         is_early_allocation: false)
-        expect(result).to eq [Date.new(2025, 1, 1), :determinate_parole]
+      describe 'when early allocation' do
+        example 'handover date is 15 months before earliest release date' do
+          result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
+                                                           earliest_release_date: Date.new(2026, 1, 1),
+                                                           is_determinate_parole: false,
+                                                           is_indeterminate: true,
+                                                           in_open_conditions: false,
+                                                           is_early_allocation: true)
+          expect(result).to eq [Date.new(2024, 10, 1), :early_allocation]
+        end
       end
     end
   end
