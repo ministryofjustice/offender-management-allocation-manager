@@ -84,8 +84,8 @@ RSpec.describe Handover::HandoverCalculation do
                                                 is_early_allocation: false)
       end
 
-      context 'with 12m offset enabled' do
-        context 'when open prison' do
+      describe 'with 12m offset enabled' do
+        describe 'when open prison' do
           let(:open_conditions) { true }
 
           example 'handover date is 12 months before earliest release date' do
@@ -93,7 +93,7 @@ RSpec.describe Handover::HandoverCalculation do
           end
         end
 
-        context 'when non-open prison' do
+        describe 'when non-open prison' do
           let(:open_conditions) { false }
 
           example 'handover date is 12 months before earliest release date' do
@@ -102,10 +102,10 @@ RSpec.describe Handover::HandoverCalculation do
         end
       end
 
-      context 'without 12m offset enabled' do
+      describe 'without 12m offset enabled' do
         before { stub_const('ENABLE_12_MONTH_PAROLE_HO_OFFSET', false) }
 
-        context 'when open prison' do
+        describe 'when open prison' do
           let(:open_conditions) { true }
 
           example 'handover date is 8 months before earliest release date' do
@@ -113,7 +113,7 @@ RSpec.describe Handover::HandoverCalculation do
           end
         end
 
-        context 'when non-open prison' do
+        describe 'when non-open prison' do
           let(:open_conditions) { false }
 
           example 'handover date is 8 months before earliest release date' do
