@@ -72,6 +72,18 @@ RSpec.describe Handover::HandoverCalculation do
           expect(result).to eq [Date.new(2024, 10, 1), :early_allocation]
         end
       end
+
+      describe 'for extended determinate parole case' do
+        example 'handover date is 8 months before earliest release date' do
+          result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
+                                                           earliest_release_date: Date.new(2026, 1, 1),
+                                                           is_determinate_parole: true,
+                                                           is_indeterminate: false,
+                                                           in_open_conditions: false,
+                                                           is_early_allocation: false)
+          expect(result).to eq [Date.new(2025, 1, 1), :determinate_parole]
+        end
+      end
     end
 
     describe 'for indeterminate case' do
@@ -120,18 +132,6 @@ RSpec.describe Handover::HandoverCalculation do
             expect(result).to eq [Date.new(2025, 5, 1), :indeterminate]
           end
         end
-      end
-    end
-
-    describe 'for extended determinate parole case' do
-      example 'handover date is 8 months before earliest release date' do
-        result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
-                                                         earliest_release_date: Date.new(2026, 1, 1),
-                                                         is_determinate_parole: true,
-                                                         is_indeterminate: false,
-                                                         in_open_conditions: false,
-                                                         is_early_allocation: false)
-        expect(result).to eq [Date.new(2025, 1, 1), :determinate_parole]
       end
     end
   end
