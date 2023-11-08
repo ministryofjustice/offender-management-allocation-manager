@@ -49,9 +49,9 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
         allow_any_instance_of(MpcOffender).to receive_messages(handover_type: 'standard')
       end
 
-      it 'does not show the section' do
+      it 'shows the section' do
         find('#all-cases .govuk-table').click_link offender_name
-        expect(page).not_to have_content 'Early allocation eligibility'
+        expect(page).to have_content 'Early allocation referral'
       end
     end
 
