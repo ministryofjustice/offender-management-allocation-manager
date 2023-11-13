@@ -51,7 +51,7 @@
       </td>
     </tr>
     <tr class="govuk-table__row">
-      <td class="govuk-table__cell">Target Hearing date</td>
+      <td class="govuk-table__cell"><%= ENABLE_NEW_PAROLE ? 'Target Hearing date' : 'Parole Review date' %></td>
       <td id="parole-review-date" class="govuk-table__cell table_cell__left_align">
         <% if @prisoner.indeterminate_sentence? %>
           <%= format_date(probation_field(@prisoner, :target_hearing_date), replacement: 'Unknown') %>

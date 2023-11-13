@@ -145,7 +145,7 @@ RSpec.describe Handover::HandoverCalculation do
           expect(result).to eq [Date.new(2024, 10, 1), :early_allocation]
         end
       end
-    end
+    end\
   end
 
   describe '::calculate_handover_start_date' do

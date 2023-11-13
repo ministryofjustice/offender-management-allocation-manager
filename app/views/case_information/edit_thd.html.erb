@@ -13,7 +13,7 @@
       <div class="govuk-form-group">
         <%=
           f.govuk_date_field :target_hearing_date,
-                             legend: { text: "Enter a new target hearing date (THD) for #{ @prisoner.full_name_ordered } (#{ @prisoner.offender_no })", tag: 'h1', size: 'l' },
+                             legend: { text: "Enter a new #{ENABLE_NEW_PAROLE ? 'target hearing date (THD)' : 'parole review date (PRD)'} for #{ @prisoner.full_name_ordered } (#{ @prisoner.offender_no })", tag: 'h1', size: 'l' },
                              hint: -> do %>
           <p class="govuk-hint">You can find this on the outcome letter from the Parole Board or by asking a case admin to
             look it up in the Public Protection Unit Database (PPUD).</p>
