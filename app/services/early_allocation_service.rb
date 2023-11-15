@@ -48,7 +48,7 @@ class EarlyAllocationService
             }
           )
         end
-        RecalculateHandoverDateJob.perform_now(offender.nomis_offender_id) if ENABLE_EVENT_BASED_HANDOVER_CALCULATION
+        RecalculateHandoverDateJob.perform_now(offender.nomis_offender_id)
       end
     end
 

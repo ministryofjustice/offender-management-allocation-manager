@@ -2,7 +2,6 @@ RSpec.describe DomainEvents::Handlers::PrisonerUpdatedHandler do
   subject!(:handler) { described_class.new }
 
   before do
-    stub_const('ENABLE_EVENT_BASED_HANDOVER_CALCULATION', true)
     allow(RecalculateHandoverDateJob).to receive(:perform_now)
     expect(RecalculateHandoverDateJob).not_to receive(:perform_later)
 

@@ -27,12 +27,6 @@ namespace :deployment do
       ],
       [
         'preprod',
-        'early-allocation-events',
-        '0 7 * * *',
-        'bundle exec rake trigger:early_allocation_events',
-      ],
-      [
-        'preprod',
         'process-movements',
         '30 7 * * *',
         'bundle exec rake movements:process',
@@ -56,12 +50,6 @@ namespace :deployment do
         'deactivate-cnls',
         '0 4 * * *',
         'bundle exec rake deactivate_cnls:process',
-      ],
-      [
-        'production',
-        'early-allocation-events',
-        '00 02 * * *',
-        'bundle exec rake trigger:early_allocation_events',
       ],
       [
         'production',

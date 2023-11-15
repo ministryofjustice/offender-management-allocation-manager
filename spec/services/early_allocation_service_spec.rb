@@ -1,8 +1,4 @@
 describe EarlyAllocationService do
-  before do
-    stub_const('ENABLE_EVENT_BASED_HANDOVER_CALCULATION', true)
-  end
-
   describe '::send_early_allocation' do
     let!(:calc_status) { create(:calculated_early_allocation_status, eligible: true) }
 
