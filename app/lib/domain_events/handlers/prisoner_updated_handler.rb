@@ -1,7 +1,5 @@
 class DomainEvents::Handlers::PrisonerUpdatedHandler
   def handle(event)
-    return unless ENABLE_EVENT_BASED_HANDOVER_CALCULATION
-
     nomis_offender_id = event.additional_information.fetch('nomsNumber')
 
     if CaseInformation.find_by_nomis_offender_id(nomis_offender_id).nil?

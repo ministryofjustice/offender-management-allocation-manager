@@ -35,7 +35,6 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
     allow(EarlyAllocationService).to receive(:send_early_allocation)
     allow(RecalculateHandoverDateJob).to receive(:perform_now)
     allow(RecalculateHandoverDateJob).to receive(:perform_later)
-    stub_const('ENABLE_EVENT_BASED_HANDOVER_CALCULATION', true)
 
     # assert that our setup created a caseload record
     expect(page.text).to match(/Showing 1 to 1 of 1 results/)
