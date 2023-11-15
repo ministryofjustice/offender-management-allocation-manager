@@ -81,7 +81,8 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
         manager: {
           code: primary_pom.staff_id,
           forename: primary_pom.first_name,
-          surname: primary_pom.last_name
+          surname: primary_pom.last_name,
+          email: primary_pom.email_address
         },
         prison: {
           code: prison.code

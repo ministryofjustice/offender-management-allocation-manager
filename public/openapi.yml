@@ -119,6 +119,8 @@ paths:
                         type: string
                       surname:
                         type: string
+                      email:
+                        type: string
                   prison:
                     type: object
                     properties:

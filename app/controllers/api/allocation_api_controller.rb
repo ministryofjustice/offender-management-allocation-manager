@@ -19,7 +19,8 @@ module Api
         manager: {
           code: staff.staff_id,
           forename: staff.first_name,
-          surname: staff.last_name
+          surname: staff.last_name,
+          email: staff.email_address
         },
         prison: {
           code: allocation.prison
