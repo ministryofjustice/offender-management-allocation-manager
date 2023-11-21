@@ -125,7 +125,8 @@ CREATE TABLE public.calculated_handover_dates (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     nomis_offender_id character varying NOT NULL,
-    responsibility character varying
+    responsibility character varying,
+    last_calculated_at timestamp without time zone
 );
 
 
@@ -1317,6 +1318,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230613125426'),
 ('20230712000001'),
 ('20230712000002'),
-('20230724141335');
+('20230724141335'),
+('20231121154615');
 
 
