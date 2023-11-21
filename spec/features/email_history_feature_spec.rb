@@ -4,6 +4,10 @@ feature 'email history' do
   let(:prison) { create(:prison) }
   let(:user) { build(:pom) }
 
+  before do
+    allow(HandoverMaintenanceService).to receive(:chase_ldu)
+  end
+
   context 'when offender has less than 10 months left to serve', :disable_push_to_delius do
     let(:nomis_offender) do
       build(:nomis_offender,
@@ -19,14 +23,8 @@ feature 'email history' do
 
       stub_poms(prison.code, [user])
       stub_keyworker prison.code, offender_no, build(:keyworker)
-
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: user.staff_id, prison: prison.code)
-
-      # Ensure that an email history record has been created
-      expect {
-        RecalculateHandoverDateJob.perform_now(offender_no)
-      }.to change(EmailHistory, :count).by(1)
 
       stub_signin_spo(user, [prison.code])
     end

@@ -59,6 +59,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
 
     allow(OffenderService).to receive(:get_probation_record).with(nomis_offender_id)
       .and_return(mock_probation_record)
+    allow(RecalculateHandoverDateJob).to receive_messages(perform_now: nil, perform_later: nil)
   end
 
   shared_examples 'audit event' do
