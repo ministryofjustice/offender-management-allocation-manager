@@ -142,6 +142,10 @@ class MpcOffender
     model.calculated_handover_date&.handover_date
   end
 
+  def handover_last_calculated_at
+    model.calculated_handover_date&.last_calculated_at
+  end
+
   def handover_reason
     handover.reason_text
   end

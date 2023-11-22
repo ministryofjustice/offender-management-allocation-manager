@@ -52,6 +52,7 @@ private
 
       if record.changed?
         record.offender_attributes_to_archive = nomis_offender.attributes_to_archive
+        record.last_calculated_at = Time.zone.now.utc
         record.save!
         handover_after = record.attributes.except('id', 'created_at', 'updated_at')
 

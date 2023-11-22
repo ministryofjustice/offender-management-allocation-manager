@@ -201,6 +201,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
         expect(record.handover_date).to eq(offender.handover_date)
         expect(record.reason_text).to eq(offender.handover_reason)
         expect(record.responsibility).to eq(CalculatedHandoverDate::CUSTODY_ONLY)
+        expect(record.last_calculated_at.class).to eq(ActiveSupport::TimeWithZone)
       end
 
       context 'with a COM responsible case' do
@@ -241,6 +242,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
           expect(existing_record.start_date).to eq(offender.handover_start_date)
           expect(existing_record.handover_date).to eq(offender.handover_date)
           expect(existing_record.reason_text).to eq(offender.handover_reason)
+          expect(existing_record.last_calculated_at.class).to eq(ActiveSupport::TimeWithZone)
         end
       end
 
