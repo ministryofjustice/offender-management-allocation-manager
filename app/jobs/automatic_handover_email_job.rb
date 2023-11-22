@@ -7,19 +7,12 @@ class AutomaticHandoverEmailJob < ApplicationJob
   SEND_THRESHOLD = 44.days.freeze
 
   def perform(ldu)
-    today = Time.zone.today
     ldu_offenders = get_ldu_offenders(ldu)
 
     # don't send any emails to empty LDUs with no offenders
     if ldu_offenders.any?
-      active_prison_codes = Prison.active.map(&:code)
+      offenders = filter_offenders(ldu_offenders)
 
-      offenders = ldu_offenders.select { |o|
-        active_prison_codes.include?(o.prison_id) &&
-            o.sentenced? &&
-            o.handover_start_date.present? && o.handover_start_date.between?(today, today + SEND_THRESHOLD)
-      }
-                      .sort_by(&:handover_start_date)
       if offenders.any?
         allocations = AllocationHistory.where(nomis_offender_id: offenders.map(&:offender_no)).index_by(&:nomis_offender_id)
         csv_data = CSV.generate do |csv|
@@ -49,6 +42,24 @@ class AutomaticHandoverEmailJob < ApplicationJob
   end
 
 private
+
+  def filter_offenders(offenders, run_on: Time.zone.today, last_report_on: Time.zone.today - 1.month)
+    active_prison_codes = Prison.active.map(&:code)
+
+    offenders.select { |o|
+      active_prison_codes.include?(o.prison_id) &&
+        o.sentenced? &&
+        o.handover_start_date.present? && (
+          o.handover_start_date.between?(run_on, run_on + SEND_THRESHOLD) || (
+            # This catches handovers that got calculated after the last report ran
+            # with handovers in the past and would therefore have been missed
+            o.handover_start_date < run_on &&
+            o.handover_last_calculated_at.present? &&
+            o.handover_last_calculated_at > last_report_on
+          )
+        )
+    }.sort_by(&:handover_start_date)
+  end
 
   def get_ldu_offenders(ldu)
     ldu.case_information.map(&:nomis_offender_id).map { |offender_id| OffenderService.get_offender(offender_id) }.compact
