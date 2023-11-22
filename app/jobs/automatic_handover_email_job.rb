@@ -35,8 +35,10 @@ class AutomaticHandoverEmailJob < ApplicationJob
         end
         # deliver_now - this is all we are doing, so we want the whole job to repeat if it fails
         CommunityMailer.with(ldu_name: ldu.name, ldu_email: ldu.email_address, csv_data: csv_data).pipeline_to_community.deliver_now
+        logger.info "event=ldu_handover_email_with_csv,ldu_code=#{ldu.code},offender_count=#{offenders.size}|Email sent to LDU with CSV"
       else
         CommunityMailer.with(ldu_name: ldu.name, ldu_email: ldu.email_address).pipeline_to_community_no_handovers.deliver_now
+        logger.info "event=ldu_handover_email_no_csv,ldu_code=#{ldu.code}|Email sent to LDU no CSV"
       end
     end
   end

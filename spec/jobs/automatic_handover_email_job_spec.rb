@@ -63,7 +63,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
       described_class.perform_now(ldu)
     end
 
-    let(:ldu) { double(LocalDeliveryUnit, name: 'X', email_address: 'x@x.com') }
+    let(:ldu) { double(LocalDeliveryUnit, name: 'X', email_address: 'x@x.com', code: 'X') }
     let(:mail_instance) { double(deliver_now: nil) }
 
     let(:mailer) do
