@@ -229,7 +229,7 @@ describe HmppsApi::PrisonApi::OffenderApi do
     end
 
     it "shows default image if there is no image available",
-       vcr: { cassette_name: 'prison_api/offender_api_image_not_found' } do
+       vcr: { cassette_name: 'prison_api/offender_api_image_not_found' }, local_only: true do
       booking_id = 1_153_753
       image_id = 1_340_556
       uri = "#{ApiHelper::T3}/images/#{image_id}/data"

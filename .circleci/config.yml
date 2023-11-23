@@ -184,7 +184,7 @@ jobs:
             set -euo pipefail
 
             env_name="${K8S_NAMESPACE#offender-management-}"
-            
+
             mkdir -p ~/env
 
             apk add jq
@@ -233,8 +233,8 @@ jobs:
             . ~/env/"${env_name}-shared-env.sh"
             . ~/env/"${env_name}"-hmpps-secrets.sh
             export SPEC_STATUS_PATH=~/spec_status
-            bundle exec parallel_test -t rspec -- -t ~flaky --format progress -- spec || \
-              (echo "Flaky tests detected, trying again..." && sleep 30 && bundle exec parallel_test -t rspec -- -t ~flaky --format progress --only-failures -- spec)
+            bundle exec parallel_test -t rspec -- -t ~flaky -t ~local_only --format progress -- spec || \
+              (echo "Flaky tests detected, trying again..." && sleep 30 && bundle exec parallel_test -t rspec -- -t ~flaky -t ~local_only --format progress --only-failures -- spec)
           environment:
             MOZ_HEADLESS: 1
             ALLOCATION_MANAGER_HOST: https://dev.moic.service.justice.gov.uk
@@ -356,7 +356,7 @@ workflows:
           requires: [build_and_push_docker_image]
           filters: { branches: { only: [preprod] } }
           context: [offender-management-shared, offender-management-preprod]
-          
+
   staging:
     jobs:
       - install_dependencies:
