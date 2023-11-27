@@ -4,7 +4,7 @@
 #
 # Do remember to check in generated files. Have a nice day.
 
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: handover-reminders-job
