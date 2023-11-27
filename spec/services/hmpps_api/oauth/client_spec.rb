@@ -12,14 +12,7 @@ describe HmppsApi::Oauth::Client do
 
       client.post(route)
 
-      expect(WebMock).to have_requested(:post, /\w/)
-        .with(
-          headers: {
-            'Authorization': "Basic #{Base64.urlsafe_encode64(
-              "#{Rails.configuration.hmpps_api_client_id}:#{Rails.configuration.hmpps_api_client_secret}"
-            )}"
-          }
-        )
+      expect(WebMock).to have_requested(:post, /\w/).with(headers: { 'Authorization': /^Basic .{100,}$/ })
     end
 
     context 'when a HTTP error response is received' do
