@@ -145,8 +145,6 @@ Rails.application.routes.draw do
   match '/500', to: 'errors#internal_server_error', via: :all
   match '/503', to: 'errors#internal_server_error', via: :all
 
-  get '/whats-new', to: 'pages#whats_new'
-
   get '/help_step0', to: 'help#help_step0'
   get '/help_step1', to: 'help#help_step1'
   get '/help_step2', to: 'help#help_step2'
