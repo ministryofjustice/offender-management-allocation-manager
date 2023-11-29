@@ -53,6 +53,12 @@
                link: new_arrivals_prison_prisoners_path(@prison.code),
                content: "Cases waiting to be matched with NDelius records before they can be allocated."
     %>
+
+    <%= render 'dashboard_partition',
+               title: "Get help with this service",
+               link: help_dashboard_path,
+               content: "TODO"
+    %>
   </div>
 
   <h2 class="govuk-heading-m no-bottom-margin govuk-!-margin-top-3">Manage staff</h2>
@@ -105,6 +111,12 @@
                title: "All allocations in this prison",
                link: prison_staff_caseload_global_path(@prison.code, @staff_id),
                content: "Cases allocated to all POMs."
+    %>
+
+    <%= render 'dashboard_partition',
+               title: "Get help with this service",
+               link: help_dashboard_path,
+               content: "TODO"
     %>
   </div>
 <% end %>
