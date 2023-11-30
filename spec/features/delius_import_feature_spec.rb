@@ -13,6 +13,7 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
     stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
 
     create(:allocation_history, nomis_offender_id: offender_no, prison: prison.code, primary_pom_nomis_id: pom.staff_id)
+    allow(RecalculateHandoverDateJob).to receive_messages(perform_now: nil, perform_later: nil)
   end
 
   context "when the LDU is known" do

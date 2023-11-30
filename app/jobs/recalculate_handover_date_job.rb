@@ -26,29 +26,7 @@ private
         handover_date: handover.handover_date,
         reason: handover.reason,
       )
-      if handover.community_responsible? &&
-        handover.reason.to_sym == :determinate_short &&
-        nomis_offender.ldu_email_address.present? &&
-        nomis_offender.allocated_com_name.blank?
-        # need to chase if we haven't chased recently
-        last_chaser = db_offender.email_histories.where(event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION).last
-        if last_chaser.nil? || last_chaser.created_at < 2.days.ago
-          # create the history first so that the validations will help with hard failures due to coding errors
-          # rather than waiting for the mailer to object
-          db_offender.email_histories.create! prison: nomis_offender.prison_id,
-                                              name: case_info.ldu_name,
-                                              email: case_info.ldu_email_address,
-                                              event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
-          # This is queued so that soft failures don't kill the whole job
-          CommunityMailer.with(
-            email: case_info.ldu_email_address,
-            crn_number: case_info.crn,
-            prison_name: PrisonService.name_for(nomis_offender.prison_id),
-            prisoner_name: "#{nomis_offender.first_name} #{nomis_offender.last_name}",
-            prisoner_number: nomis_offender.offender_no
-          ).assign_com_less_than_10_months.deliver_later
-        end
-      end
+      HandoverMaintenanceService.chase_ldu(nomis_offender)
 
       if record.changed?
         record.offender_attributes_to_archive = nomis_offender.attributes_to_archive

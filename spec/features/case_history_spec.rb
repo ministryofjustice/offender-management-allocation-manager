@@ -70,6 +70,7 @@ feature 'Case History' do
   before do
     Timecop.travel Time.zone.local 2021, 2, 28, 11, 25, 35
     stub_auth_token
+    allow(HandoverMaintenanceService).to receive(:chase_ldu)
   end
 
   after do

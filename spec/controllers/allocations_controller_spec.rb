@@ -20,6 +20,7 @@ RSpec.describe AllocationsController, type: :controller do
     stub_poms(prison_code, poms)
     stub_offender(offender)
     stub_movements_for offender_no, [attributes_for(:movement)]
+    allow(RecalculateHandoverDateJob).to receive_messages(perform_now: nil, perform_later: nil)
   end
 
   context 'when user is a POM' do
