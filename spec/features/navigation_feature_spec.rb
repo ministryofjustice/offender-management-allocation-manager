@@ -17,6 +17,10 @@ feature 'Navigation' do
       it 'has an SPO menu' do
         expect(nav_links.map(&:text)).to eq([I18n.t('service_name'), "Allocations", "Handover", "Staff"])
       end
+
+      it 'has a help tile' do
+        expect(page).to have_css('h1.card__heading a', text: 'Get help with this service')
+      end
     end
 
     context 'with a POM user' do
@@ -27,6 +31,10 @@ feature 'Navigation' do
 
       it 'has a POM menu' do
         expect(nav_links.map(&:text)).to eq([I18n.t('service_name'), "Caseload", "Handover"])
+      end
+
+      it 'has a help tile' do
+        expect(page).to have_css('h1.card__heading a', text: 'Get help with this service')
       end
     end
 
