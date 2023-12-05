@@ -33,6 +33,7 @@ feature 'Allocation' do
       { "prisonPeriod" => [{ 'prisons' => ['ABC', 'DEF'] }] }
     )
 
+    allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).and_return(nil)
     allow(OffenderService).to receive(:get_mappa_details).and_return(blank_mappa)
     allow(OffenderService).to receive(:get_community_data).and_return({ crn: 12_345 })
     allow_any_instance_of(StaffMember).to receive(:email_address).and_return('pom@example.com')

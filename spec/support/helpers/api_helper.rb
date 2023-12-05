@@ -139,8 +139,8 @@ module ApiHelper
   end
 
   def stub_oasys_assessments(offender_no)
-    stub_request(:get, "#{ASSESS_RISKS_AND_NEEDS_API_HOST}/assessments/timeline/nomisId/#{offender_no}/assessments/summary?assessmentStatus=COMPLETE")
-      .to_return(body: [].to_json)
+    stub_request(:get, "#{ASSESS_RISKS_AND_NEEDS_API_HOST}/assessments/timeline/nomisId/#{offender_no}")
+      .to_return(body: { 'timeline': [] }.to_json)
   end
 
   def stub_multiple_offenders(offenders, bookings)
