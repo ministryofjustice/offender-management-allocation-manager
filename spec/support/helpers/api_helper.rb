@@ -4,6 +4,7 @@ module ApiHelper
   AUTH_HOST = Rails.configuration.nomis_oauth_host
   T3 = "#{Rails.configuration.prison_api_host}/api".freeze
   T3_SEARCH = Rails.configuration.prisoner_search_host
+  ASSESS_RISKS_AND_NEEDS_API_HOST = Rails.configuration.assess_risks_and_needs_api_host
   KEYWORKER_API_HOST = ENV.fetch('KEYWORKER_API_HOST')
   COMMUNITY_HOST = "#{Rails.configuration.community_api_host}/secure".freeze
   T3_LATEST_MOVE_URL = "#{T3}/movements/offenders?latestOnly=true&movementTypes=TAP".freeze
