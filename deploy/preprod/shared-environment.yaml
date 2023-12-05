@@ -15,7 +15,6 @@ data:
   COMPLEXITY_API_HOST: "https://complexity-of-need-preprod.hmpps.service.justice.gov.uk"
   NOMIS_OAUTH_HOST: "https://sign-in-preprod.hmpps.service.justice.gov.uk"
   LD_PRELOAD: "/usr/lib/x86_64-linux-gnu/libjemalloc.so"
-  ASSESSMENT_API_HOST: "https://offender-prprod.aks-live-1.studio-hosting.service.justice.gov.uk"
   ASSESS_RISKS_AND_NEEDS_API_HOST: "https://assess-risks-and-needs-preprod.hmpps.service.justice.gov.uk"
   MANAGE_POM_CASES_AND_DELIUS_HOST: "https://manage-pom-cases-and-delius-preprod.hmpps.service.justice.gov.uk"
   TIERING_API_HOST: https://hmpps-tier-preprod.hmpps.service.justice.gov.uk

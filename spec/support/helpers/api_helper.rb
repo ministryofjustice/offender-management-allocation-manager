@@ -8,7 +8,6 @@ module ApiHelper
   COMMUNITY_HOST = "#{Rails.configuration.community_api_host}/secure".freeze
   T3_LATEST_MOVE_URL = "#{T3}/movements/offenders?latestOnly=true&movementTypes=TAP".freeze
   T3_BOOKINGS_URL = "#{T3}/offender-sentences/bookings".freeze
-  ASSESSMENT_API_HOST = Rails.configuration.assessment_api_host
 
   def stub_nil_offender
     stub_request(:post, "#{T3_SEARCH}/prisoner-search/prisoner-numbers").to_return(body: [].to_json).with(query: { 'include-restricted-patients': true })
@@ -139,7 +138,7 @@ module ApiHelper
   end
 
   def stub_oasys_assessments(offender_no)
-    stub_request(:get, "#{ASSESSMENT_API_HOST}/offenders/nomisId/#{offender_no}/assessments/summary?assessmentStatus=COMPLETE")
+    stub_request(:get, "#{ASSESS_RISKS_AND_NEEDS_API_HOST}/assessments/timeline/nomisId/#{offender_no}/assessments/summary?assessmentStatus=COMPLETE")
       .to_return(body: [].to_json)
   end
 
