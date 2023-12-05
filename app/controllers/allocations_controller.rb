@@ -7,7 +7,7 @@ class AllocationsController < PrisonsApplicationController
   def show
     allocation = AllocationHistory.find_by!(nomis_offender_id: @prisoner.offender_no)
     @allocation = CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
-    @oasys_assessment = HmppsApi::AssessmentApi.get_latest_oasys_date(@prisoner.offender_no)
+    @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@prisoner.offender_no)
 
     @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
     unless @pom.has_pom_role?

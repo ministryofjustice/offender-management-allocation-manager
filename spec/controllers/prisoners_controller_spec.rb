@@ -727,7 +727,7 @@ RSpec.describe PrisonersController, type: :controller do
         let(:completed_date) { '2021-06-02'.to_date }
 
         before do
-          expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
+          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
           stub_offender(offender)
           stub_keyworker prison, offender_no, build(:keyworker)
 
@@ -747,7 +747,7 @@ RSpec.describe PrisonersController, type: :controller do
         let(:completed_date) { '2021-06-02'.to_date }
 
         before do
-          expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
+          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
           stub_offender(offender)
           stub_keyworker prison, offender_no, build(:keyworker)
 
@@ -767,7 +767,7 @@ RSpec.describe PrisonersController, type: :controller do
         let(:completed_date) { nil }
 
         before do
-          expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
+          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
           stub_offender(offender)
           stub_keyworker prison, offender_no, build(:keyworker)
 
