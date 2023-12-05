@@ -25,7 +25,7 @@ gem 'logstash-event'
 gem 'logstash-logger'
 gem 'omniauth-oauth2'
 gem 'omniauth', '~> 1.9.2', require: nil
-gem 'paper_trail', '~> 12.3.0'
+gem 'paper_trail', '~> 15.1.0'
 gem 'pg'
 gem 'puma', '~> 6.3.1'
 gem 'prometheus_exporter'
