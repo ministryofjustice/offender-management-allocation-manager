@@ -123,7 +123,7 @@ module OffenderHelper
   end
 
   def last_oasys_completed(offender_no)
-    details = HmppsApi::AssessmentApi.get_latest_oasys_date(offender_no)
+    details = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(offender_no)
 
     return nil if details.nil? ||
       details.fetch(:assessment_type) == Faraday::ConflictError ||

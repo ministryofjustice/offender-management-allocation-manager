@@ -4,6 +4,7 @@ require 'rails_helper'
 
 feature 'Search for offenders' do
   before do
+    allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).and_return(nil)
     signin_spo_user [prison_code]
   end
 

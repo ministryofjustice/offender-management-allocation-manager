@@ -10,7 +10,7 @@ class DebuggingController < PrisonsApplicationController
 
     if prisoner.present?
       @offender = prisoner
-      @oasys_assessment = HmppsApi::AssessmentApi.get_latest_oasys_date(@offender.offender_no)
+      @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@offender.offender_no)
 
       @allocation = AllocationHistory.find_by(nomis_offender_id: @offender.offender_no)
       @movements =

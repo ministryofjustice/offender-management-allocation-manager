@@ -172,7 +172,7 @@ RSpec.describe AllocationStaffController, type: :controller do
           let(:completed_date) { '2021-06-02'.to_date }
 
           before do
-            expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
+            expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
           end
 
@@ -185,7 +185,7 @@ RSpec.describe AllocationStaffController, type: :controller do
           let(:completed_date) { '2021-06-02'.to_date }
 
           before do
-            expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
+            expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
           end
 
@@ -198,7 +198,7 @@ RSpec.describe AllocationStaffController, type: :controller do
           let(:completed_date) { nil }
 
           before do
-            expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
+            expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
           end
 

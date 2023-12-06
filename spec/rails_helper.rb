@@ -103,11 +103,6 @@ RSpec.configure do |config|
   # in VCR mode, allow HTTP connections to T3, but then
   # reset back to default afterwards
   config.around(:each, :vcr) do |example|
-    # Stub out the Assessments API because it's IP restricted
-    api_host = Rails.configuration.assessment_api_host
-    WebMock.stub_request(:get, ->(uri) { uri.to_s.start_with?(api_host) }).
-      to_return(status: 200, body: [].to_json)
-
     # VCR tests expect Leeds (HMP) prison to exist
     unless Prison.where(code: 'LEI').exists?
       create(:prison, code:'LEI')

@@ -83,7 +83,7 @@ RSpec.describe AllocationsController, type: :controller do
         let(:page) { Nokogiri::HTML(response.body) }
 
         before do
-          expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
+          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
           create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no,  primary_pom_nomis_id: active_pom.staff_id)
           get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
           expect(page.css('#oasys-date')).to have_text('Last completed OASys')
@@ -103,7 +103,7 @@ RSpec.describe AllocationsController, type: :controller do
         let(:page) { Nokogiri::HTML(response.body) }
 
         before do
-          expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
+          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
           create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no,  primary_pom_nomis_id: active_pom.staff_id)
           get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
           expect(page.css('#oasys-date')).to have_text('Last completed OASys')
@@ -123,7 +123,7 @@ RSpec.describe AllocationsController, type: :controller do
         let(:page) { Nokogiri::HTML(response.body) }
 
         before do
-          expect(HmppsApi::AssessmentApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
+          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
           create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no,  primary_pom_nomis_id: active_pom.staff_id)
           get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
           expect(page.css('#oasys-date')).to have_text('Last completed OASys')

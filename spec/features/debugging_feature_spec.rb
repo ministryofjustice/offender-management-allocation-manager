@@ -5,6 +5,7 @@ feature 'Provide debugging information for our team to use' do
   let(:prison) { Prison.find 'LEI' }
 
   before do
+    allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).and_return(nil)
     signin_global_admin_user
   end
 

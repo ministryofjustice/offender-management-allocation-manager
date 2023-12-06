@@ -65,7 +65,7 @@ class AllocatedOffender
   end
 
   def latest_oasys_date
-    @latest_oasys_date ||= HmppsApi::AssessmentApi.get_latest_oasys_date(nomis_offender_id)
+    @latest_oasys_date ||= HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(nomis_offender_id)
   end
 
   class << self

@@ -4,11 +4,11 @@ module ApiHelper
   AUTH_HOST = Rails.configuration.nomis_oauth_host
   T3 = "#{Rails.configuration.prison_api_host}/api".freeze
   T3_SEARCH = Rails.configuration.prisoner_search_host
+  ASSESS_RISKS_AND_NEEDS_API_HOST = Rails.configuration.assess_risks_and_needs_api_host
   KEYWORKER_API_HOST = ENV.fetch('KEYWORKER_API_HOST')
   COMMUNITY_HOST = "#{Rails.configuration.community_api_host}/secure".freeze
   T3_LATEST_MOVE_URL = "#{T3}/movements/offenders?latestOnly=true&movementTypes=TAP".freeze
   T3_BOOKINGS_URL = "#{T3}/offender-sentences/bookings".freeze
-  ASSESSMENT_API_HOST = Rails.configuration.assessment_api_host
 
   def stub_nil_offender
     stub_request(:post, "#{T3_SEARCH}/prisoner-search/prisoner-numbers").to_return(body: [].to_json).with(query: { 'include-restricted-patients': true })
@@ -139,8 +139,8 @@ module ApiHelper
   end
 
   def stub_oasys_assessments(offender_no)
-    stub_request(:get, "#{ASSESSMENT_API_HOST}/offenders/nomisId/#{offender_no}/assessments/summary?assessmentStatus=COMPLETE")
-      .to_return(body: [].to_json)
+    stub_request(:get, "#{ASSESS_RISKS_AND_NEEDS_API_HOST}/assessments/timeline/nomisId/#{offender_no}")
+      .to_return(body: { 'timeline': [] }.to_json)
   end
 
   def stub_multiple_offenders(offenders, bookings)

@@ -15,7 +15,6 @@ data:
   COMPLEXITY_API_HOST: "https://complexity-of-need-staging.hmpps.service.justice.gov.uk"
   NOMIS_OAUTH_HOST: "https://sign-in-dev.hmpps.service.justice.gov.uk"
   LD_PRELOAD: "/usr/lib/x86_64-linux-gnu/libjemalloc.so"
-  ASSESSMENT_API_HOST: "https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk"
   ASSESS_RISKS_AND_NEEDS_API_HOST: "https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk"
   MANAGE_POM_CASES_AND_DELIUS_HOST: "https://manage-pom-cases-and-delius-dev.hmpps.service.justice.gov.uk"
   TIERING_API_HOST: https://hmpps-tier-dev.hmpps.service.justice.gov.uk
