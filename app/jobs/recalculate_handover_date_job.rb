@@ -71,15 +71,15 @@ private
 
       # Don't push if the CaseInformation record is a manual entry (meaning it didn't match against nDelius)
       # This avoids 404 Not Found errors for offenders who don't exist in nDelius (they could be Scottish, etc.)
-      push_to_delius record unless case_info.manual_entry?
+      publish_domain_event record unless case_info.manual_entry?
 
       request_supporting_com record, db_offender, nomis_offender
     end
   end
 
-  def push_to_delius(record)
-    # Don't push if the dates haven't changed
-    if (record.saved_change_to_start_date? || record.saved_change_to_handover_date?) && !record.handover_date.nil?
+  def publish_domain_event(record)
+    # Don't publish if the dates haven't changed
+    if record.saved_change_to_start_date? || record.saved_change_to_handover_date?
       event = DomainEvents::EventFactory.build_handover_event(host: Rails.configuration.allocation_manager_host,
                                                               noms_number: record.nomis_offender_id)
       event.publish(job: 'recalculate_handover_date')
