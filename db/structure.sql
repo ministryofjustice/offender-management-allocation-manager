@@ -621,6 +621,53 @@ CREATE TABLE public.prisons (
 
 
 --
+-- Name: raw_parole_imports; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.raw_parole_imports (
+    id bigint NOT NULL,
+    title character varying,
+    nomis_id character varying,
+    prison_no character varying,
+    sentence_type character varying,
+    sentence_date character varying,
+    tariff_exp character varying,
+    review_date character varying,
+    review_id character varying,
+    review_milestone_date_id character varying,
+    review_type character varying,
+    review_status character varying,
+    curr_target_date character varying,
+    ms13_target_date character varying,
+    ms13_completion_date character varying,
+    final_result character varying,
+    for_date date,
+    import_id character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: raw_parole_imports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.raw_parole_imports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: raw_parole_imports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.raw_parole_imports_id_seq OWNED BY public.raw_parole_imports.id;
+
+
+--
 -- Name: responsibilities; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -836,6 +883,13 @@ ALTER TABLE ONLY public.pom_details ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: raw_parole_imports id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.raw_parole_imports ALTER COLUMN id SET DEFAULT nextval('public.raw_parole_imports_id_seq'::regclass);
+
+
+--
 -- Name: responsibilities id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1014,6 +1068,14 @@ ALTER TABLE ONLY public.pom_details
 
 ALTER TABLE ONLY public.prisons
     ADD CONSTRAINT prisons_pkey PRIMARY KEY (code);
+
+
+--
+-- Name: raw_parole_imports raw_parole_imports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.raw_parole_imports
+    ADD CONSTRAINT raw_parole_imports_pkey PRIMARY KEY (id);
 
 
 --
@@ -1319,6 +1381,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230712000001'),
 ('20230712000002'),
 ('20230724141335'),
-('20231121154615');
+('20231121154615'),
+('20240123143813');
 
 

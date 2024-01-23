@@ -41,7 +41,7 @@ class ParoleDataImportJob < ApplicationJob
     if fetched_mail.nil?
       Rails.logger.info(format_log('No mail found'))
     else
-      mail = Mail.new(fetched_email)
+      mail = Mail.new(fetched_mail)
       mail.attachments.empty? ? Rails.logger.info(format_log('No attachments found')) : process_attachments(mail)
     end
 
@@ -72,9 +72,9 @@ private
       end
 
       csv_rows = CSV.new(attachment.body.decoded, headers: true)
-      @csv_row_count = csv_rows.size
 
       csv_rows.each do |csv_row|
+        @csv_row_count += 1
         import_row(csv_row)
       end
     end
@@ -84,12 +84,12 @@ private
     imported_row = RawParoleImport.new
 
     CSV_HEADINGS.each do |attribute_name, col_heading|
-      imported_row.send(attribute_name, csv_row[col_heading])
+      imported_row.send("#{attribute_name}=", csv_row[col_heading].strip)
     end
 
     imported_row.for_date = @date
     imported_row.import_id = @import_id
-    import_row.save!
+    imported_row.save!
     @csv_row_import_count += 1
   rescue StandardError => e
     Rails.logger.error(format_log("CSV row with Review ID: #{csv_row[CSV_HEADINGS[:review_id]]} had error: #{e}"))

@@ -12,7 +12,14 @@ RSpec.describe ParoleDataImportJob, type: :job do
   end
   let(:attachment_mock_1) { double(filename: 'attachment_mock_1.csv', body: attachment_1_body) }
   let(:attachment_mock_2) { double(filename: 'attachment_mock_2.txt') }
-  let(:imap_mock) { double(login: true, select: true, search: ['123', '456'], fetch: [double(attr: { RFC822: true })], logout: true, disconnect: true) }
+
+  let(:imap_mock) do
+    double(login: true,
+           select: true,
+           search: ['123', '456'],
+           fetch: [double(attr: { 'RFC822' => true })],
+           logout: true, disconnect: true)
+  end
 
   before do
     allow(Net::IMAP).to receive(:new).and_return(imap_mock)
@@ -23,13 +30,12 @@ RSpec.describe ParoleDataImportJob, type: :job do
     context 'when one attachment is a csv' do
       let(:mail_mock) { double(attachments: [attachment_mock_1]) }
 
-      it 'creates parole records from the csv' do
-        allow(ParoleRecord).to receive(:create_or_find_by!)
-
-        expect(Rails.logger).not_to receive(:info).with(/skipping non-csv attachment/i)
-        expect(ParoleRecord).to receive(:create_or_find_by!).twice
-
+      it 'creates raw parole import records from the csv' do
+        allow(Rails.logger).to receive(:info).and_call_original
         described_class.perform_now(Time.zone.today)
+
+        expect(Rails.logger).not_to have_received(:info).with(/skipping non-csv attachment/i)
+        expect(RawParoleImport.count).to eq(2)
       end
     end
 
@@ -38,11 +44,10 @@ RSpec.describe ParoleDataImportJob, type: :job do
 
       it 'logs info that the file is being skipped' do
         allow(Rails.logger).to receive(:info).and_call_original
-
-        expect(Rails.logger).to receive(:info).with(/skipping non-csv attachment/i)
-        expect(ParoleRecord).not_to receive(:create_or_find_by!)
-
         described_class.perform_now(Time.zone.today)
+
+        expect(Rails.logger).to have_received(:info).with(/skipping non-csv attachment/i)
+        expect(RawParoleImport.count).to eq(0)
       end
     end
   end
@@ -52,24 +57,22 @@ RSpec.describe ParoleDataImportJob, type: :job do
 
     it 'logs that no attachments were found' do
       allow(Rails.logger).to receive(:info).and_call_original
-
-      expect(subject).not_to receive(:process_attachments)
-      expect(Rails.logger).to receive(:info).with(/no attachments found/i)
-
       described_class.perform_now(Time.zone.today)
+
+      expect(Rails.logger).to have_received(:info).with(/no attachments found/i)
     end
   end
 
-  context 'when find_by_or_create! throws an error' do
+  context 'when import throws an error' do
     let(:mail_mock) { double(attachments: [attachment_mock_1]) }
 
-    it 'logs the error message to the console' do
-      allow(ParoleRecord).to receive(:create_or_find_by!).and_raise(StandardError)
+    it 'logs the error message' do
+      allow(Rails.logger).to receive(:error).and_call_original
+      allow_any_instance_of(RawParoleImport).to receive(:save!).and_raise(StandardError)
 
       # Error logged for each row in the CSV that raised an error
-      expect(Rails.logger).to receive(:error).twice
-
       expect { described_class.perform_now(Time.zone.today) }.not_to raise_error
+      expect(Rails.logger).to have_received(:error).twice
     end
   end
 end
