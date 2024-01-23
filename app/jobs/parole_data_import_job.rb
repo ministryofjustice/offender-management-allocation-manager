@@ -5,13 +5,49 @@ require 'csv'
 class ParoleDataImportJob < ApplicationJob
   queue_as :default
 
+  IMAP_HOST = 'imap.gmail.com'.freeze
+  IMAP_PORT = 993
+  EMAIL_FROM = 'moic-data@digital.justice.gov.uk'.freeze
+  EMAIL_SUBJECT = 'POM Cases list'.freeze
+
+  CSV_HEADINGS = {
+    title: 'TITLE',
+    nomis_id: 'NOMIS ID',
+    prison_no: 'Offender Prison Number',
+    sentence_type: 'Sentence Type',
+    sentence_date: 'Date Of Sentence',
+    tariff_exp: 'Tariff Expiry Date',
+    review_date: 'Review Date',
+    review_id: 'Review ID',
+    review_milestone_date_id: 'Review Milestone Date ID',
+    review_type: 'Review Type',
+    review_status: 'Review Status',
+    curr_target_date: 'Current Target Date (Review)',
+    ms13_target_date: 'MS 13 Target Date',
+    ms13_completion_date: 'MS 13 Completion Date',
+    final_result: 'Final Result (Review)'
+  }.freeze
+
   def perform(date)
+    @csv_row_count = 0
+    @csv_row_import_count = 0
     @date = date
-    imap = Net::IMAP.new('imap.gmail.com', 993, true)
-    mail = Mail.new(fetch_email(imap))
-    mail.attachments.empty? ? Rails.logger.info('No attachments found') : process_attachments(mail)
+    @import_id = SecureRandom.uuid
+    Rails.logger.info(format_log('Starting'))
+
+    imap = Net::IMAP.new(IMAP_HOST, IMAP_PORT, true)
+    fetched_mail = fetch_email(imap)
+
+    if fetched_mail.nil?
+      Rails.logger.info(format_log('No mail found'))
+    else
+      mail = Mail.new(fetched_email)
+      mail.attachments.empty? ? Rails.logger.info(format_log('No attachments found')) : process_attachments(mail)
+    end
+
     imap.logout
     imap.disconnect
+    Rails.logger.info(format_log("Complete. #{@csv_row_import_count}/#{@csv_row_count} rows imported"))
   end
 
 private
@@ -21,38 +57,45 @@ private
   def fetch_email(imap)
     imap.login(ENV['GMAIL_USERNAME'], ENV['GMAIL_PASSWORD'])
     imap.select('INBOX')
-    email_id = imap.search(['FROM', 'moic-data@digital.justice.gov.uk', 'SUBJECT', 'POM Cases list', 'ON', @date.strftime('%d-%b-%Y').to_s]).max
+    email_id = imap.search(['FROM', EMAIL_FROM, 'SUBJECT', EMAIL_SUBJECT, 'ON', @date.strftime('%d-%b-%Y').to_s]).max
+
+    return nil if email_id.nil?
+
     imap.fetch(email_id, 'RFC822')[0].attr['RFC822']
   end
 
   def process_attachments(mail)
     mail.attachments.each do |attachment|
       if attachment.filename.split('.').last != 'csv'
-        Rails.logger.info("Skipping non-csv attachment '#{attachment.filename}'")
+        Rails.logger.info(format_log("Skipping non-csv attachment '#{attachment.filename}'"))
         next
       end
 
-      CSV.new(attachment.body.decoded, headers: true).each do |row|
-        build_parole_record(row)
+      csv_rows = CSV.new(attachment.body.decoded, headers: true)
+      @csv_row_count = csv_rows.size
+
+      csv_rows.each do |csv_row|
+        import_row(csv_row)
       end
     end
   end
 
-  def build_parole_record(csv_record)
-    return if csv_record['Review ID'].blank? || csv_record['NOMIS ID'].blank?
+  def import_row(csv_row)
+    imported_row = RawParoleImport.new
 
-    begin
-      ParoleRecord.create_or_find_by!(review_id: csv_record['Review ID'], nomis_offender_id: csv_record['NOMIS ID']) do |record|
-        record.target_hearing_date = csv_record['Current Target Date (Review)']
-        record.custody_report_due = csv_record['MS 13 Target Date']
-        record.review_status = csv_record['Review Status']
-        if record.no_hearing_outcome? && csv_record['Final Result (Review)'] != 'Not Applicable' && csv_record['Final Result (Review)'] != 'Not Specified'
-          record.hearing_outcome_received = @date - 1.day
-        end
-        record.hearing_outcome = csv_record['Final Result (Review)']
-      end
-    rescue StandardError => e
-      Rails.logger.error("Review ID: #{csv_record['Review ID']} had error: #{e}")
+    CSV_HEADINGS.each do |attribute_name, col_heading|
+      imported_row.send(attribute_name, csv_row[col_heading])
     end
+
+    imported_row.for_date = @date
+    imported_row.import_id = @import_id
+    import_row.save!
+    @csv_row_import_count += 1
+  rescue StandardError => e
+    Rails.logger.error(format_log("CSV row with Review ID: #{csv_row[CSV_HEADINGS[:review_id]]} had error: #{e}"))
+  end
+
+  def format_log(message)
+    "job=parole_data_import_job,for_date=#{@date},import_id=#{@import_id}|#{message}"
   end
 end
