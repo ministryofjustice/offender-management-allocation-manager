@@ -1,0 +1,8 @@
+# frozen_string_literal: true
+
+namespace :parole do
+  desc 'fetch updates to active parole records'
+  task import: :environment do |_task|
+    ParoleDataImportJob.perform_later(Time.zone.today)
+  end
+end
