@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ParoleDataImportJob, type: :job do
+RSpec.describe ParoleDataImportService do
   let(:attachment_1_body) do
     double(
       decoded: "TITLE,NOMIS ID,Offender Prison Number,Sentence Type,Date Of Sentence,Tariff Expiry Date,Review Date,Review ID,Review Milestone Date ID,Review Type,Review Status,Current Target Date (Review),MS 13 Target Date,MS 13 Completion Date,Final Result (Review)
@@ -32,10 +32,10 @@ RSpec.describe ParoleDataImportJob, type: :job do
 
       it 'creates raw parole import records from the csv' do
         allow(Rails.logger).to receive(:info).and_call_original
-        described_class.perform_now(Time.zone.today)
+        subject.import_from_email(Time.zone.today)
 
         expect(Rails.logger).not_to have_received(:info).with(/skipping non-csv attachment/i)
-        expect(RawParoleImport.count).to eq(2)
+        expect(ParoleReviewImport.count).to eq(2)
       end
     end
 
@@ -44,10 +44,10 @@ RSpec.describe ParoleDataImportJob, type: :job do
 
       it 'logs info that the file is being skipped' do
         allow(Rails.logger).to receive(:info).and_call_original
-        described_class.perform_now(Time.zone.today)
+        subject.import_from_email(Time.zone.today)
 
         expect(Rails.logger).to have_received(:info).with(/skipping non-csv attachment/i)
-        expect(RawParoleImport.count).to eq(0)
+        expect(ParoleReviewImport.count).to eq(0)
       end
     end
   end
@@ -57,7 +57,7 @@ RSpec.describe ParoleDataImportJob, type: :job do
 
     it 'logs that no attachments were found' do
       allow(Rails.logger).to receive(:info).and_call_original
-      described_class.perform_now(Time.zone.today)
+      subject.import_from_email(Time.zone.today)
 
       expect(Rails.logger).to have_received(:info).with(/no attachments found/i)
     end
@@ -68,10 +68,10 @@ RSpec.describe ParoleDataImportJob, type: :job do
 
     it 'logs the error message' do
       allow(Rails.logger).to receive(:error).and_call_original
-      allow_any_instance_of(RawParoleImport).to receive(:save!).and_raise(StandardError)
+      allow_any_instance_of(ParoleReviewImport).to receive(:save!).and_raise(StandardError)
 
       # Error logged for each row in the CSV that raised an error
-      expect { described_class.perform_now(Time.zone.today) }.not_to raise_error
+      expect { subject.import_from_email(Time.zone.today) }.not_to raise_error
       expect(Rails.logger).to have_received(:error).twice
     end
   end

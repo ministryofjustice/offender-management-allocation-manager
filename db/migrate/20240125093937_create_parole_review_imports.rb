@@ -1,6 +1,6 @@
-class CreateRawParoleImports < ActiveRecord::Migration[6.1]
+class CreateParoleReviewImports < ActiveRecord::Migration[6.1]
   def change
-    create_table :raw_parole_imports do |t|
+    create_table :parole_review_imports do |t|
       t.string :title
       t.string :nomis_id
       t.string :prison_no
@@ -16,10 +16,18 @@ class CreateRawParoleImports < ActiveRecord::Migration[6.1]
       t.string :ms13_target_date
       t.string :ms13_completion_date
       t.string :final_result
-      t.date :for_date
+
+      # Meta data
+      t.date :snapshot_date
+      t.integer :row_number
       t.string :import_id
+      t.boolean :single_day_snapshot
+      t.date :processed_on
 
       t.timestamps
+
+      t.index [:snapshot_date, :row_number], unique: true, name: :index_parole_review_imports_on_snapshot_date_row_number
+      t.index :processed_on, name: :index_parole_review_imports_on_processed_on
     end
   end
 end
