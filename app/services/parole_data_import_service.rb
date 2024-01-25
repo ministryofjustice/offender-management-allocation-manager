@@ -29,9 +29,19 @@ class ParoleDataImportService
   def initialize(log_prefix: 'service=parole_data_import_service', single_day_snapshot: true)
     @log_prefix = log_prefix
     @single_day_snapshot = single_day_snapshot
-    @csv_row_count = 0
-    @csv_row_import_count = 0
     @import_id = SecureRandom.uuid
+  end
+
+  def import_from_email_with_catchup(date)
+    latest_imported_date = ParoleReviewImport.maximum(:snapshot_date)
+
+    if latest_imported_date.nil?
+      import_from_email(date)
+    elsif latest_imported_date < date
+      (latest_imported_date + 1..date).to_a.each { |dt| import_from_email(dt) }
+    end
+
+    [@csv_row_import_count, @csv_row_count]
   end
 
   def import_from_email(date)
@@ -52,6 +62,9 @@ class ParoleDataImportService
   end
 
   def import_from_rows(csv_rows, date)
+    @csv_row_count = 0
+    @csv_row_import_count = 0
+
     ApplicationRecord.transaction do # To improve performance. The index can cause drag
       csv_rows.each do |csv_row|
         @csv_row_count += 1

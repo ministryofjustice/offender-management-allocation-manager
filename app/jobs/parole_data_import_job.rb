@@ -15,7 +15,7 @@ class ParoleDataImportJob < ApplicationJob
 
     import_count, row_count = ParoleDataImportService
       .new(log_prefix: log_prefix)
-      .import_from_email(date)
+      .import_from_email_with_catchup(date)
 
     Rails.logger.info("#{log_prefix},snapshot_date=#{date}|Complete. #{import_count}/#{row_count} imported")
   end
