@@ -45,7 +45,7 @@ class ParoleDataImportService
   end
 
   def import_from_email(date)
-    imap = Net::IMAP.new(IMAP_HOST, IMAP_PORT, true)
+    imap = Net::IMAP.new(IMAP_HOST, port: IMAP_PORT, ssl: true)
     fetched_mail = fetch_email(imap, date)
 
     if fetched_mail.nil?
