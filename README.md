@@ -185,6 +185,8 @@ Extra variables not required locally
 | DIGITAL_PRISON_SERVICE_HOST | The host where New NOMIS is hosted |
 | NOMIS_OAUTH_AUTHORISATION | Oauth authorisation string (base64 encoded) |
 | SENTRY_DSN | The URL of a sentry installation. If no installation is available, then this should be present but an empty string ( "" )|
+| GMAIL_USERNAME | Email of Gmail user for Parole import |
+| GMAIL_PASSWORD | Application password of Gmail user for Parole import |
 
 ## Git Hooks
 

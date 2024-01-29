@@ -574,6 +574,56 @@ CREATE TABLE public.parole_records (
 
 
 --
+-- Name: parole_review_imports; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.parole_review_imports (
+    id bigint NOT NULL,
+    title character varying,
+    nomis_id character varying,
+    prison_no character varying,
+    sentence_type character varying,
+    sentence_date character varying,
+    tariff_exp character varying,
+    review_date character varying,
+    review_id character varying,
+    review_milestone_date_id character varying,
+    review_type character varying,
+    review_status character varying,
+    curr_target_date character varying,
+    ms13_target_date character varying,
+    ms13_completion_date character varying,
+    final_result character varying,
+    snapshot_date date,
+    row_number integer,
+    import_id character varying,
+    single_day_snapshot boolean,
+    processed_on date,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: parole_review_imports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.parole_review_imports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: parole_review_imports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.parole_review_imports_id_seq OWNED BY public.parole_review_imports.id;
+
+
+--
 -- Name: pom_details; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -829,6 +879,13 @@ ALTER TABLE ONLY public.offender_events ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
+-- Name: parole_review_imports id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.parole_review_imports ALTER COLUMN id SET DEFAULT nextval('public.parole_review_imports_id_seq'::regclass);
+
+
+--
 -- Name: pom_details id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1001,6 +1058,14 @@ ALTER TABLE ONLY public.parole_records
 
 
 --
+-- Name: parole_review_imports parole_review_imports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.parole_review_imports
+    ADD CONSTRAINT parole_review_imports_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: pom_details pom_details_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1144,6 +1209,20 @@ CREATE INDEX index_offender_events_on_nomis_offender_id ON public.offender_event
 --
 
 CREATE INDEX index_offender_events_on_type ON public.offender_events USING btree (type);
+
+
+--
+-- Name: index_parole_review_imports_on_processed_on; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_parole_review_imports_on_processed_on ON public.parole_review_imports USING btree (processed_on);
+
+
+--
+-- Name: index_parole_review_imports_on_snapshot_date_row_number; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_parole_review_imports_on_snapshot_date_row_number ON public.parole_review_imports USING btree (snapshot_date, row_number);
 
 
 --
@@ -1319,6 +1398,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230712000001'),
 ('20230712000002'),
 ('20230724141335'),
-('20231121154615');
+('20231121154615'),
+('20240125093937');
 
 

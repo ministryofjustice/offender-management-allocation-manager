@@ -81,6 +81,12 @@ namespace :deployment do
         '0 3 * * *',
         'bundle exec rake recalculate_handover_dates',
       ],
+      [
+        'production',
+        'parol-data-import',
+        '0 4 * * *',
+        'bundle exec rake parole:import',
+      ],
     ].each do |env, name, schedule, command|
       warn "Generating #{env}/#{name}, schedule='#{schedule}', command: #{command}"
       target = "deploy/#{env}/cron-#{name}.yaml"

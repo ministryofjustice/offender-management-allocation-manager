@@ -1,0 +1,291 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://prisoner-offender-search-dev.prison.service.justice.gov.uk/prisoner-search/prisoner-numbers?include-restricted-patients=true
+    body:
+      encoding: UTF-8
+      string: '{"prisonerNumbers":["G7266VD"]}'
+    headers:
+      User-Agent:
+      - Faraday v1.10.0
+      Authorization:
+      - authorisation_header
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      date:
+      - Mon, 11 Jul 2022 16:03:34 GMT
+      content-type:
+      - application/json
+      request-context:
+      - appId=0d5d6f09-1d07-47f5-9d3a-f9f473544e78
+      x-content-type-options:
+      - nosniff
+      x-xss-protection:
+      - 1; mode=block
+      cache-control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      pragma:
+      - no-cache
+      expires:
+      - '0'
+      strict-transport-security:
+      - max-age=15724800; includeSubDomains
+      x-frame-options:
+      - SAMEORIGIN
+    body:
+      encoding: ASCII-8BIT
+      string: '[{"prisonerNumber":"G7266VD","pncNumber":"12/502134E","pncNumberCanonicalShort":"12/502134E","pncNumberCanonicalLong":"2012/502134E","croNumber":"381006/13W","bookingId":"1073602","bookNumber":"V91471","firstName":"OMISTIUS","lastName":"ANNOLE","dateOfBirth":"1994-09-26","gender":"Male","ethnicity":"White:
+        Eng./Welsh/Scot./N.Irish/British","youthOffender":true,"maritalStatus":"Single-not
+        married/in civil partnership","religion":"No Religion","nationality":"British","status":"ACTIVE
+        IN","lastMovementTypeCode":"CRT","lastMovementReasonCode":"PS","inOutStatus":"IN","prisonId":"LEI","prisonName":"Leeds
+        (HMP)","cellLocation":"D-2-037","aliases":[],"alerts":[{"alertType":"X","alertCode":"XNR","active":true,"expired":false},{"alertType":"R","alertCode":"ROH","active":true,"expired":false},{"alertType":"P","alertCode":"PC2","active":true,"expired":false}],"csra":"High","category":"B","legalStatus":"SENTENCED","imprisonmentStatus":"LASPO_DR","imprisonmentStatusDescription":"EDS
+        LASPO Discretionary Release","mostSeriousOffence":"Robbery","recall":false,"indeterminateSentence":false,"sentenceStartDate":"2016-05-28","releaseDate":"2039-12-04","confirmedReleaseDate":"2039-12-04","sentenceExpiryDate":"2045-01-03","licenceExpiryDate":"2045-01-09","nonDtoReleaseDate":"2040-01-27","nonDtoReleaseDateType":"CRD","receptionDate":"2016-02-20","paroleEligibilityDate":"2032-05-25","conditionalReleaseDate":"2040-01-27","locationDescription":"Leeds
+        (HMP)","restrictedPatient":false}]'
+  recorded_at: Mon, 11 Jul 2022 16:03:34 GMT
+- request:
+    method: post
+    uri: https://api-dev.prison.service.justice.gov.uk/api/offender-assessments/CATEGORY?activeOnly=true&latestOnly=true&mostRecentOnly=true
+    body:
+      encoding: UTF-8
+      string: '["G7266VD"]'
+    headers:
+      User-Agent:
+      - Faraday v1.10.0
+      Authorization:
+      - authorisation_header
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      Date:
+      - Mon, 11 Jul 2022 16:03:34 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Request-Context:
+      - appId=0d5d6f09-1d07-47f5-9d3a-f9f473544e78
+      X-Content-Type-Options:
+      - nosniff
+      X-XSS-Protection:
+      - 1; mode=block
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Expires:
+      - '0'
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow
+    body:
+      encoding: ASCII-8BIT
+      string: '[{"bookingId":1073602,"offenderNo":"G7266VD","classificationCode":"B","classification":"Cat
+        B","assessmentCode":"CATEGORY","assessmentDescription":"Categorisation","cellSharingAlertFlag":false,"assessmentDate":"2017-02-24","nextReviewDate":"2018-02-23","approvalDate":"2017-02-24","assessmentAgencyId":"LEI","assessmentStatus":"A","assessmentSeq":7,"assessorId":459540,"assessorUser":"WQV54Y"}]'
+  recorded_at: Mon, 11 Jul 2022 16:03:34 GMT
+- request:
+    method: post
+    uri: https://api-dev.prison.service.justice.gov.uk/api/movements/offenders?latestOnly=false&movementTypes=ADM&movementTypes=TRN
+    body:
+      encoding: UTF-8
+      string: '["G7266VD"]'
+    headers:
+      User-Agent:
+      - Faraday v1.10.0
+      Authorization:
+      - authorisation_header
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      Date:
+      - Mon, 11 Jul 2022 16:03:35 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Request-Context:
+      - appId=0d5d6f09-1d07-47f5-9d3a-f9f473544e78
+      X-Content-Type-Options:
+      - nosniff
+      X-XSS-Protection:
+      - 1; mode=block
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Pragma:
+      - no-cache
+      Expires:
+      - '0'
+      Strict-Transport-Security:
+      - max-age=31536000 ; includeSubDomains
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Robots-Tag:
+      - noindex, nofollow
+    body:
+      encoding: ASCII-8BIT
+      string: '[{"offenderNo":"G7266VD","createDateTime":"2016-02-20T13:55:31.201162","fromAgency":"LEEDMC","fromAgencyDescription":"Leeds
+        Magistrates Court","toAgency":"LEI","toAgencyDescription":"Leeds (HMP)","fromCity":"","toCity":"","movementType":"ADM","movementTypeDescription":"Admission","directionCode":"IN","movementDate":"2016-04-14","movementTime":"13:54:00","movementReason":"Unconvicted
+        Remand"},{"offenderNo":"G7266VD","createDateTime":"2016-12-01T15:23:33.229763","fromAgency":"LEI","fromAgencyDescription":"Leeds
+        (HMP)","toAgency":"DNI","toAgencyDescription":"Doncaster (HMP)","fromCity":"","toCity":"","movementType":"ADM","movementTypeDescription":"Admission","directionCode":"IN","movementDate":"2016-12-27","movementTime":"15:23:00","movementReason":"Transfer
+        In from Other Establishment"},{"offenderNo":"G7266VD","createDateTime":"2016-12-01T11:08:57.810944","fromAgency":"LEI","fromAgencyDescription":"Leeds
+        (HMP)","toAgency":"DNI","toAgencyDescription":"Doncaster (HMP)","fromCity":"","toCity":"","movementType":"TRN","movementTypeDescription":"Transfers","directionCode":"OUT","movementDate":"2017-01-22","movementTime":"11:07:00","movementReason":"Normal
+        Transfer"},{"offenderNo":"G7266VD","createDateTime":"2017-01-20T14:49:30.888598","fromAgency":"DNI","fromAgencyDescription":"Doncaster
+        (HMP)","toAgency":"LEI","toAgencyDescription":"Leeds (HMP)","fromCity":"","toCity":"","movementType":"ADM","movementTypeDescription":"Admission","directionCode":"IN","movementDate":"2017-03-13","movementTime":"14:49:00","movementReason":"Transfer
+        Via Court"}]'
+  recorded_at: Mon, 11 Jul 2022 16:03:34 GMT
+- request:
+    method: post
+    uri: https://prisoner-search-dev.prison.service.justice.gov.uk/prisoner-search/prisoner-numbers?include-restricted-patients=true
+    body:
+      encoding: UTF-8
+      string: '{"prisonerNumbers":["G7266VD"]}'
+    headers:
+      User-Agent:
+      - Faraday v1.10.3
+      Authorization:
+      - authorisation_header
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      date:
+      - Thu, 12 Oct 2023 12:23:16 GMT
+      content-type:
+      - application/json
+      x-content-type-options:
+      - nosniff
+      x-xss-protection:
+      - '0'
+      cache-control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      pragma:
+      - no-cache
+      expires:
+      - '0'
+      strict-transport-security:
+      - max-age=15724800; includeSubDomains
+      x-frame-options:
+      - SAMEORIGIN
+    body:
+      encoding: ASCII-8BIT
+      string: '[{"prisonerNumber":"G7266VD","pncNumber":"12/502134E","pncNumberCanonicalShort":"12/502134E","pncNumberCanonicalLong":"2012/502134E","croNumber":"381006/13W","bookingId":"1073602","bookNumber":"V91471","firstName":"OMISTIUS","lastName":"ANNOLE","dateOfBirth":"1994-09-26","gender":"Male","ethnicity":"White:
+        Eng./Welsh/Scot./N.Irish/British","youthOffender":true,"maritalStatus":"Single-not
+        married/in civil partnership","religion":"No Religion","nationality":"British","status":"ACTIVE
+        IN","lastMovementTypeCode":"CRT","lastMovementReasonCode":"PS","inOutStatus":"IN","prisonId":"LEI","prisonName":"Leeds
+        (HMP)","cellLocation":"D-2-037","aliases":[],"alerts":[{"alertType":"X","alertCode":"XNR","active":true,"expired":false},{"alertType":"R","alertCode":"ROH","active":true,"expired":false},{"alertType":"P","alertCode":"PC2","active":true,"expired":false}],"csra":"High","category":"B","legalStatus":"SENTENCED","imprisonmentStatus":"LASPO_DR","imprisonmentStatusDescription":"EDS
+        LASPO Discretionary Release","mostSeriousOffence":"Robbery","recall":false,"indeterminateSentence":false,"sentenceStartDate":"2016-05-28","releaseDate":"2039-12-04","confirmedReleaseDate":"2039-12-04","sentenceExpiryDate":"2045-01-03","licenceExpiryDate":"2045-01-09","nonDtoReleaseDate":"2040-01-27","nonDtoReleaseDateType":"CRD","receptionDate":"2016-02-20","paroleEligibilityDate":"2032-05-25","conditionalReleaseDate":"2040-01-27","locationDescription":"Leeds
+        (HMP)","restrictedPatient":false,"currentIncentive":{"level":{"code":"STD","description":"Standard"},"dateTime":"2017-02-06T12:03:43","nextReviewDate":"2018-02-06"},"heightCentimetres":173,"weightKilograms":89,"hairColour":"Brown","rightEyeColour":"Brown","leftEyeColour":"Brown","facialHair":"Sideburns","shapeOfFace":"Oval","build":"Thin","tattoos":[{"bodyPart":"Arm","comment":"nQDJVjCnQDJVj"}],"scars":[{"bodyPart":"Face","comment":"WFfVWFf"}]}]'
+  recorded_at: Thu, 12 Oct 2023 12:23:16 GMT
+- request:
+    method: post
+    uri: https://prison-api-dev.prison.service.justice.gov.uk/api/offender-assessments/CATEGORY?activeOnly=true&latestOnly=true&mostRecentOnly=true
+    body:
+      encoding: UTF-8
+      string: '["G7266VD"]'
+    headers:
+      User-Agent:
+      - Faraday v1.10.3
+      Authorization:
+      - authorisation_header
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      date:
+      - Thu, 12 Oct 2023 12:23:16 GMT
+      content-type:
+      - application/json
+      x-content-type-options:
+      - nosniff
+      x-xss-protection:
+      - '0'
+      cache-control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      pragma:
+      - no-cache
+      expires:
+      - '0'
+      strict-transport-security:
+      - max-age=15724800; includeSubDomains
+      x-frame-options:
+      - SAMEORIGIN
+    body:
+      encoding: ASCII-8BIT
+      string: '[{"bookingId":1073602,"offenderNo":"G7266VD","classificationCode":"B","classification":"Cat
+        B","assessmentCode":"CATEGORY","assessmentDescription":"Categorisation","cellSharingAlertFlag":false,"assessmentDate":"2017-02-24","nextReviewDate":"2018-02-23","approvalDate":"2017-02-24","assessmentAgencyId":"LEI","assessmentStatus":"A","assessmentSeq":7,"assessorId":459540,"assessorUser":"WQV54Y"}]'
+  recorded_at: Thu, 12 Oct 2023 12:23:16 GMT
+- request:
+    method: post
+    uri: https://prison-api-dev.prison.service.justice.gov.uk/api/movements/offenders?latestOnly=false&movementTypes=ADM&movementTypes=TRN
+    body:
+      encoding: UTF-8
+      string: '["G7266VD"]'
+    headers:
+      User-Agent:
+      - Faraday v1.10.3
+      Authorization:
+      - authorisation_header
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      date:
+      - Thu, 12 Oct 2023 12:23:16 GMT
+      content-type:
+      - application/json
+      x-content-type-options:
+      - nosniff
+      x-xss-protection:
+      - '0'
+      cache-control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      pragma:
+      - no-cache
+      expires:
+      - '0'
+      strict-transport-security:
+      - max-age=15724800; includeSubDomains
+      x-frame-options:
+      - SAMEORIGIN
+    body:
+      encoding: ASCII-8BIT
+      string: '[{"offenderNo":"G7266VD","createDateTime":"2016-02-20T13:55:31.201162","fromAgency":"LEEDMC","fromAgencyDescription":"Leeds
+        Magistrates Court","toAgency":"LEI","toAgencyDescription":"Leeds (HMP)","fromCity":"","toCity":"","movementType":"ADM","movementTypeDescription":"Admission","directionCode":"IN","movementDate":"2016-04-14","movementTime":"13:54:00","movementReason":"Unconvicted
+        Remand"},{"offenderNo":"G7266VD","createDateTime":"2016-12-01T15:23:33.229763","fromAgency":"LEI","fromAgencyDescription":"Leeds
+        (HMP)","toAgency":"DNI","toAgencyDescription":"Doncaster (HMP)","fromCity":"","toCity":"","movementType":"ADM","movementTypeDescription":"Admission","directionCode":"IN","movementDate":"2016-12-27","movementTime":"15:23:00","movementReason":"Transfer
+        In from Other Establishment"},{"offenderNo":"G7266VD","createDateTime":"2016-12-01T11:08:57.810944","fromAgency":"LEI","fromAgencyDescription":"Leeds
+        (HMP)","toAgency":"DNI","toAgencyDescription":"Doncaster (HMP)","fromCity":"","toCity":"","movementType":"TRN","movementTypeDescription":"Transfers","directionCode":"OUT","movementDate":"2017-01-22","movementTime":"11:07:00","movementReason":"Normal
+        Transfer"},{"offenderNo":"G7266VD","createDateTime":"2017-01-20T14:49:30.888598","fromAgency":"DNI","fromAgencyDescription":"Doncaster
+        (HMP)","toAgency":"LEI","toAgencyDescription":"Leeds (HMP)","fromCity":"","toCity":"","movementType":"ADM","movementTypeDescription":"Admission","directionCode":"IN","movementDate":"2017-03-13","movementTime":"14:49:00","movementReason":"Transfer
+        Via Court"}]'
+  recorded_at: Thu, 12 Oct 2023 12:23:16 GMT
+recorded_with: VCR 6.2.0
