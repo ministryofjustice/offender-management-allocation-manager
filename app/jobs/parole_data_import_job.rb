@@ -8,6 +8,11 @@ class ParoleDataImportJob < ApplicationJob
   def perform(date)
     log_prefix = 'job=parole_data_import_job'
 
+    if ENV['GMAIL_USERNAME'].nil? || ENV['GMAIL_PASSWORD'].nil?
+      Rails.logger.error("#{log_prefix},snapshot_date=#{date}|Gmail credentials not set")
+      return
+    end
+
     Rails.logger.info("#{log_prefix},snapshot_date=#{date}|Starting")
 
     purge_count = ParoleDataImportService.purge
