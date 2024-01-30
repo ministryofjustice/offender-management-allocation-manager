@@ -6,6 +6,7 @@ class ParoleDataImportJob < ApplicationJob
   queue_as :default
 
   def perform(date)
+    Rails.logger = Logger.new($stdout) if Rails.env.production?
     log_prefix = 'job=parole_data_import_job'
 
     if ENV['GMAIL_USERNAME'].nil? || ENV['GMAIL_PASSWORD'].nil?
