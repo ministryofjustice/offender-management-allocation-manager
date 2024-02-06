@@ -21,12 +21,14 @@ module Api
     end
 
     def verify_token
-      access_token = parse_access_token(request.headers['AUTHORIZATION'])
-
-      token = HmppsApi::Oauth::Token.new(access_token: access_token)
       unless token.valid_token_with_scope?('read', role: API_ROLE)
         render_error('Valid authorisation token required')
       end
+    end
+
+    def token
+      access_token = parse_access_token(request.headers['AUTHORIZATION'])
+      HmppsApi::Oauth::Token.new(access_token: access_token)
     end
 
     def parse_access_token(auth_header)

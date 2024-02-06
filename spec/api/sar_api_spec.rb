@@ -5,15 +5,40 @@ describe 'SAR API' do
 
   path '/subject-access-request' do
     get 'Retrieves all held info for offender' do
+      tags 'Subject Access Request'
+      description "* NOMIS Prison Number (PRN) must be provided as part of the request.
+* The role ROLE_SAR_DATA_ACCESS is required
+* If the product uses the identifier type transmitted in the request, it can respond with its data and HTTP code 200
+* If the product uses the identifier type transmitted in the request but has no data to respond with, it should respond with HTTP code 204
+* If the product does not use the identifier type transmitted in the request, it should respond with HTTP code 209"
+
       produces 'application/json'
       consumes 'application/json'
-      parameter name: :prn, in: :query, type: :string
+
+      parameter name: :prn,
+                in: :query,
+                type: :string,
+                description: 'NOMIS Prison Reference Number'
+      parameter name: :fromDate,
+                in: :query,
+                type: :string,
+                description: 'Optional parameter denoting minimum date of event occurrence which should be returned in the response'
+      parameter name: :toDate,
+                in: :query,
+                type: :string,
+                description: 'Optional parameter denoting maximum date of event occurrence which should be returned in the response'
 
       describe 'when not authorised' do
         response '401', 'Request is not authorised' do
           security [Bearer: []]
-          schema '$ref' => '#/components/schemas/Status'
-
+          schema required: %w[developerMessage errorCode status userMessage],
+                 type: :object,
+                 properties: {
+                   developerMessage: { type: :string },
+                   errorCode: { type: :integer },
+                   status: { type: :integer },
+                   userMessage: { type: :string }
+                 }
           let(:prn) { 'A1111AA' }
           run_test!
         end

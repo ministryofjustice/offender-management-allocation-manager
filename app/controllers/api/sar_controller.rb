@@ -1,5 +1,8 @@
 module Api
   class SarController < Api::ApiController
+    SAR_ROLE = 'ROLE_SAR_DATA_ACCESS'.freeze
+    MPC_ADMIN_ROLE = 'ROLE_MPC_ADMIN'.freeze
+
     def show
       render_404('Offender not found') && return if offender.nil?
 
@@ -7,6 +10,23 @@ module Api
     end
 
   private
+
+    # Overrides parent due to endpoint-specific roles
+    def verify_token
+      unless token.valid_token_with_scope?('read', role: SAR_ROLE) ||
+             token.valid_token_with_scope?('read', role: MPC_ADMIN_ROLE)
+        render_error('Valid authorisation token required')
+      end
+    end
+
+    # Overrides parent due to endpoint-specific error schema
+    def render_error(msg)
+      render json: {
+        developerMessage: msg,
+        errorCode: 1,
+        status: 401,
+        userMessage: msg }, status: :unauthorized
+    end
 
     def offender
       @offender ||= Offender.find_by(nomis_offender_id: offender_number)
