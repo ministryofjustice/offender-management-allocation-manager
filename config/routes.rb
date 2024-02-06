@@ -169,6 +169,7 @@ Rails.application.routes.draw do
 
   get '/api/allocation/:offender_no/primary_pom', to: 'api/allocation_api#primary_pom'
   get '/api/allocation/:offender_no', to: 'api/allocation_api#show'
+  get '/subject-access-request', to: 'api/sar#show'
 
   # '/admin' is already taken by ActiveAdmin
   namespace :manage do
