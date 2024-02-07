@@ -4,7 +4,9 @@ module Api
     MPC_ADMIN_ROLE = 'ROLE_MPC_ADMIN'.freeze
 
     def show
-      render_404('Offender not found') && return if offender.nil?
+      return render_error('PRN and CRN parameters passed', 2, 400) if parameter_conflict?
+      return render_error('CRN parameter not allowed', 3, 209) if only_crn?
+      return not_found if offender.nil?
 
       render json: offender_data
     end
@@ -15,17 +17,21 @@ module Api
     def verify_token
       unless token.valid_token_with_scope?('read', role: SAR_ROLE) ||
              token.valid_token_with_scope?('read', role: MPC_ADMIN_ROLE)
-        render_error('Valid authorisation token required')
+        render_error('Valid authorisation token required', 1, 401)
       end
     end
 
     # Overrides parent due to endpoint-specific error schema
-    def render_error(msg)
+    def render_error(msg, error_code, status)
       render json: {
         developerMessage: msg,
-        errorCode: 1,
-        status: 401,
-        userMessage: msg }, status: :unauthorized
+        errorCode: error_code,
+        status: status,
+        userMessage: msg }, status: status.to_s
+    end
+
+    def not_found
+      head :no_content
     end
 
     def offender
@@ -55,6 +61,18 @@ module Api
 
     def offender_number
       params[:prn]
+    end
+
+    def crn
+      params[:crn]
+    end
+
+    def parameter_conflict?
+      crn.present? && offender_number.present?
+    end
+
+    def only_crn?
+      crn.present? && offender_number.blank?
     end
 
     def jsonify_keys(collection)
