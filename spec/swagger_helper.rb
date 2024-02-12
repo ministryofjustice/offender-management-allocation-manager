@@ -152,6 +152,7 @@ RSpec.configure do |config|
                   },
                   calculatedEarlyAllocationStatus: {
                     type: :object,
+                    nullable: true,
                     required: %w[
                       eligible
                       createdAt
@@ -165,6 +166,7 @@ RSpec.configure do |config|
                   },
                   calculatedHandoverDate: {
                     type: :object,
+                    nullable: true,
                     required: %w[
                       startDate
                       handoverDate
@@ -186,6 +188,7 @@ RSpec.configure do |config|
                   },
                   caseInformation: {
                     type: :object,
+                    nullable: true,
                     required: %w[tier
                                  crn
                                  mappaLevel
@@ -299,6 +302,7 @@ RSpec.configure do |config|
                   },
                   handoverProgressChecklist: {
                     type: :object,
+                    nullable: true,
                     required: %w[
                       reviewedOasys
                       contactedCom
@@ -336,6 +340,7 @@ RSpec.configure do |config|
                   },
                   paroleRecord: {
                     type: :object,
+                    nullable: true,
                     required: %w[
                       paroleReviewDate
                       createdAt
@@ -401,6 +406,7 @@ RSpec.configure do |config|
                   },
                   responsibility: {
                     type: :object,
+                    nullable: true,
                     required: %w[
                       reason
                       reasonText

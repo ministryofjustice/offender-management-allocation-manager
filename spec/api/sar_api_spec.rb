@@ -90,29 +90,45 @@ describe 'SAR API' do
           security [Bearer: []]
           schema '$ref' => '#/components/schemas/SarOffenderData'
 
-          let(:crn) { nil }
-          let(:prn) { 'G7266VD' }
-          let(:fromDate) { nil }
-          let(:toDate) { nil }
+          context 'with no date range' do
+            let(:crn) { nil }
+            let(:prn) { 'G7266VD' }
+            let(:fromDate) { nil }
+            let(:toDate) { nil }
 
-          before do
-            create(:offender, nomis_offender_id: prn)
-            create(:allocation_history, prison: 'LEI', nomis_offender_id: prn, primary_pom_name: 'OLD_NAME, MOIC')
-            create(:audit_event, nomis_offender_id: prn)
-            create(:calculated_early_allocation_status, nomis_offender_id: prn)
-            create(:calculated_handover_date, nomis_offender_id: prn)
-            create(:case_information, nomis_offender_id: prn)
-            create(:early_allocation, nomis_offender_id: prn)
-            create(:email_history, :auto_early_allocation, nomis_offender_id: prn)
-            create(:handover_progress_checklist, nomis_offender_id: prn)
-            OffenderEmailSent.create(nomis_offender_id: prn, staff_member_id: 'ABC123', offender_email_type: 'handover_date')
-            create(:parole_record, nomis_offender_id: prn)
-            ParoleReviewImport.create(nomis_id: prn, title: 'Foo', import_id: 'abc123')
-            create(:responsibility, nomis_offender_id: prn)
-            create(:victim_liaison_officer, nomis_offender_id: prn)
+            before do
+              create(:offender, nomis_offender_id: prn)
+              create(:allocation_history, prison: 'LEI', nomis_offender_id: prn, primary_pom_name: 'OLD_NAME, MOIC')
+              create(:audit_event, nomis_offender_id: prn)
+              create(:calculated_early_allocation_status, nomis_offender_id: prn)
+              create(:calculated_handover_date, nomis_offender_id: prn)
+              create(:case_information, nomis_offender_id: prn)
+              create(:early_allocation, nomis_offender_id: prn)
+              create(:email_history, :auto_early_allocation, nomis_offender_id: prn)
+              create(:handover_progress_checklist, nomis_offender_id: prn)
+              OffenderEmailSent.create(nomis_offender_id: prn, staff_member_id: 'ABC123', offender_email_type: 'handover_date')
+              create(:parole_record, nomis_offender_id: prn)
+              ParoleReviewImport.create(nomis_id: prn, title: 'Foo', import_id: 'abc123')
+              create(:responsibility, nomis_offender_id: prn)
+              create(:victim_liaison_officer, nomis_offender_id: prn)
+            end
+
+            run_test!
           end
 
-          run_test!
+          # context 'with date range' do
+          #   let(:crn) { nil }
+          #   let(:prn) { 'G7266VD' }
+          #   let(:fromDate) { nil }
+          #   let(:toDate) { nil }
+
+          #   let(:offender1) { create(:offender, nomis_offender_id: prn, created_at: Time.zone.now - 2.days) }
+          #   let(:offender2) { create(:offender, nomis_offender_id: prn, created_at: Time.zone.now - 2.days) }
+
+          #   run_test! do
+          #     puts 'With dates - YEHAA!'
+          #   end
+          # end
         end
       end
     end
