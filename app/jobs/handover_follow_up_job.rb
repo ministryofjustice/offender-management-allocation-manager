@@ -19,11 +19,11 @@ class HandoverFollowUpJob < ApplicationJob
         prison = Prison.find(offender.prison_id)
         pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
         pom_name = full_name(pom)
-        pom_email = pom.email_address
+        pom_email = pom.email_address || 'unknown'
       else
         # There is no POM allocated
         pom_name = 'This offender does not have an allocated POM'
-        pom_email = ''
+        pom_email = 'n/a'
       end
 
       offender_type = offender.indeterminate_sentence? ? 'Indeterminate' : 'Determinate'
