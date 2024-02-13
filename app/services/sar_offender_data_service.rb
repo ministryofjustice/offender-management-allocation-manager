@@ -1,39 +1,70 @@
 class SarOffenderDataService
-  def self.find(nomis_offender_id, _start_date = nil, _end_date = nil)
-    offender = Offender.find_by(nomis_offender_id: nomis_offender_id)
+  attr_reader :nomis_offender_id, :start_date, :end_date
+
+  def initialize(nomis_offender_id, start_date = nil, end_date = nil)
+    @nomis_offender_id = nomis_offender_id
+    @start_date = start_date
+    @end_date = end_date
+  end
+
+  def find
+    offender = by_offender_id(Offender, :state).first
     return nil if offender.nil?
 
-    offender_data(nomis_offender_id)
+    offender_data
   end
 
 private
 
-  def self.offender_data(offender_number)
+  def offender_data
     {
-      nomsNumber: offender_number,
-      allocationHistory: allocation_with_history(offender_number),
-      auditEvents: jsonify_keys(AuditEvent.where(nomis_offender_id: offender_number)),
-      calculatedEarlyAllocationStatus: jsonify_keys(CalculatedEarlyAllocationStatus.where(nomis_offender_id: offender_number)).first,
-      calculatedHandoverDate: jsonify_keys(CalculatedHandoverDate.where(nomis_offender_id: offender_number)).first,
-      caseInformation: jsonify_keys(CaseInformation.where(nomis_offender_id: offender_number)).first,
-      earlyAllocations: jsonify_keys(EarlyAllocation.where(nomis_offender_id: offender_number)),
-      emailHistories: jsonify_keys(EmailHistory.where(nomis_offender_id: offender_number)),
-      handoverProgressChecklist: jsonify_keys(HandoverProgressChecklist.where(nomis_offender_id: offender_number)).first,
-      offenderEmailSent: jsonify_keys(OffenderEmailSent.where(nomis_offender_id: offender_number)),
-      paroleRecord: jsonify_keys(ParoleRecord.where(nomis_offender_id: offender_number)).first,
-      responsibility: jsonify_keys(Responsibility.where(nomis_offender_id: offender_number)).first,
-      victimLiaisonOfficers: jsonify_keys(VictimLiaisonOfficer.where(nomis_offender_id: offender_number)),
+      nomsNumber: nomis_offender_id,
+      allocationHistory: allocation_with_history,
+      auditEvents: by_offender_id(AuditEvent, :event),
+      calculatedEarlyAllocationStatus: by_offender_id(CalculatedEarlyAllocationStatus, :state).first,
+      calculatedHandoverDate: by_offender_id(CalculatedHandoverDate, :state).first,
+      caseInformation: by_offender_id(CaseInformation, :state).first,
+      earlyAllocations: by_offender_id(EarlyAllocation, :event),
+      emailHistories: by_offender_id(EmailHistory, :event),
+      handoverProgressChecklist: by_offender_id(HandoverProgressChecklist, :state).first,
+      offenderEmailSent: by_offender_id(OffenderEmailSent, :event),
+      paroleRecord: by_offender_id(ParoleRecord, :state).first,
+      responsibility: by_offender_id(Responsibility, :state).first,
+      victimLiaisonOfficers: by_offender_id(VictimLiaisonOfficer, :state),
     }
   end
 
-  def self.allocation_with_history(offender_number)
-    allocation = AllocationHistory.find_by(nomis_offender_id: offender_number)
+  def allocation_with_history
+    allocation = AllocationHistory.find_by(nomis_offender_id: nomis_offender_id)
     return [] if allocation.nil?
 
-    jsonify_keys([allocation] + allocation.get_old_versions)
+    jsonify_keys(by_date([allocation] + allocation.get_old_versions, :state))
   end
 
-  def self.jsonify_keys(collection)
+  def by_offender_id(klass, algorithm)
+    collection = klass.where(nomis_offender_id: nomis_offender_id)
+    jsonify_keys(by_date(collection, algorithm))
+  end
+
+  # @param items [Array, ActiveRecord_Relation]
+  def by_date(items, algorithm)
+    return items.sort_by(&:created_at) if start_date.blank? || end_date.blank?
+
+    start_time = start_date.to_time
+    end_time = (end_date + 1.day).to_time
+
+    last_before_range = if algorithm == :state
+                          [items.select { |i| i.created_at < start_time }.max_by(&:created_at)]
+                        else
+                          []
+                        end
+
+    within_range = items.select { |i| i.created_at >= start_time && i.created_at <= end_time }.sort_by(&:created_at)
+
+    (last_before_range + within_range).compact
+  end
+
+  def jsonify_keys(collection)
     return [] if collection.none?
 
     exclude_attributes = %w[id nomis_offender_id nomis_id]
