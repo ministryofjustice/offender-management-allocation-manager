@@ -8,7 +8,7 @@ module Api
       return render_error('CRN parameter not allowed', 3, 209) if only_crn?
       return render_error('Invalid date format', 4, 210) unless parse_dates
 
-      result = SarOffenderDataService.new(offender_number, @start_date, @end_date).find
+      result = SarOffenderDataService.new(offender_number, @from_date, @to_date).find
       return not_found if result.nil?
 
       render json: { content: result }
