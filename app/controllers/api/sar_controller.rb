@@ -6,8 +6,9 @@ module Api
     def show
       return render_error('PRN and CRN parameters passed', 2, 400) if parameter_conflict?
       return render_error('CRN parameter not allowed', 3, 209) if only_crn?
+      return render_error('Invalid date format', 4, 210) unless parse_dates
 
-      result = SarOffenderDataService.find(offender_number)
+      result = SarOffenderDataService.new(offender_number, @start_date, @end_date).find
       return not_found if result.nil?
 
       render json: { content: result }
@@ -50,6 +51,20 @@ module Api
 
     def only_crn?
       crn.present? && offender_number.blank?
+    end
+
+    def parse_dates
+      if params[:fromDate].blank? || params[:toDate].blank?
+        @from_date = nil
+        @to_date = nil
+      else
+        @from_date = Date.parse(params[:fromDate])
+        @to_date = Date.parse(params[:toDate])
+      end
+
+      true
+    rescue Date::Error
+      false
     end
   end
 end

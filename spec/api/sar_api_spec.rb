@@ -26,11 +26,11 @@ describe 'SAR API' do
       parameter name: :fromDate,
                 in: :query,
                 type: :string,
-                description: 'Optional parameter denoting minimum date of event occurrence which should be returned in the response'
+                description: 'Optional parameter denoting minimum date of event occurrence which should be returned in the response (if used, both dates must be provided)'
       parameter name: :toDate,
                 in: :query,
                 type: :string,
-                description: 'Optional parameter denoting maximum date of event occurrence which should be returned in the response'
+                description: 'Optional parameter denoting maximum date of event occurrence which should be returned in the response (if used, both dates must be provided)'
 
       describe 'when not authorised' do
         response '401', 'Request is not authorised' do
@@ -75,6 +75,18 @@ describe 'SAR API' do
           run_test!
         end
 
+        response '210', 'Invalid date format' do
+          security [Bearer: []]
+          schema '$ref' => '#/components/schemas/SarError'
+
+          let(:crn) { nil }
+          let(:prn) { 'A1111AA' }
+          let(:fromDate) { 'apples' }
+          let(:toDate) { 'pears' }
+
+          run_test!
+        end
+
         response '204', 'Offender not found' do
           security [Bearer: []]
 
@@ -90,45 +102,39 @@ describe 'SAR API' do
           security [Bearer: []]
           schema '$ref' => '#/components/schemas/SarOffenderData'
 
+          before do
+            create(:offender, nomis_offender_id: prn)
+            create(:allocation_history, prison: 'LEI', nomis_offender_id: prn, primary_pom_name: 'OLD_NAME, MOIC')
+            create(:audit_event, nomis_offender_id: prn)
+            create(:calculated_early_allocation_status, nomis_offender_id: prn)
+            create(:calculated_handover_date, nomis_offender_id: prn)
+            create(:case_information, nomis_offender_id: prn)
+            create(:early_allocation, nomis_offender_id: prn)
+            create(:email_history, :auto_early_allocation, nomis_offender_id: prn)
+            create(:handover_progress_checklist, nomis_offender_id: prn)
+            create(:offender_email_sent, nomis_offender_id: prn)
+            create(:parole_record, nomis_offender_id: prn)
+            create(:responsibility, nomis_offender_id: prn)
+            create(:victim_liaison_officer, nomis_offender_id: prn)
+          end
+
           context 'with no date range' do
             let(:crn) { nil }
             let(:prn) { 'G7266VD' }
             let(:fromDate) { nil }
             let(:toDate) { nil }
 
-            before do
-              create(:offender, nomis_offender_id: prn)
-              create(:allocation_history, prison: 'LEI', nomis_offender_id: prn, primary_pom_name: 'OLD_NAME, MOIC')
-              create(:audit_event, nomis_offender_id: prn)
-              create(:calculated_early_allocation_status, nomis_offender_id: prn)
-              create(:calculated_handover_date, nomis_offender_id: prn)
-              create(:case_information, nomis_offender_id: prn)
-              create(:early_allocation, nomis_offender_id: prn)
-              create(:email_history, :auto_early_allocation, nomis_offender_id: prn)
-              create(:handover_progress_checklist, nomis_offender_id: prn)
-              OffenderEmailSent.create(nomis_offender_id: prn, staff_member_id: 'ABC123', offender_email_type: 'handover_date')
-              create(:parole_record, nomis_offender_id: prn)
-              ParoleReviewImport.create(nomis_id: prn, title: 'Foo', import_id: 'abc123')
-              create(:responsibility, nomis_offender_id: prn)
-              create(:victim_liaison_officer, nomis_offender_id: prn)
-            end
-
             run_test!
           end
 
-          # context 'with date range' do
-          #   let(:crn) { nil }
-          #   let(:prn) { 'G7266VD' }
-          #   let(:fromDate) { nil }
-          #   let(:toDate) { nil }
+          context 'with date range' do
+            let(:crn) { nil }
+            let(:prn) { 'G7266VD' }
+            let(:fromDate) { (Time.zone.today - 1.day).to_s }
+            let(:toDate) { (Time.zone.today + 1.day).to_s }
 
-          #   let(:offender1) { create(:offender, nomis_offender_id: prn, created_at: Time.zone.now - 2.days) }
-          #   let(:offender2) { create(:offender, nomis_offender_id: prn, created_at: Time.zone.now - 2.days) }
-
-          #   run_test! do
-          #     puts 'With dates - YEHAA!'
-          #   end
-          # end
+            run_test!
+          end
         end
       end
     end

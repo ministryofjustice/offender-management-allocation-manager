@@ -71,7 +71,6 @@ RSpec.configure do |config|
                   handoverProgressChecklist
                   offenderEmailSent
                   paroleRecord
-                  paroleReviewImports
                   responsibility
                   victimLiaisonOfficers
                 ],
@@ -350,58 +349,6 @@ RSpec.configure do |config|
                       paroleReviewDate: { type: :string },
                       createdAt: { type: :string },
                       updatedAt: { type: :string },
-                    }
-                  },
-                  paroleReviewImports: {
-                    type: :array,
-                    items: {
-                      type: :object,
-                      required: %w[
-                        title
-                        prisonNo
-                        sentenceType
-                        sentenceDate
-                        tariffExp
-                        reviewDate
-                        reviewId
-                        reviewMilestoneDateId
-                        reviewType
-                        reviewStatus
-                        currTargetDate
-                        ms13TargetDate
-                        ms13CompletionDate
-                        finalResult
-                        snapshotDate
-                        rowNumber
-                        importId
-                        singleDaySnapshot
-                        processedOn
-                        createdAt
-                        updatedAt
-                      ],
-                      properties: {
-                        title: { type: :string, nullable: true },
-                        prisonNo: { type: :string, nullable: true },
-                        sentenceType: { type: :string, nullable: true },
-                        sentenceDate: { type: :string, nullable: true },
-                        tariffExp: { type: :string, nullable: true },
-                        reviewDate: { type: :string, nullable: true },
-                        reviewId: { type: :string, nullable: true },
-                        reviewMilestoneDateId: { type: :string, nullable: true },
-                        reviewType: { type: :string, nullable: true },
-                        reviewStatus: { type: :string, nullable: true },
-                        currTargetDate: { type: :string, nullable: true },
-                        ms13TargetDate: { type: :string, nullable: true },
-                        ms13CompletionDate: { type: :string, nullable: true },
-                        finalResult: { type: :string, nullable: true },
-                        snapshotDate: { type: :string, nullable: true },
-                        rowNumber: { type: :integer, nullable: true },
-                        importId: { type: :string, nullable: true },
-                        singleDaySnapshot: { type: :boolean, nullable: true },
-                        processedOn: { type: :string, nullable: true },
-                        createdAt: { type: :string },
-                        updatedAt: { type: :string },
-                      }
                     }
                   },
                   responsibility: {
