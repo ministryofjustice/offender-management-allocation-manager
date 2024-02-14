@@ -31,7 +31,7 @@ class BuildAllocationsController < PrisonsApplicationController
     @override = OverrideForm.new session[:female_allocation_override]
     @allocation = AllocationForm.new
     history = AllocationHistory.find_by(prison: @prison.code, nomis_offender_id: nomis_offender_id_from_url)
-    @reallocating_same_pom = (event(history) == :reallocate_primary_pom && staff_id == history.primary_pom_nomis_id)
+    @reallocating_same_pom = event(history) == :reallocate_primary_pom && staff_id == history.primary_pom_nomis_id
 
     unless @reallocating_same_pom
       @prev_pom_name = history&.primary_pom_nomis_id ? view_context.full_name_ordered(StaffMember.new(@prison, history.primary_pom_nomis_id)) : nil
@@ -53,7 +53,7 @@ class BuildAllocationsController < PrisonsApplicationController
       end
     else
       history = AllocationHistory.find_by(prison: @prison.code, nomis_offender_id: nomis_offender_id_from_url)
-      reallocating_same_pom = (event(history) == :reallocate_primary_pom && staff_id == history.primary_pom_nomis_id)
+      reallocating_same_pom = event(history) == :reallocate_primary_pom && staff_id == history.primary_pom_nomis_id
 
       if reallocating_same_pom
         pom = StaffMember.new(@prison, staff_id)

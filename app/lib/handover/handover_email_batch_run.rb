@@ -64,7 +64,7 @@ class Handover::HandoverEmailBatchRun
 
     def send_all(for_date: Time.zone.now.to_date)
       Rails.logger.info("event=handover_email_batch_run_start,for_date=#{for_date.iso8601}")
-      AllocatedOffender.all.each do |offender|
+      AllocatedOffender.all.find_each do |offender|
         with_error_handling(offender.offender_no, 'upcoming_handover_window') do
           send_one_upcoming_handover_window(offender, for_date: for_date)
         end
