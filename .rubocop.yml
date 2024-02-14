@@ -27,6 +27,7 @@ AllCops:
     - 'lib/tasks/elasticsearch.rake'
     - 'spec/dummy/db/**/*'
     - 'spec/factories/*.rb'
+    - 'spec/fixtures/vcr_cassettes/**/*.yml'
 
 Style/MultilineBlockChain:
   Enabled: false
