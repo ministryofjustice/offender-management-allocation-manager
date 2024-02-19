@@ -101,7 +101,7 @@ feature "view POM's caseload" do
       attributes_for(:movement, :rotl, movementDate: Time.zone.today - 1.year, offenderNo: moved_offenders.last.fetch(:prisonerNumber))
     ])
 
-    offender_map.each do |nomis_offender_id, _nomis_booking_id|
+    offender_map.each_key do |nomis_offender_id|
       create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
       create(:allocation_history, prison: prison.code, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
     end

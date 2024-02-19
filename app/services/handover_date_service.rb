@@ -105,7 +105,7 @@ private
 
       # Offenders must have been sentenced on/after the OMIC policy start date,
       # or have a release date which is on/after the 'cutoff' date.
-      within_policy_dates = (sentenced_after_policy_started || release_after_cutoff)
+      within_policy_dates = sentenced_after_policy_started || release_after_cutoff
 
       if in_open_conditions?
         # There are additional rules to decide if OMIC open prison rules apply

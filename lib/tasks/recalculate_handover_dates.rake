@@ -6,7 +6,7 @@ task recalculate_handover_dates: :environment do
 
   Rails.logger.info('Queueing RecalculateHandoverDateJob for all offenders')
 
-  Prison.all.each do |prison|
+  Prison.all.find_each do |prison|
     prison.offenders.each do |offender|
       RecalculateHandoverDateJob.perform_later(offender.offender_no)
     end
