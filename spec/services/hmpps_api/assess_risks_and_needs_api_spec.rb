@@ -10,7 +10,7 @@ describe HmppsApi::AssessRisksAndNeedsApi do
 
     let(:stub_url) { "#{api_host}/assessments/timeline/nomisId/#{offender_no}" }
 
-    context 'when there is one completed LAYER_3 OASys assessment' do
+    context 'when there is one completed LAYER3 OASys assessment' do
       let(:completed_date) { '2012-12-22'.to_date }
 
       let(:response) do
@@ -23,7 +23,7 @@ describe HmppsApi::AssessRisksAndNeedsApi do
             },
             {
               "completedDate" => "2012-12-22T14:20:42",
-              "assessmentType" => "LAYER_3",
+              "assessmentType" => "LAYER3",
               "status" => "COMPLETE"
             }
           ]
@@ -39,12 +39,12 @@ describe HmppsApi::AssessRisksAndNeedsApi do
         expect(a_request(:get, stub_url)).to have_been_made.once
       end
 
-      it 'returns the date the assessment was completed for LAYER_3' do
-        expect(described_class.get_latest_oasys_date(offender_no)).to match(assessment_type: "LAYER_3", completed: completed_date)
+      it 'returns the date the assessment was completed for LAYER3' do
+        expect(described_class.get_latest_oasys_date(offender_no)).to match(assessment_type: "LAYER3", completed: completed_date)
       end
     end
 
-    context 'when there is one completed LAYER_1 OASys assessment' do
+    context 'when there is one completed LAYER1 OASys assessment' do
       # The last assessment date is the 'completed' field.
       # The test expects it to be a date object for consistency throughout the code base
       let(:completed_date) { '2012-12-22'.to_date }
@@ -59,7 +59,7 @@ describe HmppsApi::AssessRisksAndNeedsApi do
             },
             {
               "completedDate" => "2012-12-22T14:20:42",
-              "assessmentType" => "LAYER_1",
+              "assessmentType" => "LAYER1",
               "status" => "COMPLETE"
             }
           ]
@@ -75,8 +75,8 @@ describe HmppsApi::AssessRisksAndNeedsApi do
         expect(a_request(:get, stub_url)).to have_been_made.once
       end
 
-      it 'returns the date the assessment was completed for LAYER_1' do
-        expect(described_class.get_latest_oasys_date(offender_no)).to match(assessment_type: "LAYER_1", completed: completed_date)
+      it 'returns the date the assessment was completed for LAYER1' do
+        expect(described_class.get_latest_oasys_date(offender_no)).to match(assessment_type: "LAYER1", completed: completed_date)
       end
     end
 
@@ -86,22 +86,22 @@ describe HmppsApi::AssessRisksAndNeedsApi do
           "timeline" => [
             {
               "completedDate" => "2015-12-06T10:53:44",
-              "assessmentType" => "LAYER_3",
+              "assessmentType" => "LAYER3",
               "status" => "COMPLETE"
             },
             {
               "completedDate" => "2015-12-05T10:53:44",
-              "assessmentType" => "LAYER_1",
+              "assessmentType" => "LAYER1",
               "status" => "COMPLETE"
             },
             {
               "completedDate" => "2015-12-04T10:53:44",
-              "assessmentType" => "LAYER_3",
+              "assessmentType" => "LAYER3",
               "status" => "COMPLETE"
             },
             {
               "completedDate" => "2012-12-22T14:20:42",
-              "assessmentType" => "LAYER_1",
+              "assessmentType" => "LAYER1",
               "status" => "COMPLETE"
             }
           ]
@@ -114,7 +114,7 @@ describe HmppsApi::AssessRisksAndNeedsApi do
 
       it 'returns the most recently completed assessment' do
         expect(described_class.get_latest_oasys_date(offender_no)).to match(
-          assessment_type: "LAYER_3", completed: Date.new(2015, 12, 6))
+          assessment_type: "LAYER3", completed: Date.new(2015, 12, 6))
       end
     end
 

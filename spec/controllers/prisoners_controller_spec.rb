@@ -723,11 +723,11 @@ RSpec.describe PrisonersController, type: :controller do
       let(:offender_no) { offender.fetch(:prisonerNumber) }
       let(:page) { Nokogiri::HTML(response.body) }
 
-      context 'when an offender has a previous LAYER_3 OASys assessments' do
+      context 'when an offender has a previous LAYER3 OASys assessments' do
         let(:completed_date) { '2021-06-02'.to_date }
 
         before do
-          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
+          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER3', completed: completed_date)
           stub_offender(offender)
           stub_keyworker prison, offender_no, build(:keyworker)
 
@@ -738,16 +738,16 @@ RSpec.describe PrisonersController, type: :controller do
         render_views
 
         it 'displays the latest one' do
-          expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER_3', completed: completed_date)
+          expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER3', completed: completed_date)
           expect(page.css('#oasys-date')).to have_text("02 Jun 2021")
         end
       end
 
-      context 'when an offender has a previous LAYER_1 OASys assessments' do
+      context 'when an offender has a previous LAYER1 OASys assessments' do
         let(:completed_date) { '2021-06-02'.to_date }
 
         before do
-          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
+          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER1', completed: completed_date)
           stub_offender(offender)
           stub_keyworker prison, offender_no, build(:keyworker)
 
@@ -758,7 +758,7 @@ RSpec.describe PrisonersController, type: :controller do
         render_views
 
         it 'displays the latest one' do
-          expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER_1', completed: completed_date)
+          expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER1', completed: completed_date)
           expect(page.css('#oasys-date')).to have_text("02 Jun 2021")
         end
       end

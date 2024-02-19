@@ -77,13 +77,13 @@ RSpec.describe AllocationsController, type: :controller do
         end
       end
 
-      context 'when an offender has a previous LAYER_3 assessment' do
+      context 'when an offender has a previous LAYER3 assessment' do
         let(:completed_date) { '2021-06-02'.to_date }
         let(:active_pom) { poms.last }
         let(:page) { Nokogiri::HTML(response.body) }
 
         before do
-          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
+          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER3', completed: completed_date)
           create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no,  primary_pom_nomis_id: active_pom.staff_id)
           get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
           expect(page.css('#oasys-date')).to have_text('Last completed OASys')
@@ -92,18 +92,18 @@ RSpec.describe AllocationsController, type: :controller do
         render_views
 
         it 'displays the latest one' do
-          expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER_3', completed: completed_date)
+          expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER3', completed: completed_date)
           expect(page.css('#oasys-date')).to have_text("Layer 3 – 02 Jun 2021")
         end
       end
 
-      context 'when an offender has a previous LAYER_1 assessment' do
+      context 'when an offender has a previous LAYER1 assessment' do
         let(:completed_date) { '2021-06-02'.to_date }
         let(:active_pom) { poms.last }
         let(:page) { Nokogiri::HTML(response.body) }
 
         before do
-          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
+          expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER1', completed: completed_date)
           create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no,  primary_pom_nomis_id: active_pom.staff_id)
           get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
           expect(page.css('#oasys-date')).to have_text('Last completed OASys')
@@ -112,7 +112,7 @@ RSpec.describe AllocationsController, type: :controller do
         render_views
 
         it 'displays the latest one' do
-          expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER_1', completed: completed_date)
+          expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER1', completed: completed_date)
           expect(page.css('#oasys-date')).to have_text("Layer 1 – 02 Jun 2021")
         end
       end

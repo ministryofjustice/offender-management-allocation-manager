@@ -1,6 +1,6 @@
 module HmppsApi
   class AssessRisksAndNeedsApi
-    VALID_ASSESSMENT_TYPES = %w[LAYER_1 LAYER_3].freeze
+    VALID_ASSESSMENT_TYPES = %w[LAYER1 LAYER3].freeze
 
     def self.client
       host = Rails.configuration.assess_risks_and_needs_api_host

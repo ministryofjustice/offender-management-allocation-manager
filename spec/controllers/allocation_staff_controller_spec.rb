@@ -168,29 +168,29 @@ RSpec.describe AllocationStaffController, type: :controller do
           stub_offenders_for_prison(prison_code, [offender])
         end
 
-        context 'when an offender has a previous LAYER_3 assessment' do
+        context 'when an offender has a previous LAYER3 assessment' do
           let(:completed_date) { '2021-06-02'.to_date }
 
           before do
-            expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
+            expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER3', completed: completed_date)
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
           end
 
           it 'displays the latest one' do
-            expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER_3', completed: completed_date)
+            expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER3', completed: completed_date)
           end
         end
 
-        context 'when an offender has a previous LAYER_1 assessment' do
+        context 'when an offender has a previous LAYER1 assessment' do
           let(:completed_date) { '2021-06-02'.to_date }
 
           before do
-            expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
+            expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER1', completed: completed_date)
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
           end
 
           it 'displays the latest one' do
-            expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER_1', completed: completed_date)
+            expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER1', completed: completed_date)
           end
         end
 

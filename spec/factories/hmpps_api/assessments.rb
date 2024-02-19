@@ -6,7 +6,7 @@ FactoryBot.define do
     refAssessmentVersionCode { "LAYER3" }
     refAssessmentVersionNumber { "1" }
     refAssessmentId { 4 }
-    assessmentType { "LAYER_3" }
+    assessmentType { "LAYER3" }
     assessmentStatus { "COMPLETE" }
     historicStatus { "CURRENT" }
     refAssessmentOasysScoringAlgorithmVersion { 3 }
