@@ -102,7 +102,7 @@ class OffenderService
         category: details['category'],
         level: details['level'],
         short_description: "CAT #{details['category']}/LEVEL #{details['level']}",
-        review_date: Date.parse(details['reviewDate']),
+        review_date: details['reviewDate'].present? ? Date.parse(details['reviewDate']) : nil,
         start_date: Date.parse(details['startDate'])
       }
     rescue Faraday::ResourceNotFound

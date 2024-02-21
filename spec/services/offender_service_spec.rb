@@ -372,6 +372,14 @@ describe OffenderService, type: :feature do
     it 'gets start date' do
       expect(result[:start_date]).to eq(Date.new(2021, 1, 27))
     end
+
+    context 'with absent reviewDate' do
+      before { api_mappa.delete('reviewDate') }
+
+      it 'uses nil for review_date' do
+        expect(result[:review_date]).to eq(nil)
+      end
+    end
   end
 
   describe 'get_probation_record' do
