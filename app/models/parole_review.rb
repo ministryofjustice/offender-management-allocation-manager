@@ -1,5 +1,5 @@
 class ParoleReview < ApplicationRecord
-  belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :parole_review
+  belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :parole_reviews
 
   ACTIVE_REVIEW_STATUS = [
     'Active',
@@ -25,6 +25,10 @@ class ParoleReview < ApplicationRecord
 
   def active?
     ACTIVE_REVIEW_STATUS.include? review_status
+  end
+
+  def sortable_date
+    target_hearing_date.presence || custody_report_due
   end
 
 private
