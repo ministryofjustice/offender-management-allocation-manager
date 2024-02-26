@@ -635,7 +635,7 @@ CREATE TABLE public.parole_reviews (
     custody_report_due date,
     review_status character varying,
     hearing_outcome character varying,
-    hearing_outcome_received date,
+    hearing_outcome_received_on date,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );

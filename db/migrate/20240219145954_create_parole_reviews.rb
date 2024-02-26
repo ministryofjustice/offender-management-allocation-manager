@@ -7,7 +7,7 @@ class CreateParoleReviews < ActiveRecord::Migration[6.1]
       t.date :custody_report_due
       t.string :review_status
       t.string :hearing_outcome
-      t.date :hearing_outcome_received
+      t.date :hearing_outcome_received_on
 
       t.timestamps
 
