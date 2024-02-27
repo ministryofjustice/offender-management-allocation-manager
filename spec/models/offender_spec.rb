@@ -147,4 +147,40 @@ RSpec.describe Offender, type: :model do
       end
     end
   end
+
+  describe 'parole-related methods' do
+    let(:incomplete_thd) { Time.zone.today + 2.years }
+    let(:offender) { create(:offender, parole_reviews: [completed_parole_review, incomplete_parole_review]) }
+
+    let(:completed_parole_review) do
+      create(:parole_review, custody_report_due: Time.zone.today,
+                             target_hearing_date: Time.zone.today,
+                             hearing_outcome: 'Stay in closed [*]',
+                             hearing_outcome_received_on: Time.zone.today,
+                             review_status: 'Inactive')
+    end
+
+    let(:incomplete_parole_review) do
+      create(:parole_review, custody_report_due: incomplete_thd,
+                             target_hearing_date: incomplete_thd)
+    end
+
+    describe '#most_recent_parole_review' do
+      it 'returns the most recent parole review' do
+        expect(offender.most_recent_parole_review).to eq(incomplete_parole_review)
+      end
+    end
+
+    describe '#parole_review_awaiting_hearing' do
+      it 'returns the most recent parole review that does not have a hearing outcome' do
+        expect(offender.parole_review_awaiting_hearing).to eq(incomplete_parole_review)
+      end
+    end
+
+    describe '#most_recent_completed_parole_review' do
+      it 'returns the most recently completed parole review' do
+        expect(offender.most_recent_completed_parole_review).to eq(completed_parole_review)
+      end
+    end
+  end
 end
