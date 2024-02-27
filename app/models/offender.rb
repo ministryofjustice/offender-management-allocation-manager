@@ -30,6 +30,7 @@ class Offender < ApplicationRecord
           dependent: :destroy
 
   has_one :parole_record, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
+  has_many :parole_reviews, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 
   has_one :calculated_early_allocation_status, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 
@@ -45,6 +46,21 @@ class Offender < ApplicationRecord
     (handover_progress_checklist || build_handover_progress_checklist).task_completion_data
   end
 
+  # Returns the most recent parole record (can be a future parole application), regardless of activity status and outcome.
+  def most_recent_parole_review
+    filtered_parole_reviews.max_by(&:sortable_date)
+  end
+
+  # Returns the most recent parole application if it has not yet had a hearing.
+  def parole_review_awaiting_hearing
+    most_recent_parole_review.no_hearing_outcome? ? most_recent_parole_review : nil
+  end
+
+  # Returns the most recent parole record that has an outcome
+  def most_recent_completed_parole_review
+    filtered_parole_reviews.reject(&:no_hearing_outcome?).max_by(&:sortable_date)
+  end
+
   # This logic follows the rules defined here: https://dsdmoj.atlassian.net/wiki/spaces/OCM/pages/4524311161/Handover+Type+Calculation
   # Please first work through that document with a domain expert, make sure it is correct and readable, and then
   # update this algorithm to reflect it. Direct changes here without keeping that doc in sync will not be appreciated.
@@ -58,5 +74,12 @@ class Offender < ApplicationRecord
     else
       'standard'
     end
+  end
+
+private
+
+  # If neither the THD or custody_report_due date are defined, we have no method of determining when the parole hearing was, which is vital for MPC.
+  def filtered_parole_reviews
+    parole_reviews.reject { |pr| pr.sortable_date.blank? }
   end
 end

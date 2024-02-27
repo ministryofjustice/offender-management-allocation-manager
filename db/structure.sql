@@ -624,6 +624,43 @@ ALTER SEQUENCE public.parole_review_imports_id_seq OWNED BY public.parole_review
 
 
 --
+-- Name: parole_reviews; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.parole_reviews (
+    id bigint NOT NULL,
+    review_id integer,
+    nomis_offender_id character varying,
+    target_hearing_date date,
+    custody_report_due date,
+    review_status character varying,
+    hearing_outcome character varying,
+    hearing_outcome_received_on date,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: parole_reviews_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.parole_reviews_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: parole_reviews_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.parole_reviews_id_seq OWNED BY public.parole_reviews.id;
+
+
+--
 -- Name: pom_details; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -886,6 +923,13 @@ ALTER TABLE ONLY public.parole_review_imports ALTER COLUMN id SET DEFAULT nextva
 
 
 --
+-- Name: parole_reviews id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.parole_reviews ALTER COLUMN id SET DEFAULT nextval('public.parole_reviews_id_seq'::regclass);
+
+
+--
 -- Name: pom_details id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1066,6 +1110,14 @@ ALTER TABLE ONLY public.parole_review_imports
 
 
 --
+-- Name: parole_reviews parole_reviews_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.parole_reviews
+    ADD CONSTRAINT parole_reviews_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: pom_details pom_details_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1223,6 +1275,13 @@ CREATE INDEX index_parole_review_imports_on_processed_on ON public.parole_review
 --
 
 CREATE UNIQUE INDEX index_parole_review_imports_on_snapshot_date_row_number ON public.parole_review_imports USING btree (snapshot_date, row_number);
+
+
+--
+-- Name: index_parole_reviews_on_review_id_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_parole_reviews_on_review_id_nomis_offender_id ON public.parole_reviews USING btree (review_id, nomis_offender_id);
 
 
 --
@@ -1399,6 +1458,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230712000002'),
 ('20230724141335'),
 ('20231121154615'),
-('20240125093937');
+('20240125093937'),
+('20240219145954');
 
 
