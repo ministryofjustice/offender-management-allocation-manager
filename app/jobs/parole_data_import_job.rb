@@ -7,7 +7,14 @@ class ParoleDataImportJob < ApplicationJob
 
   def perform(date)
     Rails.logger = Logger.new($stdout) if Rails.env.production?
-    log_prefix = 'job=parole_data_import_job'
+    job_prefix = 'job=parole_data_import_job'
+
+    import_parole(date, job_prefix)
+    process_parole(job_prefix)
+  end
+
+  def import_parole(date, job_prefix)
+    log_prefix = "#{job_prefix},service=parole_data_import_service"
 
     if ENV['GMAIL_USERNAME'].nil? || ENV['GMAIL_PASSWORD'].nil?
       Rails.logger.error("#{log_prefix},snapshot_date=#{date}|Gmail credentials not set")
@@ -24,5 +31,12 @@ class ParoleDataImportJob < ApplicationJob
       .import_from_email_with_catchup(date)
 
     Rails.logger.info("#{log_prefix},snapshot_date=#{date}|Complete. #{import_count}/#{row_count} imported")
+  end
+
+  def process_parole(job_prefix)
+    log_prefix = "#{job_prefix},service=parole_data_process_service"
+    Rails.logger.info("#{log_prefix}|Starting")
+    ParoleDataProcessService.process
+    Rails.logger.info("#{log_prefix}|Complete")
   end
 end
