@@ -13,7 +13,7 @@ RSpec.describe "shared/offence_info", type: :view do
   before do
     assign(:prison, prison)
     assign(:prisoner, offender)
-    render 'shared/offence_info', editable_prd: true
+    render 'shared/offence_info', editable_thd: true
   end
 
   context 'with a past TED' do
@@ -22,7 +22,7 @@ RSpec.describe "shared/offence_info", type: :view do
     context 'when a TED and PED are both in the past' do
       let(:ped) { Time.zone.today - 2.days }
 
-      it 'shows the PRD update link' do
+      it 'shows the THD update link' do
         expect(page.css('#parole-review-date')).to have_content 'Update'
       end
     end
@@ -30,7 +30,7 @@ RSpec.describe "shared/offence_info", type: :view do
     context 'when a PED is missing' do
       let(:ped) { nil }
 
-      it 'shows the PRD update link' do
+      it 'shows the THD update link' do
         expect(page.css('#parole-review-date')).to have_content 'Update'
       end
     end
@@ -38,7 +38,7 @@ RSpec.describe "shared/offence_info", type: :view do
     context 'when PED is in the future' do
       let(:ped) { Time.zone.today + 2.days }
 
-      it 'does not show the PRD update link' do
+      it 'does not show the THD update link' do
         expect(page.css('#parole-review-date')).not_to have_content 'Update'
       end
     end
@@ -50,7 +50,7 @@ RSpec.describe "shared/offence_info", type: :view do
     context 'when a TED is missing' do
       let(:ted) { nil }
 
-      it 'shows the PRD update link' do
+      it 'shows the THD update link' do
         expect(page.css('#parole-review-date')).to have_content 'Update'
       end
     end
@@ -58,7 +58,7 @@ RSpec.describe "shared/offence_info", type: :view do
     context 'when a TED is in the future' do
       let(:ted) { Time.zone.today + 2.days }
 
-      it 'does not show the PRD update link' do
+      it 'does not show the THD update link' do
         expect(page.css('#parole-review-date')).not_to have_content 'Update'
       end
     end

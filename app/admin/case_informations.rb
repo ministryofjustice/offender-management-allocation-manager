@@ -1,6 +1,6 @@
 if ENV['HEROKU_APP_NAME'].present?
   ActiveAdmin.register CaseInformation do
-    permit_params :tier, :case_allocation, :crn, :mappa_level, :manual_entry, :parole_review_date, :probation_service, :com_name, :team_name, :local_delivery_unit_id, :nomis_offender_id, :ldu_code
+    permit_params :tier, :case_allocation, :crn, :mappa_level, :manual_entry, :target_hearing_date, :probation_service, :com_name, :team_name, :local_delivery_unit_id, :nomis_offender_id, :ldu_code
 
     form do |form|
       inputs do
@@ -13,7 +13,7 @@ if ENV['HEROKU_APP_NAME'].present?
         input :crn
         input :mappa_level, as: :select, collection: [['Unknown', nil], ['None', 0], ['Level 1', 1], ['Level 2', 2], ['Level 3', 3]]
         input :manual_entry
-        input :parole_review_date, as: :datepicker
+        input :target_hearing_date, as: :datepicker
         input :probation_service, collection: ['Wales', 'England']
         input :com_name
         input :team_name

@@ -80,7 +80,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
     <%= render 'prisoner_information' %>
-    <%= render partial: 'shared/offence_info', locals: { editable_prd: true}  %>
+    <%= render partial: 'shared/offence_info', locals: { editable_thd: true}  %>
     <%= render 'prison_allocation' %>
     <%= render 'community_information' %>
     <%= render 'shared/vlo_information', offender: @prisoner, prison_code: @prison.code %>

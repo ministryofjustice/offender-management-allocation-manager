@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.feature "ChangeParoleReviewDates", type: :feature do
   let(:prison) { create(:prison) }
   let(:tariff_date) { Time.zone.today + 1.year }
-  let(:existing_prd) { nil }
+  let(:existing_thd) { nil }
   let(:nomis_offender_id) { nomis_offender.fetch(:prisonerNumber) }
 
   # Stub API response to represent an offender in NOMIS
@@ -27,38 +27,38 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
     stub_offenders_for_prison(prison.code, [nomis_offender])
     stub_keyworker(prison.code, nomis_offender_id, build(:keyworker))
 
-    if existing_prd.present?
-      offender_record.create_parole_record!(parole_review_date: existing_prd)
+    if existing_thd.present?
+      offender_record.create_parole_record!(parole_review_date: existing_thd)
     end
 
     stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
   end
 
-  shared_examples 'update PRD behaviour' do
-    context 'when the TED is in the future and no PRD has been entered' do
+  shared_examples 'update THD behaviour' do
+    context 'when the TED is in the future and no THD has been entered' do
       let(:tariff_date) { Time.zone.today + 1.year }
 
-      it 'does not allow PRD to be entered' do
+      it 'does not allow THD to be entered' do
         expect(value_for_row('Tariff date')).to eq(tariff_date.to_s(:rfc822))
-        expect(value_for_row('Parole Review date')).to eq('Unknown')
-        expect(td_for_row('Parole Review date')).to have_no_link
+        expect(value_for_row('Target Hearing date')).to eq('Unknown')
+        expect(td_for_row('Target Hearing date')).to have_no_link
       end
     end
 
-    context 'when PRD is blank' do
+    context 'when THD is blank' do
       let(:tariff_date) { Faker::Date.backward }
-      let(:existing_prd) { nil }
-      let(:new_prd) { Faker::Date.forward }
+      let(:existing_thd) { nil }
+      let(:new_thd) { Faker::Date.forward }
 
       # Form input values (zero-padded, e.g. "05")
-      let(:valid_day) { sprintf('%02d', new_prd.day) }
-      let(:valid_month) { sprintf('%02d', new_prd.month) }
-      let(:valid_year) { new_prd.year }
+      let(:valid_day) { sprintf('%02d', new_thd.day) }
+      let(:valid_month) { sprintf('%02d', new_thd.month) }
+      let(:valid_year) { new_thd.year }
       let(:invalid_year) { 2.years.ago.year }
 
       it 'can be set' do
-        expect(value_for_row('Parole Review date')).to start_with('Unknown')
-        td_for_row('Parole Review date').click_link('Update')
+        expect(value_for_row('Target Hearing date')).to start_with('Unknown')
+        td_for_row('Target Hearing date').click_link('Update')
 
         # Enter a date in the past and expect a validation error
         fill_in 'Day', with: valid_day
@@ -73,25 +73,25 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
         click_button 'Update'
 
         # Expect to see the new date on the profile page
-        expect(value_for_row('Parole Review date')).to start_with(new_prd.to_s(:rfc822))
-        expect(td_for_row('Parole Review date')).to have_link('Update')
+        expect(value_for_row('Target Hearing date')).to start_with(new_thd.to_s(:rfc822))
+        expect(td_for_row('Target Hearing date')).to have_link('Update')
       end
     end
 
-    context 'when PRD has already been entered' do
+    context 'when THD has already been entered' do
       let(:tariff_date) { Faker::Date.backward }
-      let(:existing_prd) { Faker::Date.backward }
-      let(:new_prd) { Faker::Date.forward }
+      let(:existing_thd) { Faker::Date.backward }
+      let(:new_thd) { Faker::Date.forward }
 
       # Form input values (zero-padded, e.g. "05")
-      let(:valid_day) { sprintf('%02d', new_prd.day) }
-      let(:valid_month) { sprintf('%02d', new_prd.month) }
-      let(:valid_year) { new_prd.year }
+      let(:valid_day) { sprintf('%02d', new_thd.day) }
+      let(:valid_month) { sprintf('%02d', new_thd.month) }
+      let(:valid_year) { new_thd.year }
       let(:invalid_year) { 2.years.ago.year }
 
       it 'can be updated' do
-        expect(value_for_row('Parole Review date')).to start_with(existing_prd.to_s(:rfc822))
-        td_for_row('Parole Review date').click_link('Update')
+        expect(value_for_row('Target Hearing date')).to start_with(existing_thd.to_s(:rfc822))
+        td_for_row('Target Hearing date').click_link('Update')
 
         # Enter a date in the past and expect a validation error
         fill_in 'Day', with: valid_day
@@ -106,8 +106,8 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
         click_button 'Update'
 
         # Expect to see the new date on the profile page
-        expect(value_for_row('Parole Review date')).to start_with(new_prd.to_s(:rfc822))
-        expect(td_for_row('Parole Review date')).to have_link('Update')
+        expect(value_for_row('Target Hearing date')).to start_with(new_thd.to_s(:rfc822))
+        expect(td_for_row('Target Hearing date')).to have_link('Update')
       end
     end
   end
@@ -122,7 +122,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
       visit(prison_prisoner_path(prison, nomis_offender_id))
     end
 
-    include_examples 'update PRD behaviour'
+    include_examples 'update THD behaviour'
   end
 
   context 'when user is a POM' do
@@ -148,6 +148,6 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
       page.find('#all-cases [aria-label="Prisoner name"] a').click
     end
 
-    include_examples 'update PRD behaviour'
+    include_examples 'update THD behaviour'
   end
 end

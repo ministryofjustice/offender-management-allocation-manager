@@ -41,7 +41,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
     end
   end
 
-  describe 'showing parole review date pom tasks' do
+  describe 'showing target hearing date pom tasks' do
     let(:offender_no) { 'G7514GW' }
     let(:pomtasks) { assigns(:pomtasks) }
 
@@ -60,19 +60,19 @@ RSpec.describe TasksController, :allocation, type: :controller do
     context 'with a TED in the past' do
       let(:tariff_end_date) { Time.zone.today - 3.days }
 
-      it 'can show offenders needing parole review date updates' do
-        # We expect only one of these to have a parole review date task
+      it 'can show offenders needing target hearing date updates' do
+        # We expect only one of these to have a target hearing date task
         expect(pomtasks).to eq([PomTaskPresenter.new(offender_number: offender_no,
-                                                     action_label: 'Parole review date',
+                                                     action_label: 'Target hearing date',
                                                      offender_name: 'Aliceson, Alice',
-                                                     long_label: 'Parole review date must be updated so handover dates can be calculated.')])
+                                                     long_label: 'Target hearing date must be updated so handover dates can be calculated.')])
       end
     end
 
     context 'with a TED in the future' do
       let(:tariff_end_date) { Time.zone.today + 3.days }
 
-      it 'does not show PRD task' do
+      it 'does not show THD task' do
         expect(pomtasks).to eq([])
       end
     end

@@ -114,7 +114,7 @@ class MpcOffender
   end
 
   def needs_early_allocation_notify?
-    # The case_information.present? check is needed as one of the dates is PRD which is currently inside case_information
+    # The case_information.present? check is needed as one of the dates is THD which is currently inside case_information
     case_information.present? &&
       within_early_allocation_window? &&
       early_allocations.active_pre_referral_window.any? &&
@@ -125,7 +125,7 @@ class MpcOffender
     earliest_date = [
       tariff_date,
       parole_eligibility_date,
-      parole_review_date,
+      target_hearing_date,
       automatic_release_date,
       conditional_release_date
     ].compact.min
@@ -158,8 +158,8 @@ class MpcOffender
 
   # early allocation methods
 
-  def parole_review_date
-    @offender.parole_record.parole_review_date if @offender.parole_record.present?
+  def target_hearing_date
+    @offender.parole_record.target_hearing_date if @offender.parole_record.present?
   end
 
   def early_allocation_state
@@ -332,7 +332,7 @@ class MpcOffender
       ldu_name
       allocated_com_name
       allocated_com_email
-      parole_review_date
+      target_hearing_date
       early_allocation_state
     ]
 
@@ -353,7 +353,7 @@ class MpcOffender
     Handover::HandoverCalculation.calculate_earliest_release(
       is_indeterminate: indeterminate_sentence?,
       tariff_date: tariff_date,
-      parole_review_date: parole_review_date,
+      target_hearing_date: target_hearing_date,
       parole_eligibility_date: parole_eligibility_date,
       automatic_release_date: automatic_release_date,
       conditional_release_date: conditional_release_date,

@@ -61,7 +61,7 @@ module Handover::HandoverCalculation
 
     def calculate_earliest_release(is_indeterminate:,
                                    tariff_date:,
-                                   parole_review_date:,
+                                   target_hearing_date:,
                                    parole_eligibility_date:,
                                    conditional_release_date:,
                                    automatic_release_date:,
@@ -71,8 +71,8 @@ module Handover::HandoverCalculation
           NamedDate[tariff_date, 'TED']
         else
           ped = NamedDate[parole_eligibility_date, 'PED']
-          prd = NamedDate[parole_review_date, 'PRD']
-          [prd, ped].keep_if { |d| d && d.date > today }.min
+          thd = NamedDate[target_hearing_date, 'THD']
+          [thd, ped].keep_if { |d| d && d.date > today }.min
         end
       elsif parole_eligibility_date
         NamedDate[parole_eligibility_date, 'PED']

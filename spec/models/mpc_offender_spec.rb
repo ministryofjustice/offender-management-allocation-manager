@@ -342,7 +342,7 @@ RSpec.describe MpcOffender, type: :model do
         ldu_name
         allocated_com_name
         allocated_com_email
-        parole_review_date
+        target_hearing_date
         early_allocation_state
       ]
 
@@ -439,7 +439,7 @@ RSpec.describe MpcOffender, type: :model do
       allow(offender).to receive_messages(
         indeterminate_sentence?: double(:indeterminate_sentence?),
         tariff_date: double(:tariff_date),
-        parole_review_date: double(:parole_review_date),
+        target_hearing_date: double(:target_hearing_date),
         parole_eligibility_date: double(:parole_eligibility_date),
         automatic_release_date: double(:automatic_release_date),
         conditional_release_date: double(:conditional_release_date),
@@ -453,7 +453,7 @@ RSpec.describe MpcOffender, type: :model do
         expect(Handover::HandoverCalculation).to have_received(:calculate_earliest_release)
                                                    .with(is_indeterminate: offender.indeterminate_sentence?,
                                                          tariff_date: offender.tariff_date,
-                                                         parole_review_date: offender.parole_review_date,
+                                                         target_hearing_date: offender.target_hearing_date,
                                                          parole_eligibility_date: offender.parole_eligibility_date,
                                                          automatic_release_date: offender.automatic_release_date,
                                                          conditional_release_date: offender.conditional_release_date)

@@ -115,8 +115,8 @@ Rails.application.routes.draw do
     resources :case_information, only: %i[new create edit update show], param: :prisoner_id, controller: 'case_information', path_names: {
       new: 'new/:prisoner_id',
     } do
-      get('edit_prd' => 'case_information#edit_prd', as: 'edit_prd', on: :member)
-      put('update_prd' => 'case_information#update_prd', as: 'update_prd', on: :member)
+      get('edit_thd' => 'case_information#edit_thd', as: 'edit_thd', on: :member)
+      put('update_thd' => 'case_information#update_thd', as: 'update_thd', on: :member)
     end
 
     resources :poms, only: %i[index show edit update], param: :nomis_staff_id

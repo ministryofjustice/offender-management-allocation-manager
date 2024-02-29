@@ -91,7 +91,7 @@ RSpec.describe "shared/badges", type: :view do
     end
   end
 
-  context 'when parole eligibility (both TED and PRD) and parole review date are nil' do
+  context 'when parole eligibility (both TED and THD) and target hearing date are nil' do
     let(:offender_no) { 'G7514GW' }
     let(:case_info) { build(:case_information, offender: build(:offender, nomis_offender_id: offender_no)) }
     let(:api_offender) do
