@@ -95,7 +95,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
         described_class.perform_now nomis_offender_id
       }.to change(CaseInformation, :count).by(1)
 
-      expect(case_info.attributes.symbolize_keys.except(:created_at, :id, :updated_at, :parole_review_date, :prisoner_id, :welsh_offender))
+      expect(case_info.attributes.symbolize_keys.except(:created_at, :id, :updated_at, :target_hearing_date, :prisoner_id, :welsh_offender))
           .to eq(new_case_information_attributes)
     end
 

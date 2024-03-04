@@ -88,7 +88,7 @@ private
     delegate :recalled?, :immigration_case?, :indeterminate_sentence?,
              :early_allocation?, :mappa_level, :prison_arrival_date, :category_active_since,
              :parole_eligibility_date, :conditional_release_date, :automatic_release_date,
-             :tariff_date, :parole_review_date,
+             :tariff_date, :target_hearing_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
              :sentence_start_date, :offender_no,
              :determinate_parole?,

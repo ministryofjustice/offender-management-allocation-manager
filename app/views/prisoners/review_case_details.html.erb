@@ -258,10 +258,10 @@
                   <td class="govuk-table__cell govuk-!-width-one-third"></td>
                 </tr>
               <% end %>
-              <% if @prisoner.parole_review_date.present? %>
+              <% if @prisoner.target_hearing_date.present? %>
                 <tr class="govuk-table__row">
-                  <td class="govuk-table__cell govuk-!-width-one-third">Parole review date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.parole_review_date) %></td>
+                  <td class="govuk-table__cell govuk-!-width-one-third">Target hearing date</td>
+                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.target_hearing_date) %></td>
                   <td class="govuk-table__cell govuk-!-width-one-third"></td>
                 </tr>
               <% end %>
