@@ -255,7 +255,6 @@ jobs:
       - attach_workspace:
           at: ~/
       - setup_remote_docker:
-          version: 20.10.14
           docker_layer_caching: true
       - aws-cli/install
       - *configure_k8s
@@ -270,7 +269,6 @@ jobs:
       - attach_workspace:
           at: ~/
       - setup_remote_docker:
-          version: 20.10.14
           docker_layer_caching: true
       - aws-cli/install
       - *configure_k8s
@@ -285,7 +283,6 @@ jobs:
       - attach_workspace:
           at: ~/
       - setup_remote_docker:
-          version: 20.10.14
           docker_layer_caching: true
       - aws-cli/install
       - *build_docker_image
