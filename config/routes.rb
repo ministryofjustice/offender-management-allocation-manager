@@ -178,6 +178,8 @@ Rails.application.routes.draw do
 
   mount Rswag::Ui::Engine => '/api-docs'
   mount Rswag::Api::Engine => '/api-docs'
+  get '/swagger-ui.html', to: 'sre_swagger_docs#swagger_ui'
+  get '/v3/api-docs', to: 'sre_swagger_docs#open_api_json'
 
   # Sidekiq admin interface
   constraints ->(request) { SsoIdentity.new(request.session).current_user_is_admin? } do
