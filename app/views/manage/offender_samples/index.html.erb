@@ -1,0 +1,59 @@
+<% content_for :title, "Offender Samples – #{t('global.default_page_title')}" %>
+
+<h2 class="govuk-heading-l">Get a Sample of Offenders</h2>
+
+<%= form_for(@form,
+  url: manage_offender_samples_path,
+  builder: GOVUKDesignSystemFormBuilder::FormBuilder,
+  method: :get
+) do |form| %>
+  <%= form.govuk_collection_check_boxes :criteria,
+    OffenderSampleService::FILTERS.keys.map {|key| OpenStruct.new(value: key, label: key.to_s.humanize) },
+    :value,
+    :label,
+    small: true
+    %>
+
+  <div class="govuk-button-group">
+    <%= form.govuk_submit "Get Sample" %>
+    <%= link_to "Clear", manage_offender_samples_path, class: "govuk-button govuk-button--secondary" %>
+  </div>
+<% end %>
+
+<% if @results %>
+  <table class="govuk-table">
+    <caption class="govuk-table__caption govuk-table__caption--m">Results</caption>
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Offender</th>
+        <th scope="col" class="govuk-table__header">Release Date</th>
+        <th scope="col" class="govuk-table__header">Badges</th>
+        <th scope="col" class="govuk-table__header">RoSH</th>
+        <th scope="col" class="govuk-table__header">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      <% if @results.empty? %>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell govuk-!-text-align-centre" colspan="5">No Results Found</td>
+        </tr>
+      <% end %>
+
+      <% @results.each do |offender| %>
+        <tr class="govuk-table__row">
+          <th scope="row" class="govuk-table__header"><%= offender.full_name %></th>
+          <td class="govuk-table__cell"><%= offender.release_date.strftime("%d/%m/%Y") if offender.release_date %></td>
+          <td class="govuk-table__cell">
+            <%= render partial: "shared/badges", locals: { offender: } %>
+            <%= vlo_tag(offender) %>
+          </td>
+          <td class="govuk-table__cell"><%= offender.rosh_summary[:overall] %></td>
+          <td class="govuk-table__cell">
+            <%= link_to "Review Case", prison_prisoner_review_case_details_path(prison_id: @prison.code, prisoner_id: offender.nomis_offender_id) %> |
+            <%= link_to "View Profile", prison_prisoner_path(prison_id: @prison.code, id: offender.nomis_offender_id) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
