@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Offender < ApplicationRecord
+  attr_reader :current_parole_review, :previous_parole_reviews
+
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   # NOMIS offender IDs must be of the form <letter><4 numbers><2 letters> (all uppercase)
@@ -59,6 +61,25 @@ class Offender < ApplicationRecord
   # Returns the most recent parole record that has an outcome
   def most_recent_completed_parole_review
     filtered_parole_reviews.reject(&:no_hearing_outcome?).max_by(&:sortable_date)
+  end
+
+  def build_parole_review_sections
+    @current_parole_review = nil
+    @previous_parole_reviews = []
+
+    parole_reviews.sort_by(&:custody_report_due).reverse_each do |record|
+      if record.no_hearing_outcome?
+        if record.active?
+          @current_parole_review = record
+        else
+          @previous_parole_reviews << record
+        end
+      elsif record.hearing_outcome_received_on && record.hearing_outcome_received_on > Time.zone.today - 14.days
+        @current_parole_review = record
+      else
+        @previous_parole_reviews << record
+      end
+    end
   end
 
   # This logic follows the rules defined here: https://dsdmoj.atlassian.net/wiki/spaces/OCM/pages/4524311161/Handover+Type+Calculation
