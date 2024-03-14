@@ -187,7 +187,7 @@ feature 'Allocation' do
     expect(page).to have_content('This reason cannot be more than 175 characters')
   end
 
-  scenario 're-allocating', vcr: { cassette_name: 'prison_api/re_allocate_feature' } do
+  scenario 're-allocating', vcr: { cassette_name: 'prison_api/re_allocate_feature' }, local_only: true do
     create(
       :allocation_history,
       prison: 'LEI',
@@ -247,7 +247,7 @@ feature 'Allocation' do
       create(:responsibility, nomis_offender_id: nomis_offender_id, value: 'Prison')
     end
 
-    scenario 'removing a community override', vcr: { cassette_name: 'prison_api/allocation_remove_community_override' } do
+    scenario 'removing a community override', vcr: { cassette_name: 'prison_api/allocation_remove_community_override' }, local_only: true do
       visit prison_dashboard_index_path('LEI')
       click_link 'All allocated cases'
 
