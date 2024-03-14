@@ -364,6 +364,10 @@ class MpcOffender
     parole_eligibility_date.present?
   end
 
+  def determinate_or_indeterminate_parole?
+    determinate_parole? || tariff_date.present? || (indeterminate_sentence? && target_hearing_date.present?)
+  end
+
   def active_allocation
     @active_allocation ||= AllocationHistory.active_allocations_for_prison(prison.code).find_by(nomis_offender_id: offender_no)
   end

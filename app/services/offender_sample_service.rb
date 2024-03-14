@@ -5,10 +5,7 @@ class OffenderSampleService
     badge_sentence_indeterminate:
       ->(offender) { offender.indeterminate_sentence? },
     badge_parole:
-      lambda { |offender|
-        offender.tariff_date.present? || offender.parole_eligibility_date.present? || \
-                      (offender.indeterminate_sentence? && offender.target_hearing_date.present?)
-      },
+      ->(offender) { offender.determinate_or_indeterminate_parole? },
     badge_recall:
       ->(offender) { offender.recalled? },
     badge_early_allocation_eligible:
