@@ -7,7 +7,9 @@
 <% else %>
   <% description = capture do %>
     Prisoner unallocated co-working POM
-    <%= deallocate_secondary_pom.previous_secondary_pom_name.titleize %> - <%= format_email(deallocate_secondary_pom.previous_secondary_pom_email) %>
+    <% if deallocate_secondary_pom.previous_secondary_pom_name.present? %>
+      <%= deallocate_secondary_pom.previous_secondary_pom_name.titleize %> - <%= format_email(deallocate_secondary_pom.previous_secondary_pom_email) %>
+    <% end %>
   <% end %>
   <%= render 'case_history/case_history',
              title: 'Co-working unallocated',
