@@ -2,12 +2,6 @@ module DomainEvents
   module Handlers
     class ProbationChangeHandler
       def handle(event, logger: Shoryuken::Logging.logger)
-        unless ENABLE_EVENT_BASED_PROBATION_CHANGE
-          logger.info "event=domain_event_handle_skip,domain_event_type=#{event.event_type},crn=#{event.crn_number}" \
-                      '|Skipping handling because feature flag is not set'
-          return
-        end
-
         case event.event_type
         when /probation-case\.registration\..+/
           handle_registration_change(event, logger)
