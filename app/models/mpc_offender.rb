@@ -164,7 +164,11 @@ class MpcOffender
   # parole methods
 
   def target_hearing_date
-    most_recent_parole_review&.target_hearing_date
+    if USE_PPUD_PAROLE_DATA
+      most_recent_parole_review&.target_hearing_date
+    elsif @offender.parole_record.present?
+      @offender.parole_record.target_hearing_date
+    end
   end
 
   # Returns the target hearing date for the offender's next active parole application, or nil if there isn't one.
@@ -191,11 +195,11 @@ class MpcOffender
     earliest_date = next_parole_date
     return false if earliest_date.blank?
     return false unless earliest_date <= Time.zone.today + 10.months
-    return false if !most_recent_parole_review&.no_hearing_outcome? && hearing_outcome_received.blank?
+    return false if !most_recent_parole_review&.no_hearing_outcome? && hearing_outcome_received_on.blank?
 
     if earliest_date.past? &&
-      hearing_outcome_received.present? &&
-      hearing_outcome_received <= Time.zone.today - 14.days
+      hearing_outcome_received_on.present? &&
+      hearing_outcome_received_on <= Time.zone.today - 14.days
 
       return false
     end
@@ -206,10 +210,7 @@ class MpcOffender
   def next_parole_date
     return target_hearing_date if target_hearing_date.present?
 
-    [
-      tariff_date,
-      parole_eligibility_date
-    ].compact.min
+    [tariff_date, parole_eligibility_date].compact.min
   end
 
   # Separate from next_parole_date as parole case index view sorts by next_parole_date, so it seemed sensible to avoid changing default rails behaviour
