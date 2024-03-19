@@ -71,9 +71,11 @@ describe HmppsApi::Offender do
     end
 
     context 'when PRD < 18 months' do
+      before { stub_const('USE_PPUD_PAROLE_DATA', false) }
+
       let(:case_info) do
         build(:case_information, offender: build(:offender,
-                                                 parole_reviews: [build(:parole_review, target_hearing_date: Time.zone.today + 17.months)]))
+                                                 parole_record: build(:parole_record, parole_review_date: Time.zone.today + 17.months)))
       end
       let(:api_offender) do
         build(:hmpps_api_offender,
