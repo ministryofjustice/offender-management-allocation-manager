@@ -150,6 +150,10 @@ class MpcOffender
     handover.reason_text
   end
 
+  def should_send_handover_follow_up_email?
+    sentenced? && prison.active? && handover_start_date == Time.zone.today - 1.week
+  end
+
   # LEGACY - does processing when called to blank out handover date if responsibility is COM. Use #handover_date
   # which returns the actual handover date on the CalculatedHandoverDate model
   def responsibility_handover_date
