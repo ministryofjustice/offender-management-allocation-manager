@@ -160,6 +160,7 @@ Rails.application.routes.draw do
 
   resources :health, only: %i[index], controller: 'health'
   resources :status, only: %i[index], controller: 'status'
+  resources :info, only: %i[index], controller: 'info'
 
   namespace :api do
     get('/' => 'api#index')
