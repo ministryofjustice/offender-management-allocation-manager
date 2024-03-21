@@ -24,6 +24,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
   end
 
   before do
+    stub_const('USE_PPUD_PAROLE_DATA', false)
     stub_offenders_for_prison(prison.code, [nomis_offender])
     stub_keyworker(prison.code, nomis_offender_id, build(:keyworker))
 
