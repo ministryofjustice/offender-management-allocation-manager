@@ -172,7 +172,15 @@ private
       recommended_pom_type: nil,
     )
 
-    PomMailer.with(**mail_params).offender_deallocated.deliver_later
+    if mail_params[:email].present?
+      PomMailer.with(**mail_params).offender_deallocated.deliver_later
+    else
+      Rails.logger.error 'event=deallocate_offender_blank_email,' \
+                         "nomis_offender_id=#{nomis_offender_id}," \
+                         "primary_pom_nomis_id=#{primary_pom_nomis_id}," \
+                         "event_trigger=#{event_trigger}|" \
+                         'Attempted to schedule an email send but the primary POM email address is blank'
+    end
   end
 
   def publish_allocation_changed_event
