@@ -3,10 +3,9 @@ FROM ruby:3.2.2-slim-bullseye
 # Incremenent to bust Docker layer cache
 ENV DOCKER_CACHE_BUSTER=1
 
-ARG VERSION_NUMBER
-ARG COMMIT_ID
-ARG BUILD_DATE
-ARG BUILD_TAG
+ARG BUILD_NUMBER
+ARG GIT_REF
+ARG GIT_BRANCH
 
 RUN mkdir -p /home/appuser && \
   useradd appuser -u 1001 --user-group --home /home/appuser && \
@@ -76,10 +75,9 @@ RUN yarn install \
 
 # Non-cacheable layers. Everything below here is expected to change with every commit
 
-ENV APPVERSION=${VERSION_NUMBER}
-ENV APP_GIT_COMMIT=${COMMIT_ID}
-ENV APP_BUILD_DATE=${BUILD_DATE}
-ENV APP_BUILD_TAG=${BUILD_TAG}
+ENV BUILD_NUMBER=${BUILD_NUMBER}
+ENV GIT_REF=${GIT_REF}
+ENV GIT_BRANCH=${GIT_BRANCH}
 
 COPY . /app
 
