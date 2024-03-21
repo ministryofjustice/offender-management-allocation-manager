@@ -147,7 +147,8 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
 
       let(:nomis_offender_id) { 'G2911GD' }
       let(:prison_code) { create(:prison).code }
-      let(:poms) { [build(:pom, staffId: 485_833)] }
+      let(:poms) { [build(:pom, staffId: 485_833, emails: pom_emails)] }
+      let(:pom_emails) { ['mrpom@example.com'] }
 
       let(:offender) do
         build(:nomis_offender, prisonId: prison_code, prisonerNumber: nomis_offender_id)
@@ -180,35 +181,66 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
         expect(deallocation.event_trigger).to eq 'offender_transferred'
       end
 
-      it 'when an offender is released from prison removes the primary pom details in an Offender\'s allocation' do
-        create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
+      context 'when an offender is released from prison' do
+        before do
+          create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
 
-        params = {
-          nomis_offender_id: nomis_offender_id,
-          prison: prison_code,
-          allocated_at_tier: 'A',
-          primary_pom_nomis_id: 485_833,
-          primary_pom_allocated_at: Time.zone.now.utc,
-          recommended_pom_type: 'probation',
-          event: AllocationHistory::ALLOCATE_PRIMARY_POM,
-          event_trigger: AllocationHistory::USER,
-          created_by_username: 'MOIC_POM'
-        }
-        AllocationService.create_or_update(params)
+          params = {
+            nomis_offender_id: nomis_offender_id,
+            prison: prison_code,
+            allocated_at_tier: 'A',
+            primary_pom_nomis_id: 485_833,
+            primary_pom_allocated_at: Time.zone.now.utc,
+            recommended_pom_type: 'probation',
+            event: AllocationHistory::ALLOCATE_PRIMARY_POM,
+            event_trigger: AllocationHistory::USER,
+            created_by_username: 'MOIC_POM'
+          }
+          AllocationService.create_or_update(params)
 
-        alloc = described_class.find_by(nomis_offender_id: nomis_offender_id)
-        alloc.deallocate_offender_after_release
-        deallocation = alloc.reload
+          allow(PomMailer).to receive(:with).and_return(fake_mailer)
+          allow(Rails).to receive(:logger).and_return(fake_logger)
 
-        expect(deallocation.primary_pom_nomis_id).to be_nil
-        expect(deallocation.primary_pom_name).to be_nil
-        expect(deallocation.primary_pom_allocated_at).to be_nil
-        expect(deallocation.recommended_pom_type).to be_nil
-        expect(deallocation.event_trigger).to eq 'offender_released'
+          poms
+          alloc.deallocate_offender_after_release
+        end
 
-        # We expect the offender's prison to be left intact and not removed. This will
-        # allow us to track which institution an offender was released from.
-        expect(deallocation.prison).to eq prison_code
+        let(:alloc) { described_class.find_by(nomis_offender_id: nomis_offender_id) }
+        let(:deallocation) { alloc.reload }
+        let(:fake_mailer) { double(offender_deallocated: double(deliver_later: nil)) }
+        let(:fake_logger) { double(error: nil, info: nil) }
+
+        it 'removes the primary pom details in an Offender\'s allocation' do
+          expect(deallocation.primary_pom_nomis_id).to be_nil
+          expect(deallocation.primary_pom_name).to be_nil
+          expect(deallocation.primary_pom_allocated_at).to be_nil
+          expect(deallocation.recommended_pom_type).to be_nil
+          expect(deallocation.event_trigger).to eq 'offender_released'
+
+          # We expect the offender's prison to be left intact and not removed. This will
+          # allow us to track which institution an offender was released from.
+          expect(deallocation.prison).to eq prison_code
+        end
+
+        it 'sends an email' do
+          expect(fake_mailer).to have_received(:offender_deallocated)
+        end
+
+        it 'logs no error' do
+          expect(fake_logger).not_to have_received(:error)
+        end
+
+        context 'when primary POM email is blank' do
+          let(:pom_emails) { nil }
+
+          it 'sends no email' do
+            expect(fake_mailer).not_to have_received(:offender_deallocated)
+          end
+
+          it 'logs an error' do
+            expect(fake_logger).to have_received(:error)
+          end
+        end
       end
     end
 
