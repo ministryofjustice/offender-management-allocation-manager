@@ -3,6 +3,7 @@ kind: ConfigMap
 metadata:
   name: shared-environment
 data:
+  PRODUCT_ID: "DPS030"
   PROMETHEUS_METRICS: "on"
   RAILS_ENV: "production"
   RAILS_SERVE_STATIC_FILES: "true"
