@@ -22,6 +22,12 @@ class OffenderService
       )
     end
 
+    def get_offenders(offender_numbers, ignore_legal_status: false)
+      Array(offender_numbers)
+        .map { |offender_number| get_offender(offender_number, ignore_legal_status:) }
+        .compact
+    end
+
     def get_offenders_in_prison(prison, ignore_legal_status: false)
       api_offenders = HmppsApi::PrisonApi::OffenderApi.get_offenders_in_prison(prison.code, ignore_legal_status: ignore_legal_status)
                                                       .index_by(&:offender_no)

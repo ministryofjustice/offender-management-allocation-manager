@@ -33,6 +33,8 @@ class CaseInformation < ApplicationRecord
     message: 'Select yes if the prisoner’s last known address was in Wales'
   }
 
+  scope :without_com, -> { where(com_name: nil) }
+
   def welsh_offender
     probation_service == 'Wales'
   end

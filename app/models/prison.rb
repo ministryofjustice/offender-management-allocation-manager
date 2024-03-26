@@ -7,6 +7,8 @@ class Prison < ApplicationRecord
 
   enum prison_type: { womens: 'womens', mens_open: 'mens_open', mens_closed: 'mens_closed' }
 
+  scope :active, -> { where(code: AllocationHistory.distinct.pluck(:prison)) }
+
   def get_list_of_poms
     # This API call doesn't do what it says on the tin. It can return duplicate
     # staff_ids in the situation where someone has more than one role.
@@ -31,10 +33,8 @@ class Prison < ApplicationRecord
     pom
   end
 
-  class << self
-    def active
-      Prison.where(code: AllocationHistory.distinct.pluck(:prison))
-    end
+  def active?
+    self.class.active.pluck(:code).include?(code)
   end
 
   def offenders
