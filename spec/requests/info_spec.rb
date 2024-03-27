@@ -2,14 +2,13 @@ require "rails_helper"
 
 describe "Info endpoinds" do
   describe "GET /info" do
-    it "returns information reqgarding the deployed application" do
-      stub_const('ENV',
-                 ENV.to_hash.merge(
-                   'GIT_BRANCH' => 'my/git/branch',
-                   'BUILD_NUMBER' => '2014-12-25.0afbc7.af79nbc',
-                   'PRODUCT_ID' => 'PROD1'
-                 )
-                )
+    it "returns information regarding the deployed application" do
+      new_env = ENV.to_hash.merge(
+        'GIT_BRANCH' => 'my/git/branch',
+        'BUILD_NUMBER' => '2014-12-25.0afbc7.af79nbc',
+        'PRODUCT_ID' => 'PROD1'
+      )
+      stub_const('ENV', new_env)
 
       get "/info"
 

@@ -2,6 +2,14 @@
 
 class HealthController < ApplicationController
   def index
-    render plain: 'Everything is fine.'
+    render json: {
+      **Health.status,
+      uptime: Uptime.duration_in_seconds,
+      build: {
+        'buildNumber' => ENV['BUILD_NUMBER'],
+        'gitRef' => ENV['GIT_REF']
+      },
+      version: ENV['BUILD_NUMBER']
+    }
   end
 end
