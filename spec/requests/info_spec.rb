@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe "Info endpoinds" do
+describe "Info endpoints" do
   describe "GET /info" do
     it "returns information regarding the deployed application" do
       new_env = ENV.to_hash.merge(

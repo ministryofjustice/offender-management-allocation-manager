@@ -1,2 +1,2 @@
-require 'uptime'
-Uptime.application_did_boot!
+require 'timer'
+Rails.configuration.uptime_timer = Timer.new

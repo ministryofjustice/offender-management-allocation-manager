@@ -1,38 +1,37 @@
 require 'health/status_check'
-require 'health/key_value_check'
 
-module Health
-  def self.checks
-    @checks ||= []
-  end
-
-  def self.reset_checks!
+class Health
+  def initialize(timeout_in_seconds_per_check: 2, num_retries_per_check: 2)
+    @timeout_in_seconds_per_check = timeout_in_seconds_per_check
+    @num_retries_per_check = num_retries_per_check
     @checks = []
   end
 
-  def self.add_check(name:, get_response:, check_response: {})
-    check = case check_response
-            in { key:, value: }
-              KeyValueCheck.new(key:, value:)
-            in { value: }
-              KeyValueCheck.new(value:)
-            else
-              KeyValueCheck.new(key: 'status', value: 'UP')
-            end
-
-    checks << { name:, get_response:, check: }
+  def add_check(name:, get_response:, check_response: STATUS_UP_CHECK)
+    @checks << StatusCheck.new(
+      name:,
+      get_response:,
+      check_response:,
+      num_retries: @num_retries_per_check,
+      timeout_in_seconds: @timeout_in_seconds_per_check)
 
     self
   end
 
-  def self.status
-    checks.each_with_object(status: 'UP', components: {}) do |check_details, results|
-      check_details => { name:, get_response:, check: }
+  def reset_checks!
+    @checks = []
+  end
 
-      result = check.up?(get_response)
+  def status
+    @checks.each_with_object(status: 'UP', components: {}) do |check, results|
+      result = check.up?
 
-      results[:components][name] = { status: result ? 'UP' : 'DOWN' }
+      results[:components][check.name] = { status: result ? 'UP' : 'DOWN' }
       results[:status] = 'DOWN' unless result
     end
   end
+
+private
+
+  STATUS_UP_CHECK = ->(response) { response['status'] == 'UP' }
 end

@@ -1,9 +1,9 @@
 require "rails_helper"
 
 describe Health do
-  subject(:health) { described_class }
+  subject(:health) { described_class.new(timeout_in_seconds_per_check: 2, num_retries_per_check: 2) }
 
-  before { described_class.reset_checks! }
+  before { health.reset_checks! }
 
   describe "status" do
     context "when all status checks return { 'status': 'UP' }" do
@@ -11,7 +11,7 @@ describe Health do
         health.add_check(name: 'serviceA', get_response: -> { { "status" => "UP" } })
         health.add_check(name: 'serviceB', get_response: -> { { "status" => "UP" } })
 
-        expect(described_class.status).to eq({
+        expect(health.status).to eq({
           status: "UP",
           components: {
             "serviceA" => { status: "UP" },
@@ -26,7 +26,7 @@ describe Health do
         health.add_check(name: 'serviceA', get_response: -> { { "status" => "DOWN" } })
         health.add_check(name: 'serviceB', get_response: -> { { "status" => "UP" } })
 
-        expect(described_class.status).to eq({
+        expect(health.status).to eq({
           status: "DOWN",
           components: {
             "serviceA" => { status: "DOWN" },
@@ -42,10 +42,10 @@ describe Health do
           health.add_check(
             name: 'serviceA',
             get_response: -> { { "custom" => "value" } },
-            check_response: { key: "custom", value: "value" }
+            check_response: ->(response) { response["custom"] == "value" }
           )
 
-          expect(described_class.status).to eq({
+          expect(health.status).to eq({
             status: "UP",
             components: {
               "serviceA" => { status: "UP" },
@@ -62,7 +62,7 @@ describe Health do
             check_response: { key: "custom", value: "value" }
           )
 
-          expect(described_class.status).to eq({
+          expect(health.status).to eq({
             status: "DOWN",
             components: {
               "serviceA" => { status: "DOWN" },
@@ -78,10 +78,10 @@ describe Health do
           health.add_check(
             name: 'serviceA',
             get_response: -> { "pong" },
-            check_response: { value: "pong" }
+            check_response: ->(response) { response == "pong" }
           )
 
-          expect(described_class.status).to eq({
+          expect(health.status).to eq({
             status: "UP",
             components: {
               "serviceA" => { status: "UP" },
@@ -98,7 +98,7 @@ describe Health do
             check_response: { value: "pong" }
           )
 
-          expect(described_class.status).to eq({
+          expect(health.status).to eq({
             status: "DOWN",
             components: {
               "serviceA" => { status: "DOWN" },
@@ -113,7 +113,7 @@ describe Health do
         health.add_check(name: 'serviceA', get_response: -> { { "status" => "UP" } })
         health.add_check(name: 'serviceB', get_response: -> { raise "FAILED!" })
 
-        expect(described_class.status).to eq({
+        expect(health.status).to eq({
           status: "DOWN",
           components: {
             "serviceA" => { status: "UP" },
@@ -130,7 +130,7 @@ describe Health do
           health.add_check(name: 'serviceA', get_response: -> { { "status" => "UP" } })
           health.add_check(name: 'serviceB', get_response: momentarily_down)
 
-          expect(described_class.status).to eq({
+          expect(health.status).to eq({
             status: "UP",
             components: {
               "serviceA" => { status: "UP" },
@@ -146,7 +146,7 @@ describe Health do
 
           health.add_check(name: 'serviceA', get_response: -> { { "status" => "UP" } })
 
-          expect(described_class.status).to eq({
+          expect(health.status).to eq({
             status: "DOWN",
             components: {
               "serviceA" => { status: "DOWN" },

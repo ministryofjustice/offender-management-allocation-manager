@@ -8,8 +8,8 @@ describe "Health endpoinds" do
         'BUILD_NUMBER' => '2014-12-25.0afbc7.af79nbc',
       )
       stub_const('ENV', new_env)
-      stub_const('Health', double("Health", status: { status: "UP" }))
-      stub_const('Uptime', double("Uptime", duration_in_seconds: 999))
+      Rails.configuration.uptime_timer = double("Timer", elapsed_seconds: 999)
+      Rails.configuration.health_checks = double("Health", status: { status: "UP" })
 
       get "/health"
 
