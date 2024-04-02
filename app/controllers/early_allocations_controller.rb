@@ -124,7 +124,7 @@ private
     view_context.render_early_alloc_pdf(early_allocation: @early_allocation,
                                         offender: @prisoner,
                                         pom: pom,
-                                        allocation: allocation).render
+                                        allocation: allocation).render(StringIO.new)
   end
 
   def community_decision_params
