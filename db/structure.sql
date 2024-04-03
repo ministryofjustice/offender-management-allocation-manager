@@ -515,42 +515,6 @@ ALTER SEQUENCE public.offender_email_sent_id_seq OWNED BY public.offender_email_
 
 
 --
--- Name: offender_events; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.offender_events (
-    id bigint NOT NULL,
-    nomis_offender_id character varying NOT NULL,
-    type character varying NOT NULL,
-    happened_at timestamp without time zone NOT NULL,
-    triggered_by character varying NOT NULL,
-    triggered_by_nomis_username character varying,
-    metadata jsonb,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: offender_events_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.offender_events_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: offender_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.offender_events_id_seq OWNED BY public.offender_events.id;
-
-
---
 -- Name: offenders; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -909,13 +873,6 @@ ALTER TABLE ONLY public.offender_email_sent ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- Name: offender_events id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.offender_events ALTER COLUMN id SET DEFAULT nextval('public.offender_events_id_seq'::regclass);
-
-
---
 -- Name: parole_review_imports id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1075,14 +1032,6 @@ ALTER TABLE ONLY public.offender_email_opt_outs
 
 ALTER TABLE ONLY public.offender_email_sent
     ADD CONSTRAINT offender_email_sent_pkey PRIMARY KEY (id);
-
-
---
--- Name: offender_events offender_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.offender_events
-    ADD CONSTRAINT offender_events_pkey PRIMARY KEY (id);
 
 
 --
@@ -1247,20 +1196,6 @@ CREATE INDEX index_offender_email_sent_on_nomis_offender_id ON public.offender_e
 --
 
 CREATE UNIQUE INDEX index_offender_email_sent_unique_composite_key ON public.offender_email_sent USING btree (nomis_offender_id, staff_member_id, offender_email_type);
-
-
---
--- Name: index_offender_events_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_offender_events_on_nomis_offender_id ON public.offender_events USING btree (nomis_offender_id);
-
-
---
--- Name: index_offender_events_on_type; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_offender_events_on_type ON public.offender_events USING btree (type);
 
 
 --
@@ -1459,6 +1394,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230724141335'),
 ('20231121154615'),
 ('20240125093937'),
-('20240219145954');
+('20240219145954'),
+('20240402142606');
 
 
