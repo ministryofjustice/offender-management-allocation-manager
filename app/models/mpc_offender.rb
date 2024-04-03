@@ -17,8 +17,8 @@ class MpcOffender
            to: :@case_information
 
   delegate :victim_liaison_officers, :handover_progress_task_completion_data, :handover_progress_complete?,
-           :handover_type,
-           to: :@offender
+           :handover_type, :current_parole_review, :previous_parole_reviews, :build_parole_review_sections,
+           :most_recent_parole_review, :parole_review_awaiting_hearing, :most_recent_completed_parole_review, to: :@offender
 
   # These fields make sense to be nil when the case information is nil - the others dont
   delegate :ldu_email_address, :team_name, :ldu_name, :active_vlo?, to: :@case_information, allow_nil: true
@@ -32,6 +32,7 @@ class MpcOffender
     @offender = offender
     @api_offender = prison_record # @type HmppsApi::Offender
     @case_information = offender.case_information
+    offender.build_parole_review_sections
   end
 
   # @deprecated Deprecated old name - I don't know why probation record is sometimes used but the database table and the
@@ -160,11 +161,80 @@ class MpcOffender
     handover.handover_date
   end
 
-  # early allocation methods
+  # parole methods
 
   def target_hearing_date
-    @offender.parole_record.target_hearing_date if @offender.parole_record.present?
+    if USE_PPUD_PAROLE_DATA
+      most_recent_parole_review&.target_hearing_date
+    elsif @offender.parole_record.present?
+      @offender.parole_record.target_hearing_date
+    end
   end
+
+  # Returns the target hearing date for the offender's next active parole application, or nil if there isn't one.
+  # Used to exclude THDs of previous (completed/inactive) parole applications.
+  def next_thd
+    parole_review_awaiting_hearing&.target_hearing_date
+  end
+
+  # Returns the date that the most recent hearing outcome was received.
+  def hearing_outcome_received_on
+    most_recent_parole_review&.hearing_outcome_received_on
+  end
+
+  # Returns the date that the most recent COMPLETED hearing outcome was received.
+  # Used to exclude any active parole applications.
+  def last_hearing_outcome_received_on
+    most_recent_completed_parole_review&.hearing_outcome_received_on
+  end
+
+  # If the parole application is set for a hearing within 10 months, or the outcome for a hearing was received in the last 14 days,
+  # return true. If the hearing has an outcome but we do not have the date that it was received, assume that it is no longer
+  # approaching parole (return false).
+  def approaching_parole?
+    earliest_date = next_parole_date
+    return false if earliest_date.blank?
+    return false unless earliest_date <= Time.zone.today + 10.months
+    return false if !most_recent_parole_review&.no_hearing_outcome? && hearing_outcome_received_on.blank?
+
+    if earliest_date.past? &&
+      hearing_outcome_received_on.present? &&
+      hearing_outcome_received_on <= Time.zone.today - 14.days
+
+      return false
+    end
+
+    true
+  end
+
+  def next_parole_date
+    return target_hearing_date if target_hearing_date.present?
+
+    [tariff_date, parole_eligibility_date].compact.min
+  end
+
+  # Separate from next_parole_date as parole case index view sorts by next_parole_date, so it seemed sensible to avoid changing default rails behaviour
+  # for the sake of saving a couple of simple, albeit slightly inefficient, comparisons.
+  def next_parole_date_type
+    case next_parole_date
+    when tariff_date
+      'TED'
+    when parole_eligibility_date
+      'PED'
+    when target_hearing_date
+      'Target hearing date'
+    end
+  end
+
+  def display_current_parole_info?
+    tariff_date.present? || parole_eligibility_date.present? || current_parole_review.present?
+  end
+
+  def due_for_release?
+    most_recent_parole_review&.current_record_hearing_outcome == 'Release'
+  end
+
+  # early allocation methods
 
   def early_allocation_state
     if early_allocation?

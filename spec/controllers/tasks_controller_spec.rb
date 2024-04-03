@@ -24,6 +24,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
   end
 
   before do
+    stub_const('USE_PPUD_PAROLE_DATE', false)
     stub_poms(prison, pom)
     stub_signed_in_pom(prison, staff_id)
     stub_offenders_for_prison(prison, offenders)
@@ -105,7 +106,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
     let(:test_offender_no) { 'G1234AB' }
 
     before do
-      # One offender (G1234VV) should have missing case info and one should have no PRD
+      # One offender (G1234VV) should have missing case info and one should have no THD (formerly known as PRD)
       create(:case_information, tier: 'A', mappa_level: 1,
                                 offender: build(:offender, nomis_offender_id: 'G1234AB', parole_record: build(:parole_record, parole_review_date: next_week)))
       create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)

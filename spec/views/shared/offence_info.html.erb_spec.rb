@@ -11,6 +11,7 @@ RSpec.describe "shared/offence_info", type: :view do
   let(:offender) { build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:offender)) }
 
   before do
+    stub_const('USE_PPUD_PAROLE_DATA', false)
     assign(:prison, prison)
     assign(:prisoner, offender)
     render 'shared/offence_info', editable_thd: true
