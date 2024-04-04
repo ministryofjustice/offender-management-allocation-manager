@@ -12,7 +12,7 @@ RSpec.describe DomainEvents::Event do
   end
 
   let(:now) { Time.new(2022, 6, 16, 15, 1, 44, 'Z') }
-  let(:mock_env) { ENV.to_hash.merge('DOMAIN_EVENTS_TOPIC_ARN' => topic_arn, 'LOCALSTACK_URL' => nil) }
+  let(:mock_env) { { 'DOMAIN_EVENTS_TOPIC_ARN' => topic_arn } }
   let(:aws_region) { "xx-regn-1" }
   let(:topic_arn) { "arn:aws:sns:#{aws_region}:11111111:topic-name" }
   let(:published_data) { {} }
