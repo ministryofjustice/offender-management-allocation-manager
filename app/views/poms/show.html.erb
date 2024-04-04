@@ -30,6 +30,15 @@
         <%= link_to "Handover cases (#{@summary[:in_progress_handover_count]})", prison_show_pom_tab_path(@prison.code, @pom.staff_id, :handover), class: 'moj-sub-navigation__link' %>
       <% end %>
     </li>
+    <% if USE_PPUD_PAROLE_DATA %>
+      <li class="moj-sub-navigation__item">
+        <% if @tab == 'parole' %>
+          <%= link_to 'Parole', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :parole), class: 'moj-sub-navigation__link', aria: { current: "page" } %>
+        <% else %>
+          <%= link_to 'Parole', prison_show_pom_tab_path(@prison.code, @pom.staff_id, :parole), class: 'moj-sub-navigation__link' %>
+        <% end %>
+      </li>
+    <% end %>
   </ul>
 </nav>
 
@@ -37,6 +46,8 @@
   <%= render 'caseload_tab' %>
 <% elsif @tab == 'handover' %>
   <%= render 'handover_tab' %>
+<% elsif USE_PPUD_PAROLE_DATA && @tab == 'parole'%>
+  <%= render 'parole_tab' %>
 <% else %>
   <%= render 'overview_tab' %>
 <% end %>
