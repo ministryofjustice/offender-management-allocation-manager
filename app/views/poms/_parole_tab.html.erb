@@ -1,0 +1,12 @@
+<h2 class="govuk-heading-l">Parole cases</h1>
+
+<p class="govuk-body">Cases with a target hearing date, PED or TED in the next 10 months.</p>
+
+<% if @parole_cases.empty? %>
+  <p class="govuk-body">No cases allocated</p>
+<% else %>
+  <%= render partial: 'shared/pagination', locals: { data: @parole_cases } %>
+  <br/>
+  <%= render 'shared/caseload_table', header_partial: 'shared/caseload_headers', collection_partial: 'shared/caseload_homd', collection: @parole_cases %>
+  <%= render partial: 'shared/pagination', locals: { data: @parole_cases } %>
+<% end %>
