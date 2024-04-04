@@ -70,6 +70,8 @@ private
 
     @handover_cases = Handover::CategorisedHandoverCasesForPom.new(@pom)
 
+    @parole_cases = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations.select {|allocation| ParoleReview.where(nomis_offender_id: allocation.nomis_offender_id).any? }))).page(page)
+
     @summary = {
       all_prison_cases: @prison.allocations.all.count,
       new_cases_count: @pom.allocations.count(&:new_case?),
@@ -82,6 +84,7 @@ private
       last_allocated_date: @allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date,
       pending_handover_count: @handover_cases.upcoming.count,
       in_progress_handover_count: @handover_cases.in_progress.count,
+      total_parole_cases: @parole_cases.count,
       pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count,
       overdue_task_count: @handover_cases.overdue_tasks.count,
       com_allocation_overdue_count: @handover_cases.com_allocation_overdue.count

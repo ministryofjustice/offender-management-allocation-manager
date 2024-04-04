@@ -8,6 +8,8 @@ class ParoleReview < ApplicationRecord
     'Active - Referred'
   ].freeze
 
+  scope :active, -> { where(review_status: ACTIVE_REVIEW_STATUS) }
+
   def current_hearing_outcome
     no_hearing_outcome? ? 'No hearing outcome yet' : format_hearing_outcome
   end
@@ -24,7 +26,7 @@ class ParoleReview < ApplicationRecord
   end
 
   def active?
-    ACTIVE_REVIEW_STATUS.include? review_status
+    self.class.active.include?(self)
   end
 
   def sortable_date

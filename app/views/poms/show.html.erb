@@ -1,12 +1,14 @@
 <% content_for :title, "View a POM's caseload – Digital Prison Services" %>
 
 <%= back_link %>
+
 <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
   <span class="govuk-caption-xl">
     <%= pom_level_long(@pom.position) %>
   </span>
   <%= full_name_ordered(@pom) %>
 </h1>
+
 <nav class="moj-sub-navigation" aria-label="Sub navigation">
   <ul class="moj-sub-navigation__list">
     <li class="moj-sub-navigation__item">
@@ -18,13 +20,20 @@
     <li class="moj-sub-navigation__item">
       <%= link_to "Handover cases (#{@summary[:in_progress_handover_count]})", prison_show_pom_tab_path(@prison.code, @pom.staff_id, :handover), class: 'moj-sub-navigation__link', aria: aria_current_page_for_tab("handover") %>
     </li>
+    <% if USE_PPUD_PAROLE_DATA %>
+      <li class="moj-sub-navigation__item">
+        <%= link_to "Parole cases (#{@summary[:total_parole_cases]})", prison_show_pom_tab_path(@prison.code, @pom.staff_id, :parole), class: 'moj-sub-navigation__link', aria: aria_current_page_for_tab("parole") %>
+      </li>
+    <% end %>
   </ul>
 </nav>
 
-<% if @tab == 'caseload' %>
-  <%= render 'caseload_tab' %>
-<% elsif @tab == 'handover' %>
-  <%= render 'handover_tab' %>
-<% else %>
-  <%= render 'overview_tab' %>
-<% end %>
+<%=
+  case @tab
+  when 'caseload' then render 'caseload_tab'
+  when 'handover' then render 'handover_tab'
+  when 'parole'   then render 'parole_tab'
+  else
+    render 'overview_tab'
+  end
+%>
