@@ -13,6 +13,7 @@ Dir.glob(File.join(__dir__, 'support/**/*.rb')).each do |file|
   require file
 end
 
+Capybara.server = :puma, { Silent: true }
 Capybara.default_max_wait_time = 10
 Capybara.asset_host = 'http://localhost:3000'
 Capybara.register_driver(:rack_test) do |app|
