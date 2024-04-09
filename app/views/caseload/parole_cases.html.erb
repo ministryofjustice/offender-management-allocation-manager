@@ -2,10 +2,56 @@
 <%= render partial: 'layouts/caseload' %>
 
 <h2 class="govuk-heading-l">Parole cases</h2>
-<p class="govuk-body">Cases with a target hearing date, PED or TED in the next 10 months.</p>
+<p class="govuk-body">Cases with a target hearing date, PED or TED in the next 10 months or that have had a hearing recently.</p>
 
 <% if @pom.blank? || @parole_cases.empty? %>
   <h2 class="govuk-heading-l">No cases approaching parole </h2>
 <% else %>
-  <%= render 'shared/caseload_table', header_partial: 'shared/caseload_headers', collection_partial: 'shared/caseload', collection: @parole_cases %>
+  <table class="govuk-table responsive tablesorter">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th class="govuk-table__header" scope="col">
+          <a href="<%= sort_link('last_name') %>">
+            Case
+          </a>
+          <%= sort_arrow('last_name') %>
+        </th>
+        <th class="govuk-table__header sorter-false" xscope="col">
+          <a href="<%= sort_link('allocated_pom_role') %>">
+            Role
+          </a>
+          <%= sort_arrow('allocated_pom_role') %>
+        </th>
+        <th class="govuk-table__header sorter-false" xscope="col">
+          <a href="<%= sort_link('next_parole_date') %>">
+            Next parole date
+          </a>
+          <%= sort_arrow('next_parole_date') %>
+        </th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      <% @parole_cases.each_with_index do |offender, i| %>
+        <tr class="govuk-table__row offender_row_<%= i %>">
+          <td aria-label="Prisoner name" class="govuk-table__cell ">
+            <a href="<%= prison_prisoner_path(@prison.code, offender.offender_no) %>"><%= offender.full_name %></a>
+            <br/>
+            <span class='govuk-hint govuk-!-margin-bottom-0'>
+              <%= offender.offender_no %>
+            </span>
+          </td>
+          <td aria-label="POM Role" class="govuk-table__cell">
+            <%= offender.allocated_pom_role %>
+          </td>
+          <td aria-label="Next parole date" class="govuk-table__cell">
+            <span class='govuk-!-margin-bottom-0'>
+              <%= offender.next_parole_date_type %>:
+            </span>
+            <br/>
+            <%= format_date(offender.next_parole_date) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 <% end %>
