@@ -68,4 +68,8 @@ Rails.application.configure do
   # ...which means we also need to use a proper cache store, rather than the default null store
   # To avoid leaking global state between tests, we clear this cache after every spec in rails_helper.rb
   config.cache_store = :memory_store, { size: 64.megabytes }
+
+  # Dotenv trys to autorestore ENV when using stub_const('ENV', { ..etc.. }) but rspec already frozen the object
+  # https://github.com/bkeepers/dotenv/issues/482#issuecomment-1956148520
+  config.dotenv.autorestore = false
 end

@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.configure do |config|
-  config.swagger_root = Rails.root.join('').to_s
-  config.swagger_docs = {
+  config.openapi_root = Rails.root.join('').to_s
+  config.openapi_specs = {
     'public/openapi.yml' => {
       openapi: '3.0.3',
       info: {
@@ -399,5 +399,5 @@ RSpec.configure do |config|
     }
   }
 
-  config.swagger_format = :yaml
+  config.openapi_format = :yaml
 end
