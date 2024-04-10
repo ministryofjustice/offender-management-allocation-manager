@@ -1,18 +1,17 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     <div class="govuk-tabs" data-module="govuk-tabs">
-      <h2 class="govuk-tabs__title">
-        Parole Cases
-      </h2>
+      <h2 class="govuk-tabs__title">Parole Cases</h2>
       <p class="govuk-body">Cases with a target hearing date, PED or TED in the next 10 months or that have had a hearing recently.</p>
-        <% if @parole_cases.empty? %>
-          <h2 class="govuk-heading-l">No cases approaching parole </h2>
-        <% else %>
-          <%= render partial: 'shared/pagination', locals: { data: @parole_cases } %>
-          <br/>
-          <%= render 'shared/caseload_table', header_partial: 'shared/caseload_headers', collection_partial: 'shared/caseload_homd', collection: @parole_cases %>
-          <%= render partial: 'shared/pagination', locals: { data: @parole_cases } %>
-        <% end %>
+
+      <% if @parole_cases.empty? %>
+        <h2 class="govuk-heading-l">No cases approaching parole </h2>
+      <% else %>
+        <%= render partial: 'shared/pagination', locals: { data: @parole_cases } %>
+        <br/>
+        <%= render 'shared/parole_table' %>
+        <%= render partial: 'shared/pagination', locals: { data: @parole_cases } %>
+      <% end %>
     </div>
   </div>
 </div>

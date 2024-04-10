@@ -70,6 +70,10 @@ class MpcOffender
     end
   end
 
+  def allocated_pom_role
+    pom_responsible? ? 'Responsible' : 'Supporting'
+  end
+
   def com_responsible?
     if @offender.responsibility.nil?
       HandoverDateService.handover(self).community_responsible?
