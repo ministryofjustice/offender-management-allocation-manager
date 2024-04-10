@@ -34,8 +34,8 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       described_class.perform_now(offender_no)
     end
 
-    it 'does not publish handover.changed domain event', aggregate_failures: true do
-      expect(event).not_to have_received(:publish)
+    it 'publishes handover.changed domain event', aggregate_failures: true do
+      expect(event).to have_received(:publish)
     end
   end
 
