@@ -46,6 +46,14 @@ RSpec.describe DomainEvents::Handlers::TierChangeHandler do
         expect(case_information.reload.tier).to eq('D')
       end
 
+      context 'when supervision has been suspended' do
+        let(:tier_from_api) { 'D3S' }
+
+        it 'updates tier with first char of new value' do
+          expect(case_information.reload.tier).to eq('D')
+        end
+      end
+
       it 'emits a log info message' do
         expect(Shoryuken::Logging.logger).to have_received(:info).at_least(2).times
       end
