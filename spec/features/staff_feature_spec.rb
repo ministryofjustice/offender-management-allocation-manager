@@ -42,6 +42,8 @@ feature "staff pages" do
     let(:offender) { sneaky_instance_double AllocatedOffender, **offender_attrs }
 
     before do
+      stub_const('USE_PPUD_PAROLE_DATA', true)
+
       stub_signin_spo pom, [prison.code]
       stub_offenders_for_prison(prison.code, offenders_in_prison)
       stub_poms(prison.code, (prison_poms + [pom]))
@@ -82,15 +84,17 @@ feature "staff pages" do
       expect(page).to have_css('h1', text: 'Overview')
     end
 
-    it "has 3 sub-navigation tab links" do
+    it "has 4 sub-navigation tab links" do
       expect(page).to have_css('.moj-sub-navigation a', text: 'Overview')
       expect(page).to have_css('.moj-sub-navigation a', text: 'Caseload')
       expect(page).to have_css('.moj-sub-navigation a', text: 'Handover cases')
+      expect(page).to have_css('.moj-sub-navigation a', text: 'Parole')
     end
 
-    it "has 2 caseload cards" do
+    it "has 3 caseload cards" do
       expect(page).to have_css('.card--caseload p', text: 'total cases')
       expect(page).to have_css('.card--caseload p', text: 'handovers in progress')
+      expect(page).to have_css('.card--caseload p', text: 'parole cases')
     end
 
     describe "Caseload sub-navigation" do
@@ -192,6 +196,16 @@ feature "staff pages" do
         it "has a heading" do
           expect(page).to have_css('h3', text: 'COM allocation overdue')
         end
+      end
+    end
+
+    describe "Parole sub-navigation" do
+      before do
+        click_link 'Parole'
+      end
+
+      it "has a heading" do
+        expect(page).to have_css('.govuk-body', text: 'Cases with a target hearing date, PED or TED in the next 10 months')
       end
     end
   end

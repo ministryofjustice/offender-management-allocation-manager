@@ -63,11 +63,19 @@ class Offender < ApplicationRecord
     filtered_parole_reviews.reject(&:no_hearing_outcome?).max_by(&:sortable_date)
   end
 
+  # @current_parole_review is the most recent parole record and will either be
+  # currently active, or will have had its hearing outcome within the last 14 days
+  #
+  # @previous_parole_reviews are all other parole records, those that are inactive
+  # and/or had hearing outcomes more than 14 days ago.
+  #
+  # There are situations where parole records will be inactive and not have
+  # hearing outcomes.
   def build_parole_review_sections
     @current_parole_review = nil
     @previous_parole_reviews = []
 
-    parole_reviews.sort_by(&:custody_report_due).reverse_each do |record|
+    filtered_parole_reviews.sort_by(&:sortable_date).reverse_each do |record|
       if record.no_hearing_outcome?
         if record.active?
           @current_parole_review = record

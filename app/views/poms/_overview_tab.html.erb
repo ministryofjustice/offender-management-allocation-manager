@@ -5,7 +5,7 @@
       <div class="govuk-grid-column-two-thirds">
         <h2 class="govuk-heading-m">Current workload</h2>
         <div class="govuk-grid-row">
-          <div class="govuk-grid-column-one-half">
+          <div class="govuk-grid-column-one-<%= USE_PPUD_PAROLE_DATA ? 'third' : 'half' %>">
             <div class="card--caseload card-total">
               <%= link_to prison_show_pom_tab_path(@prison.code, @pom.staff_id, :caseload) do %>
                 <span class="card__heading--large"><%= @summary.fetch(:total_cases) %></span>
@@ -13,9 +13,19 @@
               <% end %>
             </div>
           </div>
-          <div class="govuk-grid-column-one-half">
+          <div class="govuk-grid-column-one-<%= USE_PPUD_PAROLE_DATA ? 'third' : 'half' %>">
             <%= render 'caseload_global/in_progress_handovers_card', with_link: true %>
           </div>
+          <% if USE_PPUD_PAROLE_DATA %>
+            <div class="govuk-grid-column-one-third">
+              <div class="card--caseload card-total">
+                <%= link_to prison_show_pom_tab_path(@prison.code, @pom.staff_id, :parole) do %>
+                  <span class="card__heading--large"><%= @allocations.count(&:approaching_parole?) %></span>
+                  <p>parole cases</p>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
         </div>
         <div class="govuk-grid-column-row">
           <h3 class="govuk-heading-m govuk-!-margin-top-8">

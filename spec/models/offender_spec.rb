@@ -182,5 +182,51 @@ RSpec.describe Offender, type: :model do
         expect(offender.most_recent_completed_parole_review).to eq(completed_parole_review)
       end
     end
+
+    describe '#build_parole_record_sections' do
+      let(:completed_parole_review_1) do
+        create(:parole_review, custody_report_due: Time.zone.today - 2.years,
+                               target_hearing_date: Time.zone.today - 2.years,
+                               hearing_outcome: 'Stay in closed [*]',
+                               hearing_outcome_received_on: Time.zone.today - 2.years,
+                               review_status: 'Inactive'
+        )
+      end
+
+      let(:completed_parole_review_2) do
+        create(:parole_review, custody_report_due: Time.zone.today,
+                               target_hearing_date: Time.zone.today,
+                               hearing_outcome: 'Not Applicable',
+                               hearing_outcome_received_on: Time.zone.today,
+                               review_status: 'Active'
+        )
+      end
+
+      let(:offender) { create(:offender, parole_reviews: [completed_parole_review_1, completed_parole_review_2, incomplete_parole_review]) }
+
+      before { offender.build_parole_review_sections }
+
+      context 'with a completed parole record whose outcome was received within the last 14 days' do
+        it 'sets current_parole_record to the most recent completed parole record' do
+          expect(offender.current_parole_review).to eq(completed_parole_review_2)
+        end
+
+        it 'adds any older parole records to the previous_parole_records' do
+          expect(offender.previous_parole_reviews).to match_array([completed_parole_review_1])
+        end
+      end
+
+      context 'with a completed parole record whose outcome was received over 14 days ago' do
+        let(:completed_parole_review_2) { create(:parole_review, custody_report_due: Time.zone.today - 15.days, target_hearing_date: Time.zone.today - 15.days, hearing_outcome: 'Stay in closed [*]', hearing_outcome_received_on: Time.zone.today - 15.days, review_status: 'Inactive') }
+
+        it 'sets the current_parole_record to the incomplete parole record' do
+          expect(offender.current_parole_review).to eq(incomplete_parole_review)
+        end
+
+        it 'adds any older parole records to the previous_parole_records, in descending date order' do
+          expect(offender.previous_parole_reviews).to eq([completed_parole_review_2, completed_parole_review_1])
+        end
+      end
+    end
   end
 end

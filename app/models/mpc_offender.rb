@@ -32,9 +32,7 @@ class MpcOffender
     @offender = offender
     @api_offender = prison_record # @type HmppsApi::Offender
     @case_information = offender.case_information
-    # This will be needed when switch on parole but comment out
-    # until we fix the nil date error in this method
-    # offender.build_parole_review_sections
+    offender.build_parole_review_sections
   end
 
   # @deprecated Deprecated old name - I don't know why probation record is sometimes used but the database table and the
@@ -70,6 +68,10 @@ class MpcOffender
     else
       @offender.responsibility.value == Responsibility::PROBATION
     end
+  end
+
+  def allocated_pom_role
+    pom_responsible? ? 'Responsible' : 'Supporting'
   end
 
   def com_responsible?
