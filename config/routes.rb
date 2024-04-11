@@ -11,6 +11,7 @@ Rails.application.routes.draw do
 
   resources :prisons, only: [] do
     resources :dashboard, only: :index
+    resources :parole_cases, only: :index
     resources :handovers, only: [] do # Yeah I know it effing sucks but legacy code goes brrrrrr
       collection do
         get :upcoming
