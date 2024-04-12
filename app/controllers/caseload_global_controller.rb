@@ -25,9 +25,12 @@ class CaseloadGlobalController < CaseloadController
       total_cases: @pom.allocations.count,
       last_seven_days: @recent_allocations.count,
       release_next_four_weeks: @upcoming_releases.length,
-      pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count,
-      parole_cases_count: @pom.allocations.select(&:approaching_parole?).size
+      pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count
     }
+
+    if USE_PPUD_PAROLE_DATA
+      @summary[:parole_cases_count] = @pom.allocations.select(&:approaching_parole?).size
+    end
   end
 
 private
