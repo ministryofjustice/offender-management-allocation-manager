@@ -35,8 +35,7 @@ class ParoleDataProcessService
       log('No MPC offender matches NOMIS ID', import_row_id: import_row.id, nomis_offender_id: import_row.sanitized_nomis_id)
     else
       begin
-        record = ParoleReview.find_by(review_id: import_row.review_id, nomis_offender_id: import_row.sanitized_nomis_id) ||
-                   ParoleReview.new(review_id: import_row.review_id, nomis_offender_id: import_row.sanitized_nomis_id)
+        record = ParoleReview.find_or_initialize_by(review_id: import_row.review_id, nomis_offender_id: import_row.sanitized_nomis_id)
 
         hearing_outcome_received_on = if record.hearing_outcome_received_on.present?
                                         record.hearing_outcome_received_on
@@ -51,6 +50,7 @@ class ParoleDataProcessService
         record.review_status = import_row.review_status
         record.hearing_outcome_received_on = hearing_outcome_received_on
         record.hearing_outcome = import_row.final_result
+        record.review_type = import_row.review_type
 
         if record.changed?
           record.id.present? ? @results[:parole_reviews_updated_count] += 1 : @results[:parole_reviews_created_count] += 1

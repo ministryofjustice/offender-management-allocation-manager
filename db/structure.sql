@@ -601,7 +601,8 @@ CREATE TABLE public.parole_reviews (
     hearing_outcome character varying,
     hearing_outcome_received_on date,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    review_type character varying
 );
 
 
@@ -1395,6 +1396,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231121154615'),
 ('20240125093937'),
 ('20240219145954'),
-('20240402142606');
+('20240402142606'),
+('20240416124347');
 
 

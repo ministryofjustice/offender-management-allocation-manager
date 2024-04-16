@@ -12,6 +12,7 @@ RSpec.describe ParoleDataProcessService do
   describe 'for the initial import, single_day_snapshot false' do
     before do
       create(:parole_review_import, nomis_id: offender1.nomis_offender_id,
+                                    review_type: 'GPP ISP OnPost Tariff',
                                     review_date: '1/1/22',
                                     review_id: '123456',
                                     review_milestone_date_id: '12345678',
@@ -24,6 +25,7 @@ RSpec.describe ParoleDataProcessService do
                                     single_day_snapshot: false)
 
       create(:parole_review_import, nomis_id: offender1.nomis_offender_id,
+                                    review_type: 'GPP MH Accelerated Review Other',
                                     review_date: '1/1/19',
                                     review_id: '098765',
                                     review_milestone_date_id: '98765432',
@@ -36,6 +38,7 @@ RSpec.describe ParoleDataProcessService do
                                     single_day_snapshot: false)
 
       create(:parole_review_import, nomis_id: offender2.nomis_offender_id,
+                                    review_type: 'GPP SOPC Parole Review',
                                     review_date: '1/1/19',
                                     review_id: '024680',
                                     review_milestone_date_id: '02468024',
@@ -90,6 +93,7 @@ RSpec.describe ParoleDataProcessService do
   describe 'for ongoing initial imports, single_day_snapshot true' do
     before do
       create(:parole_review_import, nomis_id: offender1.nomis_offender_id,
+                                    review_type: 'GPP ISP OnPost Tariff',
                                     review_date: '01-01-2022',
                                     review_id: '123456',
                                     review_milestone_date_id: '12345678',
@@ -101,6 +105,7 @@ RSpec.describe ParoleDataProcessService do
                                     snapshot_date: snapshot_date)
 
       create(:parole_review_import, nomis_id: offender2.nomis_offender_id,
+                                    review_type: 'GPP MH Accelerated Review Other',
                                     review_date: '01-01-2019',
                                     review_id: '098765',
                                     review_milestone_date_id: '98765432',
@@ -112,6 +117,7 @@ RSpec.describe ParoleDataProcessService do
                                     snapshot_date: snapshot_date)
 
       create(:parole_review_import, nomis_id: offender3.nomis_offender_id,
+                                    review_type: 'GPP SOPC Parole Review',
                                     review_date: '01-01-2019',
                                     review_id: '024680',
                                     review_milestone_date_id: '02468024',
@@ -135,16 +141,19 @@ RSpec.describe ParoleDataProcessService do
         expect(parole_review1.current_hearing_outcome).to eq('No hearing outcome yet')
         expect(parole_review1.target_hearing_date).to eq(Date.new(2022, 1, 1))
         expect(parole_review1.custody_report_due).to eq(Date.new(2021, 1, 1))
+        expect(parole_review1.review_type).to eq('GPP ISP OnPost Tariff')
 
         expect(parole_review2.active?).to eq(true)
         expect(parole_review2.previous_hearing_outcome).to eq('No hearing outcome given')
         expect(parole_review2.target_hearing_date).to eq(Date.new(2019, 1, 1))
         expect(parole_review2.custody_report_due).to eq(Date.new(2019, 1, 1))
+        expect(parole_review2.review_type).to eq('GPP MH Accelerated Review Other')
 
         expect(parole_review3.active?).to eq(false)
         expect(parole_review3.previous_hearing_outcome).to eq('No hearing outcome given')
         expect(parole_review3.target_hearing_date).to eq(Date.new(2019, 1, 1))
         expect(parole_review3.custody_report_due).to eq(Date.new(2019, 1, 1))
+        expect(parole_review3.review_type).to eq('GPP SOPC Parole Review')
       end
 
       it 'has expected reported counts' do
@@ -161,6 +170,7 @@ RSpec.describe ParoleDataProcessService do
 
         # Today, some more imports are in. They duplicate yesterday's but the first has changed
         create(:parole_review_import, nomis_id: offender1.nomis_offender_id,
+                                      review_type: 'GPP ISP OnPost Tariff',
                                       review_date: '01-01-2022',
                                       review_id: '123456',
                                       review_milestone_date_id: '12345678',
@@ -173,6 +183,7 @@ RSpec.describe ParoleDataProcessService do
 
         # Duplicate of yesterday
         create(:parole_review_import, nomis_id: offender2.nomis_offender_id,
+                                      review_type: 'GPP MH Accelerated Review Other',
                                       review_date: '01-01-2019',
                                       review_id: '098765',
                                       review_milestone_date_id: '98765432',
@@ -185,6 +196,7 @@ RSpec.describe ParoleDataProcessService do
 
         # Duplicate of yesterday
         create(:parole_review_import, nomis_id: offender3.nomis_offender_id,
+                                      review_type: 'GPP SOPC Parole Review',
                                       review_date: '01-01-2019',
                                       review_id: '024680',
                                       review_milestone_date_id: '02468024',
@@ -231,7 +243,7 @@ RSpec.describe ParoleDataProcessService do
                                     final_result: 'Not Applicable',
                                     snapshot_date: snapshot_date)
 
-      allow(ParoleReview).to receive(:find_by).and_raise(StandardError)
+      allow(ParoleReview).to receive(:find_or_initialize_by).and_raise(StandardError)
       allow(Rails.logger).to receive(:error)
     end
 
