@@ -80,6 +80,8 @@ RSpec.describe TasksController, :allocation, type: :controller do
   end
 
   context 'when showing early allocation decisions required' do
+    before { stub_const('USE_PPUD_PAROLE_DATA', false) }
+
     let(:offender_nos) { %w[G1234AB G1234GG G7514GW G1234VV] }
     let(:test_offender_no) { 'G1234AB' }
 

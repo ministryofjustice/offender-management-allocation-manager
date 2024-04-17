@@ -205,7 +205,7 @@ feature "staff pages" do
       end
 
       it "has a heading" do
-        expect(page).to have_css('.govuk-body', text: 'Cases with a target hearing date, PED or TED in the next 10 months')
+        expect(page).to have_css('p', text: 'All cases in this prison with a target hearing date, PED or TED in the next 10 months')
       end
     end
   end
