@@ -67,10 +67,7 @@ private
     end)).page(page)
 
     @allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations))).page(page)
-
-    if USE_PPUD_PAROLE_DATA
-      @parole_cases = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations.select(&:approaching_parole?)))).page(page)
-    end
+    @parole_cases = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations.select(&:approaching_parole?)))).page(page)
 
     @handover_cases = Handover::CategorisedHandoverCasesForPom.new(@pom)
 
@@ -88,12 +85,9 @@ private
       in_progress_handover_count: @handover_cases.in_progress.count,
       pending_task_count: PomTasks.new.for_offenders(@pom.allocations).count,
       overdue_task_count: @handover_cases.overdue_tasks.count,
-      com_allocation_overdue_count: @handover_cases.com_allocation_overdue.count
+      com_allocation_overdue_count: @handover_cases.com_allocation_overdue.count,
+      parole_cases_count: @parole_cases.size
     }
-
-    if USE_PPUD_PAROLE_DATA
-      @summary[:parole_cases_count] = @parole_cases.size
-    end
   end
 
   def filter_allocations(allocations)

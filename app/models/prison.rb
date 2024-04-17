@@ -44,7 +44,7 @@ class Prison < ApplicationRecord
   def unfiltered_offenders
     # Returns all offenders at the provided prison, and does not
     # filter out under 18s or non-sentenced offenders
-    @unfiltered_offenders || OffenderService.get_offenders_in_prison(self)
+    @unfiltered_offenders ||= OffenderService.get_offenders_in_prison(self)
   end
 
   def all_policy_offenders

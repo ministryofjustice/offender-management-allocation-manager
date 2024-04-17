@@ -151,7 +151,7 @@ class OffenderService
 
     def find_or_create_offenders(nomis_ids)
       offenders = Offender
-        .includes(:early_allocations, :responsibility, case_information: [:local_delivery_unit])
+        .includes(:early_allocations, :responsibility, :parole_reviews, case_information: [:local_delivery_unit])
         .where(nomis_offender_id: nomis_ids)
 
       if offenders.count != nomis_ids.count

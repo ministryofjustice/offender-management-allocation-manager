@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Offender < ApplicationRecord
-  attr_reader :current_parole_review, :previous_parole_reviews
-
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   # NOMIS offender IDs must be of the form <letter><4 numbers><2 letters> (all uppercase)
@@ -50,7 +48,7 @@ class Offender < ApplicationRecord
 
   # Returns the most recent parole record (can be a future parole application), regardless of activity status and outcome.
   def most_recent_parole_review
-    filtered_parole_reviews.max_by(&:sortable_date)
+    @most_recent_parole_review ||= parole_reviews.ordered_by_sortable_date.to_a.last
   end
 
   # Returns the most recent parole application if it has not yet had a hearing.
@@ -60,7 +58,17 @@ class Offender < ApplicationRecord
 
   # Returns the most recent parole record that has an outcome
   def most_recent_completed_parole_review
-    filtered_parole_reviews.reject(&:no_hearing_outcome?).max_by(&:sortable_date)
+    @most_recent_completed_parole_review ||= parole_reviews.ordered_by_sortable_date.with_hearing_outcome.to_a.last
+  end
+
+  def current_parole_review
+    build_parole_review_sections unless @parole_review_sections_built
+    @current_parole_review
+  end
+
+  def previous_parole_reviews
+    build_parole_review_sections unless @parole_review_sections_built
+    @previous_parole_reviews
   end
 
   # @current_parole_review is the most recent parole record and will either be
@@ -72,10 +80,11 @@ class Offender < ApplicationRecord
   # There are situations where parole records will be inactive and not have
   # hearing outcomes.
   def build_parole_review_sections
+    @parole_review_sections_built = true
     @current_parole_review = nil
     @previous_parole_reviews = []
 
-    filtered_parole_reviews.sort_by(&:sortable_date).reverse_each do |record|
+    parole_reviews.ordered_by_sortable_date.reverse_each do |record|
       if record.no_hearing_outcome?
         if record.active?
           @current_parole_review = record
@@ -103,12 +112,5 @@ class Offender < ApplicationRecord
     else
       'standard'
     end
-  end
-
-private
-
-  # If neither the THD or custody_report_due date are defined, we have no method of determining when the parole hearing was, which is vital for MPC.
-  def filtered_parole_reviews
-    parole_reviews.reject { |pr| pr.sortable_date.blank? }
   end
 end
