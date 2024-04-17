@@ -44,20 +44,28 @@
         <% @offenders.each_with_index do |offender, i| %>
           <tr class="govuk-table__row offender_row_<%= i %>">
             <td aria-label="Prisoner name" class="govuk-table__cell ">
-              <a href="<%= prison_prisoner_path(@prison.code, offender.offender_no) %>"><%= offender.full_name %></a>
+              <%= link_to offender.full_name, prison_prisoner_allocation_path(@prison.code, offender.offender_no) %>
               <br/>
               <span class='govuk-hint govuk-!-margin-bottom-0'>
                 <%= offender.offender_no %>
               </span>
             </td>
             <td aria-label="POM" class="govuk-table__cell">
-              <%= offender.allocated_pom_name || "Not allocated" %>
+              <% if offender.allocated_pom_name %>
+                <%= link_to offender.allocated_pom_name, prison_pom_path(@prison.code, nomis_staff_id: offender.allocated_pom_nomis_id) %>
+              <% else %>
+                'Not allocated'
+              <% end %>
             </td>
             <td aria-label="POM Role" class="govuk-table__cell">
               <%= offender.allocated_pom_role %>
             </td>
             <td aria-label="Next parole date" class="govuk-table__cell">
-              <%= offender.next_parole_date %>
+              <span class='govuk-!-margin-bottom-0'>
+                <%= offender.next_parole_date_type %>:
+              </span>
+              <br/>
+              <%= format_date(offender.next_parole_date) %>
             </td>
           </tr>
         <% end %>
