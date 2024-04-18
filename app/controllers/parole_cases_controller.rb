@@ -6,13 +6,26 @@ class ParoleCasesController < PrisonsApplicationController
   before_action :ensure_spo_user
 
   def index
-    offender_list = @prison.offenders.select(&:approaching_parole?)
-    allocations = @prison.allocations.where(nomis_offender_id: offender_list.map(&:offender_no))
-    offenders_with_allocs = offender_list.map do |o|
-      OffenderWithAllocationPresenter.new(o, allocations.detect { |a| a.nomis_offender_id == o.offender_no })
-    end
-    offenders = sort_collection offenders_with_allocs, default_sort: :last_name
+    sorted_offenders_with_allocs = sort_collection offenders_with_allocs, default_sort: :last_name
+    @offenders = Kaminari.paginate_array(sorted_offenders_with_allocs).page(page)
+  end
 
-    @offenders = Kaminari.paginate_array(offenders).page(page)
+private
+
+  def offenders_with_allocs
+    parole_offenders.map do |offender|
+      OffenderWithAllocationPresenter.new(
+        offender,
+        parole_allocations.detect { |alloc| alloc.nomis_offender_id == offender.offender_no }
+      )
+    end
+  end
+
+  def parole_offenders
+    @prison.offenders.select(&:approaching_parole?)
+  end
+
+  def parole_allocations
+    @prison.allocations.where(nomis_offender_id: parole_offenders.map(&:offender_no))
   end
 end
