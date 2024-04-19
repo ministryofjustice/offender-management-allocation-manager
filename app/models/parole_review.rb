@@ -36,6 +36,10 @@ class ParoleReview < ApplicationRecord
     ACTIVE_REVIEW_STATUS.include? review_status
   end
 
+  def not_for_release?
+    hearing_outcome != 'Release [*]'
+  end
+
 private
 
   # While the parsing is gnarly, there is a wide set of criteria that needs to be met for the hearing outcome to be displayed.

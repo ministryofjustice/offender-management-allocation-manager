@@ -1,6 +1,57 @@
 # frozen_string_literal: true
 
 describe HandoverDateService do
+  context 'with a tariff date in the past' do
+    subject { described_class.handover(offender) }
+
+    let(:tariff_date) { Date.parse('1/1/2020') }
+    let(:prison) { build(:prison, code: 'LEI') }
+    let(:parole_review) { build(:parole_review, target_hearing_date:, hearing_outcome_received_on: Time.zone.today) }
+    let(:db_offender) { create(:offender, parole_reviews: [parole_review], case_information: build(:case_information)) }
+    let(:offender) { build(:mpc_offender, prison:, offender: db_offender, prison_record: api_offender) }
+    let(:sentence) { attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_date, sentenceStartDate: '1/1/2018') }
+    let(:api_offender) { build(:hmpps_api_offender, prisonId: prison.code, category: build(:offender_category, :cat_c), sentence:) }
+
+    before { stub_const('USE_PPUD_PAROLE_DATA', true) }
+
+    context 'with a target hearing date within a year of the hearing outcome' do
+      let(:target_hearing_date) { Time.zone.today + 6.months }
+
+      it 'COM is responsible' do
+        expect(subject).to be_community_responsible
+      end
+    end
+
+    context 'with a target hearing date over a year away from the hearing outcome' do
+      context 'with a target hearing date more than 12 months in the future' do
+        let(:target_hearing_date) { Time.zone.today + 2.years }
+
+        it 'POM is responsibe' do
+          expect(subject).to be_custody_responsible
+        end
+      end
+
+      context 'with a target hearing date less than 12 months in the future' do
+        let(:target_hearing_date) { Time.zone.today + 6.months }
+        let(:parole_review) { build(:parole_review, target_hearing_date:, hearing_outcome_received_on: Time.zone.today - 18.months) }
+
+        it 'COM is responsible' do
+          expect(subject).to be_community_responsible
+        end
+      end
+    end
+
+    context 'with a hearing outcome of "Release [*]"' do
+      let(:target_hearing_date) { Time.zone.today + 2.years }
+      let(:parole_review) { build(:parole_review, target_hearing_date:, hearing_outcome_received_on: Time.zone.today - 1.week, hearing_outcome: 'Release [*]') }
+
+      it 'follows non-parole allocation rules' do
+        expect_any_instance_of(MpcOffender).to receive(:recalled?)
+        described_class.handover(offender)
+      end
+    end
+  end
+
   context 'when April 2023 calculations' do
     let(:mpc_offender) do
       instance_double MpcOffender, :mpc_offender,
@@ -19,7 +70,10 @@ describe HandoverDateService do
                       open_prison_rules_apply?: double(:open_prison_rules_apply?),
                       in_womens_prison?: double(:in_womens_prison?),
                       determinate_parole?: double(:determinate_parole?),
-                      earliest_release: earliest_release
+                      earliest_release: earliest_release,
+                      target_hearing_date_is_within_12_months_of_hearing_outcome?: nil,
+                      target_hearing_date_at_least_12_months_away_from_now?: nil,
+                      indeterminate_sentence_and_eligible_for_parole_but_unsuccessful?: nil
     end
     let(:handover_date) { double :handover_date }
     let(:handover_start_date) { double :handover_start_date }

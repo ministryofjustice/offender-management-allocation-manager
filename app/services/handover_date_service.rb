@@ -29,7 +29,21 @@ class HandoverDateService
 
     offender = OffenderWrapper.new(mpc_offender)
 
-    if offender.recalled?
+    if offender.indeterminate_sentence_and_eligible_for_parole_but_unsuccessful?
+      if offender.target_hearing_date_is_within_12_months_of_hearing_outcome?
+        CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                                   start_date: nil, handover_date: nil,
+                                   reason: :thd_within_12_months_of_hearing_outcome
+      elsif offender.target_hearing_date_at_least_12_months_away_from_now?
+        CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                                   start_date: nil, handover_date: nil,
+                                   reason: :thd_within_12_months_of_now
+      else
+        CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+                                   start_date: nil, handover_date: nil,
+                                   reason: :thd_more_than_12_months_from_hearing_outcome
+      end
+    elsif offender.recalled?
       CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
                                  start_date: nil, handover_date: nil,
                                  reason: :recall_case
@@ -91,7 +105,9 @@ private
              :tariff_date, :target_hearing_date,
              :home_detention_curfew_eligibility_date, :home_detention_curfew_actual_date,
              :sentence_start_date, :offender_no,
-             :determinate_parole?,
+             :determinate_parole?, :indeterminate_sentence_and_eligible_for_parole_but_unsuccessful?,
+             :target_hearing_date_is_within_12_months_of_hearing_outcome?,
+             :target_hearing_date_at_least_12_months_away_from_now?,
              to: :@offender
 
     def initialize(offender)

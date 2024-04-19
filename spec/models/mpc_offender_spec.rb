@@ -596,5 +596,97 @@ RSpec.describe MpcOffender, type: :model do
         end
       end
     end
+
+    describe '#indeterminate_sentence_and_eligible_for_parole_but_unsuccessful?' do
+      subject { described_class.new(prison: 'LEI', offender: db_offender, prison_record: api_offender) }
+
+      let(:tariff_date) { 2.days.ago }
+      let(:sentence_type) { :indeterminate }
+      let(:parole_review_outcome) { 'NotRelease' }
+      let(:parole_review) { build(:parole_review, target_hearing_date: 1.day.from_now, hearing_outcome_received_on: Time.zone.today, hearing_outcome: parole_review_outcome) }
+      let(:db_offender) { create(:offender, case_information: build(:case_information), parole_reviews: [parole_review]) }
+      let(:sentence_detail) { attributes_for(:sentence_detail, sentence_type, tariffDate: tariff_date, sentenceStartDate: '1/1/2018') }
+      let(:api_offender) { build(:hmpps_api_offender, prisonerNumber: db_offender.nomis_offender_id, prisonId: 'LEI', category: build(:offender_category, :cat_c), sentence: sentence_detail) }
+
+      before { stub_const('USE_PPUD_PAROLE_DATA', true) }
+
+      context 'when all conditions are satisfied' do
+        it 'returns true' do
+          expect(subject).to be_indeterminate_sentence_and_eligible_for_parole_but_unsuccessful
+        end
+      end
+
+      context 'when USE_PPUD_PAROLE_DATA is not enabled' do
+        before { stub_const('USE_PPUD_PAROLE_DATA', false) }
+
+        it 'returns false' do
+          expect(subject).not_to be_indeterminate_sentence_and_eligible_for_parole_but_unsuccessful
+        end
+      end
+
+      context 'when sentence is not indeterminate' do
+        let(:sentence_type) { :determinate }
+
+        it 'returns false' do
+          expect(subject).not_to be_indeterminate_sentence_and_eligible_for_parole_but_unsuccessful
+        end
+      end
+
+      context 'when tariff_date is not in the past' do
+        let(:tariff_date) { 1.day.from_now }
+
+        it 'returns false' do
+          expect(subject).not_to be_indeterminate_sentence_and_eligible_for_parole_but_unsuccessful
+        end
+      end
+
+      context 'when most recent parole review is for release' do
+        let(:parole_review_outcome) { 'Release [*]' }
+
+        it 'returns false' do
+          expect(subject).not_to be_indeterminate_sentence_and_eligible_for_parole_but_unsuccessful
+        end
+      end
+    end
+
+    describe '#target_hearing_date_is_within_12_months_of_hearing_outcome?' do
+      context 'when target_hearing_date is nil' do
+        before { allow(subject).to receive(:target_hearing_date).and_return(nil) }
+
+        it 'returns false' do
+          expect(subject).not_to be_target_hearing_date_is_within_12_months_of_hearing_outcome
+        end
+      end
+
+      context 'when hearing_outcome_received_on is nil' do
+        before { allow(subject).to receive(:hearing_outcome_received_on).and_return(nil) }
+
+        it 'returns false' do
+          expect(subject).not_to be_target_hearing_date_is_within_12_months_of_hearing_outcome
+        end
+      end
+
+      context 'when target_hearing_date is more than 12 months away from hearing_outcome' do
+        before do
+          allow(subject).to receive(:target_hearing_date).and_return(Date.parse("01/01/2025"))
+          allow(subject).to receive(:hearing_outcome_received_on).and_return(Date.parse("01/12/2023"))
+        end
+
+        it 'returns false' do
+          expect(subject).not_to be_target_hearing_date_is_within_12_months_of_hearing_outcome
+        end
+      end
+
+      context 'when target_hearing_date is within 12 months from hearing_outcome' do
+        before do
+          allow(subject).to receive(:target_hearing_date).and_return(Date.parse("01/01/2025"))
+          allow(subject).to receive(:hearing_outcome_received_on).and_return(Date.parse("01/05/2024"))
+        end
+
+        it 'returns true' do
+          expect(subject).to be_target_hearing_date_is_within_12_months_of_hearing_outcome
+        end
+      end
+    end
   end
 end

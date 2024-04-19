@@ -191,6 +191,21 @@ class MpcOffender
     most_recent_completed_parole_review&.hearing_outcome_received_on
   end
 
+  def indeterminate_sentence_and_eligible_for_parole_but_unsuccessful?
+    USE_PPUD_PAROLE_DATA &&
+    indeterminate_sentence? &&
+    tariff_date&.past? &&
+    most_recent_parole_review&.not_for_release?
+  end
+
+  def target_hearing_date_is_within_12_months_of_hearing_outcome?
+    target_hearing_date && hearing_outcome_received_on && target_hearing_date < hearing_outcome_received_on + 12.months
+  end
+
+  def target_hearing_date_at_least_12_months_away_from_now?
+    target_hearing_date && Time.zone.now > target_hearing_date - 12.months
+  end
+
   # If the parole application is set for a hearing within 10 months, or the outcome for a hearing was received in the last 14 days,
   # return true. If the hearing has an outcome but we do not have the date that it was received, assume that it is no longer
   # approaching parole (return false).
