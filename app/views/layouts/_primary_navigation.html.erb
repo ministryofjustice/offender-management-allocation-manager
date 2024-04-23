@@ -19,6 +19,9 @@
           <% end %>
 
           <% if @is_spo %>
+            <% if USE_PPUD_PAROLE_DATA %>
+              <%= render 'layouts/controller_nav_link', text: 'Parole', path: prison_parole_cases_path(@prison.code), controllers: {} %>
+            <% end %>
             <%= render 'layouts/controller_nav_link', text: 'Handover', path: upcoming_prison_handovers_path(@prison.code), controllers: { handovers: [] } %>
             <%= render 'layouts/controller_nav_link', text: 'Staff', path: prison_poms_path(@prison.code), controllers: { poms: [] } %>
           <% else %>

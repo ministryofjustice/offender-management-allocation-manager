@@ -5,6 +5,8 @@ feature 'Navigation' do
   let(:link_css) { '.moj-primary-navigation__link' }
   let(:nav_links) { all(link_css) }
 
+  before { stub_const('USE_PPUD_PAROLE_DATA', true) }
+
   # This is a legitimate VCR test - we really don't care how/if the various
   # APIs are called in this test
   describe 'navigation menus', vcr: { cassette_name: 'prison_api/navigation_menus' } do
@@ -15,7 +17,7 @@ feature 'Navigation' do
       end
 
       it 'has an SPO menu' do
-        expect(nav_links.map(&:text)).to eq([I18n.t('service_name'), "Allocations", "Handover", "Staff"])
+        expect(nav_links.map(&:text)).to eq([I18n.t('service_name'), "Allocations", "Parole", "Handover", "Staff"])
       end
 
       it 'has a help tile' do
@@ -45,7 +47,7 @@ feature 'Navigation' do
       end
 
       it 'has a POM/SPO menu' do
-        expect(nav_links.map(&:text)).to eq([I18n.t('service_name'), "Allocations", "Caseload", "Handover", "Staff"])
+        expect(nav_links.map(&:text)).to eq([I18n.t('service_name'), "Allocations", "Caseload", "Parole", "Handover", "Staff"])
       end
 
       it 'highlights the current page via the nav links' do
@@ -69,7 +71,7 @@ feature 'Navigation' do
     let(:offender_name) { 'Abdoria, Ongmetain' }
 
     describe 'staff section' do
-      let(:index) { 4 }
+      let(:index) { 5 }
 
       it 'highlights the section' do
         all(link_css)[index].click
