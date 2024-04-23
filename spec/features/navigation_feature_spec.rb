@@ -23,6 +23,10 @@ feature 'Navigation' do
       it 'has a help tile' do
         expect(page).to have_css('h1.card__heading a', text: 'Get help with this service')
       end
+
+      it 'has a parole tile' do
+        expect(page).to have_css('h1.card__heading a', text: 'Parole cases')
+      end
     end
 
     context 'with a POM user' do
@@ -37,6 +41,10 @@ feature 'Navigation' do
 
       it 'has a help tile' do
         expect(page).to have_css('h1.card__heading a', text: 'Get help with this service')
+      end
+
+      it 'has a parole tile' do
+        expect(page).to have_css('h1.card__heading a', text: 'Parole cases')
       end
     end
 
