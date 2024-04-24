@@ -55,11 +55,11 @@ class SsoIdentity
   end
 
   def session_expired?
-    Time.current > Time.zone.at(@sso_identity.fetch(:expiry))
+    Time.current > Time.zone.at(@sso_identity&.fetch(:expiry))
   end
 
   def token
-    @sso_identity.fetch(:token)
+    @sso_identity&.fetch(:token, nil)
   end
 
 private
