@@ -30,7 +30,8 @@ config.health_checks = Health.new(timeout_in_seconds_per_check: 2, num_retries_p
     get_response: -> { HmppsApi::Client.new(config.manage_pom_cases_and_delius_host).get('/health/ping') })
   .add_check(
     name: 'hmppsAuth',
-    get_response: -> { HmppsApi::Client.new(config.nomis_oauth_host).get('/auth/health') })
+    get_response: -> { HmppsApi::Client.new(config.nomis_oauth_host).raw_get('/auth/ping') },
+    check_response: ->(response) { response == 'pong' })
   .add_check(
     name: 'tieringApi',
     get_response: -> { HmppsApi::Client.new(config.tiering_api_host).get('/health/ping') })
