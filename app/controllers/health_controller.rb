@@ -13,6 +13,10 @@ class HealthController < ApplicationController
     }
   end
 
+  def ping
+    render plain: 'pong'
+  end
+
 private
 
   def uptime_timer = Rails.configuration.uptime_timer

@@ -24,4 +24,11 @@ describe "Health endpoinds" do
       }.deep_stringify_keys)
     end
   end
+
+  describe "GET /health/ping" do
+    it 'returns pong' do
+      get "/health/ping"
+      expect(response.body).to eq('pong')
+    end
+  end
 end

@@ -161,6 +161,7 @@ Rails.application.routes.draw do
   get '/help/case_responsibility', to: 'help#case_responsibility'
 
   resources :health, only: %i[index], controller: 'health'
+  get '/health/ping', to: 'health#ping'
   resources :status, only: %i[index], controller: 'status'
   resources :info, only: %i[index], controller: 'info'
 
