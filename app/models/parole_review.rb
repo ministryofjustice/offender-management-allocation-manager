@@ -15,7 +15,7 @@ class ParoleReview < ApplicationRecord
     .order(Arel.sql('COALESCE(target_hearing_date, custody_report_due)'))
   }
 
-  scope :with_hearing_outcome, -> { where.not(hearing_outcome: ['Not Applicable', 'Not Specified']) }
+  scope :with_hearing_outcome, -> { where.not(hearing_outcome: ['Not Applicable', 'Not Specified', nil]).or(where.not(hearing_outcome_received_on: nil)) }
 
   validate :hearing_outcome_received_on_must_be_in_past, on: :manual_update
 
@@ -42,7 +42,11 @@ class ParoleReview < ApplicationRecord
   # outcome having been received. There should always be a value in the hearing_outcome field, and not having a nil check allows
   # this method to be used to determine the date that the hearing outcome was given.
   def no_hearing_outcome?
-    hearing_outcome == 'Not Applicable' || hearing_outcome == 'Not Specified'
+    hearing_outcome.in?(['Not Applicable', 'Not Specified'])
+  end
+
+  def outcome_is_release?
+    hearing_outcome == 'Release [*]'
   end
 
   def active?

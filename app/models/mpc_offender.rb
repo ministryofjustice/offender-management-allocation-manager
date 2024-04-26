@@ -11,7 +11,7 @@ class MpcOffender
            :date_of_birth, :main_offence, :awaiting_allocation_for, :location,
            :category_label, :complexity_level, :category_code, :category_active_since,
            :first_name, :last_name, :full_name_ordered, :full_name,
-           :inside_omic_policy?, :offender_no, :prison_id, :restricted_patient?, :age, to: :@api_offender
+           :inside_omic_policy?, :offender_no, :prison_id, :restricted_patient?, :age, :booking_id, to: :@api_offender
 
   delegate :crn, :manual_entry?, :tier, :mappa_level, :welsh_offender,
            to: :@case_information
@@ -174,6 +174,10 @@ class MpcOffender
     end
   end
 
+  def ppud_or_manually_entered_target_hearing_date
+    most_recent_parole_review&.target_hearing_date || @offender.parole_record&.target_hearing_date
+  end
+
   # Returns the target hearing date for the offender's next active parole application, or nil if there isn't one.
   # Used to exclude THDs of previous (completed/inactive) parole applications.
   def next_thd
@@ -235,6 +239,12 @@ class MpcOffender
 
   def due_for_release?
     most_recent_parole_review&.current_record_hearing_outcome == 'Release'
+  end
+
+  def sentenced_to_an_additional_isp?
+    @sentenced_to_an_additional_isp ||= OffenderService.get_offender_sentences_and_offences(booking_id)
+      .select(&:indeterminate?)
+      .count > 1
   end
 
   def pom_tasks

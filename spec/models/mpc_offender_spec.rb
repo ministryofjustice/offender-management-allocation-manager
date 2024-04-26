@@ -18,6 +18,7 @@ RSpec.describe MpcOffender, type: :model do
 
   let(:api_offender) do
     double(:nomis_offender,
+           booking_id: 12_345_678,
            offender_no: nomis_offender_id,
            release_date: Time.zone.today + 10.years,
            sentence_start_date: Time.zone.today - 5.years,
@@ -594,6 +595,26 @@ RSpec.describe MpcOffender, type: :model do
         it 'returns the hearing outcome received date of the most recent completed parole record' do
           expect(subject.last_hearing_outcome_received_on).to eq(completed_parole_review.hearing_outcome_received_on)
         end
+      end
+    end
+  end
+
+  describe '#sentenced_to_an_additional_isp?' do
+    before { allow(OffenderService).to receive(:get_offender_sentences_and_offences).with(12_345_678).and_return(offender_sentence_terms) }
+
+    context "when the offender has multiple indeterminate sentence terms" do
+      let(:offender_sentence_terms) { [double(indeterminate?: true), double(indeterminate?: true)] }
+
+      it 'is true' do
+        expect(subject).to be_sentenced_to_an_additional_isp
+      end
+    end
+
+    context "when the offender does not have multiple indeterminate sentence terms" do
+      let(:offender_sentence_terms) { [double(indeterminate?: true)] }
+
+      it 'is false' do
+        expect(subject).not_to be_sentenced_to_an_additional_isp
       end
     end
   end

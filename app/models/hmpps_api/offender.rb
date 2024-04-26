@@ -26,7 +26,7 @@ module HmppsApi
     attr_accessor :prison_arrival_date
 
     attr_reader :first_name, :last_name, :prison_id, :offender_no, :location, :complexity_level,
-                :date_of_birth, :sentence, :main_offence
+                :date_of_birth, :sentence, :main_offence, :booking_id
 
     def initialize(offender:, category:, latest_temp_movement:, complexity_level:)
       restricted_patient = offender['restrictedPatient'] == true
