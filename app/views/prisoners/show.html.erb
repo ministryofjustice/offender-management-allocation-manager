@@ -5,9 +5,9 @@
 <% end %>
 
 <% @tasks.each do |task| %>
-  <%= render partial: 'shared/info_banner', locals: {
-    content: task.long_label.html_safe }
-  %>
+  <% task_presenter = PomTaskPresenter.new(task) %>
+  <% content = task_presenter.long_label_link.present? ? link_to(task_presenter.long_label, task_presenter.long_label_link) : task_presenter.long_label %>
+  <%= render partial: 'shared/info_banner', locals: { content: content } %>
 <% end %>
 
 <% if @prisoner.needs_early_allocation_notify? %>

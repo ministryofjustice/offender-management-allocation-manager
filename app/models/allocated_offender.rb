@@ -17,7 +17,7 @@ class AllocatedOffender
            :conditional_release_date, :automatic_release_date,
            :earliest_release_for_handover, :handover_type,
            :early_allocation?, :licence_expiry_date, :approaching_parole?, :allocated_pom_role, :next_parole_date, :next_parole_date_type,
-           to: :@offender
+           :pom_tasks, to: :@offender
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison, :primary_pom_nomis_id,
            to: :@allocation
 
