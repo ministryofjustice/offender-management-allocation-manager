@@ -67,7 +67,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
       pomtasks = assigns(:pomtasks)
 
       expect(pomtasks.map do |pt|
-        task_presenter = PomTaskPresenter.new(pt)
+        task_presenter = PomTaskPresenter.for(pt)
         { num: task_presenter.offender_number, label: task_presenter.action_label }
       end).to eq([{ num: test_offender_no, label: 'Early allocation decision' }])
     end
@@ -100,7 +100,7 @@ RSpec.describe TasksController, :allocation, type: :controller do
       pomtasks = assigns(:pomtasks)
 
       expect(pomtasks.map do |pt|
-        task_presenter = PomTaskPresenter.new(pt)
+        task_presenter = PomTaskPresenter.for(pt)
         { num: task_presenter.offender_number, label: task_presenter.action_label }
       end).to eq([{ num: test_offender_no, label: 'Date parole hearing outcome confirmed' }])
     end
