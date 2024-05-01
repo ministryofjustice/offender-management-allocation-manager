@@ -83,7 +83,7 @@ private
       last_allocated_date: @allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date,
       pending_handover_count: @handover_cases.upcoming.count,
       in_progress_handover_count: @handover_cases.in_progress.count,
-      pending_task_count: @pom.allocations.map(&:pom_tasks).flatten.count,
+      pending_task_count: @pom.pom_tasks.count,
       overdue_task_count: @handover_cases.overdue_tasks.count,
       com_allocation_overdue_count: @handover_cases.com_allocation_overdue.count,
       parole_cases_count: @parole_cases.size

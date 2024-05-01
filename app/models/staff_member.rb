@@ -51,6 +51,10 @@ class StaffMember
     end
   end
 
+  def pom_tasks
+    allocations.map(&:pom_tasks).flatten
+  end
+
   def allocations
     @allocations ||= begin
       alloc_hash = @prison.allocations_for_pom(@staff_id).index_by(&:nomis_offender_id)
