@@ -485,11 +485,11 @@ private
     if most_recent_parole_review.present? &&
        !most_recent_parole_review.no_hearing_outcome? &&
        most_recent_parole_review.hearing_outcome_received_on.blank?
-      tasks << PomTask.new(full_name, first_name, prison_id, offender_no, :parole_outcome_date, most_recent_parole_review.review_id)
+      tasks << PomTask.new(self, :parole_outcome_date, most_recent_parole_review.review_id)
     end
 
     if early_allocations.present?
-      tasks << PomTask.new(full_name, first_name, prison_id, offender_no, :early_allocation_decision)
+      tasks << PomTask.new(self, :early_allocation_decision)
     end
 
     tasks
