@@ -17,29 +17,17 @@ class ParoleReview < ApplicationRecord
 
   scope :with_hearing_outcome, -> { where.not(hearing_outcome: ['Not Applicable', 'Not Specified']) }
 
+  validate :hearing_outcome_received_on_must_be_in_past, on: :manual_update
+
   # Used when POM manually enters this date
-  def validate_hearing_outcome_date(params)
-    if params.values.all?(&:blank?)
-      errors.add('hearing_outcome_received', 'Enter the date the hearing outcome was confirmed')
-    elsif params.values.any?(&:blank?)
-      errors.add('hearing_outcome_received', 'Enter the full date the hearing outcome was confirmed')
+  def hearing_outcome_received_on_must_be_in_past
+    if hearing_outcome_received_on.blank?
+      errors.add('hearing_outcome_received_on',
+                 'The date the hearing outcome was confirmed must be entered and a valid date')
+    elsif hearing_outcome_received_on.future?
+      errors.add('hearing_outcome_received_on',
+                 'The date the hearing outcome was confirmed must be in the past')
     end
-
-    return unless errors.empty?
-
-    begin
-      date = Date.new(params['hearing_outcome_received(1i)'].to_i, params['hearing_outcome_received(2i)'].to_i, params['hearing_outcome_received(3i)'].to_i)
-    rescue StandardError
-      errors.add('hearing_outcome_received', 'The date the hearing outcome was confirmed must be a real date')
-    end
-
-    return unless date
-
-    if date.future?
-      errors.add('hearing_outcome_received', 'The date the hearing outcome was confirmed must be in the past')
-    end
-
-    date
   end
 
   def current_hearing_outcome

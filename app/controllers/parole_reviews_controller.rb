@@ -9,8 +9,9 @@ class ParoleReviewsController < PrisonsApplicationController
 
   def update
     @parole_review = ParoleReview.find_by(review_id: params[:id])
-    hearing_outcome_received_date = @parole_review.validate_hearing_outcome_date(params['parole_review'])
-    if @parole_review.errors.empty? && @parole_review.update(hearing_outcome_received_on: hearing_outcome_received_date)
+    @parole_review.update(parole_review_params)
+
+    if @parole_review.valid?(:manual_update)
       RecalculateHandoverDateJob.perform_now(@offender.offender_no)
       redirect_to prison_prisoner_path(prison: @prison, id: @offender.offender_no)
     else
@@ -22,5 +23,9 @@ private
 
   def load_offender
     @offender = OffenderService.get_offender(params[:prisoner_id])
+  end
+
+  def parole_review_params
+    params.require(:parole_review).permit(:hearing_outcome_received_on)
   end
 end

@@ -49,7 +49,7 @@ RSpec.describe 'Parole set hearing outcome date', type: :feature do
 
     click_button('Save')
 
-    expect(page).to have_content('Enter the full date')
+    expect(page).to have_content('and a valid date')
   end
 
   it 'displays on prisoner once filled' do

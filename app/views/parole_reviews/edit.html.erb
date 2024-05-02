@@ -9,7 +9,7 @@
     <%= form.govuk_error_summary %>
     <h1 class="govuk-heading-l govuk-!-margin-top-4"></h1>
     <div class="govuk-form-group">
-      <%= form.govuk_date_field :hearing_outcome_received,
+      <%= form.govuk_date_field :hearing_outcome_received_on,
                                 maxlength_enabled: true,
                                 legend: { text: "Enter the date that the outcome of #{@offender.first_name.capitalize}#{@offender.first_name.downcase[-1] == 's' ? '\'' : '\'s'} parole hearing was confirmed", tag: 'h1', size: 'l' },
                                 hint: -> do %>
