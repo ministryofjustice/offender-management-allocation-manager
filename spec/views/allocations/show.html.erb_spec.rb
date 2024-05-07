@@ -18,6 +18,11 @@ RSpec.describe "allocations/show", type: :view do
                     handover_start_date: nil,
                     handover_date: nil,
                     handover_type: 'missing',
+                    tariff_date: nil,
+                    parole_eligibility_date: nil,
+                    target_hearing_date: nil,
+                    current_parole_review: build(:parole_review, :approaching_parole),
+                    previous_parole_reviews: [build(:parole_review)]
                    ).as_null_object
   end
 
@@ -55,6 +60,22 @@ RSpec.describe "allocations/show", type: :view do
       )
       render
       expect(page).to have_css ".responsibility_change a[href='#{confirm_removal_prison_responsibility_path(prison.code, nomis_offender_id: offender.offender_no)}']"
+    end
+  end
+
+  describe 'Parole section' do
+    before do
+      stub_const('USE_PPUD_PAROLE_DATA', true)
+      stub_template 'shared/_vlo_information.html.erb' => ''
+      render
+    end
+
+    it 'shows Parole section' do
+      expect(page).to have_css('.govuk-table__header', text: 'Parole')
+    end
+
+    it 'shows Previous Parole section' do
+      expect(page).to have_css('.govuk-table__header', text: 'Previous parole applications')
     end
   end
 
