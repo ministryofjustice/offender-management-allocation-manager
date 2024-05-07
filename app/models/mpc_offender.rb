@@ -479,12 +479,14 @@ private
 
   def build_pom_tasks
     tasks = []
+
     # We don't want the task to be created if there's no parole review, if the
     # most recent parole review is yet to have a hearing outcome, or if there is
     # already a date that the hearing outcome was received.
-    if most_recent_parole_review.present? &&
-       !most_recent_parole_review.no_hearing_outcome? &&
-       most_recent_parole_review.hearing_outcome_received_on.blank?
+    if USE_PPUD_PAROLE_DATA &&
+      most_recent_parole_review.present? &&
+      !most_recent_parole_review.no_hearing_outcome? &&
+      most_recent_parole_review.hearing_outcome_received_on.blank?
       tasks << PomTask.new(self, :parole_outcome_date, most_recent_parole_review.review_id)
     end
 
