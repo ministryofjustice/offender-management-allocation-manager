@@ -17,6 +17,19 @@ class ParoleReview < ApplicationRecord
 
   scope :with_hearing_outcome, -> { where.not(hearing_outcome: ['Not Applicable', 'Not Specified']) }
 
+  validate :hearing_outcome_received_on_must_be_in_past, on: :manual_update
+
+  # Used when POM manually enters this date
+  def hearing_outcome_received_on_must_be_in_past
+    if hearing_outcome_received_on.blank?
+      errors.add('hearing_outcome_received_on',
+                 'The date the hearing outcome was confirmed must be entered and a valid date')
+    elsif hearing_outcome_received_on.future?
+      errors.add('hearing_outcome_received_on',
+                 'The date the hearing outcome was confirmed must be in the past')
+    end
+  end
+
   def current_hearing_outcome
     no_hearing_outcome? ? 'No hearing outcome yet' : format_hearing_outcome
   end

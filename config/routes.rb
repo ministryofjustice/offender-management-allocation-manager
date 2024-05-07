@@ -88,6 +88,12 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :parole_reviews, only: [:edit, :update] do
+        member do
+          get '/enter_parole_hearing_outcome_confirmed', to: 'parole_reviews#edit'
+        end
+      end
+
       resources :staff, only: %i[index], controller: 'allocation_staff' do
         resources :build_allocations, only: %i[new show update], controller: 'build_allocations'
       end

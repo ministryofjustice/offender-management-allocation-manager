@@ -12,19 +12,20 @@ RSpec.describe TasksController, :allocation, type: :controller do
     ]
   end
 
-  let(:next_week) { Time.zone.today + 7.days }
-  let(:tariff_end_date) { Time.zone.today - 3.days }
+  let(:next_week) { today + 7.days }
+  let(:today) { Time.zone.today }
+
+  let(:tariff_end_date) { today - 3.days }
   let(:offenders) do
-    [build(:nomis_offender, prisonerNumber: 'G7514GW', firstName: "Alice", lastName: "Aliceson",
-                            sentence: attributes_for(:sentence_detail, :indeterminate, tariffDate: tariff_end_date)),
-     build(:nomis_offender, prisonerNumber: 'G1234VV', firstName: "Bob", lastName: "Bibby"),
-     build(:nomis_offender, prisonerNumber: 'G1234AB', firstName: "Carole", lastName: "Caroleson"),
-     build(:nomis_offender, prisonerNumber: 'G1234GG', firstName: "David", lastName: "Davidson")
+    [
+      build(:nomis_offender, prisonerNumber: 'G1234VV', firstName: "Bob", lastName: "Bibby"),
+      build(:nomis_offender, prisonerNumber: 'G1234AB', firstName: "Carole", lastName: "Caroleson"),
+      build(:nomis_offender, prisonerNumber: 'G1234GG', firstName: "David", lastName: "Davidson")
     ]
   end
 
   before do
-    stub_const('USE_PPUD_PAROLE_DATE', false)
+    stub_const('USE_PPUD_PAROLE_DATE', true)
     stub_poms(prison, pom)
     stub_signed_in_pom(prison, staff_id)
     stub_offenders_for_prison(prison, offenders)
@@ -42,53 +43,18 @@ RSpec.describe TasksController, :allocation, type: :controller do
     end
   end
 
-  describe 'showing target hearing date pom tasks' do
-    let(:offender_no) { 'G7514GW' }
-    let(:pomtasks) { assigns(:pomtasks) }
-
-    before do
-      # Allocate all of the offenders to this POM
-      # Make sure that we don't generate missing nDelius data by mistake
-      offenders.each do |offender|
-        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)), tier: 'A')
-        create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: staff_id, prison: prison)
-      end
-      get :index, params: { prison_id: prison }
-
-      expect(response).to be_successful
-    end
-
-    context 'with a TED in the past' do
-      let(:tariff_end_date) { Time.zone.today - 3.days }
-
-      it 'can show offenders needing target hearing date updates' do
-        # We expect only one of these to have a target hearing date task
-        expect(pomtasks).to eq([PomTaskPresenter.new(offender_number: offender_no,
-                                                     action_label: 'Target hearing date',
-                                                     offender_name: 'Aliceson, Alice',
-                                                     long_label: 'Target hearing date must be updated so handover dates can be calculated.')])
-      end
-    end
-
-    context 'with a TED in the future' do
-      let(:tariff_end_date) { Time.zone.today + 3.days }
-
-      it 'does not show THD task' do
-        expect(pomtasks).to eq([])
-      end
-    end
-  end
-
   context 'when showing early allocation decisions required' do
     before { stub_const('USE_PPUD_PAROLE_DATA', false) }
 
-    let(:offender_nos) { %w[G1234AB G1234GG G7514GW G1234VV] }
+    let(:offender_nos) { %w[G1234AB G1234GG G1234VV] }
     let(:test_offender_no) { 'G1234AB' }
 
     it 'can show offenders needing early allocation decision updates' do
       offender_nos.each do |offender_no|
         create(:case_information, tier: 'A', mappa_level: 1,
-                                  offender: build(:offender, nomis_offender_id: offender_no, parole_record: build(:parole_record, parole_review_date: next_week)))
+                                  offender: build(:offender,
+                                                  nomis_offender_id: offender_no,
+                                                  parole_reviews: [build(:parole_review, hearing_outcome_received_on: today)]))
         create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id, prison: prison)
       end
 
@@ -99,56 +65,80 @@ RSpec.describe TasksController, :allocation, type: :controller do
       expect(response).to be_successful
 
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks.map { |pt| { num: pt.offender_number, label: pt.action_label } }).to eq([{ num: test_offender_no, label: 'Early allocation decision' }])
+
+      expect(pomtasks.map do |pt|
+        task_presenter = PomTaskPresenter.for(pt)
+        { num: task_presenter.offender_number, label: task_presenter.action_label }
+      end).to eq([{ num: test_offender_no, label: 'Early allocation decision' }])
     end
   end
 
-  context 'when showing tasks' do
-    let(:offender_nos) { %w[G1234AB G1234GG G7514GW G1234VV] }
+  context 'when showing missing hearing outcome confirmed date' do
+    before { stub_const('USE_PPUD_PAROLE_DATA', true) }
+
+    let(:offender_nos) { %w[G1234AB G1234GG G1234VV] }
     let(:test_offender_no) { 'G1234AB' }
 
-    before do
-      # One offender (G1234VV) should have missing case info and one should have no THD (formerly known as PRD)
+    it 'can show offenders needing a hearing outcome confirmed date' do
       create(:case_information, tier: 'A', mappa_level: 1,
-                                offender: build(:offender, nomis_offender_id: 'G1234AB', parole_record: build(:parole_record, parole_review_date: next_week)))
+                                offender: build(:offender, nomis_offender_id: 'G1234AB',
+                                                           parole_reviews: [build(:parole_review, target_hearing_date: today, review_status: 'Inactive', hearing_outcome: 'Stay in Closed')]))
       create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
 
       create(:case_information, tier: 'A', mappa_level: 1,
-                                offender: build(:offender, nomis_offender_id: 'G1234GG', parole_record: build(:parole_record, parole_review_date: next_week)))
+                                offender: build(:offender, nomis_offender_id: 'G1234GG',
+                                                           parole_reviews: [build(:parole_review, target_hearing_date: today, hearing_outcome_received_on: today)]))
       create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
 
-      create(:case_information, offender: build(:offender, nomis_offender_id: 'G7514GW'), tier: 'A', mappa_level: 1)
-      create(:allocation_history, nomis_offender_id: 'G7514GW', primary_pom_nomis_id: staff_id, prison: prison)
-    end
-
-    it 'can show multiple types at once' do
-      # One offender should have a pending early allocation
-      create(:early_allocation, :discretionary, nomis_offender_id: test_offender_no)
+      create(:case_information, tier: 'A', mappa_level: 1,
+                                offender: build(:offender, nomis_offender_id: 'G1234VV',
+                                                           parole_reviews: [build(:parole_review, target_hearing_date: today, hearing_outcome_received_on: today)]))
+      create(:allocation_history, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: staff_id, prison: prison)
 
       get :index, params: { prison_id: prison }
 
       expect(response).to be_successful
 
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks.count).to eq(2)
+
+      expect(pomtasks.map do |pt|
+        task_presenter = PomTaskPresenter.for(pt)
+        { num: task_presenter.offender_number, label: task_presenter.action_label }
+      end).to eq([{ num: test_offender_no, label: 'Date parole hearing outcome confirmed' }])
+    end
+  end
+
+  context 'when showing tasks' do
+    before do
+      stub_const('USE_PPUD_PAROLE_DATA', true)
+
+      create(:case_information, tier: 'A', mappa_level: 1,
+                                offender: build(:offender, nomis_offender_id: 'G1234AB', parole_reviews: [build(:parole_review, hearing_outcome_received_on: today)]))
+      create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)
+
+      create(:case_information, tier: 'A', mappa_level: 1,
+                                offender: build(:offender, nomis_offender_id: 'G1234GG', parole_reviews: [build(:parole_review, hearing_outcome_received_on: today)]))
+      create(:allocation_history, nomis_offender_id: 'G1234GG', primary_pom_nomis_id: staff_id, prison: prison)
+
+      create(:case_information, tier: 'A', mappa_level: 1,
+                                offender: build(:offender, nomis_offender_id: 'G1234VV', parole_reviews: [build(:parole_review, target_hearing_date: today, review_status: 'Inactive', hearing_outcome: 'Stay in closed')]))
+      create(:allocation_history, nomis_offender_id: 'G1234VV', primary_pom_nomis_id: staff_id, prison: prison)
     end
 
     it 'can sort the results' do
-      # Two offenders should have a pending early allocation
+      # Two offenders should have a pending early allocation and one should be missing hearing_outcome_recieved
       create(:early_allocation, :discretionary, nomis_offender_id: 'G1234AB')
       create(:early_allocation, :discretionary, nomis_offender_id: 'G1234GG')
-      # This 'task' doesn't show up as it was created before the referral window of <18 months before release
-      create(:early_allocation, :discretionary, created_within_referral_window: false, nomis_offender_id: 'G7514GW')
 
       get :index, params: { prison_id: prison, sort: 'offender_name asc' }
       expect(response).to be_successful
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks.map(&:offender_name)).to eq(['Aliceson, Alice', "Caroleson, Carole", 'Davidson, David'])
+      expect(pomtasks.map(&:offender_name)).to eq(["Bibby, Bob", "Caroleson, Carole", 'Davidson, David'])
 
       get :index, params: { prison_id: prison, sort: 'offender_name desc' }
       expect(response).to be_successful
       pomtasks = assigns(:pomtasks)
-      expect(pomtasks.map(&:offender_name)).to eq(['Davidson, David', "Caroleson, Carole", 'Aliceson, Alice'])
+      expect(pomtasks.map(&:offender_name)).to eq(['Davidson, David', "Caroleson, Carole", "Bibby, Bob"])
     end
   end
 end

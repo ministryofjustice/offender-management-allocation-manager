@@ -237,6 +237,10 @@ class MpcOffender
     most_recent_parole_review&.current_record_hearing_outcome == 'Release'
   end
 
+  def pom_tasks
+    @pom_tasks ||= build_pom_tasks
+  end
+
   # early allocation methods
 
   def early_allocation_state
@@ -471,5 +475,25 @@ private
                   else
                     HandoverDateService::NO_HANDOVER_DATE
                   end
+  end
+
+  def build_pom_tasks
+    tasks = []
+
+    # We don't want the task to be created if there's no parole review, if the
+    # most recent parole review is yet to have a hearing outcome, or if there is
+    # already a date that the hearing outcome was received.
+    if USE_PPUD_PAROLE_DATA &&
+      most_recent_parole_review.present? &&
+      !most_recent_parole_review.no_hearing_outcome? &&
+      most_recent_parole_review.hearing_outcome_received_on.blank?
+      tasks << PomTask.new(self, :parole_outcome_date, most_recent_parole_review.review_id)
+    end
+
+    if early_allocations.present?
+      tasks << PomTask.new(self, :early_allocation_decision)
+    end
+
+    tasks
   end
 end
