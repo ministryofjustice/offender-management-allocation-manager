@@ -618,4 +618,49 @@ RSpec.describe MpcOffender, type: :model do
       end
     end
   end
+
+  {
+    pom_responsible: [
+      Responsibility.new(value: Responsibility::PRISON),
+      CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::CUSTODY_ONLY)
+    ],
+    com_responsible: [
+      Responsibility.new(value: Responsibility::PROBATION),
+      CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE)
+    ],
+    pom_supporting: [
+      Responsibility.new(value: Responsibility::PROBATION),
+      CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE)
+    ],
+    com_supporting: [
+      Responsibility.new(value: Responsibility::PRISON),
+      CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::CUSTODY_WITH_COM)
+    ],
+  }.each do |responsibility, criteria|
+    describe "#{responsibility}?" do
+      subject { mpc_offender.send("#{responsibility}?") }
+
+      let(:mpc_offender) { described_class.new(offender:, prison: nil, prison_record: nil) }
+
+      context "when offender has a manually overridden responsibility of #{responsibility}" do
+        let(:offender) { build(:offender, responsibility: criteria.first) }
+
+        it { is_expected.to be(true) }
+      end
+
+      context "when a handover date/responsibility has already been calculated to be #{responsibility}" do
+        let(:offender) { build(:offender, calculated_handover_date: criteria.last) }
+
+        it { is_expected.to be(true) }
+      end
+
+      context "when no handover data has been calculated already, but it does calculate as #{responsibility}" do
+        let(:offender) { build(:offender, responsibility: nil, calculated_handover_date: nil) }
+
+        before { allow(HandoverDateService).to receive(:handover).with(mpc_offender).and_return(criteria.last) }
+
+        it { is_expected.to be(true) }
+      end
+    end
+  end
 end

@@ -53,42 +53,24 @@ class MpcOffender
     case_information.present? && (com_responsible? || com_supporting?) && allocated_com_name.blank?
   end
 
-  def pom_responsible?
-    if @offender.responsibility.nil?
-      HandoverDateService.handover(self).custody_responsible?
-    else
-      @offender.responsibility.value == Responsibility::PRISON
-    end
-  end
-
-  def pom_supporting?
-    if @offender.responsibility.nil?
-      HandoverDateService.handover(self).custody_supporting?
-    else
-      @offender.responsibility.value == Responsibility::PROBATION
-    end
-  end
-
   def allocated_pom_role
     pom_responsible? ? 'Responsible' : 'Supporting'
   end
 
+  def pom_responsible?
+    responsibility.try(:pom_responsible?)
+  end
+
+  def pom_supporting?
+    responsibility.try(:pom_supporting?)
+  end
+
   def com_responsible?
-    if @offender.responsibility.nil?
-      HandoverDateService.handover(self).community_responsible?
-    else
-      @offender.responsibility.value == Responsibility::PROBATION
-    end
+    responsibility.try(:com_responsible?)
   end
 
   def com_supporting?
-    if @offender.responsibility.nil?
-      HandoverDateService.handover(self).community_supporting?
-    else
-      # Overrides to prison aren't actually possible in the UI
-      # If they were, we'd somehow need to decide whether COM is supporting or not involved
-      @offender.responsibility.value == Responsibility::PRISON
-    end
+    responsibility.try(:com_supporting?)
   end
 
   def allocated_com_name
@@ -485,6 +467,10 @@ private
                   else
                     HandoverDateService::NO_HANDOVER_DATE
                   end
+  end
+
+  def responsibility
+    @offender.responsibility || @offender.calculated_handover_date || HandoverDateService.handover(self)
   end
 
   def build_pom_tasks

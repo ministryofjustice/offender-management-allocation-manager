@@ -37,4 +37,9 @@ class Responsibility < ApplicationRecord
     other_reason: OTHER_REASON,
     prisoner_moved_to_open_prison: PRISONER_MOVED_TO_OPEN_PRISON
   }
+
+  def pom_responsible? = value == PRISON
+  def pom_supporting? = value == PROBATION
+  def com_responsible? = value == PROBATION
+  def com_supporting? = value == PRISON
 end

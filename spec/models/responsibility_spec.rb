@@ -7,6 +7,17 @@ RSpec.describe Responsibility, type: :model do
     create(:case_information, offender: offender)
   end
 
+  describe 'responsibility' do
+    it { expect(described_class.new(value: Responsibility::PRISON)).to be_pom_responsible }
+    it { expect(described_class.new(value: Responsibility::PRISON)).to be_com_supporting }
+    it { expect(described_class.new(value: Responsibility::PRISON)).not_to be_com_responsible }
+    it { expect(described_class.new(value: Responsibility::PRISON)).not_to be_pom_supporting }
+    it { expect(described_class.new(value: Responsibility::PROBATION)).to be_com_responsible }
+    it { expect(described_class.new(value: Responsibility::PROBATION)).to be_pom_supporting }
+    it { expect(described_class.new(value: Responsibility::PROBATION)).not_to be_pom_responsible }
+    it { expect(described_class.new(value: Responsibility::PROBATION)).not_to be_com_supporting }
+  end
+
   context 'with other reason' do
     subject { build(:responsibility, offender: offender, reason: :other_reason) }
 
