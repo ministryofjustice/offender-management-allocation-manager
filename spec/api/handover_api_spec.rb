@@ -40,12 +40,16 @@ describe 'Handover API', vcr: { cassette_name: 'prison_api/handover_api' } do
 
           response '200', 'Handover information successfully found' do
             security [Bearer: []]
-            schema required: %w[nomsNumber handoverDate responsibility],
+            schema required: %w[nomsNumber handoverDate responsibility responsibleComName responsibleComEmail responsiblePomName responsiblePomNomisId],
                    type: :object,
                    properties: {
                      nomsNumber: { '$ref' => '#/components/schemas/NomsNumber' },
                      handoverDate: { type: :string, format: :date },
                      responsibility: { type: :string, pattern: '^POM|COM$' },
+                     responsibleComName: { type: :string, nullable: true },
+                     responsibleComEmail: { type: :string, nullable: true },
+                     responsiblePomName: { type: :string, nullable: true },
+                     responsiblePomNomisId: { type: :string, nullable: true }
                    }
 
             let(:nomsNumber) { 'G7266VD' }
@@ -54,7 +58,11 @@ describe 'Handover API', vcr: { cassette_name: 'prison_api/handover_api' } do
                 'nomsNumber' => nomsNumber,
                 'handoverStartDate' => '2024-06-01',
                 'handoverDate' => '2024-07-01',
-                'responsibility' => 'COM'
+                'responsibility' => 'COM',
+                'responsibleComName' => nil,
+                'responsibleComEmail' => nil,
+                'responsiblePomName' => nil,
+                'responsiblePomNomisId' => nil
               }
             end
 

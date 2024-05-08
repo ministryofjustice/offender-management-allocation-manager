@@ -618,6 +618,10 @@ paths:
                 - nomsNumber
                 - handoverDate
                 - responsibility
+                - responsibleComName
+                - responsibleComEmail
+                - responsiblePomName
+                - responsiblePomNomisId
                 type: object
                 properties:
                   nomsNumber:
@@ -628,6 +632,18 @@ paths:
                   responsibility:
                     type: string
                     pattern: "^POM|COM$"
+                  responsibleComName:
+                    type: string
+                    nullable: true
+                  responsibleComEmail:
+                    type: string
+                    nullable: true
+                  responsiblePomName:
+                    type: string
+                    nullable: true
+                  responsiblePomNomisId:
+                    type: string
+                    nullable: true
         '404':
           description: Handover information for offender not found
           content:

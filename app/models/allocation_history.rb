@@ -5,6 +5,8 @@ class AllocationHistory < ApplicationRecord
 
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
+  belongs_to :offender, foreign_key: :nomis_offender_id, optional: true
+
   ALLOCATE_PRIMARY_POM = 0
   REALLOCATE_PRIMARY_POM = 1
   ALLOCATE_SECONDARY_POM = 2
