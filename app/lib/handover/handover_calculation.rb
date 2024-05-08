@@ -14,10 +14,12 @@ module Handover::HandoverCalculation
         [earliest_release_date - 15.months, :early_allocation]
       elsif is_indeterminate
         [earliest_release_date - 12.months, in_open_conditions ? :indeterminate_open : :indeterminate]
+      elsif sentence_start_date + 10.months >= earliest_release_date
+        [nil, :determinate_short]
+      elsif is_determinate_parole
+        [earliest_release_date - 12.months, :determinate_parole]
       else
-        calculate_determinate_handover_date(sentence_start_date: sentence_start_date,
-                                            earliest_release_date: earliest_release_date,
-                                            is_determinate_parole: is_determinate_parole)
+        [earliest_release_date - 8.months - 14.days, :determinate]
       end
     end
 
@@ -45,7 +47,9 @@ module Handover::HandoverCalculation
 
     def calculate_responsibility(handover_date:, handover_start_date:, today: Time.zone.now.utc.to_date)
       return COM_RESPONSIBLE if handover_date.nil?
+
       raise HandoverCalculationArgumentError, 'handover_start_date must be given' if handover_start_date.nil?
+
       if handover_start_date > handover_date
         raise HandoverCalculationArgumentError, 'handover_start_date cannot be after handover_date'
       end
@@ -80,20 +84,6 @@ module Handover::HandoverCalculation
         crd = NamedDate[conditional_release_date, 'CRD']
         ard = NamedDate[automatic_release_date, 'ARD']
         [ard, crd].compact.min
-      end
-    end
-
-  private
-
-    def calculate_determinate_handover_date(sentence_start_date:,
-                                            earliest_release_date:,
-                                            is_determinate_parole:)
-      if sentence_start_date + 10.months >= earliest_release_date
-        [nil, :determinate_short]
-      elsif is_determinate_parole
-        [earliest_release_date - 12.months, :determinate_parole]
-      else
-        [earliest_release_date - 8.months - 14.days, :determinate]
       end
     end
   end

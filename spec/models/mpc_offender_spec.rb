@@ -18,6 +18,7 @@ RSpec.describe MpcOffender, type: :model do
 
   let(:api_offender) do
     double(:nomis_offender,
+           booking_id: 12_345_678,
            offender_no: nomis_offender_id,
            release_date: Time.zone.today + 10.years,
            sentence_start_date: Time.zone.today - 5.years,
@@ -594,6 +595,71 @@ RSpec.describe MpcOffender, type: :model do
         it 'returns the hearing outcome received date of the most recent completed parole record' do
           expect(subject.last_hearing_outcome_received_on).to eq(completed_parole_review.hearing_outcome_received_on)
         end
+      end
+    end
+  end
+
+  describe '#sentenced_to_an_additional_isp?' do
+    before { allow(OffenderService).to receive(:get_offender_sentences_and_offences).with(12_345_678).and_return(offender_sentence_terms) }
+
+    context "when the offender has multiple indeterminate sentence terms" do
+      let(:offender_sentence_terms) { [double(indeterminate?: true), double(indeterminate?: true)] }
+
+      it 'is true' do
+        expect(subject).to be_sentenced_to_an_additional_isp
+      end
+    end
+
+    context "when the offender does not have multiple indeterminate sentence terms" do
+      let(:offender_sentence_terms) { [double(indeterminate?: true)] }
+
+      it 'is false' do
+        expect(subject).not_to be_sentenced_to_an_additional_isp
+      end
+    end
+  end
+
+  {
+    pom_responsible: [
+      Responsibility.new(value: Responsibility::PRISON),
+      CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::CUSTODY_ONLY)
+    ],
+    com_responsible: [
+      Responsibility.new(value: Responsibility::PROBATION),
+      CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE)
+    ],
+    pom_supporting: [
+      Responsibility.new(value: Responsibility::PROBATION),
+      CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE)
+    ],
+    com_supporting: [
+      Responsibility.new(value: Responsibility::PRISON),
+      CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::CUSTODY_WITH_COM)
+    ],
+  }.each do |responsibility, criteria|
+    describe "#{responsibility}?" do
+      subject { mpc_offender.send("#{responsibility}?") }
+
+      let(:mpc_offender) { described_class.new(offender:, prison: nil, prison_record: nil) }
+
+      context "when offender has a manually overridden responsibility of #{responsibility}" do
+        let(:offender) { build(:offender, responsibility: criteria.first) }
+
+        it { is_expected.to be(true) }
+      end
+
+      context "when a handover date/responsibility has already been calculated to be #{responsibility}" do
+        let(:offender) { build(:offender, calculated_handover_date: criteria.last) }
+
+        it { is_expected.to be(true) }
+      end
+
+      context "when no handover data has been calculated already, but it does calculate as #{responsibility}" do
+        let(:offender) { build(:offender, responsibility: nil, calculated_handover_date: nil) }
+
+        before { allow(HandoverDateService).to receive(:handover).with(mpc_offender).and_return(criteria.last) }
+
+        it { is_expected.to be(true) }
       end
     end
   end

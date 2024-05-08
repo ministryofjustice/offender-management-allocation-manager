@@ -29,24 +29,41 @@ class HandoverDateService
 
     offender = OffenderWrapper.new(mpc_offender)
 
-    if offender.recalled?
-      CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                                 start_date: nil, handover_date: nil,
-                                 reason: :recall_case
+    if USE_PPUD_PAROLE_DATA && mpc_offender.sentenced_to_an_additional_isp?
+      pom_only_is_responsible reason: :additional_isp
+
+    elsif mpc_offender.recalled?
+      com_is_responsible reason: :recall_case
+
+    elsif USE_PPUD_PAROLE_DATA && mpc_offender.tariff_date.try(:<=, 12.months.from_now)
+      com_is_responsible reason: :within_12_months_of_tarrif_date
+
+    elsif USE_PPUD_PAROLE_DATA && mpc_offender.ppud_or_manually_entered_target_hearing_date.try(:<=, 12.months.from_now)
+      com_is_responsible reason: :within_12_months_of_target_hearing_date
+
+    elsif USE_PPUD_PAROLE_DATA && mpc_offender.most_recent_parole_review&.no_hearing_outcome?
+      com_is_responsible reason: :awaiting_parole_outcome
+
+    elsif USE_PPUD_PAROLE_DATA && mpc_offender.most_recent_completed_parole_review&.outcome_is_release?
+      com_is_responsible reason: :parole_outcome_release
+
+    elsif USE_PPUD_PAROLE_DATA && mpc_offender.mappa_level.in?([nil, 1])
+      pom_is_responsible reason: :parole_outcome_no_release_mappa_empty_or_1
+
+    elsif USE_PPUD_PAROLE_DATA && mpc_offender.mappa_level.in?([2, 3])
+      com_is_responsible reason: :parole_outcome_no_release_mappa_2_or_3
+
     elsif offender.immigration_case?
-      CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                                 start_date: nil, handover_date: nil,
-                                 reason: :immigration_case
+      com_is_responsible reason: :immigration_case
+
     elsif !offender.earliest_release
-      CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
-                                 start_date: nil, handover_date: nil,
-                                 reason: :release_date_unknown
+      pom_only_is_responsible reason: :release_date_unknown
+
     elsif !offender.policy_case?
-      CalculatedHandoverDate.new responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                                 start_date: nil, handover_date: nil,
-                                 reason: :pre_omic_rules
+      com_is_responsible reason: :pre_omic_rules
+
     else
-      handover_date, handover_reason = Handover::HandoverCalculation.calculate_handover_date(
+      handover_date, reason = Handover::HandoverCalculation.calculate_handover_date(
         sentence_start_date: offender.sentence_start_date,
         earliest_release_date: offender.earliest_release.date,
         is_early_allocation: offender.early_allocation?,
@@ -54,8 +71,8 @@ class HandoverDateService
         in_open_conditions: offender.in_open_conditions?,
         is_determinate_parole: offender.determinate_parole?,
       )
-      handover_start_date = Handover::HandoverCalculation.calculate_handover_start_date(
-        handover_date: handover_date,
+      start_date = Handover::HandoverCalculation.calculate_handover_start_date(
+        handover_date:,
         category_active_since_date: offender.category_active_since,
         prison_arrival_date: offender.prison_arrival_date,
         is_indeterminate: offender.indeterminate_sentence?,
@@ -64,15 +81,25 @@ class HandoverDateService
       )
       responsibility = Handover::HandoverCalculation.calculate_responsibility(
         handover_date: handover_date,
-        handover_start_date: handover_start_date,
+        handover_start_date: start_date,
       )
-      CalculatedHandoverDate.new responsibility: responsibility,
-                                 start_date: handover_start_date, handover_date: handover_date,
-                                 reason: handover_reason
+      CalculatedHandoverDate.new responsibility:, start_date:, handover_date:, reason:
     end
   end
 
 private
+
+  def self.com_is_responsible(extra_attributes = {})
+    CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE, **extra_attributes)
+  end
+
+  def self.pom_only_is_responsible(extra_attributes = {})
+    CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::CUSTODY_ONLY, **extra_attributes)
+  end
+
+  def self.pom_is_responsible(extra_attributes = {})
+    CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::CUSTODY_WITH_COM, **extra_attributes)
+  end
 
   WELSH_POLICY_START_DATE = Time.zone.local(2019, 2, 4).utc.to_date.freeze
   WELSH_CUTOFF_DATE = '4 May 2020'.to_date.freeze

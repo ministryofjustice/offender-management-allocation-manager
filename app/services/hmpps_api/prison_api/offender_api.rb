@@ -140,6 +140,11 @@ module HmppsApi
         client.get(path)
       end
 
+      def self.get_offender_sentences_and_offences(booking_id)
+        path = "/offender-sentences/booking/#{booking_id}/sentenceTerms"
+        client.get(path)
+      end
+
     private
 
       def self.get_search_api_offenders_in_prison(prison_code)

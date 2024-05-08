@@ -43,7 +43,15 @@ module ApiHelper
     # Alerts
     stub_request(:get, "#{T3}/offenders/#{offender_no}/alerts/v2").to_return(body: [].to_json)
 
+    stub_sentence_terms(offender)
+
     stub_oasys_assessments(offender_no)
+  end
+
+  def stub_sentence_terms(offender)
+    # Offender Sentence and Terms
+    booking_id = offender.fetch(:bookingId)
+    stub_request(:get, "#{T3}/offender-sentences/booking/#{booking_id}/sentenceTerms").to_return(body: [].to_json)
   end
 
   def stub_movements(movements = [])

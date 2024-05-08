@@ -28,6 +28,11 @@ class OffenderService
         .compact
     end
 
+    def get_offender_sentences_and_offences(booking_id)
+      HmppsApi::PrisonApi::OffenderApi.get_offender_sentences_and_offences(booking_id)
+        .map { |payload| HmppsApi::OffenderSentenceTerm.new(payload) }
+    end
+
     def get_offenders_in_prison(prison, ignore_legal_status: false)
       api_offenders = HmppsApi::PrisonApi::OffenderApi.get_offenders_in_prison(prison.code, ignore_legal_status: ignore_legal_status)
                                                       .index_by(&:offender_no)
