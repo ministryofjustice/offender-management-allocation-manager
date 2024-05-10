@@ -42,6 +42,10 @@ FactoryBot.define do
       DateTime.now.utc
     end
 
+    trait :with_prison do
+      association :prison
+    end
+
     trait :primary do
       event {AllocationHistory::ALLOCATE_PRIMARY_POM}
       event_trigger { AllocationHistory::USER }

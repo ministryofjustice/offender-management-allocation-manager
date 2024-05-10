@@ -75,6 +75,13 @@ class CalculatedHandoverDate < ApplicationRecord
     REASONS.fetch(reason, "Unknown handover reason #{reason}")
   end
 
+  def responsibility_text
+    case responsibility
+    when CUSTODY_ONLY, CUSTODY_WITH_COM then 'POM'
+    when COMMUNITY_RESPONSIBLE          then 'COM'
+    end
+  end
+
   attr_accessor :offender_attributes_to_archive
 
   class << self

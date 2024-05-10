@@ -8,6 +8,10 @@ class Offender < ApplicationRecord
 
   has_one :case_information, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 
+  has_many :allocations, class_name: 'AllocationHistory', foreign_key: :nomis_offender_id do
+    def latest = order('created_at DESC').first
+  end
+
   has_many :early_allocations,
            -> { order(created_at: :asc) },
            foreign_key: :nomis_offender_id,
@@ -113,4 +117,9 @@ class Offender < ApplicationRecord
       'standard'
     end
   end
+
+  def responsible_pom_name = allocations.latest&.primary_pom_name
+  def responsible_pom_nomis_id = allocations.latest&.primary_pom_nomis_id
+  def responsible_com_name = case_information&.com_name
+  def responsible_com_email = case_information&.com_email
 end

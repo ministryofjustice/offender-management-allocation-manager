@@ -229,4 +229,18 @@ RSpec.describe Offender, type: :model do
       end
     end
   end
+
+  describe '#responsible_pom_name' do
+    it "returns the POMs full name using the AllocationHistory to look them up" do
+      create(:allocation_history, :with_prison, offender:, primary_pom_name: "Pom Nomis")
+      expect(offender.responsible_pom_name).to eq("Pom Nomis")
+    end
+  end
+
+  describe '#responsible_com_name' do
+    it "returns the COMs full name using the CaseInformation to look them up" do
+      create(:case_information, offender:, com_name: 'Com Nomis')
+      expect(offender.responsible_com_name).to eq("Com Nomis")
+    end
+  end
 end

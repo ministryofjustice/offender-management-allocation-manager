@@ -200,4 +200,19 @@ RSpec.describe CalculatedHandoverDate, :disable_push_to_delius do
       end
     end
   end
+
+  describe '#responsibility_text' do
+    {
+      'COM' => [CalculatedHandoverDate::COMMUNITY_RESPONSIBLE],
+      'POM' => [CalculatedHandoverDate::CUSTODY_ONLY, CalculatedHandoverDate::CUSTODY_WITH_COM]
+    }.each do |responsibility, values|
+      values.each do |value|
+        context "when responsibility is #{value}" do
+          subject { described_class.new(responsibility: value).responsibility_text }
+
+          it { is_expected.to be(responsibility) }
+        end
+      end
+    end
+  end
 end

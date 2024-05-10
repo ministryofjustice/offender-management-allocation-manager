@@ -5,10 +5,6 @@ require 'swagger_helper'
 describe 'Handover API', vcr: { cassette_name: 'prison_api/handover_api' } do
   let(:Authorization) { 'Bearer TEST_TOKEN' }
 
-  before do
-    allow(Api::Handover).to receive(:[])
-  end
-
   path '/api/handovers/{nomsNumber}' do
     get 'Retrieves the handover information for an offender' do
       tags 'Handovers'
@@ -30,32 +26,49 @@ describe 'Handover API', vcr: { cassette_name: 'prison_api/handover_api' } do
           allow_any_instance_of(Api::HandoversApiController).to receive(:verify_token)
         end
 
-        response '200', 'Handover information successfully found' do
-          security [Bearer: []]
-          schema required: %w[nomsNumber handoverDate responsibility],
-                 type: :object,
-                 properties: {
-                   nomsNumber: { '$ref' => '#/components/schemas/NomsNumber' },
-                   handoverDate: { type: :string, format: :date },
-                   responsibility: { type: :string, pattern: '^POM|COM$' },
-                 }
-
-          let(:nomsNumber) { 'G7266VD' }
-          let(:body) do
-            {
-              'nomsNumber' => nomsNumber,
-              'handoverStartDate' => '2021-12-01',
-              'handoverDate' => '2021-12-01',
-              'responsibility' => 'COM'
-            }
-          end
-
+        context 'when handover has been calculated' do
           before do
-            allow(Api::Handover).to receive(:[]).with(nomsNumber).and_return(body)
+            create(
+              :calculated_handover_date,
+              offender: build(:offender, nomis_offender_id: nomsNumber),
+              start_date: Date.new(2024, 6, 1),
+              handover_date: Date.new(2024, 7, 1),
+              responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+              reason: :recall_case
+            )
           end
 
-          run_test! do |_|
-            expect(JSON.parse(response.body)).to eq body
+          response '200', 'Handover information successfully found' do
+            security [Bearer: []]
+            schema required: %w[nomsNumber handoverDate responsibility responsibleComName responsibleComEmail responsiblePomName responsiblePomNomisId],
+                   type: :object,
+                   properties: {
+                     nomsNumber: { '$ref' => '#/components/schemas/NomsNumber' },
+                     handoverDate: { type: :string, format: :date },
+                     responsibility: { type: :string, pattern: '^POM|COM$' },
+                     responsibleComName: { type: :string, nullable: true },
+                     responsibleComEmail: { type: :string, nullable: true },
+                     responsiblePomName: { type: :string, nullable: true },
+                     responsiblePomNomisId: { type: :string, nullable: true }
+                   }
+
+            let(:nomsNumber) { 'G7266VD' }
+            let(:body) do
+              {
+                'nomsNumber' => nomsNumber,
+                'handoverStartDate' => '2024-06-01',
+                'handoverDate' => '2024-07-01',
+                'responsibility' => 'COM',
+                'responsibleComName' => nil,
+                'responsibleComEmail' => nil,
+                'responsiblePomName' => nil,
+                'responsiblePomNomisId' => nil
+              }
+            end
+
+            run_test! do |_|
+              expect(JSON.parse(response.body)).to eq body
+            end
           end
         end
 

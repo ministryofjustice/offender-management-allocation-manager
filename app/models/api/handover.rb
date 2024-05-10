@@ -1,45 +1,36 @@
 class Api::Handover
-  def initialize(db_model)
-    @db_model = db_model
+  def initialize(calculated_handover_date)
+    @calculated_handover_date = calculated_handover_date
+    @offender = @calculated_handover_date.offender
   end
 
-  private_class_method :new
-
-  def self.[](noms_number)
-    db_model = CalculatedHandoverDate.find_by_nomis_offender_id(noms_number)
-    if db_model && db_model.responsibility
-      new(db_model)
-    else
-      nil
-    end
-  end
-
-  def noms_number
-    @db_model.nomis_offender_id
-  end
-
-  def handover_date
-    @db_model.handover_date
-  end
-
-  def handover_start_date
-    @db_model.start_date
-  end
-
-  def responsibility
-    case @db_model.responsibility
-    when CalculatedHandoverDate::CUSTODY_ONLY, CalculatedHandoverDate::CUSTODY_WITH_COM then 'POM'
-    when CalculatedHandoverDate::COMMUNITY_RESPONSIBLE then 'COM'
-    else raise 'Invalid case value'
-    end
-  end
-
-  def as_json
+  def as_json(*)
     {
-      'nomsNumber' => noms_number,
-      'handoverDate' => handover_date&.iso8601,
-      'handoverStartDate' => handover_start_date&.iso8601,
-      'responsibility' => responsibility,
+      'nomsNumber' => @calculated_handover_date.nomis_offender_id,
+      'handoverDate' => @calculated_handover_date.handover_date&.iso8601,
+      'handoverStartDate' => @calculated_handover_date.start_date&.iso8601,
+      'responsibility' => @calculated_handover_date.responsibility_text,
+      **(@calculated_handover_date.com_responsible? ? com_responsibility : pom_responsibility)
+    }
+  end
+
+private
+
+  def com_responsibility
+    {
+      'responsibleComName' => @offender.responsible_com_name,
+      'responsibleComEmail' => @offender.responsible_com_email,
+      'responsiblePomName' => nil,
+      'responsiblePomNomisId' => nil,
+    }
+  end
+
+  def pom_responsibility
+    {
+      'responsibleComName' => nil,
+      'responsibleComEmail' => nil,
+      'responsiblePomName' => @offender.responsible_pom_name,
+      'responsiblePomNomisId' => @offender.responsible_pom_nomis_id,
     }
   end
 end
