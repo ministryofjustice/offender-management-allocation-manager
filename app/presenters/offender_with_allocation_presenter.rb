@@ -3,6 +3,8 @@
 # This class is another attempt to merge a 'prisoner' with an 'allocation'
 # despite the fact that this should be really easy in theory
 class OffenderWithAllocationPresenter
+  include Rails.application.routes.url_helpers
+
   delegate :offender_no, :full_name, :last_name, :earliest_release_date, :earliest_release, :latest_temp_movement_date, :allocated_com_name,
            :enhanced_handover?, :complexity_level, :date_of_birth, :tier, :probation_record, :handover_start_date, :restricted_patient?,
            :location, :responsibility_handover_date, :pom_responsible?, :pom_supporting?, :coworking?, :prison, :active_allocation,
@@ -52,5 +54,13 @@ class OffenderWithAllocationPresenter
 
   def primary_pom_allocated_at
     @allocation.primary_pom_allocated_at
+  end
+
+  def offender_link
+    if @allocation
+      prison_prisoner_allocation_path(prison.code, offender_no)
+    else
+      prison_prisoner_path(prison.code, offender_no)
+    end
   end
 end
