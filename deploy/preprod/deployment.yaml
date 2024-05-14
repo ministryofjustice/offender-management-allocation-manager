@@ -139,6 +139,16 @@ spec:
                 secretKeyRef:
                   name: hmpps-domain-events-topic
                   key: topic_arn
+            - name: GMAIL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: parole-data-import
+                  key: email_username
+            - name: GMAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: parole-data-import
+                  key: email_password
         - name: allocation-manager-metrics
           image: quay.io/hmpps/offender-management:latest
           imagePullPolicy: Always
