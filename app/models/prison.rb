@@ -52,18 +52,11 @@ class Prison < ApplicationRecord
   end
 
   def allocations
-    @allocations ||= AllocationHistory.active_allocations_for_prison(code).where(nomis_offender_id: all_policy_offenders.map(&:offender_no))
+    @allocations ||= AllocationHistory.active_allocations_for_prison(code)
+      .where(nomis_offender_id: all_policy_offenders.map(&:offender_no))
   end
 
   delegate :for_pom, to: :allocations, prefix: true
-
-  delegate :allocated, to: :summary
-
-  delegate :unallocated, to: :summary
-
-  delegate :new_arrivals, to: :summary
-
-  delegate :missing_info, to: :summary
 
   def primary_allocated_offenders
     alloc_hash = allocations.index_by(&:nomis_offender_id)
@@ -74,41 +67,24 @@ class Prison < ApplicationRecord
     end
   end
 
+  def offender_allocatable?(offender)
+    offender.case_information.present? && (womens? ? offender.complexity_level.present? : true)
+  end
+
+  def offender_allocated?(offender)
+    @allocations_by_offender_nomis_id ||= allocations.index_by(&:nomis_offender_id)
+    @allocations_by_offender_nomis_id.key?(offender.nomis_offender_id)
+  end
+
+  delegate :allocated, to: :summary
+  delegate :unallocated, to: :summary
+  delegate :new_arrivals, to: :summary
+  delegate :missing_info, to: :summary
+
 private
 
-  Summary = Struct.new :allocated, :unallocated, :new_arrivals, :missing_info, :outside_omic_policy, keyword_init: true
-
   def summary
-    @summary ||= begin
-      alloc_hash = allocations.index_by(&:nomis_offender_id)
-      summary = unfiltered_offenders.group_by do |offender|
-        if offender.inside_omic_policy?
-          allocatable = if womens?
-                          offender.probation_record.present? && offender.complexity_level.present?
-                        else
-                          offender.probation_record.present?
-                        end
-          if allocatable
-            if alloc_hash.key? offender.offender_no
-              :allocated
-            else
-              :unallocated
-            end
-          elsif offender.prison_arrival_date.to_date == Time.zone.today
-            :new_arrival
-          else
-            :missing_info
-          end
-        else
-          :outside_omic_policy
-        end
-      end
-      Summary.new allocated: summary.fetch(:allocated, []),
-                  unallocated: summary.fetch(:unallocated, []),
-                  new_arrivals: summary.fetch(:new_arrival, []),
-                  missing_info: summary.fetch(:missing_info, []),
-                  outside_omic_policy: summary.fetch(:outside_omic_policy, [])
-    end
+    @summary ||= AllocationsSummary.new(self)
   end
 
   def get_pom_detail(details, nomis_staff_id)
