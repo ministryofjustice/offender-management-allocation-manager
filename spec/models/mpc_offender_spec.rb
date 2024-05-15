@@ -667,66 +667,38 @@ RSpec.describe MpcOffender, type: :model do
   describe "#approaching_parole?" do
     subject { mpc_offender.approaching_parole? }
 
-    let(:mpc_offender) do
-      most_recent_parole_review = ParoleReview.new(hearing_outcome:, hearing_outcome_received_on:)
+    let(:mpc_offender) { described_class.new(prison: nil, offender: double(:offender).as_null_object, prison_record: nil) }
 
-      described_class.new(
-        prison: nil,
-        offender: double(:offender, most_recent_parole_review:).as_null_object,
-        prison_record: double(:api_offender, target_hearing_date:, tariff_date:, parole_eligibility_date:)
-      )
-    end
+    before { allow(mpc_offender).to receive_messages(target_hearing_date: nil, tariff_date: nil) }
 
-    earliest_date_fields = %i[target_hearing_date tariff_date parole_eligibility_date]
+    parole_date_fields = %i[target_hearing_date tariff_date]
 
-    earliest_date_fields.each do |earliest_date_field|
-      let(:hearing_outcome) { 'Not Specified' }
-      let(:hearing_outcome_received_on) { nil }
-      let(:target_hearing_date) { nil }
-      let(:tariff_date) { nil }
-      let(:parole_eligibility_date) { nil }
+    parole_date_fields.each do |date_field|
+      describe "with either parole date (in this case #{date_field})" do
+        before { allow(mpc_offender).to receive(date_field).and_return(earliest_date_value) }
 
-      before { allow(mpc_offender).to receive(earliest_date_field).and_return(earliest_date_value) }
-
-      context "when next parole date (#{earliest_date_field}) is blank" do
-        let(:earliest_date_value) { nil }
-
-        it { is_expected.to be_falsey }
-      end
-
-      context "when next parole date (#{earliest_date_field}) is 10 months in the future or earlier" do
-        let(:earliest_date_value) { 10.months.from_now - 1.day }
-
-        it { is_expected.to be_truthy }
-      end
-
-      context "when next parole date (#{earliest_date_field}) is later than 10 months in the future" do
-        let(:earliest_date_value) { 10.months.from_now + 1.day }
-
-        it { is_expected.to be_falsey }
-      end
-
-      context "when next parole date (#{earliest_date_field}) is in the past" do
-        let(:earliest_date_value) { 18.years.ago }
-
-        context "and the hearing outcome has not been received yet" do
-          let(:hearing_outcome_received_on) { nil }
-
-          it { is_expected.to be_falsey }
-        end
-
-        context "and the hearing outcome was received more than 14 days ago" do
-          let(:hearing_outcome_received_on) { 15.days.ago }
-
-          it { is_expected.to be_falsey }
-        end
-
-        context "and the hearing outcome was received within the past 14 days" do
-          let(:hearing_outcome_received_on) { 14.days.ago }
+        context "when the date is 10 months in the future or earlier" do
+          let(:earliest_date_value) { 10.months.from_now - 1.day }
 
           it { is_expected.to be_truthy }
         end
+
+        context "when the date is later than 10 months in the future" do
+          let(:earliest_date_value) { 10.months.from_now + 1.day }
+
+          it { is_expected.to be_falsey }
+        end
+
+        context "when the date is in the past" do
+          let(:earliest_date_value) { 18.years.ago }
+
+          it { is_expected.to be_falsey }
+        end
       end
+    end
+
+    context "when both parole dates are blank" do
+      it { is_expected.to be_falsey }
     end
   end
 end

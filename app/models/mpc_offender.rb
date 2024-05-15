@@ -178,8 +178,9 @@ class MpcOffender
   end
 
   def approaching_parole?
-    next_parole_date&.between?(Time.zone.now, 10.months.from_now.end_of_day) ||
-    hearing_outcome_received_on&.between?(14.days.ago.beginning_of_day, Time.zone.now)
+    [target_hearing_date, tariff_date].compact.any? do |date|
+      date.between?(Time.zone.now, 10.months.from_now.end_of_day)
+    end
   end
 
   def next_parole_date
