@@ -101,7 +101,8 @@ RSpec.describe ParoleDataProcessService do
                                     curr_target_date: '01-01-2022',
                                     ms13_target_date: '01-01-2021',
                                     ms13_completion_date: 'NULL',
-                                    final_result: 'Not Applicable',
+                                    final_result: 'Some kinda result',
+                                    single_day_snapshot: true,
                                     snapshot_date: snapshot_date)
 
       create(:parole_review_import, nomis_id: offender2.nomis_offender_id,
@@ -114,6 +115,7 @@ RSpec.describe ParoleDataProcessService do
                                     ms13_target_date: '01-01-2019',
                                     ms13_completion_date: 'NULL',
                                     final_result: 'Not Applicable',
+                                    single_day_snapshot: true,
                                     snapshot_date: snapshot_date)
 
       create(:parole_review_import, nomis_id: offender3.nomis_offender_id,
@@ -126,6 +128,7 @@ RSpec.describe ParoleDataProcessService do
                                     ms13_target_date: '01-01-2019',
                                     ms13_completion_date: 'NULL',
                                     final_result: 'Not Specified',
+                                    single_day_snapshot: true,
                                     snapshot_date: snapshot_date)
     end
 
@@ -138,22 +141,25 @@ RSpec.describe ParoleDataProcessService do
         results
 
         expect(parole_review1.active?).to eq(true)
-        expect(parole_review1.current_hearing_outcome).to eq('No hearing outcome yet')
+        expect(parole_review1.current_hearing_outcome).to eq('Some kinda result')
         expect(parole_review1.target_hearing_date).to eq(Date.new(2022, 1, 1))
         expect(parole_review1.custody_report_due).to eq(Date.new(2021, 1, 1))
         expect(parole_review1.review_type).to eq('GPP ISP OnPost Tariff')
+        expect(parole_review1.hearing_outcome_received_on).to eq(snapshot_date)
 
         expect(parole_review2.active?).to eq(true)
         expect(parole_review2.previous_hearing_outcome).to eq('No hearing outcome given')
         expect(parole_review2.target_hearing_date).to eq(Date.new(2019, 1, 1))
         expect(parole_review2.custody_report_due).to eq(Date.new(2019, 1, 1))
         expect(parole_review2.review_type).to eq('GPP MH Accelerated Review Other')
+        expect(parole_review2.hearing_outcome_received_on).to eq(nil)
 
         expect(parole_review3.active?).to eq(false)
         expect(parole_review3.previous_hearing_outcome).to eq('No hearing outcome given')
         expect(parole_review3.target_hearing_date).to eq(Date.new(2019, 1, 1))
         expect(parole_review3.custody_report_due).to eq(Date.new(2019, 1, 1))
         expect(parole_review3.review_type).to eq('GPP SOPC Parole Review')
+        expect(parole_review3.hearing_outcome_received_on).to eq(nil)
       end
 
       it 'has expected reported counts' do
@@ -178,7 +184,7 @@ RSpec.describe ParoleDataProcessService do
                                       curr_target_date: '01-01-2022',
                                       ms13_target_date: '01-01-2021',
                                       ms13_completion_date: '01-01-2021', # Was 'NULL' in yesterday's import
-                                      final_result: 'Stay In Closed [*]', # Was 'Not Applicable' in yesterday's import
+                                      final_result: 'Stay In Closed [*]', # Was different in yesterday's import
                                       snapshot_date: snapshot_date + 1.day)
 
         # Duplicate of yesterday
@@ -213,12 +219,15 @@ RSpec.describe ParoleDataProcessService do
 
         expect(parole_review1.active?).to eq(false)
         expect(parole_review1.current_hearing_outcome).to eq('Stay in closed')
+        expect(parole_review1.hearing_outcome_received_on).to eq(snapshot_date) # Already got it yesterday
 
         expect(parole_review2.active?).to eq(true)
         expect(parole_review2.previous_hearing_outcome).to eq('No hearing outcome given')
+        expect(parole_review2.hearing_outcome_received_on).to eq(nil)
 
         expect(parole_review3.active?).to eq(false)
         expect(parole_review3.previous_hearing_outcome).to eq('No hearing outcome given')
+        expect(parole_review3.hearing_outcome_received_on).to eq(nil)
       end
 
       it 'has expected reported counts' do

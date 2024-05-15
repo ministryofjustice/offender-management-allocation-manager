@@ -42,7 +42,7 @@ class ParoleReview < ApplicationRecord
   # outcome having been received. There should always be a value in the hearing_outcome field, and not having a nil check allows
   # this method to be used to determine the date that the hearing outcome was given.
   def no_hearing_outcome?
-    hearing_outcome.in?(['Not Applicable', 'Not Specified'])
+    hearing_outcome.blank? || hearing_outcome.in?(['Not Applicable', 'Not Specified'])
   end
 
   def outcome_is_release?
