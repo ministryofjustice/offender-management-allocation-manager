@@ -83,6 +83,10 @@ module HmppsApi
       @restricted_patient == true
     end
 
+    def new_arrival?
+      prison_arrival_date.to_date == Time.zone.today
+    end
+
     delegate :sentence_start_date, to: :sentence
 
     def full_name

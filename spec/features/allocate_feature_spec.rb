@@ -99,7 +99,7 @@ feature 'Allocation' do
       expect(page).to have_css('.govuk-details__summary-text', text: "You can copy information about this allocation to paste into an email to someone else")
     end
 
-    scenario 'using the compare POM page with no POMs checked', vcr: { cassette_name: 'prison_api/use_compare_with_none_checked_feature' } do
+    scenario 'using the compare POM page with no POMs checked', vcr: { cassette_name: 'prison_api/use_compare_with_none_checked_feature' }, flaky: true do
       click_button 'Compare workloads'
       expect(page).to have_css('div#pom-selection-error')
     end

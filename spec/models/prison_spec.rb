@@ -144,8 +144,9 @@ RSpec.describe Prison do
       allocation_history.map do |ah|
         nomis_offender_id = ah.nomis_offender_id
         instance_double MpcOffender, "mpc_offender-#{nomis_offender_id}", offender_no: nomis_offender_id,
+                                                                          nomis_offender_id:,
                                                                           inside_omic_policy?: true,
-                                                                          probation_record: double,
+                                                                          case_information: double,
                                                                           released?: false
       end
     end

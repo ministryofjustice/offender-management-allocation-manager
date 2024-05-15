@@ -42,20 +42,19 @@ class AllocationHistory < ApplicationRecord
     offender_released: OFFENDER_RELEASED
   }
 
-  scope :active_pom_allocations, lambda { |nomis_staff_id, prison|
-    secondaries = where(secondary_pom_nomis_id: nomis_staff_id)
+  scope :active, -> { where.not(primary_pom_nomis_id: nil) }
 
-    where(primary_pom_nomis_id: nomis_staff_id).or(secondaries)
-    .where.not(primary_pom_nomis_id: nil)
-    .where(prison: prison)
+  scope :at_prison, ->(prison) { where(prison:) }
+
+  scope :active_pom_allocations, lambda { |nomis_staff_id, prison|
+    active.for_pom(nomis_staff_id).at_prison(prison)
   }
 
-  scope :active_allocations_for_prison, ->(prison) { where.not(primary_pom_nomis_id: nil).where(prison: prison) }
+  scope :active_allocations_for_prison, ->(prison) { active.at_prison(prison) }
 
   scope :for_pom, lambda { |nomis_staff_id|
-    secondaries = where(secondary_pom_nomis_id: nomis_staff_id)
-
-    where(primary_pom_nomis_id: nomis_staff_id).or(secondaries)
+    where(primary_pom_nomis_id: nomis_staff_id)
+      .or(where(secondary_pom_nomis_id: nomis_staff_id))
   }
 
   validate do |av|
