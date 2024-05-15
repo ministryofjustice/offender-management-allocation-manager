@@ -20,7 +20,7 @@
             <div class="govuk-grid-column-one-third">
               <div class="card--caseload card-total">
                 <%= link_to prison_show_pom_tab_path(@prison.code, @pom.staff_id, :parole) do %>
-                  <span class="card__heading--large"><%= @allocations.count(&:approaching_parole?) %></span>
+                  <span class="card__heading--large"><%= @summary.fetch(:parole_cases_count) %></span>
                   <p>parole cases</p>
                 <% end %>
               </div>
