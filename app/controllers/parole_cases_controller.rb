@@ -13,12 +13,12 @@ class ParoleCasesController < PrisonsApplicationController
 private
 
   def offenders_with_allocs
-    parole_offenders.map do |offender|
-      OffenderWithAllocationPresenter.new(
-        offender,
-        parole_allocations.detect { |alloc| alloc.nomis_offender_id == offender.offender_no }
-      )
-    end
+    parole_offenders.map { |offender|
+      parole_allocation = parole_allocations.detect { |alloc| alloc.nomis_offender_id == offender.offender_no }
+      next if parole_allocation.nil? # Only show allocated offenders
+
+      OffenderWithAllocationPresenter.new(offender, parole_allocation)
+    }.compact
   end
 
   def parole_offenders
