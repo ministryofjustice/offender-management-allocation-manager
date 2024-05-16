@@ -178,13 +178,13 @@ class MpcOffender
   end
 
   def approaching_parole?
-    [target_hearing_date, tariff_date].compact.any? do |date|
-      date.between?(Time.zone.now, 10.months.from_now.end_of_day)
-    end
+    next_parole_date.present?
   end
 
   def next_parole_date
-    target_hearing_date || [tariff_date, parole_eligibility_date].compact.min
+    [target_hearing_date, tariff_date].compact.sort.find do |date|
+      date.between?(Time.zone.now, 10.months.from_now.end_of_day)
+    end
   end
 
   # Separate from next_parole_date as parole case index view sorts by next_parole_date, so it seemed sensible to avoid changing default rails behaviour

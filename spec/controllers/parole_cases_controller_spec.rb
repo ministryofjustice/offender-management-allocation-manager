@@ -131,7 +131,7 @@ RSpec.describe ParoleCasesController, type: :controller do
         context 'when sorting by next parole date' do
           it 'sorts' do
             get :index, params: { prison_id: prison, sort: 'next_parole_date desc' }
-            expect(assigns(:offenders).map(&:offender_no)).to eq(["G1234VV", "G7514GW"])
+            expect(assigns(:offenders).map(&:offender_no)).to eq(["G7514GW", "G1234VV"])
           end
         end
       end
