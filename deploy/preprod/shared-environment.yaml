@@ -10,7 +10,7 @@ data:
   RAILS_WEB_CONCURRENCY: "5"
   ENV_NAME: "preprod"
   SENTRY_CURRENT_ENV: "preprod"
-  PRISON_API_HOST: "https://api-preprod.prison.service.justice.gov.uk"
+  PRISON_API_HOST: "https://prison-api-preprod.prison.service.justice.gov.uk"
   PRISONER_SEARCH_HOST: "https://prisoner-search-preprod.prison.service.justice.gov.uk"
   COMMUNITY_API_HOST: "https://community-api-secure.pre-prod.delius.probation.hmpps.dsd.io"
   COMPLEXITY_API_HOST: "https://complexity-of-need-preprod.hmpps.service.justice.gov.uk"
