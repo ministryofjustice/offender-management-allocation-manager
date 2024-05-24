@@ -61,6 +61,7 @@ RSpec.describe 'Parole set hearing outcome date', type: :feature do
 
     click_button('Save')
 
-    expect(page).to have_content(/Jan 2001 – #{parole_review.hearing_outcome}/i)
+    expect(page).to have_css('.govuk-table__cell', text: /#{parole_review.hearing_outcome}/i)
+    expect(page).to have_css('.govuk-table__cell', text: 'Jan 2001')
   end
 end

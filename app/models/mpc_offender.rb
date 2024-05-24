@@ -177,29 +177,14 @@ class MpcOffender
     most_recent_completed_parole_review&.hearing_outcome_received_on
   end
 
-  # If the parole application is set for a hearing within 10 months, or the outcome for a hearing was received in the last 14 days,
-  # return true. If the hearing has an outcome but we do not have the date that it was received, assume that it is no longer
-  # approaching parole (return false).
   def approaching_parole?
-    earliest_date = next_parole_date
-    return false if earliest_date.blank?
-    return false unless earliest_date <= Time.zone.today + 10.months
-    return false if !most_recent_parole_review&.no_hearing_outcome? && hearing_outcome_received_on.blank?
-
-    if earliest_date.past? &&
-      hearing_outcome_received_on.present? &&
-      hearing_outcome_received_on <= Time.zone.today - 14.days
-
-      return false
-    end
-
-    true
+    next_parole_date.present?
   end
 
   def next_parole_date
-    return target_hearing_date if target_hearing_date.present?
-
-    [tariff_date, parole_eligibility_date].compact.min
+    [target_hearing_date, tariff_date].compact.sort.find do |date|
+      date.between?(Time.zone.now, 10.months.from_now.end_of_day)
+    end
   end
 
   # Separate from next_parole_date as parole case index view sorts by next_parole_date, so it seemed sensible to avoid changing default rails behaviour
