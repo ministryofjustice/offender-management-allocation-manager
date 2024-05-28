@@ -67,5 +67,183 @@ FactoryBot.define do
                                       offender: attributes.fetch(:offender),
                                       prison_record: attributes.fetch(:prison_record)) }
 
+
+    # NOTE: It is advised to freeze time at 20th May 2024 when using the persons
+    # This makes the test data easier to read
+    #
+    # Timecop.freeze(Time.local(2024, 5, 20))
+    #
+    trait :with_persona do
+      isp { false }
+      ted { nil }
+      ped { nil }
+      mappa_level { nil }
+      recall { nil }
+
+      initialize_with {
+        sentence_data = attributes_for(:sentence_detail, (isp ? :indeterminate : :determinate), recall:)
+        api_offender = HmppsApi::Offender.new(
+          category: nil,
+          latest_temp_movement: nil,
+          complexity_level: nil,
+          offender: attributes_for(:nomis_offender,
+            sentence: sentence_data,
+            **sentence_data,
+            tariffDate: ted,
+            paroleEligibilityDate: ped,
+          ).deep_stringify_keys,
+        )
+        api_offender.prison_arrival_date = api_offender.sentence_start_date
+
+        MpcOffender.new(
+          prison: build(:prison),
+          offender: create(:offender,
+            nomis_offender_id: api_offender.offender_no,
+            case_information: build(:case_information,
+              mappa_level:
+            )
+          ),
+          prison_record: api_offender
+        )
+      }
+    end
+
+    # Robin Hoodwink has a Tariff expiry date (TED) of 20th January 2025 = COM responsibility
+    # (handover from POM to COM was 12 months prior to TED / 20/1/24)
+    trait :robin_hoodwink do
+      isp { true }
+      ted { Date.parse("20th January 2025") }
+    end
+
+    # Clarke Kentish has had two previous parole hearings,
+    # the outcome of his last parole was recorded on
+    # 1st February 2024 - ‘move to open conditions’.
+    # He has a Target Hearing Date (THD) of 30th January 2025 = COM responsibility
+    # (under 12 months)
+    trait :clarke_kentish do
+      isp { true }
+
+      after(:build) do |mpc_offender|
+        hearing_outcomes = [
+          { hearing_outcome_received_on: Date.parse("1st February 2024") - 1.year,
+            hearing_outcome: "Open Conditions - Rejected [*]" },
+          { hearing_outcome_received_on: Date.parse("1st February 2024"),
+            hearing_outcome: "Open Conditions - Accepted [*]",
+            target_hearing_date: Date.parse("30th January 2025") },
+        ]
+        hearing_outcomes.each do |hearing_outcome|
+          create(:parole_review,
+            nomis_offender_id: mpc_offender.nomis_offender_id,
+            **hearing_outcome
+          )
+        end
+      end
+    end
+
+    # Jane Heart has had one Parole hearing,
+    # the outcome was recorded on 12th May 2024 - ‘remain in closed’.
+    # She has a Target Hearing Date (THD) for 12th May 2026.
+    # She is MAPPA Level 1 = POM responsibility
+    # (Over 12 months)
+    trait :jane_heart do
+      isp { true }
+      mappa_level { 1 }
+
+      after(:build) do |mpc_offender|
+        create(:parole_review,
+          nomis_offender_id: mpc_offender.nomis_offender_id,
+          hearing_outcome_received_on: Date.parse("12th May 2024"),
+          hearing_outcome: "Stay In Closed [*]",
+          target_hearing_date: Date.parse("12th May 2026")
+        )
+      end
+    end
+
+    # Adam Leant has a Tariff expiry date (TED) of 6th November 2045 = POM responsibility
+    # (Pre-handover)
+    trait :adam_leant do
+      isp { true }
+      ted { Date.parse("6th November 2045") }
+    end
+
+    # Paul McCain has had three previous parole hearings,
+    # the outcome of his last parole was recorded on 15th May 2024 - ‘release’
+    # = COM responsibility (to be released)
+    trait :paul_mccain do
+      isp { true }
+      ped { Date.parse("15th July 2024") }
+
+      after(:build) do |mpc_offender|
+        hearing_outcomes = [
+          { hearing_outcome_received_on: Date.parse("15th May 2022"),
+            hearing_outcome: "Not Applicable" },
+          { hearing_outcome_received_on: Date.parse("15th May 2023"),
+            hearing_outcome: "Not Applicable" },
+          { hearing_outcome_received_on: Date.parse("15th May 2024"),
+            hearing_outcome: "Release [*]" },
+        ]
+        hearing_outcomes.each do |hearing_outcome|
+          create(:parole_review,
+            nomis_offender_id: mpc_offender.nomis_offender_id,
+            **hearing_outcome
+          )
+        end
+      end
+    end
+
+    # Peggy Sueis has had one Parole hearing, the outcome was recorded
+    # on 30th April 2024 - ‘remain in closed’.
+    # She has a Target Hearing Date (THD) for 16th May 2027.
+    # She is MAPPA Level 3 = COM responsibility
+    # (Mappa level 3)
+    trait :peggy_sueis do
+      isp { true }
+      mappa_level { 3 }
+
+      after(:build) do |mpc_offender|
+        create(:parole_review,
+          nomis_offender_id: mpc_offender.nomis_offender_id,
+          hearing_outcome_received_on: Date.parse("30th April 2024"),
+          hearing_outcome: "Stay In Closed [*]",
+          target_hearing_date: Date.parse("16th May 2027")
+        )
+      end
+    end
+
+    # Nelly Theeleph has been recalled back to prison, ISP prisoner.
+    # After her Recall hearing outcome which was recorded on 18th May 2024;
+    # she now has a THD for 10th May 2025 = COM responsibility
+    # (under 12 months)
+    trait :nelly_theeleph do
+      isp { true }
+      recall { true }
+
+      after(:build) do |mpc_offender|
+        create(:parole_review,
+          nomis_offender_id: mpc_offender.nomis_offender_id,
+          hearing_outcome_received_on: Date.parse("18th May 2024"),
+          hearing_outcome: "Stay In Closed [*]",
+          target_hearing_date: Date.parse("10th May 2025")
+        )
+      end
+    end
+
+    # Seymore Tress has been recalled back to prison, ISP prisoner.
+    # After his Recall hearing outcome which was recorded on 18th January 2023;
+    # she now has a THD for 10th May 2025 = COM responsibility
+    # (Handover to COM on 10th May 2024)
+    trait :seymore_tress do
+      isp { true }
+      recall { true }
+
+      after(:build) do |mpc_offender|
+        create(:parole_review,
+          nomis_offender_id: mpc_offender.nomis_offender_id,
+          hearing_outcome_received_on: Date.parse("18th January 2023"),
+          hearing_outcome: "Stay In Closed [*]",
+          target_hearing_date: Date.parse("10th May 2025")
+        )
+      end
+    end
   end
 end

@@ -1,123 +1,13 @@
 # frozen_string_literal: true
 
-describe HandoverDateService do
-  context 'when using PPUD dates' do
-    subject(:responsibility) { described_class.handover(mpc_offender) }
-
-    let(:today) { Date.parse('01/02/2024') }
-    let(:tariff_date) { today + 24.months }
-    let(:mpc_offender) { build_mpc_offender }
-    let(:parole_reviews) { [] }
-    let(:sentence_type) { :determinate }
-    let(:mappa_level) { nil }
-
-    def build_mpc_offender
-      db_offender = create(:offender, case_information: build(:case_information, mappa_level:), parole_reviews:)
-
-      api_offender = build(:hmpps_api_offender,
-                           prisonerNumber: db_offender.nomis_offender_id,
-                           prisonId: 'LEI',
-                           category: build(:offender_category, :cat_c),
-                           sentence: attributes_for(:sentence_detail, sentence_type, tariffDate: tariff_date, sentenceStartDate: '1/1/2018')
-                          )
-
-      MpcOffender.new(prison: 'LEI', offender: db_offender, prison_record: api_offender)
-    end
-
-    before { stub_const('USE_PPUD_PAROLE_DATA', true) }
-    before { allow(HmppsApi::PrisonApi::OffenderApi).to receive(:get_offender_sentences_and_offences).and_return([]) }
-
-    context "when it is within 12 months before TED (Tariff End Date)" do
-      let(:tariff_date) { today + 11.months }
-
-      specify "COM is responsible" do
-        expect(responsibility).to be_com_responsible
-      end
-    end
-
-    context "when it is within 12 months before THD (Target Hearing Date) which has come from PPUD" do
-      let(:parole_reviews) { [build(:parole_review, target_hearing_date: today + 11.months, hearing_outcome_received_on: Time.zone.today, hearing_outcome: 'Anything')] }
-
-      specify "COM is responsible" do
-        expect(responsibility).to be_com_responsible
-      end
-    end
-
-    context "when it is within 12 months before THD (Target Hearing Date) which has been manually entered" do
-      before { create(:parole_record, nomis_offender_id: mpc_offender.nomis_offender_id, parole_review_date: today + 11.months) }
-
-      specify "COM is responsible" do
-        expect(responsibility).to be_com_responsible
-      end
-    end
-
-    context 'when it is after TED and no parole decision has been made' do
-      let(:parole_reviews) { [build(:parole_review, target_hearing_date: today + 24.months)] }
-
-      specify "COM is responsible" do
-        expect(responsibility).to be_com_responsible
-      end
-    end
-
-    context 'when a parole decision of Release has been made' do
-      let(:parole_reviews) { [build(:parole_review, target_hearing_date: today - 1.day, hearing_outcome_received_on: Time.zone.today, hearing_outcome: 'Release [*]')] }
-
-      specify "COM is responsible" do
-        expect(responsibility).to be_com_responsible
-      end
-    end
-
-    context 'when a parole decision of Not Release has been made' do
-      context 'and THD is within 12 months of now' do
-        let(:parole_reviews) { [build(:parole_review, target_hearing_date: today + 11.months, hearing_outcome_received_on: Time.zone.today, hearing_outcome: 'Anything But Release')] }
-
-        specify "COM is responsible" do
-          expect(responsibility).to be_com_responsible
-        end
-      end
-
-      context 'and THD is more than 12 months of now' do
-        let(:parole_reviews) { [build(:parole_review, target_hearing_date: today + 24.months, hearing_outcome_received_on: Time.zone.today, hearing_outcome: 'Anything But Release')] }
-
-        {
-          nil => :be_pom_responsible,
-          1 => :be_pom_responsible,
-          2 => :be_com_responsible,
-          3 => :be_com_responsible
-        }.each do |mappa_level, responsibility_expectation|
-          context "and MAPPA level is #{mappa_level}" do
-            let(:mappa_level) { mappa_level }
-
-            it { is_expected.to send(responsibility_expectation) }
-          end
-        end
-      end
-    end
-
-    context 'when recalled on initial ISP sentence' do
-      let(:sentence_type) { :indeterminate_recall }
-
-      specify "COM is responsible" do
-        expect(responsibility).to be_com_responsible
-      end
-    end
-
-    context 'when offender has an additional ISP sentence' do
-      before { allow(mpc_offender).to receive(:sentenced_to_an_additional_isp?).and_return(true) }
-
-      specify "only the POM is responsible" do
-        expect(responsibility).to be_pom_responsible
-        expect(responsibility).not_to be_com_supporting
-      end
-    end
-  end
-
+describe HandoverDateService, handover_calculations: true do
   context 'when April 2023 calculations' do
     let(:mpc_offender) do
       instance_double(MpcOffender, :mpc_offender,
                       offender_no: 'X1111XX',
                       inside_omic_policy?: true,
-                      recalled?: false).as_null_object
+                      recalled?: false,
+                      indeterminate_sentence?: false).as_null_object
     end
     let(:offender_wrapper) do
       instance_double described_class::OffenderWrapper, :offender_wrapper,
@@ -131,7 +21,9 @@ describe HandoverDateService do
                       open_prison_rules_apply?: double(:open_prison_rules_apply?),
                       in_womens_prison?: double(:in_womens_prison?),
                       determinate_parole?: double(:determinate_parole?),
-                      earliest_release: earliest_release
+                      earliest_release: earliest_release,
+                      target_hearing_date: double(:target_hearing_date),
+                      tariff_date: double(:tariff_date)
     end
     let(:handover_date) { double :handover_date }
     let(:handover_start_date) { double :handover_start_date }
@@ -163,14 +55,30 @@ describe HandoverDateService do
         expect { described_class.handover(mpc_offender) }.to raise_error(/OMIC/)
       end
 
-      it 'calculates no date and COM responsible for recall cases' do
-        allow(mpc_offender).to receive_messages(recalled?: true)
+      context "when ISP recall" do
+        it 'calculates handover dates and COM responsible for recall cases' do
+          allow(offender_wrapper).to receive_messages(recalled?: true)
+          allow(offender_wrapper).to receive_messages(indeterminate_sentence?: true)
 
-        expect(described_class.handover(mpc_offender).attributes)
-          .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                        'start_date' => nil,
-                        'handover_date' => nil,
-                        'reason' => 'recall_case' })
+          expect(described_class.handover(mpc_offender).attributes)
+            .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                          'start_date' => handover_start_date,
+                          'handover_date' => handover_date,
+                          'reason' => 'recall_case' })
+        end
+      end
+
+      context "when non ISP recall" do
+        it 'calculates no date and COM responsible for recall cases' do
+          allow(offender_wrapper).to receive_messages(recalled?: true)
+          allow(offender_wrapper).to receive_messages(indeterminate_sentence?: false)
+
+          expect(described_class.handover(mpc_offender).attributes)
+            .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                          'start_date' => nil,
+                          'handover_date' => nil,
+                          'reason' => 'recall_case' })
+        end
       end
 
       it 'calculates no date and COM responsible for immigration cases' do
@@ -232,7 +140,7 @@ describe HandoverDateService do
             is_indeterminate: offender_wrapper.indeterminate_sentence?,
             open_prison_rules_apply: offender_wrapper.open_prison_rules_apply?,
             in_womens_prison: offender_wrapper.in_womens_prison?,
-          )
+          ).at_least(1).time
         end
 
         it 'is set to the calculated value' do
