@@ -52,7 +52,7 @@
       <%= render 'dashboard_partition',
                  title: "Parole cases",
                  link: prison_parole_cases_path(@prison.code),
-                 content: "All cases in the prison with a target hearing date, PED or TED in the next 10 months or that have had a hearing recently."
+                 content: t('parole.upcoming.spo')
       %>
     <% end %>
 
@@ -110,7 +110,7 @@
       <%= render 'dashboard_partition',
                  title: 'Parole cases',
                  link: prison_staff_caseload_parole_cases_path(@prison.code, @staff_id),
-                 content: "Cases with a target hearing date, PED or TED in the next 10 months or that have had a hearing recently."
+                 content: t('parole.upcoming.pom')
       %>
     <% end %>
 
