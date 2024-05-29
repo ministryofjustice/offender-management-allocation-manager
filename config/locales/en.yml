@@ -49,6 +49,11 @@ en:
     missing: 'Unknown'
     none: 'None'
 
+  parole:
+    upcoming:
+      pom: Cases with a target hearing date, PED or TED in the next 10 months
+      spo: All cases in this prison with a target hearing date, PED or TED in the next 10 months
+
   service_name: 'POM cases'
 
   activemodel:
