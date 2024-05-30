@@ -210,9 +210,7 @@ class MpcOffender
   end
 
   def sentenced_to_an_additional_isp?
-    @sentenced_to_an_additional_isp ||= OffenderService.get_offender_sentences_and_offences(booking_id)
-      .select(&:indeterminate?)
-      .count > 1
+    @sentenced_to_an_additional_isp ||= Offenders::AdditionalIsps.new(booking_id).any?
   end
 
   def pom_tasks
