@@ -639,53 +639,59 @@ RSpec.describe MpcOffender, type: :model do
   end
 
   describe "approaching_parole? and next_parole_date" do
-    subject { mpc_offender.approaching_parole? }
+    subject { mpc_offender }
 
     let(:mpc_offender) { described_class.new(prison: nil, offender: double(:offender).as_null_object, prison_record: nil) }
 
-    before { allow(mpc_offender).to receive_messages(target_hearing_date: nil, tariff_date: nil) }
+    before { allow(mpc_offender).to receive_messages(target_hearing_date: nil, tariff_date: nil, parole_eligibility_date: nil) }
 
-    parole_date_fields = %i[target_hearing_date tariff_date]
+    parole_date_fields = {
+      target_hearing_date: "Target hearing date",
+      tariff_date: "TED",
+      parole_eligibility_date: "PED"
+    }
 
-    parole_date_fields.each do |date_field|
+    parole_date_fields.each do |(date_field, date_type)|
       describe "with either parole date (in this case #{date_field})" do
         before { allow(mpc_offender).to receive(date_field).and_return(earliest_date_value) }
 
         context "when the date is 10 months in the future or earlier" do
           let(:earliest_date_value) { 10.months.from_now - 1.day }
 
-          it { is_expected.to be_truthy }
+          it { is_expected.to be_approaching_parole }
 
           specify "next parole date is #{date_field}" do
             expect(mpc_offender.next_parole_date).to eq(mpc_offender.send(date_field))
+            expect(mpc_offender.next_parole_date_type).to eq(date_type)
           end
         end
 
         context "when the date is later than 10 months in the future" do
           let(:earliest_date_value) { 10.months.from_now + 1.day }
 
-          it { is_expected.to be_falsey }
+          it { is_expected.not_to be_approaching_parole }
         end
 
         context "when the date is in the past" do
           let(:earliest_date_value) { 18.years.ago }
 
-          it { is_expected.to be_falsey }
+          it { is_expected.not_to be_approaching_parole }
         end
       end
     end
 
     context "when both parole dates are blank" do
-      it { is_expected.to be_falsey }
+      it { is_expected.not_to be_approaching_parole }
     end
 
     context "when THD is in 9 months, TED is in 5 months" do
       before { allow(mpc_offender).to receive_messages(target_hearing_date: 9.months.from_now, tariff_date: 5.months.from_now) }
 
-      it { is_expected.to be_truthy }
+      it { is_expected.to be_approaching_parole }
 
       specify "next parole date is the earlier date of the two (TED)" do
         expect(mpc_offender.next_parole_date).to eq(mpc_offender.tariff_date)
+        expect(mpc_offender.next_parole_date_type).to eq('TED')
       end
     end
   end

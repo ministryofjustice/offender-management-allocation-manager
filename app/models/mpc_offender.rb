@@ -182,7 +182,7 @@ class MpcOffender
   end
 
   def next_parole_date
-    [target_hearing_date, tariff_date].compact.sort.find do |date|
+    [target_hearing_date, tariff_date, parole_eligibility_date].compact.sort.find do |date|
       date.between?(Time.zone.now, 10.months.from_now.end_of_day)
     end
   end
