@@ -1,4 +1,4 @@
-RSpec.describe Handover::HandoverCalculation do
+RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
   let(:sentence_start_date) { Date.new(2024, 1, 1) }
 
   describe '::calculate_handover_date' do

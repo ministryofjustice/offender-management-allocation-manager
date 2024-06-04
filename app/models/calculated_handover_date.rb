@@ -11,12 +11,9 @@ class CalculatedHandoverDate < ApplicationRecord
     immigration_case: 'Immigration Case',
     release_date_unknown: 'Release Date Unknown',
 
-    within_12_months_of_tarrif_date: 'Within 12 months of TED',
-    within_12_months_of_target_hearing_date: 'Within 12 months of THD',
-    awaiting_parole_outcome: 'Awaiting Parole Review Outcome',
-    parole_outcome_release: 'Parole Review Outcome: Release',
-    parole_outcome_no_release_mappa_empty_or_1: 'MAPPA Level none/1',
-    parole_outcome_no_release_mappa_2_or_3: 'MAPPA Level 2/3',
+    thd_over_12_months: 'Next parole hearing more than 12 months away',
+    parole_mappa_2_3: 'Unsuccessful parole and Mappa 2/3',
+    additional_isp: 'Additional ISP',
 
     crc_case: 'CRC Case', # legacy
     nps_early_allocation: 'NPS Early Allocation', # legacy

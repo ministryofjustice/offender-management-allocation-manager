@@ -49,6 +49,10 @@ class ParoleReview < ApplicationRecord
     hearing_outcome == 'Release [*]'
   end
 
+  def outcome_is_not_release?
+    hearing_outcome != 'Release [*]'
+  end
+
   def active?
     ACTIVE_REVIEW_STATUS.include? review_status
   end
