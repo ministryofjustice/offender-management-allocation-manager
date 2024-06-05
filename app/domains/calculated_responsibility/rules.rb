@@ -6,7 +6,7 @@ class CalculatedResponsibility::Rules < SimpleDelegator
   end
 
   def outcome
-    isps || recalls || edge_cases || general_cases
+    isps || edge_cases || general_cases
   end
 
 private
@@ -27,16 +27,10 @@ private
     end
   end
 
-  def recalls
-    return unless recalled?
-
-    responsibility.com :recall_case, with_handover: (handover if indeterminate_sentence?)
-  end
-
   def edge_cases
     if immigration_case?
       responsibility.com :immigration_case
-    elsif !earliest_release
+    elsif !earliest_release && !recalled?
       responsibility.pom :release_date_unknown
     elsif !policy_case?
       responsibility.com :pre_omic_rules

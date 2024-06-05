@@ -60,7 +60,7 @@ class HandoverDateService
     # Work out if OMIC policy rules apply to this case
     def policy_case?
       sentenced_after_policy_started = @offender.sentence_start_date >= policy_start_date
-      release_after_cutoff = release_date >= policy_cutoff_date
+      release_after_cutoff = release_date && release_date >= policy_cutoff_date
 
       # Offenders must have been sentenced on/after the OMIC policy start date,
       # or have a release date which is on/after the 'cutoff' date.

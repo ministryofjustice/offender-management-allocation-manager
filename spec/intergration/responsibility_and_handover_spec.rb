@@ -219,5 +219,15 @@ describe "Responsibility and Handover",  handover_calculations: true do
         expect(responsibility).not_to be_com_supporting
       end
     end
+
+    context "with ISP recall offenders with no earliest release date" do
+      let(:mpc_offender) { build(:mpc_offender, :with_persona, isp: true, recall: true) }
+
+      it "is COM responsible" do
+        expect(responsibility).to be_com_responsible
+        expect(responsibility.start_date).to be_nil
+        expect(responsibility.handover_date).to be_nil
+      end
+    end
   end
 end

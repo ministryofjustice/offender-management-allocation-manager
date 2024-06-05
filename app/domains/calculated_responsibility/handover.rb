@@ -17,7 +17,8 @@ private
         is_early_allocation: offender.early_allocation?,
         is_indeterminate: offender.indeterminate_sentence?,
         in_open_conditions: offender.in_open_conditions?,
-        is_determinate_parole: offender.determinate_parole?
+        is_determinate_parole: offender.determinate_parole?,
+        is_recall: offender.recalled?
       )
 
       start_date = Handover::HandoverCalculation.calculate_handover_start_date(

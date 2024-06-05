@@ -55,32 +55,6 @@ describe HandoverDateService, handover_calculations: true do
         expect { described_class.handover(mpc_offender) }.to raise_error(/OMIC/)
       end
 
-      context "when ISP recall" do
-        it 'calculates handover dates and COM responsible for recall cases' do
-          allow(offender_wrapper).to receive_messages(recalled?: true)
-          allow(offender_wrapper).to receive_messages(indeterminate_sentence?: true)
-
-          expect(described_class.handover(mpc_offender).attributes)
-            .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                          'start_date' => handover_start_date,
-                          'handover_date' => handover_date,
-                          'reason' => 'recall_case' })
-        end
-      end
-
-      context "when non ISP recall" do
-        it 'calculates no date and COM responsible for recall cases' do
-          allow(offender_wrapper).to receive_messages(recalled?: true)
-          allow(offender_wrapper).to receive_messages(indeterminate_sentence?: false)
-
-          expect(described_class.handover(mpc_offender).attributes)
-            .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                          'start_date' => nil,
-                          'handover_date' => nil,
-                          'reason' => 'recall_case' })
-        end
-      end
-
       it 'calculates no date and COM responsible for immigration cases' do
         allow(offender_wrapper).to receive_messages(immigration_case?: true)
 
@@ -123,7 +97,8 @@ describe HandoverDateService, handover_calculations: true do
             is_early_allocation: offender_wrapper.early_allocation?,
             is_indeterminate: offender_wrapper.indeterminate_sentence?,
             in_open_conditions: offender_wrapper.in_open_conditions?,
-            is_determinate_parole: offender_wrapper.determinate_parole?)
+            is_determinate_parole: offender_wrapper.determinate_parole?,
+            is_recall: offender_wrapper.recalled?)
         end
 
         it 'returns results of official calculations' do

@@ -10,7 +10,8 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
                                                            is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
-                                                           is_early_allocation: false)
+                                                           is_early_allocation: false,
+                                                           is_recall: false)
           expect(result).to eq [nil, :determinate_short]
         end
       end
@@ -22,7 +23,8 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
                                                            is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
-                                                           is_early_allocation: false)
+                                                           is_early_allocation: false,
+                                                           is_recall: false)
           expect(result).to eq [nil, :determinate_short]
         end
       end
@@ -34,7 +36,8 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
                                                            is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
-                                                           is_early_allocation: false)
+                                                           is_early_allocation: false,
+                                                           is_recall: false)
           expect(result).to eq [Date.new(2024, 2, 17), :determinate]
         end
       end
@@ -46,7 +49,8 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
                                                            is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
-                                                           is_early_allocation: false)
+                                                           is_early_allocation: false,
+                                                           is_recall: false)
           expect(result).to eq [Date.new(2024, 2, 18), :determinate]
         end
       end
@@ -58,7 +62,8 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
                                                            is_determinate_parole: false,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
-                                                           is_early_allocation: true)
+                                                           is_early_allocation: true,
+                                                           is_recall: false)
           expect(result).to eq [Date.new(2024, 10, 1), :early_allocation]
         end
 
@@ -68,7 +73,8 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
                                                            is_determinate_parole: true,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
-                                                           is_early_allocation: true)
+                                                           is_early_allocation: true,
+                                                           is_recall: false)
           expect(result).to eq [Date.new(2024, 10, 1), :early_allocation]
         end
       end
@@ -80,23 +86,41 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
                                                            is_determinate_parole: true,
                                                            is_indeterminate: false,
                                                            in_open_conditions: false,
-                                                           is_early_allocation: false)
+                                                           is_early_allocation: false,
+                                                           is_recall: false)
           expect(result).to eq [Date.new(2025, 1, 1), :determinate_parole]
         end
       end
     end
 
     describe 'for indeterminate case' do
+      let(:is_recall) { false }
+      let(:earliest_release_date) { Date.new(2026, 1, 1) }
+      let(:open_conditions) { false }
+
       let(:result) do
-        described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
-                                                earliest_release_date: Date.new(2026, 1, 1),
+        described_class.calculate_handover_date(sentence_start_date:,
+                                                earliest_release_date:,
                                                 is_determinate_parole: false,
                                                 is_indeterminate: true,
                                                 in_open_conditions: open_conditions,
-                                                is_early_allocation: false)
+                                                is_early_allocation: false,
+                                                is_recall:)
       end
 
-      describe 'when open prison' do
+      context 'when offender is ISP recall' do
+        let(:is_recall) { true }
+
+        context "when earliest release date is empty" do
+          let(:earliest_release_date) { nil }
+
+          example 'handover dates are empty' do
+            expect(result).to eq [nil, :recall_case]
+          end
+        end
+      end
+
+      context 'when open prison' do
         let(:open_conditions) { true }
 
         example 'handover date is 12 months before earliest release date' do
@@ -104,7 +128,7 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
         end
       end
 
-      describe 'when non-open prison' do
+      context 'when non-open prison' do
         let(:open_conditions) { false }
 
         example 'handover date is 12 months before earliest release date' do
@@ -112,14 +136,15 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
         end
       end
 
-      describe 'when early allocation' do
+      context 'when early allocation' do
         example 'handover date is 15 months before earliest release date' do
           result = described_class.calculate_handover_date(sentence_start_date: sentence_start_date,
                                                            earliest_release_date: Date.new(2026, 1, 1),
                                                            is_determinate_parole: false,
                                                            is_indeterminate: true,
                                                            in_open_conditions: false,
-                                                           is_early_allocation: true)
+                                                           is_early_allocation: true,
+                                                           is_recall: false)
           expect(result).to eq [Date.new(2024, 10, 1), :early_allocation]
         end
       end
