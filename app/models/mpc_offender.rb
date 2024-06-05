@@ -454,7 +454,9 @@ private
   end
 
   def responsibility
-    @offender.responsibility || @offender.calculated_handover_date || HandoverDateService.handover(self)
+    @responsibility ||= @offender.responsibility || \
+      @offender.calculated_handover_date || \
+      HandoverDateService.handover(self)
   end
 
   def build_pom_tasks

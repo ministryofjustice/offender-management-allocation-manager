@@ -23,7 +23,11 @@ describe HandoverDateService, handover_calculations: true do
                       determinate_parole?: double(:determinate_parole?),
                       earliest_release: earliest_release,
                       target_hearing_date: double(:target_hearing_date),
-                      tariff_date: double(:tariff_date)
+                      tariff_date: double(:tariff_date),
+                      parole_outcome_not_release?: false,
+                      thd_12_or_more_months_from_now?: false,
+                      mappa_level: [],
+                      sentenced_to_an_additional_isp?: false
     end
     let(:handover_date) { double :handover_date }
     let(:handover_start_date) { double :handover_start_date }
@@ -53,32 +57,6 @@ describe HandoverDateService, handover_calculations: true do
       it 'raises error when outside OMIC policy' do
         allow(mpc_offender).to receive_messages(inside_omic_policy?: false)
         expect { described_class.handover(mpc_offender) }.to raise_error(/OMIC/)
-      end
-
-      context "when ISP recall" do
-        it 'calculates handover dates and COM responsible for recall cases' do
-          allow(offender_wrapper).to receive_messages(recalled?: true)
-          allow(offender_wrapper).to receive_messages(indeterminate_sentence?: true)
-
-          expect(described_class.handover(mpc_offender).attributes)
-            .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                          'start_date' => handover_start_date,
-                          'handover_date' => handover_date,
-                          'reason' => 'recall_case' })
-        end
-      end
-
-      context "when non ISP recall" do
-        it 'calculates no date and COM responsible for recall cases' do
-          allow(offender_wrapper).to receive_messages(recalled?: true)
-          allow(offender_wrapper).to receive_messages(indeterminate_sentence?: false)
-
-          expect(described_class.handover(mpc_offender).attributes)
-            .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-                          'start_date' => nil,
-                          'handover_date' => nil,
-                          'reason' => 'recall_case' })
-        end
       end
 
       it 'calculates no date and COM responsible for immigration cases' do
@@ -123,7 +101,8 @@ describe HandoverDateService, handover_calculations: true do
             is_early_allocation: offender_wrapper.early_allocation?,
             is_indeterminate: offender_wrapper.indeterminate_sentence?,
             in_open_conditions: offender_wrapper.in_open_conditions?,
-            is_determinate_parole: offender_wrapper.determinate_parole?)
+            is_determinate_parole: offender_wrapper.determinate_parole?,
+            is_recall: offender_wrapper.recalled?)
         end
 
         it 'returns results of official calculations' do

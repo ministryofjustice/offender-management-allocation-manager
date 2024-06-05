@@ -37,7 +37,8 @@ class HandoverDateService
     end
 
     offender = OffenderWrapper.new(mpc_offender)
-    CalculatedResponsibility.new(offender).result
+    handover = OffenderHandover.new(offender)
+    handover.as_calculated_handover_date
   end
 
   # TODO: Clean up all the shit here that's no longer used
@@ -60,7 +61,7 @@ class HandoverDateService
     # Work out if OMIC policy rules apply to this case
     def policy_case?
       sentenced_after_policy_started = @offender.sentence_start_date >= policy_start_date
-      release_after_cutoff = release_date >= policy_cutoff_date
+      release_after_cutoff = release_date && release_date >= policy_cutoff_date
 
       # Offenders must have been sentenced on/after the OMIC policy start date,
       # or have a release date which is on/after the 'cutoff' date.
