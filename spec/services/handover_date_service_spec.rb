@@ -23,7 +23,11 @@ describe HandoverDateService, handover_calculations: true do
                       determinate_parole?: double(:determinate_parole?),
                       earliest_release: earliest_release,
                       target_hearing_date: double(:target_hearing_date),
-                      tariff_date: double(:tariff_date)
+                      tariff_date: double(:tariff_date),
+                      parole_outcome_not_release?: false,
+                      thd_12_or_more_months_from_now?: false,
+                      mappa_level: [],
+                      sentenced_to_an_additional_isp?: false
     end
     let(:handover_date) { double :handover_date }
     let(:handover_start_date) { double :handover_start_date }

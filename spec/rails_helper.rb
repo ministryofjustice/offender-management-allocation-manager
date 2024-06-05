@@ -121,6 +121,10 @@ RSpec.configure do |config|
     allow(PushPomToDeliusJob).to receive(:perform_later)
   end
 
+  config.before(:each) do
+    stub_request(:get, %r{#{Rails.configuration.prison_api_host}/api/offender-sentences/booking/\d+/sentenceTerms}).to_return(body: [].to_json)
+  end
+
   config.before(:each) do |example|
     if [:feature, :controller].include?(example.metadata[:type]) and
       example.metadata[:skip_dps_header_footer_stubbing].blank?

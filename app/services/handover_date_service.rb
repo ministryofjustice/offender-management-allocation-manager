@@ -37,7 +37,8 @@ class HandoverDateService
     end
 
     offender = OffenderWrapper.new(mpc_offender)
-    CalculatedResponsibility.new(offender).result
+    handover = OffenderHandover.new(offender)
+    handover.as_calculated_handover_date
   end
 
   # TODO: Clean up all the shit here that's no longer used
