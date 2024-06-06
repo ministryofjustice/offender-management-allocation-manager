@@ -29,7 +29,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), enhanced_resourcing: true, manual_entry: false)
       FactoryBot.create(:calculated_handover_date, :before_handover, nomis_offender_id: offender_no)
       offender # instantiate it after the previous lines
-      allow(HandoverDateService).to receive(:handover).and_return(HandoverDateService::NO_HANDOVER_DATE)
+      allow(HandoverDateService).to receive(:handover).and_return(OffenderHandover::COM_NO_HANDOVER_DATE)
 
       described_class.perform_now(offender_no)
     end
@@ -303,7 +303,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     # Default: male offender
     let(:prison) { create(:prison, :open) }
     let(:category) { attributes_for(:offender_category, :cat_d) }
-    let(:policy_start_date) { HandoverDateService::OPEN_PRISON_POLICY_START_DATE }
+    let(:policy_start_date) { Offenders::PrisonPolicies::OPEN_PRISON_POLICY_START_DATE }
 
     before do
       stub_offender(nomis_offender)
@@ -333,7 +333,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
     context 'when in a female prison' do
       let(:prison) { create(:womens_prison) }
       let(:category) { attributes_for(:offender_category, :female_open) }
-      let(:policy_start_date) { HandoverDateService::WOMENS_POLICY_START_DATE }
+      let(:policy_start_date) { Offenders::PrisonPolicies::WOMENS_POLICY_START_DATE }
 
       it 'emails the LDU to notify them that a COM is now needed', :aggregate_failures do
         expect { described_class.perform_now(offender_no) }.to change(EmailHistory, :count).by(1)

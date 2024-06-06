@@ -7,11 +7,8 @@ describe HandoverDateService, handover_calculations: true do
                       offender_no: 'X1111XX',
                       inside_omic_policy?: true,
                       recalled?: false,
-                      indeterminate_sentence?: false).as_null_object
-    end
-    let(:offender_wrapper) do
-      instance_double described_class::OffenderWrapper, :offender_wrapper,
-                      policy_case?: true, recalled?: false, immigration_case?: false,
+                      policy_case?: true,
+                      immigration_case?: false,
                       sentence_start_date: double(:sentence_start_date),
                       early_allocation?: double(:early_allocation?),
                       indeterminate_sentence?: double(:indeterminate_sentence?),
@@ -21,13 +18,13 @@ describe HandoverDateService, handover_calculations: true do
                       open_prison_rules_apply?: double(:open_prison_rules_apply?),
                       in_womens_prison?: double(:in_womens_prison?),
                       determinate_parole?: double(:determinate_parole?),
-                      earliest_release: earliest_release,
+                      earliest_release_for_handover: earliest_release,
                       target_hearing_date: double(:target_hearing_date),
                       tariff_date: double(:tariff_date),
                       parole_outcome_not_release?: false,
                       thd_12_or_more_months_from_now?: false,
                       mappa_level: [],
-                      sentenced_to_an_additional_isp?: false
+                      sentenced_to_an_additional_isp?: false)
     end
     let(:handover_date) { double :handover_date }
     let(:handover_start_date) { double :handover_start_date }
@@ -35,8 +32,6 @@ describe HandoverDateService, handover_calculations: true do
     let(:earliest_release) { double(:earliest_release, date: double(:earliest_release_date)) }
 
     before do
-      allow(described_class::OffenderWrapper).to receive(:new).with(mpc_offender)
-                                                              .and_return(offender_wrapper)
       allow(Handover::HandoverCalculation)
         .to receive_messages(calculate_handover_date: [handover_date, 'policy_reason'],
                              calculate_handover_start_date: handover_start_date,
@@ -60,7 +55,7 @@ describe HandoverDateService, handover_calculations: true do
       end
 
       it 'calculates no date and COM responsible for immigration cases' do
-        allow(offender_wrapper).to receive_messages(immigration_case?: true)
+        allow(mpc_offender).to receive_messages(immigration_case?: true)
 
         expect(described_class.handover(mpc_offender).attributes)
           .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
@@ -70,7 +65,7 @@ describe HandoverDateService, handover_calculations: true do
       end
 
       it 'calculates no date and COM responsible when no release date' do
-        allow(offender_wrapper).to receive(:earliest_release).and_return(nil)
+        allow(mpc_offender).to receive(:earliest_release_for_handover).and_return(nil)
 
         expect(described_class.handover(mpc_offender).attributes)
           .to include({ 'responsibility' => CalculatedHandoverDate::CUSTODY_ONLY,
@@ -80,7 +75,7 @@ describe HandoverDateService, handover_calculations: true do
       end
 
       it 'calculates no date and COM responsible when pre-OMIC case' do
-        allow(offender_wrapper).to receive_messages(policy_case?: false)
+        allow(mpc_offender).to receive_messages(policy_case?: false)
 
         expect(described_class.handover(mpc_offender).attributes)
           .to include({ 'responsibility' => CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
@@ -96,13 +91,13 @@ describe HandoverDateService, handover_calculations: true do
       describe 'handover date' do
         it 'uses official calculations correctly' do
           expect(Handover::HandoverCalculation).to have_received(:calculate_handover_date).with(
-            sentence_start_date: offender_wrapper.sentence_start_date,
+            sentence_start_date: mpc_offender.sentence_start_date,
             earliest_release_date: earliest_release.date,
-            is_early_allocation: offender_wrapper.early_allocation?,
-            is_indeterminate: offender_wrapper.indeterminate_sentence?,
-            in_open_conditions: offender_wrapper.in_open_conditions?,
-            is_determinate_parole: offender_wrapper.determinate_parole?,
-            is_recall: offender_wrapper.recalled?)
+            is_early_allocation: mpc_offender.early_allocation?,
+            is_indeterminate: mpc_offender.indeterminate_sentence?,
+            in_open_conditions: mpc_offender.in_open_conditions?,
+            is_determinate_parole: mpc_offender.determinate_parole?,
+            is_recall: mpc_offender.recalled?)
         end
 
         it 'returns results of official calculations' do
@@ -114,11 +109,11 @@ describe HandoverDateService, handover_calculations: true do
         it 'uses official calculations correctly' do
           expect(Handover::HandoverCalculation).to have_received(:calculate_handover_start_date).with(
             handover_date: handover_date,
-            category_active_since_date: offender_wrapper.category_active_since,
-            prison_arrival_date: offender_wrapper.prison_arrival_date,
-            is_indeterminate: offender_wrapper.indeterminate_sentence?,
-            open_prison_rules_apply: offender_wrapper.open_prison_rules_apply?,
-            in_womens_prison: offender_wrapper.in_womens_prison?,
+            category_active_since_date: mpc_offender.category_active_since,
+            prison_arrival_date: mpc_offender.prison_arrival_date,
+            is_indeterminate: mpc_offender.indeterminate_sentence?,
+            open_prison_rules_apply: mpc_offender.open_prison_rules_apply?,
+            in_womens_prison: mpc_offender.in_womens_prison?,
           ).at_least(1).time
         end
 

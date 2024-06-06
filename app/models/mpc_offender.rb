@@ -433,6 +433,22 @@ class MpcOffender
     end
   end
 
+  def policy_case?
+    Offenders::PrisonPolicies.new(self).policy_case?
+  end
+
+  def open_prison_rules_apply?
+    Offenders::PrisonPolicies.new(self).open_prison_rules_apply?
+  end
+
+  def in_womens_prison?
+    Offenders::PrisonPolicies.new(self).in_womens_prison?
+  end
+
+  def in_open_conditions?
+    Offenders::PrisonPolicies.new(self).in_open_conditions?
+  end
+
 private
 
   def early_allocation_notes?
@@ -449,7 +465,7 @@ private
     @handover ||= if pom_responsible?
                     HandoverDateService.handover(self)
                   else
-                    HandoverDateService::NO_HANDOVER_DATE
+                    OffenderHandover::COM_NO_HANDOVER_DATE
                   end
   end
 
