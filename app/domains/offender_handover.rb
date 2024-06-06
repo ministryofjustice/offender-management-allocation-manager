@@ -11,7 +11,7 @@ class OffenderHandover < SimpleDelegator
       CalculatedHandoverDate.new(responsibility: pom_only, reason: :additional_isp)
     elsif immigration_case?
       CalculatedHandoverDate.new(responsibility: com, reason: :immigration_case)
-    elsif !earliest_release && !recalled?
+    elsif !earliest_release_for_handover && !recalled?
       CalculatedHandoverDate.new(responsibility: pom_only, reason: :release_date_unknown)
     elsif !policy_case?
       CalculatedHandoverDate.new(responsibility: com, reason: :pre_omic_rules)
@@ -29,7 +29,7 @@ private
   def general_rules
     handover_date, reason = Handover::HandoverCalculation.calculate_handover_date(
       sentence_start_date:,
-      earliest_release_date: earliest_release&.date,
+      earliest_release_date: earliest_release_for_handover&.date,
       is_early_allocation: early_allocation?,
       is_indeterminate: indeterminate_sentence?,
       in_open_conditions: in_open_conditions?,
