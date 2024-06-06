@@ -465,7 +465,7 @@ private
     @handover ||= if pom_responsible?
                     HandoverDateService.handover(self)
                   else
-                    CalculatedHandoverDate::COM_NO_HANDOVER_DATE
+                    OffenderHandover::COM_NO_HANDOVER_DATE
                   end
   end
 

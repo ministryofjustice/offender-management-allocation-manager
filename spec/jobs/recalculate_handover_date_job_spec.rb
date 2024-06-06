@@ -29,7 +29,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), enhanced_resourcing: true, manual_entry: false)
       FactoryBot.create(:calculated_handover_date, :before_handover, nomis_offender_id: offender_no)
       offender # instantiate it after the previous lines
-      allow(HandoverDateService).to receive(:handover).and_return(CalculatedHandoverDate::COM_NO_HANDOVER_DATE)
+      allow(HandoverDateService).to receive(:handover).and_return(OffenderHandover::COM_NO_HANDOVER_DATE)
 
       described_class.perform_now(offender_no)
     end

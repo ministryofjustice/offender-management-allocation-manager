@@ -5,10 +5,6 @@ class CalculatedHandoverDate < ApplicationRecord
   CUSTODY_WITH_COM = 'CustodyWithCom'
   COMMUNITY_RESPONSIBLE = 'Community'
 
-  COM_NO_HANDOVER_DATE = new responsibility: COMMUNITY_RESPONSIBLE,
-                             start_date: nil, handover_date: nil,
-                             reason: :com_responsibility
-
   REASONS = {
     com_responsibility: 'COM Responsibility',
     recall_case: 'Recall case',

@@ -1,4 +1,8 @@
 class OffenderHandover < SimpleDelegator
+  COM_NO_HANDOVER_DATE = CalculatedHandoverDate.new(
+    responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+    reason: :com_responsibility)
+
   def as_calculated_handover_date
     if USE_PPUD_PAROLE_DATA && indeterminate_sentence? && \
         parole_outcome_not_release? && thd_12_or_more_months_from_now?
