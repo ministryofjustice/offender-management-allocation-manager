@@ -209,11 +209,15 @@ describe HmppsApi::PrisonApi::OffenderApi do
   end
 
   describe 'fetching an image' do
-    it "can get a user's jpg",
-       vcr: { cassette_name: 'prison_api/offender_api_image_spec' } do
-      booking_id = 1_153_753
-      response = described_class.get_image(booking_id)
+    let(:default_image_file) { described_class.default_image }
+    let(:booking_id) { 1_153_753 }
+    let(:image_id) { 1_340_556 }
 
+    let(:details_uri) { "#{ApiHelper::T3}/offender-sentences/bookings" }
+    let(:images_uri) { "#{ApiHelper::T3}/images/#{image_id}/data" }
+
+    it "can get a user's jpg", vcr: { cassette_name: 'prison_api/offender_api_image_spec' } do
+      response = described_class.get_image(booking_id)
       expect(response).not_to be_nil
 
       # JPEG files start with FF D8 FF as the first three bytes ...
@@ -228,62 +232,39 @@ describe HmppsApi::PrisonApi::OffenderApi do
       expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
     end
 
-    it "shows default image if there is no image available" do
-      booking_id = 1_153_753
-      image_id = 1_340_556
-      details_uri = "#{ApiHelper::T3}/offender-sentences/bookings"
-      images_uri = "#{ApiHelper::T3}/images/#{image_id}/data"
+    context 'when image is not found' do
+      it 'returns the default image' do
+        stub_request(:post, details_uri).with(body: "[#{booking_id}]").to_return(
+          body: [{ bookingId: booking_id, facialImageId: image_id }].to_json
+        )
+        stub_request(:get, images_uri).to_return(status: 404)
 
-      stub_request(:post, details_uri).to_return(body: [{ bookingId: booking_id, facialImageId: image_id }].to_json)
-      stub_request(:get, images_uri).to_return(status: 404)
-
-      response = described_class.get_image(booking_id)
-      default_image_file = described_class.default_image
-
-      expect(default_image_file).to eq(response)
+        response = described_class.get_image(booking_id)
+        expect(response).to eq(default_image_file)
+      end
     end
 
-    it "uses a default image if there is no available image",
-       vcr: { cassette_name: 'prison_api/offender_api_image_use_default_image' } do
-      booking_id = 1_153_753
-      image_id = 1_340_556
-      uri = "#{ApiHelper::T3}/images/#{image_id}/data"
+    context 'when request for image returns empty' do
+      it 'returns the default image' do
+        stub_request(:post, details_uri).with(body: "[#{booking_id}]").to_return(
+          body: [{ bookingId: booking_id, facialImageId: image_id }].to_json
+        )
+        stub_request(:get, images_uri).to_return(body: '')
 
-      WebMock.stub_request(:get, uri).to_return(body: "")
-
-      response = described_class.get_image(booking_id)
-      expect(response).not_to be nil?
-
-      jpeg_start_sentinel = [0xFF, 0xD8, 0xFF]
-      jpeg_end_sentinel = [0xFF, 0xD9]
-
-      bytes = response.bytes.to_a
-
-      expect(bytes[0, 3]).to eq(jpeg_start_sentinel)
-      expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
+        response = described_class.get_image(booking_id)
+        expect(response).to eq(default_image_file)
+      end
     end
 
-    it "uses the default image if no offender facialImageId found",
-       vcr: { cassette_name: 'prison_api/offender_api_no_facial_image_id' } do
-      booking_id = 1_153_753
-      uri = "#{ApiHelper::T3}/offender-sentences/bookings"
+    context 'when attribute `facialImageId` is missing' do
+      it 'returns the default image' do
+        stub_request(:post, details_uri).with(body: "[#{booking_id}]").to_return(
+          body: [{ bookingId: booking_id }].to_json
+        )
 
-      WebMock.stub_request(:post, uri).with(body: "[#{booking_id}]").to_return(
-        body: [
-          { "bookingId": 1_153_753,
-            "dateOfBirth": "1953-04-15"
-        }].to_json)
-
-      response = described_class.get_image(booking_id)
-      expect(response).not_to be nil?
-
-      jpeg_start_sentinel = [0xFF, 0xD8, 0xFF]
-      jpeg_end_sentinel = [0xFF, 0xD9]
-
-      bytes = response.bytes.to_a
-
-      expect(bytes[0, 3]).to eq(jpeg_start_sentinel)
-      expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
+        response = described_class.get_image(booking_id)
+        expect(response).to eq(default_image_file)
+      end
     end
   end
 end
