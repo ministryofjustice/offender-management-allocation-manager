@@ -228,19 +228,19 @@ describe HmppsApi::PrisonApi::OffenderApi do
       expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
     end
 
-    it "shows default image if there is no image available",
-       vcr: { cassette_name: 'prison_api/offender_api_image_not_found' }, local_only: true do
+    it "shows default image if there is no image available" do
       booking_id = 1_153_753
       image_id = 1_340_556
-      uri = "#{ApiHelper::T3}/images/#{image_id}/data"
+      details_uri = "#{ApiHelper::T3}/offender-sentences/bookings"
+      images_uri = "#{ApiHelper::T3}/images/#{image_id}/data"
 
-      stub_request(:get, uri).to_return(status: 404)
+      stub_request(:post, details_uri).to_return(body: [{ bookingId: booking_id, facialImageId: image_id }].to_json)
+      stub_request(:get, images_uri).to_return(status: 404)
 
       response = described_class.get_image(booking_id)
-      default_image_file = Rails.root.join('app/assets/images/default_profile_image.jpg')
+      default_image_file = described_class.default_image
 
-      image_bytes = File.read(default_image_file)
-      expect(image_bytes).to eq(response)
+      expect(default_image_file).to eq(response)
     end
 
     it "uses a default image if there is no available image",
