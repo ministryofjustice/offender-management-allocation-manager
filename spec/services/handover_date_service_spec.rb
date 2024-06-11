@@ -96,8 +96,7 @@ describe HandoverDateService, handover_calculations: true do
             is_early_allocation: mpc_offender.early_allocation?,
             is_indeterminate: mpc_offender.indeterminate_sentence?,
             in_open_conditions: mpc_offender.in_open_conditions?,
-            is_determinate_parole: mpc_offender.determinate_parole?,
-            is_recall: mpc_offender.recalled?)
+            is_determinate_parole: mpc_offender.determinate_parole?)
         end
 
         it 'returns results of official calculations' do

@@ -4,31 +4,36 @@ class OffenderHandover < SimpleDelegator
     reason: :com_responsibility)
 
   def as_calculated_handover_date
-    if USE_PPUD_PAROLE_DATA && indeterminate_sentence? && \
-        parole_outcome_not_release? && thd_12_or_more_months_from_now?
-      if mappa_level.in?([2, 3])
-        CalculatedHandoverDate.new(responsibility: com, reason: :mappa_2_or_3)
-      else
-        CalculatedHandoverDate.new(responsibility: pom_with_com, reason: :thd_over_12_months)
-      end
-    elsif USE_PPUD_PAROLE_DATA && indeterminate_sentence? && sentenced_to_an_additional_isp?
-      CalculatedHandoverDate.new(responsibility: pom_only, reason: :additional_isp)
-    elsif immigration_case?
-      CalculatedHandoverDate.new(responsibility: com, reason: :immigration_case)
-    elsif !earliest_release_for_handover && !recalled?
-      CalculatedHandoverDate.new(responsibility: pom_only, reason: :release_date_unknown)
-    elsif !policy_case?
-      CalculatedHandoverDate.new(responsibility: com, reason: :pre_omic_rules)
-    else
-      general_rules
-    end
+    indeterminate_sentences || edge_cases || general_rules
   end
 
 private
 
-  def pom_only = CalculatedHandoverDate::CUSTODY_ONLY
-  def pom_with_com = CalculatedHandoverDate::CUSTODY_WITH_COM
-  def com = CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
+  def indeterminate_sentences
+    return unless USE_PPUD_PAROLE_DATA && indeterminate_sentence?
+
+    if parole_outcome_not_release? && thd_12_or_more_months_from_now? && mappa_level.in?([2, 3])
+      CalculatedHandoverDate.new(responsibility: com, reason: :mappa_2_or_3)
+    elsif parole_outcome_not_release? && thd_12_or_more_months_from_now? && mappa_level.in?([nil, 1])
+      CalculatedHandoverDate.new(responsibility: pom_with_com, reason: :thd_over_12_months)
+    elsif sentenced_to_an_additional_isp?
+      CalculatedHandoverDate.new(responsibility: pom_only, reason: :additional_isp)
+    elsif recalled?
+      CalculatedHandoverDate.new(responsibility: com, reason: :recall_case, **general_rules.slice(:handover_date, :start_date))
+    end
+  end
+
+  def edge_cases
+    if recalled?
+      CalculatedHandoverDate.new(responsibility: com, reason: :recall_case)
+    elsif immigration_case?
+      CalculatedHandoverDate.new(responsibility: com, reason: :immigration_case)
+    elsif !earliest_release_for_handover
+      CalculatedHandoverDate.new(responsibility: pom_only, reason: :release_date_unknown)
+    elsif !policy_case?
+      CalculatedHandoverDate.new(responsibility: com, reason: :pre_omic_rules)
+    end
+  end
 
   def general_rules
     handover_date, reason = Handover::HandoverCalculation.calculate_handover_date(
@@ -37,8 +42,7 @@ private
       is_early_allocation: early_allocation?,
       is_indeterminate: indeterminate_sentence?,
       in_open_conditions: in_open_conditions?,
-      is_determinate_parole: determinate_parole?,
-      is_recall: recalled?
+      is_determinate_parole: determinate_parole?
     )
 
     start_date = Handover::HandoverCalculation.calculate_handover_start_date(
@@ -57,4 +61,8 @@ private
 
     CalculatedHandoverDate.new(responsibility:, handover_date:, start_date:, reason:)
   end
+
+  def pom_only = CalculatedHandoverDate::CUSTODY_ONLY
+  def pom_with_com = CalculatedHandoverDate::CUSTODY_WITH_COM
+  def com = CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
 end

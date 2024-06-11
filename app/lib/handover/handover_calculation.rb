@@ -9,14 +9,11 @@ module Handover::HandoverCalculation
                                 is_determinate_parole:,
                                 is_early_allocation:,
                                 is_indeterminate:,
-                                in_open_conditions:,
-                                is_recall:)
+                                in_open_conditions:)
       if is_early_allocation
         [earliest_release_date - 15.months, :early_allocation]
-      elsif is_recall
-        [(earliest_release_date - 12.months if earliest_release_date), :recall_case]
       elsif is_indeterminate
-        [earliest_release_date - 12.months, in_open_conditions ? :indeterminate_open : :indeterminate]
+        [(earliest_release_date - 12.months if earliest_release_date), in_open_conditions ? :indeterminate_open : :indeterminate]
       elsif sentence_start_date + 10.months >= earliest_release_date
         [nil, :determinate_short]
       elsif is_determinate_parole
