@@ -237,6 +237,16 @@ describe "Responsibility and Handover",  handover_calculations: true do
         expect(responsibility).to be_com_responsible
         expect(responsibility.start_date).to eq(Date.parse("20th January 2024"))
         expect(responsibility.handover_date).to eq(Date.parse("20th January 2024"))
+        expect(responsibility.reason).to eq("recall_case")
+      end
+    end
+
+    context "with determinate recall offenders" do
+      let(:mpc_offender) { build(:mpc_offender, :with_persona, isp: false, recall: true, ted: Date.parse("20th January 2025")) }
+
+      it "is COM responsible" do
+        expect(responsibility).to be_com_responsible
+        expect(responsibility.reason).to eq("recall_case")
       end
     end
   end
