@@ -18,9 +18,13 @@ module Api
 
     # Overrides parent due to endpoint-specific roles
     def verify_token
+      unless token.valid?
+        return render_error('Valid authorisation token required', 1, 401)
+      end
+
       unless token.valid_token_with_scope?('read', role: SAR_ROLE) ||
              token.valid_token_with_scope?('read', role: MPC_ADMIN_ROLE)
-        render_error('Valid authorisation token required', 1, 401)
+        render_error('Invalid token role', 5, 403)
       end
     end
 
