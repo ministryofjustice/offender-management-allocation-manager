@@ -446,7 +446,7 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
 
             # We're on the 'View' page
             expect(page).to have_content 'View previous early allocation assessment'
-            expect(page).to have_content 3.days.ago.to_date.to_s(:rfc822)
+            expect(page).to have_content 3.days.ago.to_date.to_formatted_s(:rfc822)
             expect(page).to have_content 'Eligible - assessment not sent to the community probation team'
           end
         end

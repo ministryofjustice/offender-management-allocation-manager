@@ -1,6 +1,6 @@
 Rails.application.configure do
   stdout_logger = ActiveSupport::Logger.new($stdout)
-  config.lograge.logger.extend(ActiveSupport::Logger.broadcast(stdout_logger))
+  config.lograge.logger = ActiveSupport::BroadcastLogger.new(stdout_logger)
   config.lograge.custom_options = lambda do |event|
     ex = event.payload[:exception_object]
     if ex

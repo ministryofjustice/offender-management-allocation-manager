@@ -36,7 +36,8 @@ RSpec.describe "poms/show", type: :view do
       pending_handover_count: 42,
       in_progress_handover_count: 0,
       pending_task_count: 0,
-      last_allocated_date: allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date
+      last_allocated_date: allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date,
+      parole_cases_count: 0
     })
 
     render
@@ -77,7 +78,7 @@ RSpec.describe "poms/show", type: :view do
     end
 
     it 'shows last case allocated date' do
-      expect(summary_rows.first).to have_content(two_days_ago.to_s(:rfc822))
+      expect(summary_rows.first).to have_content(two_days_ago.to_formatted_s(:rfc822))
     end
 
     it 'shows allocations in last 7 days' do

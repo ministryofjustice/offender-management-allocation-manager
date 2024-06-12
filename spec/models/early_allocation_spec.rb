@@ -20,7 +20,7 @@ RSpec.describe EarlyAllocation, type: :model do
 
     it 'validates' do
       expect(ea).not_to be_valid
-      expect(ea.errors.full_messages_for(:oasys_risk_assessment_date)).to eq(['This date must be in the last 3 months'])
+      expect(ea.errors[:oasys_risk_assessment_date]).to eq(['This date must be in the last 3 months'])
     end
   end
 
@@ -29,7 +29,7 @@ RSpec.describe EarlyAllocation, type: :model do
 
     it 'validates' do
       expect(ea).not_to be_valid
-      expect(ea.errors.full_messages_for(:oasys_risk_assessment_date)).to eq(['This must not be a date in the future'])
+      expect(ea.errors[:oasys_risk_assessment_date]).to eq(['This must not be a date in the future'])
     end
   end
 

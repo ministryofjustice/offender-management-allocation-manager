@@ -505,7 +505,7 @@ http_interactions:
       x-frame-options:
       - SAMEORIGIN
     body:
-      encoding: ASCII-8BIT
+      encoding: UTF-8
       string: '{"staffId":485926,"firstName":"MOIC","lastName":"POM","status":"ACTIVE"}'
   recorded_at: Thu, 12 Oct 2023 13:21:46 GMT
 - request:
@@ -543,7 +543,7 @@ http_interactions:
       x-frame-options:
       - SAMEORIGIN
     body:
-      encoding: ASCII-8BIT
+      encoding: UTF-8
       string: '{"staffId":485926,"username":"MOIC_POM","firstName":"Moic","lastName":"Pom","activeCaseLoadId":"LEI","accountStatus":"ACTIVE","lockedFlag":false,"expiredFlag":false,"active":true}'
   recorded_at: Thu, 12 Oct 2023 13:21:46 GMT
 - request:
@@ -581,7 +581,7 @@ http_interactions:
       x-frame-options:
       - SAMEORIGIN
     body:
-      encoding: ASCII-8BIT
+      encoding: UTF-8
       string: '["pom@digital.justice.gov.uk"]'
   recorded_at: Thu, 12 Oct 2023 13:21:46 GMT
 - request:
@@ -629,7 +629,7 @@ http_interactions:
       x-frame-options:
       - SAMEORIGIN
     body:
-      encoding: ASCII-8BIT
+      encoding: UTF-8
       string: '[{"staffId":485636,"firstName":"JENNY","lastName":"DUCKETT","status":"ACTIVE","agencyId":"LEI","agencyDescription":"Leeds
         (HMP)","fromDate":"2019-01-22","position":"PRO","positionDescription":"Prison
         Officer","role":"POM","roleDescription":"Prison Offender Manager","scheduleType":"FT","scheduleTypeDescription":"Full
@@ -792,7 +792,7 @@ http_interactions:
       x-frame-options:
       - SAMEORIGIN
     body:
-      encoding: ASCII-8BIT
+      encoding: UTF-8
       string: '[{"prisonerNumber":"G7266VD","pncNumber":"12/502134E","pncNumberCanonicalShort":"12/502134E","pncNumberCanonicalLong":"2012/502134E","croNumber":"381006/13W","bookingId":"1073602","bookNumber":"V91471","firstName":"OMISTIUS","lastName":"ANNOLE","dateOfBirth":"1994-09-26","gender":"Male","ethnicity":"White:
         Eng./Welsh/Scot./N.Irish/British","youthOffender":true,"maritalStatus":"Single-not
         married/in civil partnership","religion":"No Religion","nationality":"British","status":"ACTIVE
@@ -838,7 +838,7 @@ http_interactions:
       x-frame-options:
       - SAMEORIGIN
     body:
-      encoding: ASCII-8BIT
+      encoding: UTF-8
       string: '[{"bookingId":1073602,"offenderNo":"G7266VD","classificationCode":"B","classification":"Cat
         B","assessmentCode":"CATEGORY","assessmentDescription":"Categorisation","cellSharingAlertFlag":false,"assessmentDate":"2017-02-24","nextReviewDate":"2018-02-23","approvalDate":"2017-02-24","assessmentAgencyId":"LEI","assessmentStatus":"A","assessmentSeq":7,"assessorId":459540,"assessorUser":"WQV54Y"}]'
   recorded_at: Thu, 12 Oct 2023 13:21:47 GMT
@@ -879,7 +879,7 @@ http_interactions:
       x-frame-options:
       - SAMEORIGIN
     body:
-      encoding: ASCII-8BIT
+      encoding: UTF-8
       string: '[{"offenderNo":"G7266VD","createDateTime":"2016-02-20T13:55:31.201162","fromAgency":"LEEDMC","fromAgencyDescription":"Leeds
         Magistrates Court","toAgency":"LEI","toAgencyDescription":"Leeds (HMP)","fromCity":"","toCity":"","movementType":"ADM","movementTypeDescription":"Admission","directionCode":"IN","movementDate":"2016-04-14","movementTime":"13:54:00","movementReason":"Unconvicted
         Remand"},{"offenderNo":"G7266VD","createDateTime":"2016-12-01T15:23:33.229763","fromAgency":"LEI","fromAgencyDescription":"Leeds
@@ -890,4 +890,44 @@ http_interactions:
         (HMP)","toAgency":"LEI","toAgencyDescription":"Leeds (HMP)","fromCity":"","toCity":"","movementType":"ADM","movementTypeDescription":"Admission","directionCode":"IN","movementDate":"2017-03-13","movementTime":"14:49:00","movementReason":"Transfer
         Via Court"}]'
   recorded_at: Thu, 12 Oct 2023 13:21:47 GMT
+- request:
+    method: get
+    uri: https://prison-api-dev.prison.service.justice.gov.uk/api/staff/485926/emails
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.3
+      Authorization:
+      - authorisation_header
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      date:
+      - Tue, 11 Jun 2024 11:01:28 GMT
+      content-type:
+      - application/json
+      vary:
+      - Origin, Access-Control-Request-Method, Access-Control-Request-Headers
+      x-content-type-options:
+      - nosniff
+      x-xss-protection:
+      - '0'
+      cache-control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      pragma:
+      - no-cache
+      expires:
+      - '0'
+      strict-transport-security:
+      - max-age=15724800; includeSubDomains
+      x-frame-options:
+      - SAMEORIGIN
+    body:
+      encoding: ASCII-8BIT
+      string: '["pom@digital.justice.gov.uk"]'
+  recorded_at: Tue, 11 Jun 2024 11:01:28 GMT
 recorded_with: VCR 6.2.0

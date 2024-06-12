@@ -1,14 +1,18 @@
 require_relative 'boot'
 
 require 'rails'
+# Pick the frameworks you want:
 require 'active_model/railtie'
 require 'active_job/railtie'
 require 'active_record/railtie'
+# require "active_storage/engine"
 require 'action_controller/railtie'
 require 'action_mailer/railtie'
+# require "action_mailbox/engine"
+# require "action_text/engine"
 require 'action_view/railtie'
 require 'action_cable/engine'
-require 'sprockets/railtie'
+# require "rails/test_unit/railtie"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -16,13 +20,23 @@ Bundler.require(*Rails.groups)
 
 module OffenderManagementAllocationClient
   class Application < Rails::Application
-    # Disable CSS compression to enable SASSC support
-    config.assets.css_compressor = nil
-
-    # allow customization of full error messages on a per-model basis
-    config.active_model.i18n_customize_full_message = true
+    # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.1
-    config.exceptions_app = routes
+
+    # Please, add to the `ignore` list any other `lib` subdirectories that do
+    # not contain `.rb` files, or that should not be reloaded or eager loaded.
+    # Common ones are `templates`, `generators`, or `middleware`, for example.
+    config.autoload_lib(ignore: %w[assets tasks])
+
+    # Configuration for the application, engines, and railties goes here.
+    #
+    # These settings can be overridden in specific environments using the files
+    # in config/environments, which are processed later.
+    #
+    # config.time_zone = "Central Time (US & Canada)"
+    # config.eager_load_paths << Rails.root.join("extras")
+
+    # Don't generate system test files.
     config.generators.system_tests = nil
 
     config.active_job.queue_adapter = if ENV['RUN_JOBS_INLINE'].present?
@@ -31,19 +45,12 @@ module OffenderManagementAllocationClient
                                         :sidekiq
                                       end
 
-    config.allocation_manager_host =
-      ENV.fetch(
-        'ALLOCATION_MANAGER_HOST',
-        'http://localhost:3000'
-      )
+    config.allocation_manager_host = ENV.fetch('ALLOCATION_MANAGER_HOST', 'http://localhost:3000')
     Rails.application.routes.default_url_options[:host] =
       if ENV['HEROKU_APP_NAME'].present?
         "#{ENV.fetch('HEROKU_APP_NAME')}.herokuapp.com"
       else
-        ENV.fetch(
-          'ALLOCATION_MANAGER_HOST',
-          'http://localhost:3000'
-        )
+        ENV.fetch('ALLOCATION_MANAGER_HOST', 'http://localhost:3000')
       end
 
     # Sentry environment set with SENTRY_CURRENT_ENV

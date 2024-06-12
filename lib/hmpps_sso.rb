@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'omniauth-oauth2'
+require_relative '../app/services/hmpps_api/oauth/client_helper'
 
 module OmniAuth
   module Strategies

@@ -7,7 +7,7 @@ RSpec.describe CaseloadHelper do
     context 'with latest_temp_movement_date method (allocated offender)' do
       it 'displays the date of temporary movement if ROTL exists' do
         offender = OpenStruct.new(offender_no: 'G4706UP', latest_temp_movement_date: Time.zone.today, location: "Z-10-112", restricted_patient?: false)
-        expect(helper.prisoner_location(offender)).to eq "Temporary absence<br />(out #{Time.zone.today.to_s(:rfc822)})"
+        expect(helper.prisoner_location(offender)).to eq "Temporary absence<br />(out #{Time.zone.today.to_formatted_s(:rfc822)})"
       end
 
       it 'displays the location of the cell if no there is no ROTL' do

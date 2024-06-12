@@ -40,7 +40,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
       let(:tariff_date) { Time.zone.today + 1.year }
 
       it 'does not allow THD to be entered' do
-        expect(value_for_row('Tariff date')).to eq(tariff_date.to_s(:rfc822))
+        expect(value_for_row('Tariff date')).to eq(tariff_date.to_formatted_s(:rfc822))
         expect(value_for_row('Target Hearing date')).to eq('Unknown')
         expect(td_for_row('Target Hearing date')).to have_no_link
       end
@@ -74,7 +74,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
         click_button 'Update'
 
         # Expect to see the new date on the profile page
-        expect(value_for_row('Target Hearing date')).to start_with(new_thd.to_s(:rfc822))
+        expect(value_for_row('Target Hearing date')).to start_with(new_thd.to_formatted_s(:rfc822))
         expect(td_for_row('Target Hearing date')).to have_link('Update')
       end
     end
@@ -91,7 +91,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
       let(:invalid_year) { 2.years.ago.year }
 
       it 'can be updated' do
-        expect(value_for_row('Target Hearing date')).to start_with(existing_thd.to_s(:rfc822))
+        expect(value_for_row('Target Hearing date')).to start_with(existing_thd.to_formatted_s(:rfc822))
         td_for_row('Target Hearing date').click_link('Update')
 
         # Enter a date in the past and expect a validation error
@@ -107,7 +107,7 @@ RSpec.feature "ChangeParoleReviewDates", type: :feature do
         click_button 'Update'
 
         # Expect to see the new date on the profile page
-        expect(value_for_row('Target Hearing date')).to start_with(new_thd.to_s(:rfc822))
+        expect(value_for_row('Target Hearing date')).to start_with(new_thd.to_formatted_s(:rfc822))
         expect(td_for_row('Target Hearing date')).to have_link('Update')
       end
     end
