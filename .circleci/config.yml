@@ -155,11 +155,12 @@ jobs:
               chmod +x ~/.local/bin/cc-test-reporter
             fi
       - save_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
+          key: allocation-manager-{{ checksum "Gemfile.lock" }}-2024-06-13T16:15:00 # Set current time in iso8601 to bust cache
           paths:
             - ~/repo/vendor/bundle
             - ~/repo/node_modules
             - ~/.local/bin
+            - .bundle/config
       - persist_to_workspace:
           root: ~/
           paths:
