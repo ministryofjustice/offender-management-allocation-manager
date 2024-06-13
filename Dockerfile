@@ -43,7 +43,7 @@ RUN \
     ca-certificates \
     gnupg \
   && timedatectl set-timezone Europe/London || true \
-  && gem install bundler -v 2.2.29 --no-document \
+  && gem install bundler -v 2.5.11 --no-document \
   && apt-get clean
 
 # Install official AWS CLI
