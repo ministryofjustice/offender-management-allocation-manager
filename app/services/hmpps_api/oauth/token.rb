@@ -28,6 +28,14 @@ module HmppsApi
         @expiry_time - Time.zone.now < 20
       end
 
+      # High level check to see if we can decode the token
+      def valid?
+        payload.present?
+      rescue JWT::DecodeError => e
+        Rails.logger.error("event=api_access_blocked|#{e.message}")
+        false
+      end
+
       def valid_token_with_scope?(scope, role: nil)
         return false if payload['scope'].nil?
         return false unless payload['scope'].include? scope
@@ -42,7 +50,8 @@ module HmppsApi
         end
 
         true
-      rescue JWT::DecodeError, JWT::ExpiredSignature => e
+      rescue JWT::DecodeError => e
+        Rails.logger.error("event=api_access_blocked|#{e.message}")
         Sentry.capture_exception(e)
         false
       end

@@ -32,6 +32,44 @@ describe HmppsApi::Oauth::Token do
     expect(token.needs_refresh?).to be(false)
   end
 
+  describe '#valid?' do
+    subject(:token) { described_class.new(access_token:) }
+
+    before do
+      allow(Rails.logger).to receive(:error)
+    end
+
+    context 'with missing token' do
+      let(:access_token) { nil }
+
+      it 'logs the error' do
+        token.valid?
+        expect(Rails.logger).to have_received(:error).with(
+          'event=api_access_blocked|Nil JSON web token'
+        )
+      end
+
+      it 'returns false' do
+        expect(token).not_to be_valid
+      end
+    end
+
+    context 'with an invalid token' do
+      let(:access_token) { 'foobar' }
+
+      it 'logs the error' do
+        token.valid?
+        expect(Rails.logger).to have_received(:error).with(
+          'event=api_access_blocked|Not enough or too many segments'
+        )
+      end
+
+      it 'returns false' do
+        expect(token).not_to be_valid
+      end
+    end
+  end
+
   describe '#valid_token_with_scope?' do
     let(:role) { 'MY_FAB_ROLE' }
     let(:scope) { 'read' }

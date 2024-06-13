@@ -739,6 +739,12 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/SarError"
+        '403':
+          description: Invalid token role
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SarError"
         '400':
           description: Both PRN and CRN parameter passed
           content:
