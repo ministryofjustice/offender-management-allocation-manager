@@ -96,6 +96,7 @@ version: 2.1
 orbs:
   browser-tools: circleci/browser-tools@1.4.4
   aws-cli: circleci/aws-cli@2.0.3
+  ruby: circleci/ruby@2.1.3
 
 commands:
   install_firefox:
@@ -122,27 +123,10 @@ jobs:
     <<: *test_container_config
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/
-      - restore_cache:
-          key: &gem-cache allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
-      - run:
-          name: Which bundler?
-          # Install the version of bundler used in Gemfile.lock
-          command: gem install -v $(ruby -e 'puts /BUNDLED WITH\s+(\d+\.\d+\.\d+)/m.match(File.read("Gemfile.lock"))[1]') bundler && bundle -v
+      - ruby/install-deps
       - run:
           name: Install frontend modules
           command: yarn install
-      - run:
-          name: Install ruby gems
-          command: |
-            bundle config set path 'vendor/bundle'
-            bundle check || {
-              # Install CMake - required to install undercover gem
-              sudo apt update && sudo apt install cmake
-              # Install missing gems
-              bundle install
-            }
       - install_firefox
       - run:
           name: Download Code Climate
@@ -154,12 +138,6 @@ jobs:
               curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ~/.local/bin/cc-test-reporter
               chmod +x ~/.local/bin/cc-test-reporter
             fi
-      - save_cache:
-          key: *gem-cache
-          paths:
-            - vendor/bundle
-            - node_modules
-            - ~/.local/bin
       - persist_to_workspace:
           root: ~/
           paths:
@@ -172,8 +150,6 @@ jobs:
     <<: *defaults
     <<: *deploy_container_config
     steps:
-      - attach_workspace:
-          at: ~/
       - *configure_k8s
       - run:
           name: Fetch creds from K8s and store in workspace
