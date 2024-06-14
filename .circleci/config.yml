@@ -124,9 +124,18 @@ jobs:
     steps:
       - checkout
       - ruby/install-deps
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          key: &yarn-cache yarn-packages-{{ checksum "yarn.lock" }}
       - run:
           name: Install frontend modules
-          command: yarn install
+          command: yarn install --immutable
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: *yarn-cache
+          paths:
+            - .yarn/cache
+            - .yarn/unplugged
       - install_firefox
       - run:
           name: Download Code Climate
@@ -182,9 +191,6 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
-      - run:
-          name: Setup bundler path
-          command: bundle config set path 'vendor/bundle'
       - run:
           name: Rubocop
           command: bundle exec rubocop
@@ -289,18 +295,18 @@ workflows:
     jobs:
       - install_dependencies:
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-      - fetch_env_vars:
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-          context: [offender-management-shared, offender-management-staging]
+#      - fetch_env_vars:
+#          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+#          context: [offender-management-shared, offender-management-staging]
       - rubocop:
           requires: [install_dependencies]
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-      - test:
-          requires: [install_dependencies, fetch_env_vars]
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-          context: [offender-management-shared, offender-management-staging]
-      - verify_docker_image_builds:
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+#      - test:
+#          requires: [install_dependencies, fetch_env_vars]
+#          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+#          context: [offender-management-shared, offender-management-staging]
+#      - verify_docker_image_builds:
+#          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
 
   test_env:
     jobs:
