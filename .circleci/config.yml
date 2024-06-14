@@ -163,8 +163,8 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - vendor/bundle
-            - node_modules
+            - repo/vendor/bundle
+            - repo/node_modules
             - .local/bin
             - .bundle/config
 
