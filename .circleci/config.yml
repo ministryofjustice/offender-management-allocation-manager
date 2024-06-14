@@ -192,6 +192,9 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
+          name: Setup bundler path
+          command: bundle config set path 'vendor/bundle'
+      - run:
           name: Rubocop
           command: bundle exec rubocop
   test:
@@ -295,18 +298,18 @@ workflows:
     jobs:
       - install_dependencies:
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-#      - fetch_env_vars:
-#          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-#          context: [offender-management-shared, offender-management-staging]
+      - fetch_env_vars:
+          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+          context: [offender-management-shared, offender-management-staging]
       - rubocop:
           requires: [install_dependencies]
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-#      - test:
-#          requires: [install_dependencies, fetch_env_vars]
-#          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-#          context: [offender-management-shared, offender-management-staging]
-#      - verify_docker_image_builds:
-#          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+      - test:
+          requires: [install_dependencies, fetch_env_vars]
+          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+          context: [offender-management-shared, offender-management-staging]
+      - verify_docker_image_builds:
+          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
 
   test_env:
     jobs:
