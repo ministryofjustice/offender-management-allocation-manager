@@ -207,6 +207,9 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
+          name: Setup bundler path
+          command: bundle config set path 'vendor/bundle'
+      - run:
           name: Rubocop
           command: bundle exec rubocop
   test:
