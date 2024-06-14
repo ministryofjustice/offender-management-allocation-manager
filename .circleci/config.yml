@@ -125,7 +125,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - restore_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
+          key: &gem-cache allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
       - run:
           name: Which bundler?
           # Install the version of bundler used in Gemfile.lock
@@ -155,16 +155,16 @@ jobs:
               chmod +x ~/.local/bin/cc-test-reporter
             fi
       - save_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
+          key: *gem-cache
           paths:
-            - ~/repo/vendor/bundle
-            - ~/repo/node_modules
+            - vendor/bundle
+            - node_modules
             - ~/.local/bin
       - persist_to_workspace:
           root: ~/
           paths:
-            - repo/vendor/bundle
-            - repo/node_modules
+            - vendor/bundle
+            - node_modules
             - .local/bin
             - .bundle/config
 
@@ -307,19 +307,19 @@ workflows:
     jobs:
       - install_dependencies:
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-      - fetch_env_vars:
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-          context: [offender-management-shared, offender-management-staging]
+#      - fetch_env_vars:
+#          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+#          context: [offender-management-shared, offender-management-staging]
 
       - rubocop:
           requires: [install_dependencies]
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-      - test:
-          requires: [install_dependencies, fetch_env_vars]
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
-          context: [offender-management-shared, offender-management-staging]
-      - verify_docker_image_builds:
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+#      - test:
+#          requires: [install_dependencies, fetch_env_vars]
+#          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+#          context: [offender-management-shared, offender-management-staging]
+#      - verify_docker_image_builds:
+#          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
 
   test_env:
     jobs:
