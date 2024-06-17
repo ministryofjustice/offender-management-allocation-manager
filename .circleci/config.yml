@@ -96,6 +96,7 @@ version: 2.1
 orbs:
   browser-tools: circleci/browser-tools@1.4.4
   aws-cli: circleci/aws-cli@2.0.3
+  ruby: circleci/ruby@2.1.3
 
 commands:
   install_firefox:
@@ -122,27 +123,19 @@ jobs:
     <<: *test_container_config
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/
+      - ruby/install-deps
       - restore_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
-      - run:
-          name: Which bundler?
-          # Install the version of bundler used in Gemfile.lock
-          command: gem install -v $(ruby -e 'puts /BUNDLED WITH\s+(\d+\.\d+\.\d+)/m.match(File.read("Gemfile.lock"))[1]') bundler && bundle -v
+          name: Restore Yarn Package Cache
+          key: &yarn-cache yarn-packages-{{ checksum "yarn.lock" }}
       - run:
           name: Install frontend modules
-          command: yarn install
-      - run:
-          name: Install ruby gems
-          command: |
-            bundle config set path 'vendor/bundle'
-            bundle check || {
-              # Install CMake - required to install undercover gem
-              sudo apt update && sudo apt install cmake
-              # Install missing gems
-              bundle install
-            }
+          command: yarn install --immutable
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: *yarn-cache
+          paths:
+            - .yarn/cache
+            - .yarn/unplugged
       - install_firefox
       - run:
           name: Download Code Climate
@@ -154,12 +147,6 @@ jobs:
               curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ~/.local/bin/cc-test-reporter
               chmod +x ~/.local/bin/cc-test-reporter
             fi
-      - save_cache:
-          key: allocation-manager-{{ checksum "Gemfile.lock" }}-2022-10-05T13:43:00 # Set current time in iso8601 to bust cache
-          paths:
-            - ~/repo/vendor/bundle
-            - ~/repo/node_modules
-            - ~/.local/bin
       - persist_to_workspace:
           root: ~/
           paths:
@@ -172,8 +159,6 @@ jobs:
     <<: *defaults
     <<: *deploy_container_config
     steps:
-      - attach_workspace:
-          at: ~/
       - *configure_k8s
       - run:
           name: Fetch creds from K8s and store in workspace
@@ -207,6 +192,9 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
+          name: Setup bundler path
+          command: bundle config set path 'vendor/bundle'
+      - run:
           name: Rubocop
           command: bundle exec rubocop
   test:
@@ -216,6 +204,9 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
+      - run:
+          name: Setup bundler path
+          command: bundle config set path 'vendor/bundle'
       - run:
           name: Security analysis
           command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
@@ -310,7 +301,6 @@ workflows:
       - fetch_env_vars:
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
           context: [offender-management-shared, offender-management-staging]
-
       - rubocop:
           requires: [install_dependencies]
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }

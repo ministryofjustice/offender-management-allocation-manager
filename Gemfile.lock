@@ -286,7 +286,7 @@ GEM
     memory_profiler (1.0.1)
     method_source (1.0.0)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.5)
+    mini_portile2 (2.8.7)
     minitest (5.22.3)
     msgpack (1.7.2)
     multi_xml (0.6.0)
@@ -682,4 +682,4 @@ RUBY VERSION
    ruby 3.2.2p53
 
 BUNDLED WITH
-   2.2.29
+   2.5.12
