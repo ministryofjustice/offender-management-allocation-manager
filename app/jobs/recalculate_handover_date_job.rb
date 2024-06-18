@@ -146,10 +146,10 @@ private
     CommunityMailer.with(
       email: case_info.ldu_email_address,
       offender_crn: case_info.crn,
-      offender_name: nomis_offender.full_name,
-      nomis_offender_id: nomis_offender.offender_no,
+      offender_name: nomis_offender.full_name_ordered,
+      prison_number: nomis_offender.offender_no,
       sentence_type: nomis_offender.indeterminate_sentence? ? 'Indeterminate' : 'Determinate',
-      prison: prison.name,
+      prison_name: prison.name,
       pom_name: pom.full_name,
       pom_email: pom.email_address,
     ).assign_com_less_than_10_months_chaser.deliver_later

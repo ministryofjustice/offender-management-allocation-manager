@@ -170,7 +170,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
         context 'when weekly chaser email' do
           let(:allocation_double) { instance_double(AllocationHistory, primary_pom_nomis_id: offender_no) }
-          let(:prison_double) { build(:prison) }
+          let(:prison_double) { build(:prison, code: 'LEI') }
           let(:pom_double) { double(full_name: 'John Doe', email_address: 'john@example.com') }
 
           before do
@@ -179,7 +179,28 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
             allow(prison_double).to receive(:get_single_pom).with(offender_no).and_return(pom_double)
           end
 
-          it 'sends a chaser email 1 week later from the first com email' do
+          it 'sends a chaser email 1 week after the first com email' do
+            described_class.perform_now(offender_no)
+
+            Timecop.travel one_week_later do
+              expect_any_instance_of(described_class).to receive(:assign_com_email)
+              described_class.perform_now(offender_no)
+
+              expect(CommunityMailer).to have_received(:with).with(
+                email: ldu.email_address,
+                offender_crn: case_info.crn,
+                offender_name: "#{nomis_offender.fetch(:firstName)} #{nomis_offender.fetch(:lastName)}",
+                prison_number: offender_no,
+                sentence_type: 'Determinate',
+                prison_name: 'Leeds (HMP)',
+                pom_name: 'John Doe',
+                pom_email: 'john@example.com',
+              )
+              expect(assign_com_less_than_10_months_chaser_mailer).to have_received(:deliver_later)
+            end
+          end
+
+          it 'records the email history' do
             expect {
               described_class.perform_now(offender_no)
             }.to change(EmailHistory.immediate_community_allocation, :count).by(1).and \

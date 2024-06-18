@@ -136,9 +136,9 @@ RSpec.describe CommunityMailer, type: :mailer do
         email: 'ldu_email@example.com',
         offender_crn: 'offender_crn',
         offender_name: 'offender_name',
-        nomis_offender_id: 'nomis_offender_id',
+        prison_number: 'prison_number',
         sentence_type: 'sentence_type',
-        prison: 'prison',
+        prison_name: 'prison_name',
         pom_name: 'pom_name',
         pom_email: 'pom_email',
       }
@@ -157,10 +157,10 @@ RSpec.describe CommunityMailer, type: :mailer do
         mail.govuk_notify_personalisation
       ).to eq({
         crn: 'offender_crn',
-        name: 'offender_name',
-        noms_no: 'nomis_offender_id',
+        prisoner_name: 'offender_name',
+        prison_number: 'prison_number',
         sentence_type: 'sentence_type',
-        prison_name: 'prison',
+        prison_name: 'prison_name',
         pom_name: 'pom_name',
         pom_email: 'pom_email',
       })

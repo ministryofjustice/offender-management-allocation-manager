@@ -55,10 +55,10 @@ class CommunityMailer < ApplicationMailer
 
     set_personalisation(
       crn: params.fetch(:offender_crn),
-      name: params.fetch(:offender_name),
-      noms_no: params.fetch(:nomis_offender_id),
+      prisoner_name: params.fetch(:offender_name),
+      prison_number: params.fetch(:prison_number),
       sentence_type: params.fetch(:sentence_type),
-      prison_name: params.fetch(:prison),
+      prison_name: params.fetch(:prison_name),
       pom_name: params.fetch(:pom_name),
       pom_email: params.fetch(:pom_email),
     )
