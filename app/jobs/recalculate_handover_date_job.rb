@@ -30,23 +30,20 @@ private
         handover.reason.to_sym == :determinate_short &&
         nomis_offender.ldu_email_address.present? &&
         nomis_offender.allocated_com_name.blank?
-        # need to chase if we haven't chased recently
-        last_chaser = db_offender.email_histories.where(event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION).last
-        if last_chaser.nil? || last_chaser.created_at < 2.days.ago
-          # create the history first so that the validations will help with hard failures due to coding errors
-          # rather than waiting for the mailer to object
-          db_offender.email_histories.create! prison: nomis_offender.prison_id,
-                                              name: case_info.ldu_name,
-                                              email: case_info.ldu_email_address,
-                                              event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
-          # This is queued so that soft failures don't kill the whole job
-          CommunityMailer.with(
-            email: case_info.ldu_email_address,
-            crn_number: case_info.crn,
-            prison_name: PrisonService.name_for(nomis_offender.prison_id),
-            prisoner_name: "#{nomis_offender.first_name} #{nomis_offender.last_name}",
-            prisoner_number: nomis_offender.offender_no
-          ).assign_com_less_than_10_months.deliver_later
+
+        # send email for the first time, or resend it if we haven't recently
+        last_com_email = db_offender.email_histories.immediate_community_allocation.last
+        if last_com_email.nil? || last_com_email.created_at < 2.days.ago
+          assign_com_email(db_offender:, nomis_offender:, case_info:)
+        end
+
+        # one-week chaser since first com email was sent, and weekly after this
+        first_com_email = db_offender.email_histories.immediate_community_allocation.first
+        last_weekly_chaser = db_offender.email_histories.immediate_community_allocation_chaser.last
+
+        if (last_weekly_chaser.nil? && first_com_email.created_at < 1.week.ago) ||
+          (last_weekly_chaser.present? && last_weekly_chaser.created_at < 1.week.ago)
+          assign_com_email_weekly_chaser(db_offender:, nomis_offender:, case_info:)
         end
       end
 
@@ -109,5 +106,52 @@ private
         ldu_email: nomis_offender.ldu_email_address
       ).open_prison_supporting_com_needed.deliver_later
     end
+  end
+
+  def assign_com_email(db_offender:, nomis_offender:, case_info:)
+    # create the history first so that the validations will help with hard failures due to coding errors
+    # rather than waiting for the mailer to object
+    db_offender.email_histories.create!(
+      prison: nomis_offender.prison_id,
+      name: case_info.ldu_name,
+      email: case_info.ldu_email_address,
+      event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
+    )
+
+    # This is queued so that soft failures don't kill the whole job
+    CommunityMailer.with(
+      email: case_info.ldu_email_address,
+      crn_number: case_info.crn,
+      prison_name: PrisonService.name_for(nomis_offender.prison_id),
+      prisoner_name: "#{nomis_offender.first_name} #{nomis_offender.last_name}",
+      prisoner_number: nomis_offender.offender_no
+    ).assign_com_less_than_10_months.deliver_later
+  end
+
+  def assign_com_email_weekly_chaser(db_offender:, nomis_offender:, case_info:)
+    allocation = AllocationHistory.find_by(nomis_offender_id: nomis_offender.offender_no)
+    prison = Prison.find(nomis_offender.prison_id)
+    pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
+
+    # create the history first so that the validations will help with hard failures due to coding errors
+    # rather than waiting for the mailer to object
+    db_offender.email_histories.create!(
+      prison: nomis_offender.prison_id,
+      name: case_info.ldu_name,
+      email: case_info.ldu_email_address,
+      event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION_CHASER
+    )
+
+    # This is queued so that soft failures don't kill the whole job
+    CommunityMailer.with(
+      email: case_info.ldu_email_address,
+      offender_crn: case_info.crn,
+      offender_name: nomis_offender.full_name,
+      nomis_offender_id: nomis_offender.offender_no,
+      sentence_type: nomis_offender.indeterminate_sentence? ? 'Indeterminate' : 'Determinate',
+      prison: prison.name,
+      pom_name: pom.full_name,
+      pom_email: pom.email_address,
+    ).assign_com_less_than_10_months_chaser.deliver_later
   end
 end
