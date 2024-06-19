@@ -44,9 +44,9 @@ RSpec.describe Api::HandoversApiController, type: :controller do
         context 'when the COM is responsible' do
           let(:responsibility) { CalculatedHandoverDate::COMMUNITY_RESPONSIBLE }
 
-          it "reports as COM responsible" do
-            create(:case_information, offender:, com_name: 'Com Nomis', com_email: 'com.nomis@community.gov.uk')
+          before { create(:case_information, offender:, com_name: 'Com Nomis', com_email: 'com.nomis@community.gov.uk') }
 
+          it "reports as COM responsible" do
             get :show, params: { id: nomis_offender_id }, format: :json
 
             expect(JSON.parse(response.body)).to include(
@@ -56,6 +56,22 @@ RSpec.describe Api::HandoversApiController, type: :controller do
               'responsiblePomName' => nil,
               'responsiblePomNomisId' => nil,
             )
+          end
+
+          context 'when the offender cannot be found' do
+            it 'returns empty details for the responsible officer' do
+              Offender.delete_all
+
+              get :show, params: { id: nomis_offender_id }, format: :json
+
+              expect(JSON.parse(response.body)).to include(
+                'responsibility' => 'COM',
+                'responsibleComName' => nil,
+                'responsibleComEmail' => nil,
+                'responsiblePomName' => nil,
+                'responsiblePomNomisId' => nil,
+              )
+            end
           end
         end
 
@@ -74,6 +90,22 @@ RSpec.describe Api::HandoversApiController, type: :controller do
               'responsiblePomName' => 'Pom Nomis',
               'responsiblePomNomisId' => 485_926,
             )
+          end
+
+          context 'when the offender cannot be found' do
+            it 'returns empty details for the responsible officer' do
+              Offender.delete_all
+
+              get :show, params: { id: nomis_offender_id }, format: :json
+
+              expect(JSON.parse(response.body)).to include(
+                'responsibility' => 'POM',
+                'responsibleComName' => nil,
+                'responsibleComEmail' => nil,
+                'responsiblePomName' => nil,
+                'responsiblePomNomisId' => nil,
+              )
+            end
           end
         end
       end
