@@ -4,10 +4,12 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   let(:prison) { create(:prison) }
   let(:event) { instance_double DomainEvents::Event, :event, publish: nil }
   let(:assign_com_less_than_10_months_mailer) { double :assign_com_less_than_10_months_mailer, deliver_later: nil }
+  let(:assign_com_less_than_10_months_chaser_mailer) { double :assign_com_less_than_10_months_chaser_mailer, deliver_later: nil }
   let(:open_prison_supporting_com_needed_mailer) { double :open_prison_supporting_com_needed_mailer, deliver_later: nil }
   let(:community_mailer_with) do
     double(:community_mailer_with,
            assign_com_less_than_10_months: assign_com_less_than_10_months_mailer,
+           assign_com_less_than_10_months_chaser: assign_com_less_than_10_months_chaser_mailer,
            open_prison_supporting_com_needed: open_prison_supporting_com_needed_mailer)
   end
   let(:published_args) { {} }
@@ -131,6 +133,8 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
         let!(:case_info) { create(:case_information, enhanced_resourcing: true, local_delivery_unit: ldu, offender: build(:offender, nomis_offender_id: offender_no)) }
         let(:one_day_later) { today + 1.day }
         let(:two_days_later) { today + 2.days }
+        let(:one_week_later) { today + 1.week }
+        let(:ten_days_later) { today + 10.days }
 
         it 'sends an email and records the fact', :aggregate_failures do
           expect {
@@ -161,6 +165,60 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
             expect {
               described_class.perform_now(offender_no)
             }.to change(EmailHistory, :count).by(1)
+          end
+        end
+
+        context 'when weekly chaser email' do
+          let(:allocation_double) { instance_double(AllocationHistory, primary_pom_nomis_id: offender_no) }
+          let(:prison_double) { build(:prison, code: 'LEI') }
+          let(:pom_double) { double(full_name: 'John Doe', email_address: 'john@example.com') }
+
+          before do
+            allow(AllocationHistory).to receive(:find_by).with(nomis_offender_id: offender_no).and_return(allocation_double)
+            allow(Prison).to receive(:find).with(nomis_offender.fetch(:prisonId)).and_return(prison_double)
+            allow(prison_double).to receive(:get_single_pom).with(offender_no).and_return(pom_double)
+          end
+
+          it 'sends a chaser email 1 week after the first com email' do
+            described_class.perform_now(offender_no)
+
+            Timecop.travel one_week_later do
+              expect_any_instance_of(described_class).to receive(:assign_com_email)
+              described_class.perform_now(offender_no)
+
+              expect(CommunityMailer).to have_received(:with).with(
+                email: ldu.email_address,
+                offender_crn: case_info.crn,
+                offender_name: "#{nomis_offender.fetch(:firstName)} #{nomis_offender.fetch(:lastName)}",
+                prison_number: offender_no,
+                sentence_type: 'Determinate',
+                prison_name: 'Leeds (HMP)',
+                pom_name: 'John Doe',
+                pom_email: 'john@example.com',
+              )
+              expect(assign_com_less_than_10_months_chaser_mailer).to have_received(:deliver_later)
+            end
+          end
+
+          it 'records the email history' do
+            expect {
+              described_class.perform_now(offender_no)
+            }.to change(EmailHistory.immediate_community_allocation, :count).by(1).and \
+              change(EmailHistory.immediate_community_allocation_chaser, :count).by(0)
+
+            Timecop.travel one_week_later do
+              expect {
+                described_class.perform_now(offender_no)
+              }.to change(EmailHistory.immediate_community_allocation, :count).by(1).and \
+                change(EmailHistory.immediate_community_allocation_chaser, :count).by(1)
+            end
+
+            Timecop.travel ten_days_later do
+              expect {
+                described_class.perform_now(offender_no)
+              }.to change(EmailHistory.immediate_community_allocation, :count).by(1).and \
+                change(EmailHistory.immediate_community_allocation_chaser, :count).by(0)
+            end
           end
         end
       end

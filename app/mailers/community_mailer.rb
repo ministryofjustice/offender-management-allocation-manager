@@ -49,4 +49,20 @@ class CommunityMailer < ApplicationMailer
 
     mail(to: params.fetch(:email))
   end
+
+  def assign_com_less_than_10_months_chaser
+    set_template('99286519-708d-4c9e-ac6b-8b128c3d3d2e')
+
+    set_personalisation(
+      crn: params.fetch(:offender_crn),
+      prisoner_name: params.fetch(:offender_name),
+      prison_number: params.fetch(:prison_number),
+      sentence_type: params.fetch(:sentence_type),
+      prison_name: params.fetch(:prison_name),
+      pom_name: params.fetch(:pom_name),
+      pom_email: params.fetch(:pom_email),
+    )
+
+    mail(to: params.fetch(:email))
+  end
 end

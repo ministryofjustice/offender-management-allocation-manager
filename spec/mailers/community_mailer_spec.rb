@@ -125,4 +125,45 @@ RSpec.describe CommunityMailer, type: :mailer do
             )
     end
   end
+
+  describe '#assign_com_less_than_10_months_chaser' do
+    let(:mail) do
+      described_class.with(**params).assign_com_less_than_10_months_chaser
+    end
+
+    let(:params) do
+      {
+        email: 'ldu_email@example.com',
+        offender_crn: 'offender_crn',
+        offender_name: 'offender_name',
+        prison_number: 'prison_number',
+        sentence_type: 'sentence_type',
+        prison_name: 'prison_name',
+        pom_name: 'pom_name',
+        pom_email: 'pom_email',
+      }
+    end
+
+    it 'sets the template' do
+      expect(mail.govuk_notify_template).to eq('99286519-708d-4c9e-ac6b-8b128c3d3d2e')
+    end
+
+    it 'sets the email recipient' do
+      expect(mail.to).to eq([params.fetch(:email)])
+    end
+
+    it 'sets the personalisation' do
+      expect(
+        mail.govuk_notify_personalisation
+      ).to eq({
+        crn: 'offender_crn',
+        prisoner_name: 'offender_name',
+        prison_number: 'prison_number',
+        sentence_type: 'sentence_type',
+        prison_name: 'prison_name',
+        pom_name: 'pom_name',
+        pom_email: 'pom_email',
+      })
+    end
+  end
 end

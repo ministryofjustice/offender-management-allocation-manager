@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
 class EmailHistory < ApplicationRecord
-  AUTO_EARLY_ALLOCATION = 'auto_early_allocation'
-  DISCRETIONARY_EARLY_ALLOCATION = 'discretionary_early_allocation'
-  SUITABLE_FOR_EARLY_ALLOCATION = 'suitable_for_early_allocation'
-  OPEN_PRISON_COMMUNITY_ALLOCATION = 'open_prison_community_allocation'
-  IMMEDIATE_COMMUNITY_ALLOCATION = 'immediate_community_allocation'
+  EVENTS = [
+    AUTO_EARLY_ALLOCATION = 'auto_early_allocation',
+    DISCRETIONARY_EARLY_ALLOCATION = 'discretionary_early_allocation',
+    SUITABLE_FOR_EARLY_ALLOCATION = 'suitable_for_early_allocation',
+    OPEN_PRISON_COMMUNITY_ALLOCATION = 'open_prison_community_allocation',
+    IMMEDIATE_COMMUNITY_ALLOCATION = 'immediate_community_allocation',
+    IMMEDIATE_COMMUNITY_ALLOCATION_CHASER = 'immediate_community_allocation_chaser',
+  ].freeze
 
   belongs_to :offender,
              primary_key: :nomis_offender_id,
@@ -15,17 +18,16 @@ class EmailHistory < ApplicationRecord
   # name is the name of the person/LDU being emailed
   validates :name, presence: true
 
-  validates :event, inclusion: { in: [AUTO_EARLY_ALLOCATION,
-                                      DISCRETIONARY_EARLY_ALLOCATION,
-                                      SUITABLE_FOR_EARLY_ALLOCATION,
-                                      OPEN_PRISON_COMMUNITY_ALLOCATION,
-                                      IMMEDIATE_COMMUNITY_ALLOCATION],
-                                 allow_nil: false }
+  validates :event, inclusion: { in: EVENTS, allow_nil: false }
   validates :prison, inclusion: { in: PrisonService.prison_codes, allow_nil: false }
   validates :email, presence: true, 'valid_email_2/email': true
 
+  EVENTS.each { |event| scope event, -> { where(event:) } }
+
   # This scope removes history records which are not supposed to be displayed in the offender timeline (case history page)
-  scope :in_offender_timeline, -> { where.not(event: IMMEDIATE_COMMUNITY_ALLOCATION) }
+  scope :in_offender_timeline, lambda {
+    where.not(event: [IMMEDIATE_COMMUNITY_ALLOCATION, IMMEDIATE_COMMUNITY_ALLOCATION_CHASER])
+  }
 
   def self.sent_within_current_sentence(offender, event)
     where(nomis_offender_id: offender.offender_no, event: event).where('created_at >= ?', offender.sentence_start_date)
