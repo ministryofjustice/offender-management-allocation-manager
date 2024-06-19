@@ -131,7 +131,15 @@ private
   def assign_com_email_weekly_chaser(db_offender:, nomis_offender:, case_info:)
     allocation = AllocationHistory.find_by(nomis_offender_id: nomis_offender.offender_no)
     prison = Prison.find(nomis_offender.prison_id)
-    pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
+
+    if allocation.try(:active?)
+      pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
+      pom_name  = pom.full_name
+      pom_email = pom.email_address.presence || 'unknown'
+    else
+      pom_name  = 'This offender does not have an allocated POM'
+      pom_email = 'n/a'
+    end
 
     # create the history first so that the validations will help with hard failures due to coding errors
     # rather than waiting for the mailer to object
@@ -150,8 +158,8 @@ private
       prison_number: nomis_offender.offender_no,
       sentence_type: nomis_offender.indeterminate_sentence? ? 'Indeterminate' : 'Determinate',
       prison_name: prison.name,
-      pom_name: pom.full_name,
-      pom_email: pom.email_address,
+      pom_name: pom_name,
+      pom_email: pom_email,
     ).assign_com_less_than_10_months_chaser.deliver_later
   end
 end
