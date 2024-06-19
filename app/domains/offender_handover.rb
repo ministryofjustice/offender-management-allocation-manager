@@ -13,7 +13,7 @@ private
     return unless USE_PPUD_PAROLE_DATA && indeterminate_sentence?
 
     if parole_outcome_not_release? && thd_12_or_more_months_from_now? && mappa_level.in?([2, 3])
-      CalculatedHandoverDate.new(responsibility: com, reason: :mappa_2_or_3)
+      CalculatedHandoverDate.new(responsibility: com, reason: :parole_mappa_2_3)
     elsif parole_outcome_not_release? && thd_12_or_more_months_from_now? && mappa_level.in?([nil, 1])
       CalculatedHandoverDate.new(responsibility: pom_with_com, reason: :thd_over_12_months)
     elsif sentenced_to_an_additional_isp?
