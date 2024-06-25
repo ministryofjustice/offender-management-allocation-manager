@@ -4,11 +4,16 @@
   </div>
 
   <p class="moj-timeline__date">
-    <%= format_date_long(object.created_at) %> by <%= object.created_by_name.present? ? object.created_by_name.titleize : 'System Admin' %>
+    <%= format_date_long(object.created_at) %> by <%= object.created_by_name.present? ? object.created_by_name.titleize : "System Admin" %>
   </p>
 
   <div class="moj-timeline__description">
     <%= description %>
-  </div>
 
+    <% if object.respond_to?(:system_admin_note) && object.system_admin_note %>
+      <div class="govuk-body govuk-!-margin-top-5">
+        System Admin note: <%= object.system_admin_note %>
+      </div>
+    <% end %>
+  </div>
 </div>

@@ -12,6 +12,14 @@ class CaseHistory
     @version = version
   end
 
+  def system_admin_name
+    @version.whodunnit
+  end
+
+  def system_admin_note
+    @version.system_admin_note
+  end
+
   # we need to override the 'updated_at' in the history with the 'to' value (index 1)
   # so that if it is changed later w/o history (e.g. by updating the COM name)
   # we don't produce the wrong answer
@@ -37,6 +45,8 @@ class CaseHistory
   def created_by_name
     if @allocation.event_trigger == 'user'
       @allocation.created_by_name
+    elsif system_admin_note && system_admin_name
+      "System Admin (#{system_admin_name})"
     end
   end
 
