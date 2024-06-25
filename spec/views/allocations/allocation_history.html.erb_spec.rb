@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "allocations/history", type: :view do
-  let(:dummy_version) { Struct.new(:object_changes).new({ 'updated_at' => [now, now] }.to_yaml) }
+  let(:dummy_version) { PaperTrail::Version.new(object_changes: { 'updated_at' => [now, now] }.to_yaml) }
   let(:page) { Nokogiri::HTML(rendered) }
   let(:prison) { create(:prison) }
   let(:offender) { build(:hmpps_api_offender) }
@@ -235,7 +235,7 @@ RSpec.describe "allocations/history", type: :view do
           .map { |ah| CaseHistory.new(nil, ah, released_version) }
       end
 
-      let(:released_version) { Struct.new(:object_changes).new({ 'updated_at' => [release_date_and_time, release_date_and_time] }.to_yaml) }
+      let(:released_version) { PaperTrail::Version.new(object_changes: { 'updated_at' => [release_date_and_time, release_date_and_time] }.to_yaml) }
       let(:release_date_and_time) { Time.zone.local(2019, 11, 19, 11, 28, 0) }
 
       it 'displays a release label and the release date and time in the allocation history' do

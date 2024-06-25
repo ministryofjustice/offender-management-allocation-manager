@@ -732,7 +732,8 @@ CREATE TABLE public.versions (
     user_first_name character varying,
     user_last_name character varying,
     prison character varying,
-    offender_attributes_to_archive jsonb
+    offender_attributes_to_archive jsonb,
+    system_admin_note character varying
 );
 
 
@@ -1397,6 +1398,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20240125093937'),
 ('20240219145954'),
 ('20240402142606'),
-('20240416124347');
+('20240416124347'),
+('20240614083226');
 
 
