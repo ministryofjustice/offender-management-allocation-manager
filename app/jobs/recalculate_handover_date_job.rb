@@ -36,15 +36,6 @@ private
         if last_com_email.nil? || last_com_email.created_at < 2.days.ago
           assign_com_email(db_offender:, nomis_offender:, case_info:)
         end
-
-        # one-week chaser since first com email was sent, and weekly after this
-        first_com_email = db_offender.email_histories.immediate_community_allocation.first
-        last_weekly_chaser = db_offender.email_histories.immediate_community_allocation_chaser.last
-
-        if (last_weekly_chaser.nil? && first_com_email.created_at < 1.week.ago) ||
-          (last_weekly_chaser.present? && last_weekly_chaser.created_at < 1.week.ago)
-          assign_com_email_weekly_chaser(db_offender:, nomis_offender:, case_info:)
-        end
       end
 
       if record.changed?
@@ -126,40 +117,5 @@ private
       prisoner_name: "#{nomis_offender.first_name} #{nomis_offender.last_name}",
       prisoner_number: nomis_offender.offender_no
     ).assign_com_less_than_10_months.deliver_later
-  end
-
-  def assign_com_email_weekly_chaser(db_offender:, nomis_offender:, case_info:)
-    allocation = AllocationHistory.find_by(nomis_offender_id: nomis_offender.offender_no)
-    prison = Prison.find(nomis_offender.prison_id)
-
-    if allocation.try(:active?)
-      pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
-      pom_name  = pom.full_name
-      pom_email = pom.email_address.presence || 'unknown'
-    else
-      pom_name  = 'This offender does not have an allocated POM'
-      pom_email = 'n/a'
-    end
-
-    # create the history first so that the validations will help with hard failures due to coding errors
-    # rather than waiting for the mailer to object
-    db_offender.email_histories.create!(
-      prison: nomis_offender.prison_id,
-      name: case_info.ldu_name,
-      email: case_info.ldu_email_address,
-      event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION_CHASER
-    )
-
-    # This is queued so that soft failures don't kill the whole job
-    CommunityMailer.with(
-      email: case_info.ldu_email_address,
-      offender_crn: case_info.crn,
-      offender_name: nomis_offender.full_name_ordered,
-      prison_number: nomis_offender.offender_no,
-      sentence_type: nomis_offender.indeterminate_sentence? ? 'Indeterminate' : 'Determinate',
-      prison_name: prison.name,
-      pom_name: pom_name,
-      pom_email: pom_email,
-    ).assign_com_less_than_10_months_chaser.deliver_later
   end
 end
