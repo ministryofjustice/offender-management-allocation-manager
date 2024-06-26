@@ -50,7 +50,7 @@ module HmppsApi
       @from_agency = payload['fromAgency']
       @to_agency = payload['toAgency']
       @movement_type = payload.fetch('movementType')
-      @direction_code = payload.fetch('directionCode')
+      @direction_code = payload['directionCode']
       @movement_time = payload.fetch('movementTime')
       @movement_date = payload.fetch('movementDate')
     end
