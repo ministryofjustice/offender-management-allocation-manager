@@ -38,7 +38,7 @@ module Handover::HandoverCalculation
                               # Men's estate: the day the offender arrived in the open prison
                               prison_arrival_date
                             end
-      if handover_start_date.present? && handover_start_date < handover_date
+      if handover_start_date.present? && handover_date.present? && handover_start_date < handover_date
         handover_start_date
       else
         handover_date

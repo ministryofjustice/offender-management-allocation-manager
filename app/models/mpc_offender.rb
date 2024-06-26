@@ -13,15 +13,13 @@ class MpcOffender
            :first_name, :last_name, :full_name_ordered, :full_name,
            :inside_omic_policy?, :offender_no, :prison_id, :restricted_patient?, :age, :booking_id, to: :@api_offender
 
-  delegate :crn, :manual_entry?, :tier, :mappa_level, :welsh_offender,
-           to: :@case_information
+  delegate :crn, :manual_entry?, :tier, :mappa_level, to: :@case_information
+  # These fields make sense to be nil when the case information is nil - the others dont
+  delegate :ldu_email_address, :team_name, :ldu_name, :active_vlo?, :welsh_offender, to: :@case_information, allow_nil: true
 
   delegate :victim_liaison_officers, :handover_progress_task_completion_data, :handover_progress_complete?,
            :handover_type, :current_parole_review, :previous_parole_reviews, :build_parole_review_sections,
            :most_recent_parole_review, :parole_review_awaiting_hearing, :most_recent_completed_parole_review, to: :@offender
-
-  # These fields make sense to be nil when the case information is nil - the others dont
-  delegate :ldu_email_address, :team_name, :ldu_name, :active_vlo?, to: :@case_information, allow_nil: true
 
   attr_reader :case_information, :prison
 
