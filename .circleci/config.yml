@@ -13,7 +13,7 @@ references:
   test_container_config: &test_container_config
     resource_class: large
     docker:
-      - image: cimg/ruby:3.3.0-browsers
+      - image: cimg/ruby:3.3.3-browsers
         environment:
           RAILS_ENV: test
           PGHOST: 127.0.0.1
