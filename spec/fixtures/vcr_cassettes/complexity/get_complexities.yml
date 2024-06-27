@@ -5,7 +5,7 @@ http_interactions:
     uri: https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/multiple/offender-no
     body:
       encoding: UTF-8
-      string: '[["G0276VC","T0000FT"]]'
+      string: '["G0276VC","T0000FT"]'
     headers:
       User-Agent:
       - Faraday v1.10.0
@@ -53,7 +53,7 @@ http_interactions:
     uri: https://complexity-of-need-staging.hmpps.service.justice.gov.uk/v1/complexity-of-need/multiple/offender-no
     body:
       encoding: UTF-8
-      string: '[["G0276VC","T0000FT","X00887XX"]]'
+      string: '["G0276VC","T0000FT","X00887XX"]'
     headers:
       User-Agent:
       - Faraday v1.10.0

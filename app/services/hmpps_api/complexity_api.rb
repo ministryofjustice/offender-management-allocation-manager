@@ -20,7 +20,7 @@ module HmppsApi
 
       def get_complexities(offender_nos)
         route = '/complexity-of-need/multiple/offender-no'
-        result = client.post route, [offender_nos], cache: false
+        result = client.post route, offender_nos, cache: false
         result.map { |complexity| [complexity.fetch('offenderNo'), complexity.fetch('level')] }.to_h
       end
 
