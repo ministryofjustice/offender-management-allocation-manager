@@ -68,7 +68,7 @@ RUN set -ex ; \
 # Highly cachable layers. These statements are rarely expected to invalidate the cache.
 
 # Install Ruby and Node dependencies
-COPY Gemfile Gemfile.lock package.json ./
+COPY Gemfile* .ruby-version package.json ./
 RUN yarn install \
     && bundle config set --local without 'development test' \
     && bundle install --jobs 2 --retry 3
