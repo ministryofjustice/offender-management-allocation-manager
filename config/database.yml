@@ -17,3 +17,5 @@ production:
   username: <%= ENV['POSTGRES_USER'] %>
   password: <%= ENV['POSTGRES_PASSWORD'] %>
   host:     <%= ENV['POSTGRES_HOST'] %>
+  sslmode: verify-full
+  sslrootcert: root.crt
