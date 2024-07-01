@@ -61,9 +61,6 @@ gem 'aws-sdk-sqs', '~> 1.55'
 
 gem 'activeadmin'
 
-# Needed until Ruby 3.3.4 is released https://github.com/ruby/ruby/pull/11006
-gem 'net-pop', github: 'ruby/net-pop'
-
 group :development, :test do
   gem 'brakeman', '~> 6.0'
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
