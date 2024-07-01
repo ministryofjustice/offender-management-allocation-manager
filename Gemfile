@@ -14,9 +14,10 @@ gem 'faraday', '~> 1.10.3'
 gem 'net-http' # needed to undo a conflict with system libs
 gem 'govuk_notify_rails'
 # we need the extra is_csv parameter available in 5.2 and above
-gem 'notifications-ruby-client', '>= 5.2'
+# TODO: update code to work with latest version
+gem 'notifications-ruby-client', '>= 5.2', '< 6.0.0'
 gem 'govuk_design_system_formbuilder', '~> 2.5'
-gem 'json-schema', '~> 3.0'
+gem 'json-schema', '~> 4.0'
 gem 'jsonb_accessor'
 gem 'jwt'
 gem 'lograge'
@@ -59,6 +60,9 @@ gem 'shoryuken', '~> 6.0'
 gem 'aws-sdk-sqs', '~> 1.55'
 
 gem 'activeadmin'
+
+# Needed until Ruby 3.3.4 is released https://github.com/ruby/ruby/pull/11006
+gem 'net-pop', github: 'ruby/net-pop'
 
 group :development, :test do
   gem 'brakeman', '~> 6.0'
