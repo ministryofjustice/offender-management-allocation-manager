@@ -18,4 +18,4 @@ production:
   password: <%= ENV['POSTGRES_PASSWORD'] %>
   host:     <%= ENV['POSTGRES_HOST'] %>
   sslmode: verify-full
-  sslrootcert: root.crt
+  sslrootcert: /home/appuser/.postgresql/root.crt
