@@ -215,23 +215,22 @@ workflows:
   test_build_deploy:
     jobs:
       - install_dependencies:
-          filters: { branches: { ignore: [staging, preprod, test, test2] } }
+          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
       - fetch_env_vars:
-          filters: { branches: { ignore: [staging, preprod, test, test2] } }
+          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
           context: [offender-management-shared, offender-management-staging]
       - rubocop:
           requires: [install_dependencies]
-          filters: { branches: { ignore: [staging, preprod, test, test2] } }
+          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
       - test:
           requires: [install_dependencies, fetch_env_vars]
-          filters: { branches: { ignore: [staging, preprod, test, test2] } }
+          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
           context: [offender-management-shared, offender-management-staging]
       - hmpps/build_docker:
           <<: *verify_docker_image_config
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
       - hmpps/build_docker:
           <<: *build_and_push_docker_image_config
-          requires: [rubocop, test]
           filters: { branches: { only: [main] } }
           context: [offender-management-shared, offender-management-staging]
       - deploy:
