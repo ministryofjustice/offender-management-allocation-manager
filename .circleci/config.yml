@@ -1,16 +1,28 @@
 references:
-  defaults: &defaults
-    working_directory: ~/repo
-
   github_team_name_slug: &github_team_name_slug
     GITHUB_TEAM_NAME_SLUG: offender-management
 
+  docker_image_name: &docker_image_name
+    image_name: quay.io/hmpps/offender-management
+
+  build_and_push_docker_image_config: &build_and_push_docker_image_config
+    name: build_and_push_docker_image
+    persist_container_image: true
+    <<: *docker_image_name
+
+  verify_docker_image_config: &verify_docker_image_config
+    name: verify_docker_image
+    publish: false
+    <<: *docker_image_name
+
   deploy_container_config: &deploy_container_config
+    working_directory: ~/app
     resource_class: small
     docker:
       - image: ministryofjustice/cloud-platform-tools
 
   test_container_config: &test_container_config
+    working_directory: ~/app
     resource_class: large
     docker:
       - image: cimg/ruby:3.3.3-browsers
@@ -44,59 +56,12 @@ references:
         kubectl config current-context
         kubectl -n "${K8S_NAMESPACE}" get pods
 
-  build_docker_image: &build_docker_image
-    run:
-      name: Build allocation-manager docker image
-      command: |
-        export BUILD_DATE=$(date '+%Y-%m-%d') >> $BASH_ENV
-        source $BASH_ENV
-        docker build \
-          --build-arg BUILD_NUMBER=${BUILD_DATE}.${CIRCLE_BUILD_NUM}.${CIRCLE_SHA1:0:6} \
-          --build-arg GIT_REF=${CIRCLE_SHA1} \
-          --build-arg GIT_BRANCH=${CIRCLE_BRANCH} \
-          -t app .
-
-  build_quick_docker_image: &build_quick_docker_image
-    run:
-      name: Build allocation-manager docker image - quick mode
-      command: |
-        set -xeuo pipefail
-        export BUILD_DATE=$(date '+%Y-%m-%d') >> $BASH_ENV
-        source $BASH_ENV
-
-        docker login --username "${QUAYIO_USERNAME}" --password "${QUAYIO_PASSWORD}" quay.io
-
-        docker pull "${QUAYIO_REPO}:latest"
-        docker tag "${QUAYIO_REPO}:latest" offender-management:latest
-
-        docker build \
-          --build-arg BUILD_NUMBER=${BUILD_DATE}.${CIRCLE_BUILD_NUM}.${CIRCLE_SHA1:0:6} \
-          --build-arg GIT_REF=${CIRCLE_SHA1} \
-          --build-arg GIT_BRANCH=${CIRCLE_BRANCH} \
-          -f Dockerfile.quick \
-          -t app .
-
-  push_docker_image: &push_docker_image
-    run:
-      name: Push allocation-manager docker image
-      command: |
-        set -xeuo pipefail
-        docker login --username "${QUAYIO_USERNAME}" --password "${QUAYIO_PASSWORD}" quay.io
-        docker tag app "${QUAYIO_REPO}:${CIRCLE_SHA1}"
-        docker push "${QUAYIO_REPO}:${CIRCLE_SHA1}"
-        if [ "${CIRCLE_BRANCH}" == "main" ]; then
-          docker tag app "${QUAYIO_REPO}:latest"
-          docker push "${QUAYIO_REPO}:latest"
-        fi
-      environment:
-        <<: *github_team_name_slug
-
 version: 2.1
 
 orbs:
   browser-tools: circleci/browser-tools@1.4.4
-  aws-cli: circleci/aws-cli@2.0.3
   ruby: circleci/ruby@2.1.3
+  hmpps: ministryofjustice/hmpps@9.1.0
 
 commands:
   install_firefox:
@@ -111,7 +76,6 @@ commands:
 
 jobs:
   noop:
-    <<: *defaults
     <<: *deploy_container_config
     steps:
       - run:
@@ -119,7 +83,6 @@ jobs:
           command: "true"
 
   install_dependencies:
-    <<: *defaults
     <<: *test_container_config
     steps:
       - checkout
@@ -150,13 +113,12 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - repo/vendor/bundle
-            - repo/node_modules
+            - app/vendor/bundle
+            - app/node_modules
             - .local/bin
             - .bundle/config
 
   fetch_env_vars:
-    <<: *defaults
     <<: *deploy_container_config
     steps:
       - *configure_k8s
@@ -185,28 +147,21 @@ jobs:
             - env
 
   rubocop:
-    <<: *defaults
     <<: *test_container_config
     steps:
       - checkout
       - attach_workspace:
           at: ~/
-      - run:
-          name: Setup bundler path
-          command: bundle config set path 'vendor/bundle'
-      - run:
-          name: Rubocop
-          command: bundle exec rubocop
+      - ruby/install-deps
+      - ruby/rubocop-check
+
   test:
-    <<: *defaults
     <<: *test_container_config
     steps:
       - checkout
       - attach_workspace:
           at: ~/
-      - run:
-          name: Setup bundler path
-          command: bundle config set path 'vendor/bundle'
+      - ruby/install-deps
       - run:
           name: Security analysis
           command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
@@ -236,84 +191,65 @@ jobs:
       - store_artifacts:
           path: ~/test-results
 
-  build_and_push_docker_image:
-    <<: *defaults
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - aws-cli/install
-      - *configure_k8s
-      - *build_docker_image
-      - *push_docker_image
-
-  build_and_push_quick_docker_image:
-    <<: *defaults
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - aws-cli/install
-      - *configure_k8s
-      - *build_quick_docker_image
-      - *push_docker_image
-
-  verify_docker_image_builds:
-    <<: *defaults
-    <<: *test_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - aws-cli/install
-      - *build_docker_image
-
   deploy:
     <<: *deploy_container_config
     steps:
       - checkout
       - attach_workspace:
           at: ~/
+      - setup_remote_docker:
+          docker_layer_caching: true
       - *configure_k8s
+      - hmpps/recall_container_image
       - deploy:
           name: Deploy
           command: |
             set -x
             shopt -s nullglob
             env_name="${K8S_NAMESPACE#offender-management-}"
-            sed -i -e "s/:latest/:${CIRCLE_SHA1}/" deploy/"${env_name}"/deployment.yaml deploy/"${env_name}"/domain-events-consumer.yaml* deploy/"${env_name}"/cron-*.yaml
+            sed -i -e "s/:latest/:${APP_VERSION}/" deploy/"${env_name}"/deployment.yaml deploy/"${env_name}"/domain-events-consumer.yaml* deploy/"${env_name}"/cron-*.yaml
             kubectl -n "${K8S_NAMESPACE}" annotate deployments/allocation-manager kubernetes.io/change-cause="${CIRCLE_BUILD_URL}"
-            kubectl apply --record=false -f ./deploy/"${env_name}"
+            kubectl apply -f ./deploy/"${env_name}"
 
 workflows:
-  feature_branch:
+  test_build_deploy:
     jobs:
       - install_dependencies:
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+          filters: { branches: { ignore: [staging, preprod, test, test2] } }
       - fetch_env_vars:
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+          filters: { branches: { ignore: [staging, preprod, test, test2] } }
           context: [offender-management-shared, offender-management-staging]
       - rubocop:
           requires: [install_dependencies]
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+          filters: { branches: { ignore: [staging, preprod, test, test2] } }
       - test:
           requires: [install_dependencies, fetch_env_vars]
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+          filters: { branches: { ignore: [staging, preprod, test, test2] } }
           context: [offender-management-shared, offender-management-staging]
-      - verify_docker_image_builds:
+      - hmpps/build_docker:
+          <<: *verify_docker_image_config
           filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+      - hmpps/build_docker:
+          <<: *build_and_push_docker_image_config
+          requires: [rubocop, test]
+          filters: { branches: { only: [main] } }
+          context: [offender-management-shared, offender-management-staging]
+      - deploy:
+          name: deploy_staging
+          requires: [build_and_push_docker_image]
+          context: [offender-management-shared, offender-management-staging]
+      - deploy_production_approval:
+          type: approval
+          requires: [deploy_staging]
+      - deploy:
+          name: deploy_production
+          requires: [deploy_production_approval]
+          context: [offender-management-shared, offender-management-production]
 
   test_env:
     jobs:
-      - build_and_push_docker_image:
+      - hmpps/build_docker:
+          <<: *build_and_push_docker_image_config
           filters: { branches: { only: [test] } }
           context: [offender-management-shared, offender-management-test]
       - deploy:
@@ -323,7 +259,8 @@ workflows:
 
   test2_env:
     jobs:
-      - build_and_push_docker_image:
+      - hmpps/build_docker:
+          <<: *build_and_push_docker_image_config
           filters: { branches: { only: [test2] } }
           context: [offender-management-shared, offender-management-test2]
       - deploy:
@@ -333,7 +270,8 @@ workflows:
 
   preprod:
     jobs:
-      - build_and_push_docker_image:
+      - hmpps/build_docker:
+          <<: *build_and_push_docker_image_config
           filters: { branches: { only: [preprod] } }
           context: [offender-management-shared, offender-management-preprod]
       - deploy:
@@ -348,9 +286,8 @@ workflows:
       - fetch_env_vars:
           filters: { branches: { only: [staging] } }
           context: [offender-management-shared, offender-management-staging]
-
-      - build_and_push_docker_image:
-          requires: [install_dependencies]
+      - hmpps/build_docker:
+          <<: *build_and_push_docker_image_config
           filters: { branches: { only: [staging] } }
           context: [offender-management-shared, offender-management-staging]
       - rubocop:
@@ -360,40 +297,7 @@ workflows:
           requires: [install_dependencies, fetch_env_vars]
           filters: { branches: { only: [staging] } }
           context: [offender-management-shared, offender-management-staging]
-
       - deploy:
           requires: [build_and_push_docker_image, rubocop, test]
           filters: { branches: { only: [staging] } }
           context: [offender-management-shared, offender-management-staging]
-
-  staging_and_production:
-    jobs:
-      - install_dependencies:
-          filters: { branches: { only: [main] } }
-      - fetch_env_vars:
-          filters: { branches: { only: [main] } }
-          context: [offender-management-shared, offender-management-staging]
-
-      - build_and_push_docker_image:
-          requires: [install_dependencies]
-          filters: { branches: { only: [main] } }
-          context: [offender-management-shared, offender-management-staging]
-      - rubocop:
-          requires: [install_dependencies]
-          filters: { branches: { only: [main] } }
-      - test:
-          requires: [install_dependencies, fetch_env_vars]
-          filters: { branches: { only: [main] } }
-          context: [offender-management-shared, offender-management-staging]
-
-      - deploy:
-          name: deploy_staging
-          requires: [build_and_push_docker_image, rubocop, test]
-          filters: { branches: { only: [main] } }
-          context: [offender-management-shared, offender-management-staging]
-
-      - deploy:
-          name: deploy_production
-          requires: [deploy_staging]
-          filters: { branches: { only: [main] } }
-          context: [offender-management-shared, offender-management-production]
