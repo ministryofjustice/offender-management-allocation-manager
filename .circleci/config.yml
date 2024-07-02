@@ -238,6 +238,10 @@ workflows:
           name: deploy_staging
           requires: [build_and_push_docker_image]
           context: [offender-management-shared, offender-management-staging]
+      - deploy:
+          name: deploy_preprod
+          requires: [build_and_push_docker_image]
+          context: [offender-management-shared, offender-management-preprod]
       - deploy_production_approval:
           type: approval
           requires: [deploy_staging]
