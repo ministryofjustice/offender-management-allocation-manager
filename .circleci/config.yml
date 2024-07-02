@@ -1,6 +1,6 @@
 references:
-  github_team_name_slug: &github_team_name_slug
-    GITHUB_TEAM_NAME_SLUG: offender-management
+  ignore_deployable_branches: &ignore_deployable_branches
+    filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
 
   docker_image_name: &docker_image_name
     image_name: quay.io/hmpps/offender-management
@@ -215,20 +215,18 @@ workflows:
   test_build_deploy:
     jobs:
       - install_dependencies:
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+          <<: *ignore_deployable_branches
       - fetch_env_vars:
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+          <<: *ignore_deployable_branches
           context: [offender-management-shared, offender-management-staging]
       - rubocop:
           requires: [install_dependencies]
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
       - test:
           requires: [install_dependencies, fetch_env_vars]
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
           context: [offender-management-shared, offender-management-staging]
       - hmpps/build_docker:
+          <<: *ignore_deployable_branches
           <<: *verify_docker_image_config
-          filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
       - hmpps/build_docker:
           <<: *build_and_push_docker_image_config
           filters: { branches: { only: [main] } }
