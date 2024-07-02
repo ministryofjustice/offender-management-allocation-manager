@@ -46,6 +46,10 @@ RUN \
   && gem install bundler -v 2.5.12 --no-document \
   && apt-get clean
 
+ RUN mkdir /home/appuser/.postgresql && \
+  curl https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+    > /home/appuser/.postgresql/root.crt
+
 # Install official AWS CLI
 RUN \
   set -ex \
