@@ -6,24 +6,18 @@
     </tr>
     <% @prisoner.previous_parole_reviews.first(3).each_with_index do |review, index| %>
       <tr class="govuk-table__row">
-        <% if index == 0 %>
-          <td class="govuk-table__cell govuk-!-width-one-half">Hearing outcomes (up to last 3)</td>
-        <% else %>
-          <td class="govuk-table__cell govuk-!-width-one-half"></td>
-        <% end %>
-        <% if review.hearing_outcome_received_on.present? %>
-          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-            <%= review.previous_hearing_outcome %>
-            <br/>
+        <td class="govuk-table__cell govuk-!-width-one-half">
+          <%= 'Hearing outcomes (up to last 3)' if index == 0 %>
+        </td>
+        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
+          <%= review.previous_hearing_outcome %>
+          <br/>
+          <% if review.hearing_outcome_received_on.present? %>
             <%= review.hearing_outcome_received_on.strftime("%b %Y") %>
-          </td>
-        <% else %>
-          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-            <%= review.previous_hearing_outcome %>
-            <br/>
+          <% else %>
             We do not have the date this outcome was confirmed
-          </td>
-        <% end %>
+          <% end %>
+        </td>
       </tr>
     <% end %>
   </tbody>
