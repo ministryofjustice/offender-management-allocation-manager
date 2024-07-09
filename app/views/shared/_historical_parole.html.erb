@@ -10,7 +10,7 @@
           <%= 'Hearing outcomes (up to last 3)' if index == 0 %>
         </td>
         <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-          <%= review.previous_hearing_outcome %>
+          <%= review.hearing_outcome_as_historic %>
           <br/>
           <% if review.hearing_outcome_received_on.present? %>
             <%= review.hearing_outcome_received_on.strftime("%b %Y") %>

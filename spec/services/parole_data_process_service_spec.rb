@@ -141,21 +141,21 @@ RSpec.describe ParoleDataProcessService do
         results
 
         expect(parole_review1.active?).to eq(true)
-        expect(parole_review1.current_hearing_outcome).to eq('Some kinda result')
+        expect(parole_review1.hearing_outcome_as_current).to eq('Some kinda result')
         expect(parole_review1.target_hearing_date).to eq(Date.new(2022, 1, 1))
         expect(parole_review1.custody_report_due).to eq(Date.new(2021, 1, 1))
         expect(parole_review1.review_type).to eq('GPP ISP OnPost Tariff')
         expect(parole_review1.hearing_outcome_received_on).to eq(snapshot_date)
 
         expect(parole_review2.active?).to eq(true)
-        expect(parole_review2.previous_hearing_outcome).to eq('No hearing outcome given')
+        expect(parole_review2.hearing_outcome_as_historic).to eq('Refused')
         expect(parole_review2.target_hearing_date).to eq(Date.new(2019, 1, 1))
         expect(parole_review2.custody_report_due).to eq(Date.new(2019, 1, 1))
         expect(parole_review2.review_type).to eq('GPP MH Accelerated Review Other')
         expect(parole_review2.hearing_outcome_received_on).to eq(nil)
 
         expect(parole_review3.active?).to eq(false)
-        expect(parole_review3.previous_hearing_outcome).to eq('No hearing outcome given')
+        expect(parole_review3.hearing_outcome_as_historic).to eq('Refused')
         expect(parole_review3.target_hearing_date).to eq(Date.new(2019, 1, 1))
         expect(parole_review3.custody_report_due).to eq(Date.new(2019, 1, 1))
         expect(parole_review3.review_type).to eq('GPP SOPC Parole Review')
@@ -218,15 +218,15 @@ RSpec.describe ParoleDataProcessService do
         results # Today's run
 
         expect(parole_review1.active?).to eq(false)
-        expect(parole_review1.current_hearing_outcome).to eq('Stay in closed')
+        expect(parole_review1.hearing_outcome_as_current).to eq('Stay in closed')
         expect(parole_review1.hearing_outcome_received_on).to eq(snapshot_date) # Already got it yesterday
 
         expect(parole_review2.active?).to eq(true)
-        expect(parole_review2.previous_hearing_outcome).to eq('No hearing outcome given')
+        expect(parole_review2.hearing_outcome_as_historic).to eq('Refused')
         expect(parole_review2.hearing_outcome_received_on).to eq(nil)
 
         expect(parole_review3.active?).to eq(false)
-        expect(parole_review3.previous_hearing_outcome).to eq('No hearing outcome given')
+        expect(parole_review3.hearing_outcome_as_historic).to eq('Refused')
         expect(parole_review3.hearing_outcome_received_on).to eq(nil)
       end
 

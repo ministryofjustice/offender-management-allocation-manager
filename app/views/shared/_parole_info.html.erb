@@ -31,7 +31,7 @@
     <% if @prisoner.current_parole_review&.hearing_outcome.present? %>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell govuk-!-width-one-half">Hearing outcome</td>
-        <td id='hearing-outcome' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= @prisoner.current_parole_review.current_hearing_outcome %></td>
+        <td id='hearing-outcome' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= @prisoner.current_parole_review.hearing_outcome_as_current %></td>
       </tr>
     <% end %>
   </tbody>
