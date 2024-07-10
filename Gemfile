@@ -3,7 +3,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby File.read('.ruby-version').chomp
 
-gem 'rails', '~> 6.1.7'
+gem "rails", "~> 7.0.0"
 gem 'auto_strip_attributes'
 # Need AWS SNS SDK for publishing events to HMPPS_DOMAIN_EVENTS
 gem 'aws-sdk-sns'
@@ -58,6 +58,10 @@ gem 'business_time'
 gem 'matrix' # App does not use it directly but it has to be explicitly declared otherwise build breaks
 gem 'shoryuken', '~> 6.0'
 gem 'aws-sdk-sqs', '~> 1.55'
+
+# these default gems will be removed in ruby 3.4
+gem "drb"
+gem "mutex_m"
 
 gem 'activeadmin'
 
