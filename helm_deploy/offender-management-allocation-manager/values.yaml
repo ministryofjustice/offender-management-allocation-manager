@@ -1,0 +1,146 @@
+---
+# Default values.
+# Declare variables to be passed into your templates.
+#
+# Variables in `helm_deploy/values-[env].yaml` will take precedence.
+
+custom_templates_config:
+  rails_db_migration:
+    enabled: true
+  background_jobs_processor:
+    enabled: true
+  domain_events_consumer:
+    enabled: true
+
+generic-service:
+  replicaCount: 2
+
+  nameOverride: offender-management
+  serviceAccountName: offender-management-allocation-manager
+  productId: DPS030
+
+  containerCommand: ['sh', '-c', 'bundle exec puma']
+
+  image:
+    repository: quay.io/hmpps/offender-management
+    tag: app_version # overridden at deployment time
+    port: 3000
+
+  service:
+    port: 3000
+
+  ingress:
+    enabled: true
+
+  custommetrics:
+    enabled: true
+    metricsPort: &metricsPort 9394
+    metricsPath: &metricsPath /metrics
+
+  livenessProbe:
+    httpGet:
+      path: /health/ping
+    periodSeconds: 60
+
+  readinessProbe:
+    httpGet:
+      path: /health/ping
+    periodSeconds: 60
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 25%
+
+  podSecurityContext:
+    fsGroup: 1001
+
+  resources:
+    limits:
+      memory: 1500Mi
+      cpu: 1000m
+    requests:
+      memory: 500Mi
+      cpu: 50m
+
+  extraContainers:
+    - name: metrics
+      image: quay.io/hmpps/offender-management:latest
+      imagePullPolicy: IfNotPresent
+      command: ['sh', '-c', 'bundle exec prometheus_exporter --bind 0.0.0.0']
+      ports:
+        - name: metrics
+          containerPort: *metricsPort
+          protocol: TCP
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        seccompProfile:
+          type: RuntimeDefault
+      resources:
+        limits:
+          memory: 200Mi
+          cpu: 50m
+        requests:
+          memory: 100Mi
+          cpu: 10m
+      livenessProbe:
+        httpGet:
+          path: *metricsPath
+          port: *metricsPort
+        initialDelaySeconds: 10
+        periodSeconds: 60
+      readinessProbe:
+        httpGet:
+          path: *metricsPath
+          port: *metricsPort
+        initialDelaySeconds: 10
+        periodSeconds: 60
+
+  # Environment variables to load into the deployment
+  env:
+    RAILS_ENV: production
+    RAILS_WEB_CONCURRENCY: 5
+    RAILS_LOG_TO_STDOUT: on
+    RAILS_SERVE_STATIC_FILES: on
+    PROMETHEUS_METRICS: on
+    LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
+
+  # Pre-existing kubernetes secrets to load as environment variables in the deployment.
+  # namespace_secrets:
+  #   [name of kubernetes secret]:
+  #     [name of environment variable as seen by app]: [key of kubernetes secret to load]
+  namespace_secrets:
+    allocation-manager-secrets:
+      SECRET_KEY_BASE: SECRET_KEY_BASE
+      SENTRY_DSN: SENTRY_DSN
+      KEYWORKER_API_HOST: KEYWORKER_API_HOST
+      LIVE_NOTIFY_API_KEY: LIVE_NOTIFY_API_KEY
+      PAROLE_DATA_IMPORT_EMAIL_PASSWORD: PAROLE_DATA_IMPORT_EMAIL_PASSWORD
+      PAROLE_DATA_IMPORT_EMAIL_USERNAME: PAROLE_DATA_IMPORT_EMAIL_USERNAME
+      SUPPORT_EMAIL: SUPPORT_EMAIL
+    hmpps-auth-secrets:
+      HMPPS_API_CLIENT_ID: HMPPS_API_CLIENT_ID
+      HMPPS_API_CLIENT_SECRET: HMPPS_API_CLIENT_SECRET
+      HMPPS_OAUTH_CLIENT_ID: HMPPS_OAUTH_CLIENT_ID
+      HMPPS_OAUTH_CLIENT_SECRET: HMPPS_OAUTH_CLIENT_SECRET
+    domain-events:
+      DOMAIN_EVENTS_SQS_DLQ_ARN: DOMAIN_EVENTS_SQS_DLQ_ARN
+      DOMAIN_EVENTS_SQS_DLQ_NAME: DOMAIN_EVENTS_SQS_DLQ_NAME
+      DOMAIN_EVENTS_SQS_DLQ_URL: DOMAIN_EVENTS_SQS_DLQ_URL
+      DOMAIN_EVENTS_SQS_QUEUE_ARN: DOMAIN_EVENTS_SQS_QUEUE_ARN
+      DOMAIN_EVENTS_SQS_QUEUE_NAME: DOMAIN_EVENTS_SQS_QUEUE_NAME
+      DOMAIN_EVENTS_SQS_QUEUE_URL: DOMAIN_EVENTS_SQS_QUEUE_URL
+    allocation-rds-instance-output:
+      POSTGRES_HOST: rds_instance_address
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_NAME: postgres_name
+    allocation-elasticache-redis:
+      REDIS_URL: url
+    hmpps-domain-events-topic:
+      DOMAIN_EVENTS_TOPIC_ARN: topic_arn

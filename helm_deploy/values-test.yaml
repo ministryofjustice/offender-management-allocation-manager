@@ -1,0 +1,31 @@
+---
+custom_templates_config:
+  rails_db_migration:
+    enabled: false
+  background_jobs_processor:
+    enabled: false
+  domain_events_consumer:
+    enabled: false
+
+generic-service:
+  ingress:
+    hosts:
+      - temp-test.moic.service.justice.gov.uk
+    tlsSecretName: allocation-manager-hostname
+
+  replicaCount: 1
+  allowlist: null
+
+  env:
+    ENV_NAME: test
+    SENTRY_CURRENT_ENV: test
+    PRISON_API_HOST: https://prison-api-dev.prison.service.justice.gov.uk
+    PRISONER_SEARCH_HOST: https://prisoner-search-dev.prison.service.justice.gov.uk
+    COMMUNITY_API_HOST: https://community-api-secure.test.delius.probation.hmpps.dsd.io
+    COMPLEXITY_API_HOST: https://complexity-of-need-staging.hmpps.service.justice.gov.uk
+    NOMIS_OAUTH_HOST: https://sign-in-dev.hmpps.service.justice.gov.uk
+    ASSESS_RISKS_AND_NEEDS_API_HOST: https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk
+    MANAGE_POM_CASES_AND_DELIUS_HOST: https://manage-pom-cases-and-delius-dev.hmpps.service.justice.gov.uk
+    TIERING_API_HOST: https://hmpps-tier-dev.hmpps.service.justice.gov.uk
+    DPS_FRONTEND_COMPONENTS_API_HOST: https://frontend-components-dev.hmpps.service.justice.gov.uk
+    DIGITAL_PRISON_SERVICE_HOST: https://digital-dev.prison.service.justice.gov.uk

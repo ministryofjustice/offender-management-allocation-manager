@@ -8,6 +8,8 @@ preload_app!
 port        ENV['PORT']     || 3000
 environment ENV['RACK_ENV'] || 'production'
 
+pidfile ENV.fetch('PIDFILE', '/tmp/server.pid')
+
 # Configure Prometheus Exporter
 if ENV['PROMETHEUS_METRICS']&.strip == 'on'
   after_worker_boot do

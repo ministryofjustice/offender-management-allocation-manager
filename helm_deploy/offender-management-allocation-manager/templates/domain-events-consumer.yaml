@@ -1,0 +1,41 @@
+{{- if .Values.custom_templates_config.domain_events_consumer.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: offender-management-events-consumer
+  labels:
+    app: offender-management-events-consumer
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  minReadySeconds: 10
+  strategy:
+    {{- with index .Values "generic-service" }}{{ toYaml .strategy | nindent 4 }}{{ end }}
+  selector:
+    matchLabels:
+      app: offender-management-events-consumer
+  template:
+    metadata:
+      labels:
+        app: offender-management-events-consumer
+    spec:
+      serviceAccountName: {{ with index .Values "generic-service" }}{{ .serviceAccountName }}{{ end }}
+      containers:
+      - name: worker
+        image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
+        imagePullPolicy: Always
+        securityContext:
+          {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
+        command: ['sh', '-c', 'bin/rake shoryuken:start']
+          {{- include "deployment.envs" (index .Values "generic-service") | nindent 8 }}
+        resources:
+          {{- with index .Values "generic-service" }}{{ toYaml .resources | nindent 10 }}{{ end }}
+      - {{ with index .Values "generic-service" }}
+        {{- $imageTag := .image.tag }}
+        {{- range $extraContainers := .extraContainers }}
+        {{- . | toYaml | replace "app_version" $imageTag | indent 8 | trim }}
+        {{ end }}
+        {{ end }}
+---
+{{- end }}

@@ -1,0 +1,34 @@
+{{- if .Values.custom_templates_config.rails_db_migration.enabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rails-db-migration
+spec:
+  ttlSecondsAfterFinished: 120
+  completions: 1
+  parallelism: 1
+  backoffLimit: 4
+  template:
+    spec:
+      serviceAccountName: {{ with index .Values "generic-service" }}{{ .serviceAccountName }}{{ end }}
+      restartPolicy: Never
+      securityContext:
+        {{- with index .Values "generic-service" }}{{ toYaml .podSecurityContext | nindent 8 }}{{ end }}
+      containers:
+      - name: rails-db-migration
+        image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
+        imagePullPolicy: Always
+        securityContext:
+          {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
+        command: ['sh', '-c', 'bundle exec rails db:migrate && bundle exec rake import:prison']
+          {{- include "deployment.envs" (index .Values "generic-service") | nindent 8 }}
+        resources:
+          limits:
+            memory: 1000Mi
+            cpu: 1000m
+          requests:
+            memory: 500Mi
+            cpu: 50m
+---
+{{- end }}

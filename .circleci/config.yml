@@ -214,38 +214,63 @@ jobs:
 workflows:
   test_build_deploy:
     jobs:
-      - install_dependencies:
+#      - install_dependencies:
+#          <<: *ignore_deployable_branches
+#      - fetch_env_vars:
+#          <<: *ignore_deployable_branches
+#          context: [offender-management-shared, offender-management-staging]
+#      - rubocop:
+#          requires: [install_dependencies]
+#      - test:
+#          requires: [install_dependencies, fetch_env_vars]
+#          context: [offender-management-shared, offender-management-staging]
+      - hmpps/helm_lint:
           <<: *ignore_deployable_branches
-      - fetch_env_vars:
-          <<: *ignore_deployable_branches
-          context: [offender-management-shared, offender-management-staging]
-      - rubocop:
-          requires: [install_dependencies]
-      - test:
-          requires: [install_dependencies, fetch_env_vars]
-          context: [offender-management-shared, offender-management-staging]
-      - hmpps/build_docker:
-          <<: *ignore_deployable_branches
-          <<: *verify_docker_image_config
+          name: helm_lint
+          env: staging
+#      - hmpps/build_docker:
+#          <<: *ignore_deployable_branches
+#          <<: *verify_docker_image_config
+#          requires:
+#            - helm_lint
       - hmpps/build_docker:
           <<: *build_and_push_docker_image_config
-          filters: { branches: { only: [main] } }
-          context: [offender-management-shared, offender-management-staging]
-      - deploy:
-          name: deploy_staging
-          requires: [build_and_push_docker_image]
-          context: [offender-management-shared, offender-management-staging]
-      - deploy:
-          name: deploy_preprod
-          requires: [build_and_push_docker_image]
-          context: [offender-management-shared, offender-management-preprod]
-      - deploy_production_approval:
-          type: approval
-          requires: [deploy_staging]
-      - deploy:
-          name: deploy_production
-          requires: [deploy_production_approval]
-          context: [offender-management-shared, offender-management-production]
+          # filters: { branches: { only: [main] } }
+          context:
+            - offender-management-shared
+      - hmpps/deploy_env:
+          name: deploy_test
+          env: test
+          context:
+            - hmpps-common-vars
+            - offender-management-shared
+            - offender-management-test
+          requires:
+            - build_and_push_docker_image
+#      - hmpps/deploy_env:
+#          name: deploy_staging
+#          env: staging
+#          context:
+#            - hmpps-common-vars
+#            - offender-management-shared
+#            - offender-management-staging
+#          requires:
+#            - build_and_push_docker_image
+#      - deploy:
+#          name: deploy_staging
+#          requires: [build_and_push_docker_image]
+#          context: [offender-management-shared, offender-management-staging]
+#      - deploy:
+#          name: deploy_preprod
+#          requires: [build_and_push_docker_image]
+#          context: [offender-management-shared, offender-management-preprod]
+#      - deploy_production_approval:
+#          type: approval
+#          requires: [deploy_staging]
+#      - deploy:
+#          name: deploy_production
+#          requires: [deploy_production_approval]
+#          context: [offender-management-shared, offender-management-production]
 
   test_env:
     jobs:
