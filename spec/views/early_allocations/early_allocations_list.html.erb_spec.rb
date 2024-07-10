@@ -44,7 +44,7 @@ RSpec.describe "early_allocations/early_allocations_list", type: :view do
         let(:column_index) { 1 }
 
         it 'shows the date the record was created' do
-          created_dates = early_allocations.map { |record| record.created_at.to_date.to_s(:rfc822) }
+          created_dates = early_allocations.map { |record| record.created_at.to_date.to_fs(:rfc822) }
           expect(rendered_values).to eq(created_dates)
         end
       end

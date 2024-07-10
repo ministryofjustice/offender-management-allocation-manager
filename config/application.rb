@@ -21,7 +21,7 @@ module OffenderManagementAllocationClient
 
     # allow customization of full error messages on a per-model basis
     config.active_model.i18n_customize_full_message = true
-    config.load_defaults 6.1
+    config.load_defaults 7.0
     config.exceptions_app = routes
     config.generators.system_tests = nil
 
@@ -96,7 +96,11 @@ module OffenderManagementAllocationClient
       Date,
     ]
 
+    require_relative "../app/lib/mail_publish_audit_event_observer"
     config.action_mailer.observers = %w[MailPublishAuditEventObserver]
+
+    require_relative "../app/middleware/robots_tag"
+    config.middleware.use RobotsTag
 
     config.domain_event_handlers = {
       # event_type               => handler class (as a string)

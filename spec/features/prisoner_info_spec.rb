@@ -288,7 +288,7 @@ feature 'View a prisoner profile page', flaky: true do
         visit prison_prisoner_path(prison.code, nomis_offender_id)
         within '.govuk-error-summary' do
           reload_page
-          date = date_sent.to_date.to_s(:rfc822)
+          date = date_sent.to_date.to_fs(:rfc822)
           expect(page).to have_content "We automatically emailed the LDU asking them to allocate a COM on #{date}"
         end
       end

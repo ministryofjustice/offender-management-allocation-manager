@@ -3,7 +3,7 @@
 module ApplicationHelper
   def format_date(date_obj, replacement: '')
     if date_obj
-      date_obj.to_s(:rfc822)
+      date_obj.to_fs(:rfc822)
     else
       replacement
     end
