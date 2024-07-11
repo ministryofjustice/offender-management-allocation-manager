@@ -89,4 +89,4 @@ RUN chown -R appuser:appuser /app
 
 USER 1001
 
-RUN RAILS_ENV=production rails assets:precompile
+RUN RAILS_ENV=production SECRET_KEY_BASE=key rails assets:precompile
