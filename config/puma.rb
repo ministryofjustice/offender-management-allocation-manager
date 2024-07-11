@@ -1,4 +1,7 @@
 require 'yaml'
+
+silence_single_worker_warning
+
 threads_number = Integer(ENV['RAILS_MAX_THREADS'] || 5)
 workers Integer(ENV['WEB_CONCURRENCY'] || 1)
 threads threads_number, threads_number

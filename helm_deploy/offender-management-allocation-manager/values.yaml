@@ -35,7 +35,7 @@ generic-service:
   custommetrics:
     enabled: true
     metricsPort: &metricsPort 9394
-    metricsPath: &metricsPath /metrics
+    metricsPath: /metrics
 
   livenessProbe:
     httpGet:
@@ -65,7 +65,7 @@ generic-service:
       cpu: 50m
 
   extraContainers:
-    - name: metrics
+    - name: offender-management-metrics
       image: quay.io/hmpps/offender-management:latest
       imagePullPolicy: IfNotPresent
       command: ['sh', '-c', 'bundle exec prometheus_exporter --bind 0.0.0.0']
@@ -90,13 +90,13 @@ generic-service:
           cpu: 10m
       livenessProbe:
         httpGet:
-          path: *metricsPath
+          path: /ping
           port: *metricsPort
         initialDelaySeconds: 10
         periodSeconds: 60
       readinessProbe:
         httpGet:
-          path: *metricsPath
+          path: /ping
           port: *metricsPort
         initialDelaySeconds: 10
         periodSeconds: 60
@@ -107,7 +107,7 @@ generic-service:
     RAILS_WEB_CONCURRENCY: 5
     RAILS_LOG_TO_STDOUT: on
     RAILS_SERVE_STATIC_FILES: on
-    PROMETHEUS_METRICS: on
+    PROMETHEUS_METRICS: "on" # do not remove quotes!
     LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
