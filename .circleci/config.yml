@@ -25,7 +25,7 @@ references:
     working_directory: ~/app
     resource_class: large
     docker:
-      - image: cimg/ruby:3.3.3-browsers
+      - image: cimg/ruby:3.3.4-browsers
         environment:
           RAILS_ENV: test
           PGHOST: 127.0.0.1

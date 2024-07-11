@@ -324,6 +324,7 @@ GEM
       date
       net-protocol
     net-pop (0.1.2)
+      net-protocol
     net-protocol (0.2.2)
       timeout
     net-smtp (0.5.0)
@@ -736,7 +737,7 @@ DEPENDENCIES
   wicked
 
 RUBY VERSION
-   ruby 3.3.3p89
+   ruby 3.3.4p94
 
 BUNDLED WITH
-   2.5.12
+   2.5.11
