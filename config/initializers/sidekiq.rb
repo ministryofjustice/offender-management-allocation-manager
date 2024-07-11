@@ -39,3 +39,7 @@ if Rails.env.production?
     }
   end
 end
+
+if Rails.env.test?
+  Sidekiq.logger.level = Logger::WARN
+end

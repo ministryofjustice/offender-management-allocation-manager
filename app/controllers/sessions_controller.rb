@@ -14,7 +14,7 @@ class SessionsController < ApplicationController
 
   def destroy
     session.delete(:sso_data)
-    redirect_to sso_signout_url
+    redirect_to sso_signout_url, allow_other_host: true
   end
 
 private

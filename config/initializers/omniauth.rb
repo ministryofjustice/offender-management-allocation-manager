@@ -1,5 +1,3 @@
-require 'hmpps_sso'
-
 sso_client_secret = Rails.configuration.hmpps_oauth_client_secret
 sso_client_id = Rails.configuration.hmpps_oauth_client_id
 sso_host = Rails.configuration.nomis_oauth_host

@@ -77,7 +77,7 @@ RSpec.describe "poms/show", type: :view do
     end
 
     it 'shows last case allocated date' do
-      expect(summary_rows.first).to have_content(two_days_ago.to_s(:rfc822))
+      expect(summary_rows.first).to have_content(two_days_ago.to_fs(:rfc822))
     end
 
     it 'shows allocations in last 7 days' do

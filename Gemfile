@@ -3,7 +3,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby File.read('.ruby-version').chomp
 
-gem 'rails', '~> 6.1.7'
+gem 'rails', '~> 7.1.3'
 gem 'auto_strip_attributes'
 # Need AWS SNS SDK for publishing events to HMPPS_DOMAIN_EVENTS
 gem 'aws-sdk-sns'
@@ -30,7 +30,7 @@ gem 'paper_trail', '~> 15.1.0'
 gem 'pg'
 gem 'puma', '~> 6.4.2'
 gem 'prometheus_exporter'
-gem 'sidekiq', '>= 6.4.0', '< 6.5.0'
+gem 'sidekiq'
 gem 'sentry-ruby'
 gem 'sentry-rails'
 gem 'sentry-sidekiq'
@@ -59,6 +59,10 @@ gem 'matrix' # App does not use it directly but it has to be explicitly declared
 gem 'shoryuken', '~> 6.0'
 gem 'aws-sdk-sqs', '~> 1.55'
 
+# these default gems will be removed in ruby 3.4
+gem 'drb'
+gem 'mutex_m'
+
 gem 'activeadmin'
 
 group :development, :test do
@@ -68,7 +72,7 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'parallel_tests'
   gem 'rubocop-govuk', '~> 4.12'
-  gem 'rspec-rails', '~> 6.0.3'
+  gem 'rspec-rails'
   gem 'rswag-specs'
   gem 'spring'
   gem 'undercover'

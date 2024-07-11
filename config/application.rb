@@ -21,9 +21,11 @@ module OffenderManagementAllocationClient
 
     # allow customization of full error messages on a per-model basis
     config.active_model.i18n_customize_full_message = true
-    config.load_defaults 6.1
+    config.load_defaults 7.1
     config.exceptions_app = routes
     config.generators.system_tests = nil
+
+    config.autoload_lib(ignore: %w[assets tasks])
 
     config.active_job.queue_adapter = if ENV['RUN_JOBS_INLINE'].present?
                                         :inline
@@ -96,7 +98,9 @@ module OffenderManagementAllocationClient
       Date,
     ]
 
-    config.action_mailer.observers = %w[MailPublishAuditEventObserver]
+    config.action_dispatch.default_headers = {
+      'X-Robots-Tag' => 'noindex, nofollow'
+    }
 
     config.domain_event_handlers = {
       # event_type               => handler class (as a string)

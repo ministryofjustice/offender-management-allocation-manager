@@ -1,4 +1,4 @@
-FROM ruby:3.3.3-slim-bullseye
+FROM ruby:3.3.4-slim-bullseye
 
 # Incremenent to bust Docker layer cache
 ENV DOCKER_CACHE_BUSTER=1
@@ -89,4 +89,4 @@ RUN chown -R appuser:appuser /app
 
 USER 1001
 
-RUN RAILS_ENV=production rails assets:precompile
+RUN RAILS_ENV=production SECRET_KEY_BASE=key rails assets:precompile
