@@ -25,7 +25,7 @@ module OffenderManagementAllocationClient
     config.exceptions_app = routes
     config.generators.system_tests = nil
 
-    config.autoload_lib(ignore: %w(assets tasks))
+    config.autoload_lib(ignore: %w[assets tasks])
 
     config.active_job.queue_adapter = if ENV['RUN_JOBS_INLINE'].present?
                                         :inline
