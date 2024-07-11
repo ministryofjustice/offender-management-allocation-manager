@@ -1,6 +1,6 @@
 references:
   ignore_deployable_branches: &ignore_deployable_branches
-    filters: { branches: { ignore: [main, staging, preprod, test, test2] } }
+    filters: { branches: { ignore: [main, staging, preprod, test] } }
 
   docker_image_name: &docker_image_name
     image_name: quay.io/hmpps/offender-management
@@ -282,17 +282,6 @@ workflows:
           requires: [build_and_push_docker_image]
           filters: { branches: { only: [test] } }
           context: [offender-management-shared, offender-management-test]
-
-  test2_env:
-    jobs:
-      - hmpps/build_docker:
-          <<: *build_and_push_docker_image_config
-          filters: { branches: { only: [test2] } }
-          context: [offender-management-shared, offender-management-test2]
-      - deploy:
-          requires: [build_and_push_docker_image]
-          filters: { branches: { only: [test2] } }
-          context: [offender-management-shared, offender-management-test2]
 
   preprod:
     jobs:
