@@ -1,3 +1,3 @@
-web: bundle exec puma -C config/puma_prod.rb
+web: bundle exec puma -C config/puma.rb
 worker: bundle exec sidekiq -C config/sidekiq.yml
 release: bundle exec rails db:migrate && bundle exec rake import:prison
