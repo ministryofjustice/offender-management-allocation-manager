@@ -98,11 +98,9 @@ module OffenderManagementAllocationClient
       Date,
     ]
 
-    require_relative "../app/lib/mail_publish_audit_event_observer"
-    config.action_mailer.observers = %w[MailPublishAuditEventObserver]
-
-    require_relative "../app/middleware/robots_tag"
-    config.middleware.use RobotsTag
+    config.action_dispatch.default_headers = {
+      'X-Robots-Tag' => 'noindex, nofollow'
+    }
 
     config.domain_event_handlers = {
       # event_type               => handler class (as a string)
