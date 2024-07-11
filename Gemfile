@@ -72,7 +72,7 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'parallel_tests'
   gem 'rubocop-govuk', '~> 4.12'
-  gem 'rspec-rails', '~> 6.0.3'
+  gem 'rspec-rails'
   gem 'rswag-specs'
   gem 'spring'
   gem 'undercover'
