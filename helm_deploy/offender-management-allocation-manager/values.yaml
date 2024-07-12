@@ -12,6 +12,12 @@ custom_templates_config:
   domain_events_consumer:
     enabled: true
 
+cronjobs:
+  integration_tests_cleanup:
+    enabled: false # should only be enabled in `staging`
+  recalculate_handover_dates:
+    enabled: false
+
 generic-service:
   replicaCount: 2
 

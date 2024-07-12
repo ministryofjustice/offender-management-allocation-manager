@@ -7,7 +7,7 @@ metadata:
   labels:
     app: offender-management-jobs-processor
 spec:
-  replicas: 2
+  replicas: 1
   revisionHistoryLimit: 1
   minReadySeconds: 10
   strategy:
@@ -20,7 +20,7 @@ spec:
       labels:
         app: offender-management-jobs-processor
     spec:
-      serviceAccountName: {{ with index .Values "generic-service" }}{{ .serviceAccountName }}{{ end }}
+      serviceAccountName: {{ index .Values "generic-service" "serviceAccountName" }}
       containers:
       - name: worker
         image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
@@ -28,7 +28,7 @@ spec:
         securityContext:
           {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
         command: ['sh', '-c', "bundle exec sidekiq -C config/sidekiq.yml"]
-          {{- include "deployment.envs" (index .Values "generic-service") | nindent 8 }}
+          {{- include "moic-helpers.envs_without_prometheus_metrics" . | nindent 8 }}
         resources:
           {{- with index .Values "generic-service" }}{{ toYaml .resources | nindent 10 }}{{ end }}
 ---

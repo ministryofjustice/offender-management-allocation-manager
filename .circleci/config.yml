@@ -247,15 +247,15 @@ workflows:
             - offender-management-test
           requires:
             - build_and_push_docker_image
-#      - hmpps/deploy_env:
-#          name: deploy_staging
-#          env: staging
-#          context:
-#            - hmpps-common-vars
-#            - offender-management-shared
-#            - offender-management-staging
-#          requires:
-#            - build_and_push_docker_image
+      - hmpps/deploy_env:
+          name: deploy_staging
+          env: staging
+          context:
+            - hmpps-common-vars
+            - offender-management-shared
+            - offender-management-staging
+          requires:
+            - build_and_push_docker_image
 #      - deploy:
 #          name: deploy_staging
 #          requires: [build_and_push_docker_image]

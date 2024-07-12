@@ -11,7 +11,7 @@ spec:
   backoffLimit: 4
   template:
     spec:
-      serviceAccountName: {{ with index .Values "generic-service" }}{{ .serviceAccountName }}{{ end }}
+      serviceAccountName: {{ index .Values "generic-service" "serviceAccountName" }}
       restartPolicy: Never
       securityContext:
         {{- with index .Values "generic-service" }}{{ toYaml .podSecurityContext | nindent 8 }}{{ end }}
@@ -22,7 +22,7 @@ spec:
         securityContext:
           {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
         command: ['sh', '-c', 'bundle exec rails db:migrate && bundle exec rake import:prison']
-          {{- include "deployment.envs" (index .Values "generic-service") | nindent 8 }}
+          {{- include "moic-helpers.envs_without_prometheus_metrics" . | nindent 8 }}
         resources:
           limits:
             memory: 1000Mi

@@ -1,4 +1,10 @@
 ---
+cronjobs:
+  integration_tests_cleanup:
+    enabled: true
+  recalculate_handover_dates:
+    enabled: true
+
 generic-service:
   ingress:
     hosts:

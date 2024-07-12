@@ -20,7 +20,7 @@ spec:
       labels:
         app: offender-management-events-consumer
     spec:
-      serviceAccountName: {{ with index .Values "generic-service" }}{{ .serviceAccountName }}{{ end }}
+      serviceAccountName: {{ index .Values "generic-service" "serviceAccountName" }}
       containers:
       - name: worker
         image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
@@ -28,14 +28,8 @@ spec:
         securityContext:
           {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
         command: ['sh', '-c', 'bin/rake shoryuken:start']
-          {{- include "deployment.envs" (index .Values "generic-service") | nindent 8 }}
+          {{- include "moic-helpers.envs_without_prometheus_metrics" . | nindent 8 }}
         resources:
           {{- with index .Values "generic-service" }}{{ toYaml .resources | nindent 10 }}{{ end }}
-      - {{ with index .Values "generic-service" }}
-        {{- $imageTag := .image.tag }}
-        {{- range $extraContainers := .extraContainers }}
-        {{- . | toYaml | replace "app_version" $imageTag | indent 8 | trim }}
-        {{ end }}
-        {{ end }}
 ---
 {{- end }}
