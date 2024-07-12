@@ -5,7 +5,7 @@ kind: CronJob
 metadata:
   name: integration-tests-cleanup
 spec:
-  schedule: "0 5 * * *"
+  schedule: {{ .Values.cronjobs.integration_tests_cleanup.schedule }}
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3

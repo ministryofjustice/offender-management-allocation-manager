@@ -2,7 +2,11 @@
 cronjobs:
   integration_tests_cleanup:
     enabled: true
+  process_movements:
+    enabled: true
   recalculate_handover_dates:
+    enabled: true
+  community_api_import:
     enabled: true
 
 generic-service:

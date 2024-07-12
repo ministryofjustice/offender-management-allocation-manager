@@ -12,11 +12,31 @@ custom_templates_config:
   domain_events_consumer:
     enabled: true
 
+# IMPORTANT: `staging` and `preprod` turn off RDS instance for cost savings
+# between 10:00 PM - 6:00 AM, so any cronjobs running on those environments
+# that require DB access must be scheduled outside this downtime window.
+# Additionally, none of these cronjobs should run in `test` environment.
 cronjobs:
   integration_tests_cleanup:
     enabled: false # should only be enabled in `staging`
+    schedule: 15 6 * * *
+  process_movements:
+    enabled: false
+    schedule: 30 6 * * *
   recalculate_handover_dates:
     enabled: false
+    schedule: 45 6 * * *
+  community_api_import:
+    enabled: false
+    schedule: 0 7 * * *
+
+cronjob_resources:
+  limits:
+    memory: 1500Mi
+    cpu: 1000m
+  requests:
+    memory: 500Mi
+    cpu: 100m
 
 generic-service:
   replicaCount: 2
