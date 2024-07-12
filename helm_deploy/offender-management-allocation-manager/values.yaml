@@ -58,6 +58,15 @@ generic-service:
   ingress:
     enabled: true
 
+  # https://github.com/ministryofjustice/hmpps-ip-allowlists/blob/main/ip-allowlist-groups.yaml
+  allowlist:
+    groups:
+      - moj_cloud_platform
+      - digital_staff_and_mojo
+      - private_prisons
+      - prisons
+      - probation
+
   custommetrics:
     enabled: true
     metricsPort: &metricsPort 9394

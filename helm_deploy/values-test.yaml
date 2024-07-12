@@ -10,7 +10,7 @@ custom_templates_config:
 generic-service:
   ingress:
     hosts:
-      - temp-test.moic.service.justice.gov.uk
+      - test.moic.service.justice.gov.uk
     tlsSecretName: allocation-manager-hostname
 
   replicaCount: 1
