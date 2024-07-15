@@ -11,6 +11,10 @@ custom_templates_config:
     enabled: true
   domain_events_consumer:
     enabled: true
+  # One grafana dashboard covers all namespaces, so only needs
+  # to be applied in one environment, usually `staging`
+  grafana_dashboard:
+    enabled: false
 
 # IMPORTANT: `staging` and `preprod` turn off RDS instance for cost savings
 # between 10:00 PM - 6:00 AM, so any cronjobs running on those environments

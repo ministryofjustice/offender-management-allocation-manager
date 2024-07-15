@@ -1,4 +1,8 @@
 ---
+custom_templates_config:
+  grafana_dashboard:
+    enabled: true
+
 cronjobs:
   integration_tests_cleanup:
     enabled: true
