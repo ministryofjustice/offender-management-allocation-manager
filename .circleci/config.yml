@@ -44,18 +44,6 @@ references:
           POSTGRES_DB: offender-management_test
       - image: cimg/redis:7.0
 
-  configure_k8s: &configure_k8s
-    run:
-      name: Setup Kubectl
-      command: |
-        echo -n "${K8S_CLUSTER_CERT}" | base64 -d > ./live_ca.crt
-        kubectl config set-cluster "${K8S_CLUSTER_NAME}" --certificate-authority=./live_ca.crt --server="https://${K8S_CLUSTER_NAME}"
-        kubectl config set-credentials circleci --token="${K8S_TOKEN}"
-        kubectl config set-context "${K8S_CLUSTER_NAME}" --cluster="${K8S_CLUSTER_NAME}" --user=circleci --namespace="${K8S_NAMESPACE}"
-        kubectl config use-context "${K8S_CLUSTER_NAME}"
-        kubectl config current-context
-        kubectl -n "${K8S_NAMESPACE}" get pods
-
 version: 2.1
 
 orbs:
@@ -121,26 +109,26 @@ jobs:
   fetch_env_vars:
     <<: *deploy_container_config
     steps:
-      - *configure_k8s
+      - hmpps/k8s_setup
       - run:
           name: Fetch creds from K8s and store in workspace
           command: |
             set -euo pipefail
 
-            env_name="${K8S_NAMESPACE#offender-management-}"
+            env_name="${KUBE_ENV_NAMESPACE#offender-management-}"
 
             mkdir -p ~/env
 
             apk add jq
 
-            kubectl -n "${K8S_NAMESPACE}" get secrets hmpps-auth-secrets -o json > /tmp/hmpps-secrets.json
+            kubectl -n "${KUBE_ENV_NAMESPACE}" get secrets hmpps-auth-secrets -o json > /tmp/hmpps-secrets.json
             > ~/env/"${env_name}"-hmpps-secrets.sh
             echo "export HMPPS_API_CLIENT_ID='$(jq -r .data.HMPPS_API_CLIENT_ID /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
             echo "export HMPPS_API_CLIENT_SECRET='$(jq -r .data.HMPPS_API_CLIENT_SECRET /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
             rm /tmp/hmpps-secrets.json
 
             # Takes all vars ending with '_HOST' in the 'shared-environment' configmap and puts them in a file with the format: export VAR='value'
-            kubectl -n "${K8S_NAMESPACE}" get configmap/shared-environment -o json | jq -Mr '.data | to_entries[] | select(.key|endswith("_HOST")) | "export \(.key)='\''\(.value)'\''"' > ~/env/"${env_name}-shared-env.sh"
+            kubectl -n "${KUBE_ENV_NAMESPACE}" get configmap/shared-environment -o json | jq -Mr '.data | to_entries[] | select(.key|endswith("_HOST")) | "export \(.key)='\''\(.value)'\''"' > ~/env/"${env_name}-shared-env.sh"
       - persist_to_workspace:
           root: ~/
           paths:
@@ -172,7 +160,7 @@ jobs:
       - run:
           name: Run tests
           command: |
-            env_name="${K8S_NAMESPACE#offender-management-}"
+            env_name="${KUBE_ENV_NAMESPACE#offender-management-}"
             . ~/env/"${env_name}-shared-env.sh"
             . ~/env/"${env_name}"-hmpps-secrets.sh
             export SPEC_STATUS_PATH=~/spec_status
@@ -191,26 +179,6 @@ jobs:
       - store_artifacts:
           path: ~/test-results
 
-  deploy:
-    <<: *deploy_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - *configure_k8s
-      - hmpps/recall_container_image
-      - deploy:
-          name: Deploy
-          command: |
-            set -x
-            shopt -s nullglob
-            env_name="${K8S_NAMESPACE#offender-management-}"
-            sed -i -e "s/:latest/:${APP_VERSION}/" deploy/"${env_name}"/deployment.yaml deploy/"${env_name}"/domain-events-consumer.yaml* deploy/"${env_name}"/cron-*.yaml
-            kubectl -n "${K8S_NAMESPACE}" annotate deployments/allocation-manager kubernetes.io/change-cause="${CIRCLE_BUILD_URL}"
-            kubectl apply -f ./deploy/"${env_name}"
-
 workflows:
   test_build_deploy:
     jobs:
@@ -225,7 +193,6 @@ workflows:
           requires: [install_dependencies, fetch_env_vars]
           context: [offender-management-shared, offender-management-staging]
       - hmpps/helm_lint:
-          <<: *ignore_deployable_branches
           name: helm_lint
           env: staging
       - hmpps/build_docker:
@@ -238,6 +205,8 @@ workflows:
           filters: { branches: { only: [ main, test, staging, preprod ] } }
           context:
             - offender-management-shared
+          requires:
+            - helm_lint
       - hmpps/deploy_env:
           name: deploy_test
           env: test
@@ -268,10 +237,17 @@ workflows:
             - offender-management-preprod
           requires:
             - build_and_push_docker_image
-#      - deploy_production_approval:
-#          type: approval
-#          requires: [deploy_staging]
-#      - deploy:
-#          name: deploy_production
-#          requires: [deploy_production_approval]
-#          context: [offender-management-shared, offender-management-production]
+      - deploy_production_approval:
+          type: approval
+          filters: { branches: { only: [ main ] } }
+          requires:
+            - deploy_staging
+      - hmpps/deploy_env:
+          name: deploy_production
+          env: production
+          context:
+            - hmpps-common-vars
+            - offender-management-shared
+            - offender-management-production
+          requires:
+            - deploy_production_approval
