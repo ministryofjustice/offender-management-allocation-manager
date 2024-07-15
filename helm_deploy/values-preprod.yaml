@@ -12,7 +12,7 @@ cronjobs:
 generic-service:
   ingress:
     hosts:
-      - temp-preprod.moic.service.justice.gov.uk
+      - preprod.moic.service.justice.gov.uk
     tlsSecretName: allocation-manager-hostname
 
   env:
