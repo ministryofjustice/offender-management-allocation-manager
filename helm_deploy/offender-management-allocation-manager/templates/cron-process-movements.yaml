@@ -1,9 +1,10 @@
 {{- if .Values.cronjobs.process_movements.enabled }}
+{{- $cronjobName := "process-movements" }}
 ---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: process-movements
+  name: {{ $cronjobName }}
 spec:
   schedule: {{ .Values.cronjobs.process_movements.schedule }}
   concurrencyPolicy: Replace
@@ -19,7 +20,7 @@ spec:
           securityContext:
             {{- with index .Values "generic-service" }}{{ toYaml .podSecurityContext | nindent 12 }}{{ end }}
           containers:
-          - name: process-movements
+          - name: {{ $cronjobName }}
             image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
             imagePullPolicy: Always
             securityContext:

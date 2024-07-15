@@ -1,0 +1,56 @@
+---
+cronjobs:
+  process_movements:
+    enabled: true
+    schedule: 0 2 * * *
+  recalculate_handover_dates:
+    enabled: true
+    schedule: 0 3 * * *
+  deactivate_cnls:
+    enabled: true
+    schedule: 45 3 * * *
+  parole_data_import:
+    enabled: true
+    schedule: 0 4 * * *
+  early_allocation_suitability_email:
+    enabled: true
+    schedule: 30 4 * * *
+  handover_email:
+    enabled: true
+    schedule: 4 9 1 * *
+  handover_chase_email:
+    enabled: true
+    schedule: 0 5 * * *
+  handover_reminder_email:
+    enabled: true
+    schedule: 5 0 * * *
+  community_api_import:
+    enabled: true
+    schedule: 0 6 * * *
+
+generic-service:
+  replicaCount: 5
+
+  ingress:
+    hosts:
+      - moic2.service.justice.gov.uk
+    tlsSecretName: allocation-manager-hostname
+
+  env:
+    ENV_NAME: production
+    SENTRY_CURRENT_ENV: production
+    PRISON_API_HOST: https://prison-api.prison.service.justice.gov.uk
+    PRISONER_SEARCH_HOST: https://prisoner-search.prison.service.justice.gov.uk
+    COMMUNITY_API_HOST: https://community-api-secure.probation.service.justice.gov.uk
+    COMPLEXITY_API_HOST: https://complexity-of-need.hmpps.service.justice.gov.uk
+    NOMIS_OAUTH_HOST: https://sign-in.hmpps.service.justice.gov.uk
+    ASSESS_RISKS_AND_NEEDS_API_HOST: https://assess-risks-and-needs.hmpps.service.justice.gov.uk
+    MANAGE_POM_CASES_AND_DELIUS_HOST: https://manage-pom-cases-and-delius.hmpps.service.justice.gov.uk
+    TIERING_API_HOST: https://hmpps-tier.hmpps.service.justice.gov.uk
+    DPS_FRONTEND_COMPONENTS_API_HOST: https://frontend-components.hmpps.service.justice.gov.uk
+    DIGITAL_PRISON_SERVICE_HOST: https://digital.prison.service.justice.gov.uk
+
+  namespace_secrets:
+    parole-data-import:
+      GMAIL_USERNAME: email_username
+      GMAIL_PASSWORD: email_password

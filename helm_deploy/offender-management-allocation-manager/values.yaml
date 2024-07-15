@@ -29,6 +29,19 @@ cronjobs:
   community_api_import:
     enabled: false
     schedule: 0 7 * * *
+  # Below cronjobs are currently only enabled in production
+  deactivate_cnls:
+    enabled: false
+  parole_data_import:
+    enabled: false
+  early_allocation_suitability_email:
+    enabled: false
+  handover_email:
+    enabled: false
+  handover_chase_email:
+    enabled: false
+  handover_reminder_email:
+    enabled: false
 
 cronjob_resources:
   limits:

@@ -1,9 +1,10 @@
 {{- if .Values.cronjobs.integration_tests_cleanup.enabled }}
+{{- $cronjobName := "integration-tests-cleanup" }}
 ---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: integration-tests-cleanup
+  name: {{ $cronjobName }}
 spec:
   schedule: {{ .Values.cronjobs.integration_tests_cleanup.schedule }}
   concurrencyPolicy: Replace
@@ -19,7 +20,7 @@ spec:
           securityContext:
             {{- with index .Values "generic-service" }}{{ toYaml .podSecurityContext | nindent 12 }}{{ end }}
           containers:
-          - name: integration-tests-cleanup
+          - name: {{ $cronjobName }}
             image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
             imagePullPolicy: Always
             securityContext:

@@ -1,12 +1,12 @@
-{{- if .Values.cronjobs.community_api_import.enabled }}
-{{- $cronjobName := "community-api-import" }}
+{{- if .Values.cronjobs.parole_data_import.enabled }}
+{{- $cronjobName := "parole-data-import" }}
 ---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ $cronjobName }}
 spec:
-  schedule: {{ .Values.cronjobs.community_api_import.schedule }}
+  schedule: {{ .Values.cronjobs.parole_data_import.schedule }}
   concurrencyPolicy: Replace
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -25,7 +25,7 @@ spec:
             imagePullPolicy: Always
             securityContext:
               {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 14 }}{{ end }}
-            command: ["sh", "-c", "bundle exec rake community_api:import"]
+            command: ["sh", "-c", "bundle exec rake parole:import"]
               {{- include "moic-helpers.envs_without_prometheus_metrics" . | nindent 12 }}
             resources:
               {{- toYaml .Values.cronjob_resources | nindent 14 }}

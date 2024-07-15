@@ -1,7 +1,5 @@
 ---
 cronjobs:
-  integration_tests_cleanup:
-    enabled: true
   process_movements:
     enabled: true
   recalculate_handover_dates:
