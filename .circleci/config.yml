@@ -33,10 +33,6 @@ references:
           RACK_ENV: test
           VCR: 1
           PARALLEL_TEST_PROCESSORS: 4
-          COMPLEXITY_API_HOST: https://complexity-of-need-staging.hmpps.service.justice.gov.uk
-          COMMUNITY_API_HOST: https://community-api-secure.test.delius.probation.hmpps.dsd.io
-          ASSESS_RISKS_AND_NEEDS_API_HOST: https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk
-          TIERING_API_HOST: https://hmpps-tier-dev.hmpps.service.justice.gov.uk
       - image: cimg/postgres:14.4
         environment:
           POSTGRES_USER: ubuntu
@@ -126,9 +122,6 @@ jobs:
             echo "export HMPPS_API_CLIENT_ID='$(jq -r .data.HMPPS_API_CLIENT_ID /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
             echo "export HMPPS_API_CLIENT_SECRET='$(jq -r .data.HMPPS_API_CLIENT_SECRET /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
             rm /tmp/hmpps-secrets.json
-
-            # Takes all vars ending with '_HOST' in the 'shared-environment' configmap and puts them in a file with the format: export VAR='value'
-            kubectl -n "${KUBE_ENV_NAMESPACE}" get configmap/shared-environment -o json | jq -Mr '.data | to_entries[] | select(.key|endswith("_HOST")) | "export \(.key)='\''\(.value)'\''"' > ~/env/"${env_name}-shared-env.sh"
       - persist_to_workspace:
           root: ~/
           paths:
@@ -161,7 +154,6 @@ jobs:
           name: Run tests
           command: |
             env_name="${KUBE_ENV_NAMESPACE#offender-management-}"
-            . ~/env/"${env_name}-shared-env.sh"
             . ~/env/"${env_name}"-hmpps-secrets.sh
             export SPEC_STATUS_PATH=~/spec_status
             bundle exec parallel_test -t rspec -- -t ~flaky -t ~local_only --format progress -- spec || \
