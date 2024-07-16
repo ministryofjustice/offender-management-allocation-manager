@@ -19,6 +19,8 @@ generic-service:
   env:
     ENV_NAME: test
     SENTRY_CURRENT_ENV: test
+    CACHE_TIMEOUT: "0"
+    ALLOCATION_MANAGER_HOST: https://test.moic.service.justice.gov.uk
     PRISON_API_HOST: https://prison-api-dev.prison.service.justice.gov.uk
     PRISONER_SEARCH_HOST: https://prisoner-search-dev.prison.service.justice.gov.uk
     COMMUNITY_API_HOST: https://community-api-secure.test.delius.probation.hmpps.dsd.io

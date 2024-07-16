@@ -39,6 +39,7 @@ generic-service:
   env:
     ENV_NAME: production
     SENTRY_CURRENT_ENV: production
+    ALLOCATION_MANAGER_HOST: https://moic.service.justice.gov.uk
     PRISON_API_HOST: https://prison-api.prison.service.justice.gov.uk
     PRISONER_SEARCH_HOST: https://prisoner-search.prison.service.justice.gov.uk
     COMMUNITY_API_HOST: https://community-api-secure.probation.service.justice.gov.uk
@@ -51,6 +52,8 @@ generic-service:
     DIGITAL_PRISON_SERVICE_HOST: https://digital.prison.service.justice.gov.uk
 
   namespace_secrets:
+    allocation-manager-secrets:
+      GTM_ID: GTM_ID
     parole-data-import:
       GMAIL_USERNAME: email_username
       GMAIL_PASSWORD: email_password
