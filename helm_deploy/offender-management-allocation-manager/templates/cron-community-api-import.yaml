@@ -1,0 +1,33 @@
+{{- if .Values.cronjobs.community_api_import.enabled }}
+{{- $cronjobName := "community-api-import" }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ $cronjobName }}
+spec:
+  schedule: {{ .Values.cronjobs.community_api_import.schedule }}
+  concurrencyPolicy: Replace
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 120
+      template:
+        spec:
+          serviceAccountName: {{ index .Values "generic-service" "serviceAccountName" }}
+          restartPolicy: OnFailure
+          securityContext:
+            {{- with index .Values "generic-service" }}{{ toYaml .podSecurityContext | nindent 12 }}{{ end }}
+          containers:
+          - name: {{ $cronjobName }}
+            image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
+            imagePullPolicy: Always
+            securityContext:
+              {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 14 }}{{ end }}
+            command: ["sh", "-c", "bundle exec rake community_api:import"]
+              {{- include "moic-helpers.envs_without_prometheus_metrics" . | nindent 12 }}
+            resources:
+              {{- toYaml .Values.cronjob_resources | nindent 14 }}
+---
+{{- end }}

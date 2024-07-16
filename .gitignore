@@ -41,3 +41,7 @@
 
 # Ignore ruby-gemset (local isolated environments for dependencies)
 .ruby-gemset
+
+# Helm
+**/Chart.lock
+**/charts/*.tgz

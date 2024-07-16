@@ -1,4 +1,7 @@
 require 'yaml'
+
+silence_single_worker_warning
+
 threads_number = Integer(ENV['RAILS_MAX_THREADS'] || 5)
 workers Integer(ENV['WEB_CONCURRENCY'] || 1)
 threads threads_number, threads_number
@@ -7,6 +10,8 @@ preload_app!
 
 port        ENV['PORT']     || 3000
 environment ENV['RACK_ENV'] || 'production'
+
+pidfile ENV.fetch('PIDFILE', '/tmp/server.pid')
 
 # Configure Prometheus Exporter
 if ENV['PROMETHEUS_METRICS']&.strip == 'on'

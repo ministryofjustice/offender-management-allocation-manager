@@ -28,7 +28,7 @@ spec:
         - name: allocation-manager
           image: quay.io/hmpps/offender-management:latest
           imagePullPolicy: Always
-          command: ['sh', '-c','bundle exec rails db:migrate && bundle exec rake import:prison && bundle exec puma -p 3000 -C ./config/puma_prod.rb --pidfile /tmp/server.pid']
+          command: ['sh', '-c','bundle exec rails db:migrate && bundle exec rake import:prison && bundle exec puma -p 3000 -C ./config/puma.rb --pidfile /tmp/server.pid']
           ports:
             - containerPort: 3000
           livenessProbe:

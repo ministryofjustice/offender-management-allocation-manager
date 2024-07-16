@@ -1,0 +1,13 @@
+{{- if .Values.custom_templates_config.grafana_dashboard.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: offender-management-dashboard
+  labels:
+    grafana_dashboard: ""
+data:
+  offender-management-dashboard.json: |
+    {{- .Files.Get "files/grafana-dashboard.json" | nindent 4 }}
+---
+{{- end }}

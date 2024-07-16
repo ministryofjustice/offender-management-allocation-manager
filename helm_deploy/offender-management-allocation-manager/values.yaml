@@ -1,0 +1,199 @@
+---
+# Default values.
+# Declare variables to be passed into your templates.
+#
+# Variables in `helm_deploy/values-[env].yaml` will take precedence.
+
+custom_templates_config:
+  rails_db_migration:
+    enabled: true
+  background_jobs_processor:
+    enabled: true
+  domain_events_consumer:
+    enabled: true
+  # One grafana dashboard covers all namespaces, so only needs
+  # to be applied in one environment, usually `staging`
+  grafana_dashboard:
+    enabled: false
+
+# IMPORTANT: `staging` and `preprod` turn off RDS instance for cost savings
+# between 10:00 PM - 6:00 AM, so any cronjobs running on those environments
+# that require DB access must be scheduled outside this downtime window.
+# Additionally, none of these cronjobs should run in `test` environment.
+cronjobs:
+  integration_tests_cleanup:
+    enabled: false # should only be enabled in `staging`
+    schedule: 15 6 * * *
+  process_movements:
+    enabled: false
+    schedule: 30 6 * * *
+  recalculate_handover_dates:
+    enabled: false
+    schedule: 45 6 * * *
+  community_api_import:
+    enabled: false
+    schedule: 0 7 * * *
+  # Below cronjobs are currently only enabled in production
+  deactivate_cnls:
+    enabled: false
+  parole_data_import:
+    enabled: false
+  early_allocation_suitability_email:
+    enabled: false
+  handover_email:
+    enabled: false
+  handover_chase_email:
+    enabled: false
+  handover_reminder_email:
+    enabled: false
+
+cronjob_resources:
+  limits:
+    memory: 1500Mi
+    cpu: 1000m
+  requests:
+    memory: 500Mi
+    cpu: 100m
+
+generic-service:
+  replicaCount: 2
+
+  nameOverride: offender-management
+  serviceAccountName: offender-management-allocation-manager
+  productId: DPS030
+
+  containerCommand: ['sh', '-c', 'bundle exec puma']
+
+  image:
+    repository: quay.io/hmpps/offender-management
+    tag: app_version # overridden at deployment time
+    port: 3000
+
+  service:
+    port: 3000
+
+  ingress:
+    enabled: true
+
+  # https://github.com/ministryofjustice/hmpps-ip-allowlists/blob/main/ip-allowlist-groups.yaml
+  allowlist:
+    groups:
+      - moj_cloud_platform
+      - digital_staff_and_mojo
+      - private_prisons
+      - prisons
+      - probation
+
+  custommetrics:
+    enabled: true
+    metricsPort: &metricsPort 9394
+    metricsPath: /metrics
+
+  livenessProbe:
+    httpGet:
+      path: /health/ping
+    periodSeconds: 60
+
+  readinessProbe:
+    httpGet:
+      path: /health/ping
+    periodSeconds: 60
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 100%
+      maxUnavailable: 25%
+
+  podSecurityContext:
+    fsGroup: 1001
+
+  resources:
+    limits:
+      memory: 1500Mi
+      cpu: 1000m
+    requests:
+      memory: 500Mi
+      cpu: 50m
+
+  extraContainers:
+    - name: offender-management-metrics
+      image: quay.io/hmpps/offender-management:latest
+      imagePullPolicy: IfNotPresent
+      command: ['sh', '-c', 'bundle exec prometheus_exporter --bind 0.0.0.0']
+      ports:
+        - name: metrics
+          containerPort: *metricsPort
+          protocol: TCP
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        seccompProfile:
+          type: RuntimeDefault
+      resources:
+        limits:
+          memory: 200Mi
+          cpu: 50m
+        requests:
+          memory: 100Mi
+          cpu: 10m
+      livenessProbe:
+        httpGet:
+          path: /ping
+          port: *metricsPort
+        initialDelaySeconds: 10
+        periodSeconds: 60
+      readinessProbe:
+        httpGet:
+          path: /ping
+          port: *metricsPort
+        initialDelaySeconds: 10
+        periodSeconds: 60
+
+  # Environment variables to load into the deployment
+  env:
+    RAILS_ENV: production
+    RAILS_WEB_CONCURRENCY: 5
+    RAILS_LOG_TO_STDOUT: on
+    RAILS_SERVE_STATIC_FILES: on
+    PROMETHEUS_METRICS: "on" # do not remove quotes!
+    USE_PPUD_PAROLE_DATA: "1"
+    LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
+
+  # Pre-existing kubernetes secrets to load as environment variables in the deployment.
+  # namespace_secrets:
+  #   [name of kubernetes secret]:
+  #     [name of environment variable as seen by app]: [key of kubernetes secret to load]
+  namespace_secrets:
+    allocation-manager-secrets:
+      SECRET_KEY_BASE: SECRET_KEY_BASE
+      SENTRY_DSN: SENTRY_DSN
+      KEYWORKER_API_HOST: KEYWORKER_API_HOST
+      LIVE_NOTIFY_API_KEY: LIVE_NOTIFY_API_KEY
+      PAROLE_DATA_IMPORT_EMAIL_PASSWORD: PAROLE_DATA_IMPORT_EMAIL_PASSWORD
+      PAROLE_DATA_IMPORT_EMAIL_USERNAME: PAROLE_DATA_IMPORT_EMAIL_USERNAME
+      SUPPORT_EMAIL: SUPPORT_EMAIL
+    hmpps-auth-secrets:
+      HMPPS_API_CLIENT_ID: HMPPS_API_CLIENT_ID
+      HMPPS_API_CLIENT_SECRET: HMPPS_API_CLIENT_SECRET
+      HMPPS_OAUTH_CLIENT_ID: HMPPS_OAUTH_CLIENT_ID
+      HMPPS_OAUTH_CLIENT_SECRET: HMPPS_OAUTH_CLIENT_SECRET
+    domain-events:
+      DOMAIN_EVENTS_SQS_DLQ_ARN: DOMAIN_EVENTS_SQS_DLQ_ARN
+      DOMAIN_EVENTS_SQS_DLQ_NAME: DOMAIN_EVENTS_SQS_DLQ_NAME
+      DOMAIN_EVENTS_SQS_DLQ_URL: DOMAIN_EVENTS_SQS_DLQ_URL
+      DOMAIN_EVENTS_SQS_QUEUE_ARN: DOMAIN_EVENTS_SQS_QUEUE_ARN
+      DOMAIN_EVENTS_SQS_QUEUE_NAME: DOMAIN_EVENTS_SQS_QUEUE_NAME
+      DOMAIN_EVENTS_SQS_QUEUE_URL: DOMAIN_EVENTS_SQS_QUEUE_URL
+    allocation-rds-instance-output:
+      POSTGRES_HOST: rds_instance_address
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_NAME: postgres_name
+    allocation-elasticache-redis:
+      REDIS_URL: url
+    hmpps-domain-events-topic:
+      DOMAIN_EVENTS_TOPIC_ARN: topic_arn

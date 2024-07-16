@@ -1,0 +1,35 @@
+{{- if .Values.custom_templates_config.background_jobs_processor.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: offender-management-jobs-processor
+  labels:
+    app: offender-management-jobs-processor
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  minReadySeconds: 10
+  strategy:
+    {{- with index .Values "generic-service" }}{{ toYaml .strategy | nindent 4 }}{{ end }}
+  selector:
+    matchLabels:
+      app: offender-management-jobs-processor
+  template:
+    metadata:
+      labels:
+        app: offender-management-jobs-processor
+    spec:
+      serviceAccountName: {{ index .Values "generic-service" "serviceAccountName" }}
+      containers:
+      - name: worker
+        image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
+        imagePullPolicy: Always
+        securityContext:
+          {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
+        command: ['sh', '-c', "bundle exec sidekiq -C config/sidekiq.yml"]
+          {{- include "moic-helpers.envs_without_prometheus_metrics" . | nindent 8 }}
+        resources:
+          {{- with index .Values "generic-service" }}{{ toYaml .resources | nindent 10 }}{{ end }}
+---
+{{- end }}
