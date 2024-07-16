@@ -179,6 +179,26 @@ jobs:
       - store_artifacts:
           path: ~/test-results
 
+  deploy:
+    <<: *deploy_container_config
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - hmpps/k8s_setup
+      - hmpps/recall_container_image
+      - deploy:
+          name: Deploy
+          command: |
+            set -x
+            shopt -s nullglob
+            env_name="${KUBE_ENV_NAMESPACE#offender-management-}"
+            sed -i -e "s/:latest/:${APP_VERSION}/" deploy/"${env_name}"/deployment.yaml deploy/"${env_name}"/domain-events-consumer.yaml* deploy/"${env_name}"/cron-*.yaml
+            kubectl -n "${KUBE_ENV_NAMESPACE}" annotate deployments/allocation-manager kubernetes.io/change-cause="${CIRCLE_BUILD_URL}"
+            kubectl apply -f ./deploy/"${env_name}"
+
 workflows:
   test_build_deploy:
     jobs:
@@ -242,12 +262,20 @@ workflows:
           filters: { branches: { only: [ main ] } }
           requires:
             - deploy_staging
-      - hmpps/deploy_env:
+      - deploy:
           name: deploy_production
-          env: production
           context:
             - hmpps-common-vars
             - offender-management-shared
             - offender-management-production
           requires:
             - deploy_production_approval
+#      - hmpps/deploy_env:
+#          name: deploy_production
+#          env: production
+#          context:
+#            - hmpps-common-vars
+#            - offender-management-shared
+#            - offender-management-production
+#          requires:
+#            - deploy_production_approval
