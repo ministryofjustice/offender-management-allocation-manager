@@ -1,5 +1,0 @@
-######### DO NOT EDIT #########
-# This file is generated from a template in deploy/templates/ by the rake task in lib/tasks/deployment.rake
-# Any changes will be overwritten by this rake task!
-#
-# Do remember to check in generated files. Have a nice day.

@@ -199,24 +199,7 @@ then disable the hook first: `chmod -x .git/hooks/pre-commit`
 
 ## Deployment files
 
-Kubernetes files in deploy/ manage deployment. Modify these to manage deployment.
-
-### Templating System
-
-A simple custom templating system has been built to manage these files. For now it is used to manage production cron
-jobs.
-
-Modify the relevant template in deploy/templates/, add the file to generate to the relevant section in
-lib/tasks/deployment.rake, and run the rake task `bin/rake deployment:generate_jobs`.
-
-This will create or modify many .yaml files in the subfolders of `deploy/` - check these in or they will not take
-effect.
-
-NOTE: If you remove a section in lib/tasks/deployment.rake that results in a file no longer being generated, you'll have
-to manually delete the .yaml file from the relevant subfolder(s) of `deploy/`. The rake task will not remove files that
-are no longer referenced.
-
-It should not be made any more complex - if more complexity is required, stop requiring it. Simplicity is genius.
+Helm chart files in `helm_deploy/` directory. Modify these to manage deployment.
 
 ## CircleCI
 
