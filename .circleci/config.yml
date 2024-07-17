@@ -102,31 +102,6 @@ jobs:
             - .local/bin
             - .bundle/config
 
-  fetch_env_vars:
-    <<: *deploy_container_config
-    steps:
-      - hmpps/k8s_setup
-      - run:
-          name: Fetch creds from K8s and store in workspace
-          command: |
-            set -euo pipefail
-
-            env_name="${KUBE_ENV_NAMESPACE#offender-management-}"
-
-            mkdir -p ~/env
-
-            apk add jq
-
-            kubectl -n "${KUBE_ENV_NAMESPACE}" get secrets hmpps-auth-secrets -o json > /tmp/hmpps-secrets.json
-            > ~/env/"${env_name}"-hmpps-secrets.sh
-            echo "export HMPPS_API_CLIENT_ID='$(jq -r .data.HMPPS_API_CLIENT_ID /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
-            echo "export HMPPS_API_CLIENT_SECRET='$(jq -r .data.HMPPS_API_CLIENT_SECRET /tmp/hmpps-secrets.json | base64 -d)'" >> ~/env/"${env_name}"-hmpps-secrets.sh
-            rm /tmp/hmpps-secrets.json
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - env
-
   rubocop:
     <<: *test_container_config
     steps:
@@ -153,14 +128,11 @@ jobs:
       - run:
           name: Run tests
           command: |
-            env_name="${KUBE_ENV_NAMESPACE#offender-management-}"
-            . ~/env/"${env_name}"-hmpps-secrets.sh
             export SPEC_STATUS_PATH=~/spec_status
             bundle exec parallel_test -t rspec -- -t ~flaky -t ~local_only --format progress -- spec || \
               (echo "Flaky tests detected, trying again..." && sleep 30 && bundle exec parallel_test -t rspec -- -t ~flaky -t ~local_only --format progress --only-failures -- spec)
           environment:
             MOZ_HEADLESS: 1
-            ALLOCATION_MANAGER_HOST: https://dev.moic.service.justice.gov.uk
             RAILS_ENV: test
             RACK_ENV: test
             DISABLE_COVERAGE: 1
@@ -196,14 +168,10 @@ workflows:
     jobs:
       - install_dependencies:
           <<: *ignore_deployable_branches
-      - fetch_env_vars:
-          <<: *ignore_deployable_branches
-          context: [offender-management-shared, offender-management-staging]
       - rubocop:
           requires: [install_dependencies]
       - test:
-          requires: [install_dependencies, fetch_env_vars]
-          context: [offender-management-shared, offender-management-staging]
+          requires: [install_dependencies]
       - hmpps/helm_lint:
           name: helm_lint
           env: staging
@@ -225,7 +193,6 @@ workflows:
           filters: { branches: { only: [ test ] } }
           context:
             - hmpps-common-vars
-            - offender-management-shared
             - offender-management-test
           requires:
             - build_and_push_docker_image
@@ -235,7 +202,6 @@ workflows:
           filters: { branches: { only: [ main, staging ] } }
           context:
             - hmpps-common-vars
-            - offender-management-shared
             - offender-management-staging
           requires:
             - build_and_push_docker_image
@@ -245,7 +211,6 @@ workflows:
           filters: { branches: { only: [ main, preprod ] } }
           context:
             - hmpps-common-vars
-            - offender-management-shared
             - offender-management-preprod
           requires:
             - build_and_push_docker_image
@@ -258,7 +223,6 @@ workflows:
           name: deploy_production
           context:
             - hmpps-common-vars
-            - offender-management-shared
             - offender-management-production
           requires:
             - deploy_production_approval
@@ -267,7 +231,6 @@ workflows:
 #          env: production
 #          context:
 #            - hmpps-common-vars
-#            - offender-management-shared
 #            - offender-management-production
 #          requires:
 #            - deploy_production_approval
