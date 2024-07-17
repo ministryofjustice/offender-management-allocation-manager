@@ -24,7 +24,7 @@ generic-service:
   env:
     ENV_NAME: staging
     SENTRY_CURRENT_ENV: staging
-    CACHE_TIMEOUT: "0"
+    CACHE_TIMEOUT: "3"
     ALLOCATION_MANAGER_HOST: https://dev.moic.service.justice.gov.uk
     PRISON_API_HOST: https://prison-api-dev.prison.service.justice.gov.uk
     PRISONER_SEARCH_HOST: https://prisoner-search-dev.prison.service.justice.gov.uk
