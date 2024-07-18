@@ -82,8 +82,6 @@ Rails.application.configure do
   end
 
   config.lograge.enabled = true
-  config.lograge.formatter = Lograge::Formatters::Logstash.new
-  config.lograge.logger = ActiveSupport::Logger.new($stdout)
 
   if Rails.configuration.redis_url.present?
     config.cache_store = :redis_cache_store,

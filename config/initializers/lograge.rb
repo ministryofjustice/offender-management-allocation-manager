@@ -1,6 +1,13 @@
 Rails.application.configure do
-  stdout_logger = ActiveSupport::Logger.new($stdout)
-  config.lograge.logger = ActiveSupport::BroadcastLogger.new(stdout_logger, config.lograge.logger)
+  config.lograge.logger = ActiveSupport::Logger.new($stdout)
+  config.lograge.formatter = Lograge::Formatters::Logstash.new
+
+  # Reduce noise in the logs by ignoring the healthcheck actions
+  config.lograge.ignore_actions = %w[
+    HealthController#index
+    HealthController#ping
+  ]
+
   config.lograge.custom_options = lambda do |event|
     ex = event.payload[:exception_object]
     if ex
