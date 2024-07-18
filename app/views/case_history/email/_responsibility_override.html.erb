@@ -1,0 +1,9 @@
+<% description = capture do %>
+  <p>
+    Request for responsible COM to be allocated sent to <%= responsibility_override.email %>
+  </p>
+<% end %>
+<%= render 'case_history/email_history',
+           title: 'System generated email sent',
+           description: description,
+           object: responsibility_override %>
