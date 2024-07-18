@@ -25,6 +25,14 @@ class EmailHistoryMailObserver
         email: message.to.first,
         name: message.to.first,
       )
+    when 'email.community.assign_com_less_than_10_months'
+      EmailHistory.create!(
+        event: EmailHistory::ASSIGN_COM_LESS_THAN_10_MONTHS,
+        nomis_offender_id: message.govuk_notify_personalisation[:prisoner_number],
+        prison: Prison.find_by(name: message.govuk_notify_personalisation[:prison_name]).code,
+        email: message.to.first,
+        name: message.to.first,
+      )
     end
   end
 end

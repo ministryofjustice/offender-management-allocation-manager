@@ -5,7 +5,9 @@ describe "Email history partials" do
     EmailHistory::OPEN_PRISON_SUPPORTING_COM_NEEDED => \
       "Request for supporting COM to be allocated after move to open prison sent to test@email.com",
     EmailHistory::URGENT_PIPELINE_TO_COMMUNITY => \
-      "Request for COM to be allocated as this person has less than 10 months to serve sent to test@email.com",
+      "Reminder that COM allocation still needed after handover sent to test@email.com",
+    EmailHistory::ASSIGN_COM_LESS_THAN_10_MONTHS => \
+      "Request for COM to be allocated as this person has less than 10 months to serve sent to test@email.com"
   }
 
   emails_and_descriptions.each do |event, expected_description|

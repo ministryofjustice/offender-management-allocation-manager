@@ -35,6 +35,16 @@ describe "Emails sent are logged in EmailHistory" do
       sentence_type: "ISP"
     ).urgent_pipeline_to_community
   end
+  let(:assign_com_less_than_10_months) do
+    CommunityMailer.with(
+      prisoner_number: offender.nomis_offender_id,
+      nomis_offender_id: offender.nomis_offender_id,
+      prison_name: prison.name,
+      crn_number: "CRN123",
+      prisoner_name: "Red Herring",
+      email: "test1@email.com"
+    ).assign_com_less_than_10_months
+  end
   let(:email_histories) do
     EmailHistory.where(
       nomis_offender_id: offender.nomis_offender_id,
@@ -49,7 +59,8 @@ describe "Emails sent are logged in EmailHistory" do
   actions = [
     :responsibility_override,
     :open_prison_supporting_com_needed,
-    :urgent_pipeline_to_community
+    :urgent_pipeline_to_community,
+    :assign_com_less_than_10_months
   ]
   actions.each do |action|
     it "is logs action #{action} appropriately" do
