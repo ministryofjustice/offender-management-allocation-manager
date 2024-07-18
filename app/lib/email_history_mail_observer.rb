@@ -1,7 +1,7 @@
 class EmailHistoryMailObserver
   def self.delivered_email(message)
     case message.govuk_notify_reference
-    when "email.pom.responsibility_override"
+    when 'email.pom.responsibility_override'
       EmailHistory.create!(
         event: EmailHistory::RESPONSIBILITY_OVERRIDE,
         nomis_offender_id: message.govuk_notify_personalisation[:prisoner_number],
@@ -9,7 +9,7 @@ class EmailHistoryMailObserver
         email: message.to.first,
         name: message.to.first,
       )
-    when "email.community.open_prison_supporting_com_needed"
+    when 'email.community.open_prison_supporting_com_needed'
       EmailHistory.create!(
         event: EmailHistory::OPEN_PRISON_SUPPORTING_COM_NEEDED,
         nomis_offender_id: message.govuk_notify_personalisation[:prisoner_number],
@@ -17,7 +17,7 @@ class EmailHistoryMailObserver
         email: message.to.first,
         name: message.to.first,
       )
-    when "email.community.urgent_pipeline_to_community"
+    when 'email.community.urgent_pipeline_to_community'
       EmailHistory.create!(
         event: EmailHistory::URGENT_PIPELINE_TO_COMMUNITY,
         nomis_offender_id: message.govuk_notify_personalisation[:noms_no],

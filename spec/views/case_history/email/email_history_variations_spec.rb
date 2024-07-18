@@ -10,7 +10,9 @@ describe "Email history partials" do
 
   emails_and_descriptions.each do |event, expected_description|
     it "renders the correct description for the event type" do
-      email_history = create(:email_history, event:,
+      email_history = create(
+        :email_history,
+        event:,
         nomis_offender_id: create(:offender).nomis_offender_id,
         email: "test@email.com",
         name: "Test Name",

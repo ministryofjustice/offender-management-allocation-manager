@@ -12,7 +12,7 @@ class AuditEventsMailObserver
       nomis_offender_id:,
       tags:,
       system_event: true,
-      data: { govuk_notify_message: { to:, template:, personalisation: }}
+      data: { govuk_notify_message: { to:, template:, personalisation: } }
     )
   end
 end
