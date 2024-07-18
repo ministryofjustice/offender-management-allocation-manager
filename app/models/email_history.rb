@@ -7,7 +7,8 @@ class EmailHistory < ApplicationRecord
     SUITABLE_FOR_EARLY_ALLOCATION = 'suitable_for_early_allocation',
     OPEN_PRISON_COMMUNITY_ALLOCATION = 'open_prison_community_allocation',
     IMMEDIATE_COMMUNITY_ALLOCATION = 'immediate_community_allocation',
-    RESPONSIBILITY_OVERRIDE = 'responsibility_override'
+    RESPONSIBILITY_OVERRIDE = 'responsibility_override',
+    OPEN_PRISON_SUPPORTING_COM_NEEDED = 'open_prison_supporting_com_needed'
   ].freeze
 
   belongs_to :offender,

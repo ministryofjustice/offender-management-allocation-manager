@@ -31,4 +31,26 @@ describe "Emails sent are logged in EmailHistory" do
       }.from(0).to(1)
     end
   end
+
+  describe "CommunityMailer open_prison_supporting_com_needed" do
+    it "is logged" do
+      expect {
+        perform_enqueued_jobs do
+          CommunityMailer.with(
+            prisoner_name:   "Test Offender",
+            prisoner_number: offender.nomis_offender_id,
+            prisoner_crn:    "CRN123",
+            prison_name:     prison.name,
+            ldu_email:       "test1@email.com"
+          ).open_prison_supporting_com_needed.deliver_later
+        end
+      }.to change {
+        EmailHistory.open_prison_supporting_com_needed.where(
+          nomis_offender_id: offender.nomis_offender_id,
+          prison:            prison.code,
+          email:             "test1@email.com",
+        ).count
+      }.from(0).to(1)
+    end
+  end
 end

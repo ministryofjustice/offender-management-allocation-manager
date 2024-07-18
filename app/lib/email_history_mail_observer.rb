@@ -13,6 +13,18 @@ class EmailHistoryMailObserver
         email:,
         name:
       )
+    when CommunityMailer::OPEN_PRISON_SUPPORTING_COM_NEEDED_TEMPLATE
+      nomis_offender_id = message.govuk_notify_personalisation[:prisoner_number]
+      prison = Prison.find_by(name: message.govuk_notify_personalisation[:prison_name]).code
+      email = message.to.first
+      name = email
+
+      EmailHistory.open_prison_supporting_com_needed.create!(
+        nomis_offender_id:,
+        prison:,
+        email:,
+        name:
+      )
     end
   end
 end
