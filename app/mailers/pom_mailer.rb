@@ -22,8 +22,9 @@ class PomMailer < ApplicationMailer
     mail(to: params[:pom_email])
   end
 
+  RESPONSIBILITY_OVERRIDE_TEMPLATE = 'ca952ba5-58b5-4e2d-8d87-60590d76560c'
   def responsibility_override
-    set_template('ca952ba5-58b5-4e2d-8d87-60590d76560c')
+    set_template(RESPONSIBILITY_OVERRIDE_TEMPLATE)
     set_personalisation(prisoner_name: params.fetch(:prisoner_name),
                         prisoner_number: params.fetch(:prisoner_number),
                         reason: params.fetch(:message),
