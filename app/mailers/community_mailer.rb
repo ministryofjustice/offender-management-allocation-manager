@@ -34,10 +34,8 @@ class CommunityMailer < ApplicationMailer
     mail(to: params.fetch(:ldu_email))
   end
 
-  OPEN_PRISON_SUPPORTING_COM_NEEDED_TEMPLATE = '51eea8d1-6c73-4b86-bac0-f74ad5573b43'
-
   def open_prison_supporting_com_needed
-    set_template(OPEN_PRISON_SUPPORTING_COM_NEEDED_TEMPLATE)
+    set_template('51eea8d1-6c73-4b86-bac0-f74ad5573b43')
 
     set_personalisation(**params.slice(:prisoner_name, :prisoner_number, :prisoner_crn, :prison_name))
 
