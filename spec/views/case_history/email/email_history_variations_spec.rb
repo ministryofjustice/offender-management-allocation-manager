@@ -7,7 +7,9 @@ describe "Email history partials" do
     EmailHistory::URGENT_PIPELINE_TO_COMMUNITY => \
       "Reminder that COM allocation still needed after handover sent to test@email.com",
     EmailHistory::ASSIGN_COM_LESS_THAN_10_MONTHS => \
-      "Request for COM to be allocated as this person has less than 10 months to serve sent to test@email.com"
+      "Request for COM to be allocated as this person has less than 10 months to serve sent to test@email.com",
+    EmailHistory::COMMUNITY_EARLY_ALLOCATION => \
+      "Notification that early allocation assessment submitted for review sent to test@email.com"
   }
 
   emails_and_descriptions.each do |event, expected_description|

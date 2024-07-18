@@ -33,6 +33,14 @@ class EmailHistoryMailObserver
         email: message.to.first,
         name: message.to.first,
       )
+    when 'email.early_allocation.community_early_allocation'
+      EmailHistory.create!(
+        event: EmailHistory::COMMUNITY_EARLY_ALLOCATION,
+        nomis_offender_id: message.govuk_notify_personalisation[:prisoner_number],
+        prison: Prison.find_by(name: message.govuk_notify_personalisation[:prison_name]).code,
+        email: message.to.first,
+        name: message.to.first,
+      )
     end
   end
 end
