@@ -9,15 +9,19 @@ class EmailHistoryMailObserver
     }
 
     if (event = reference_to_event_map[message.govuk_notify_reference]).present?
-      prison = Prison.find_by(name: message.govuk_notify_personalisation[:prison_name])&.code
-
-      nomis_offender_id = [:prisoner_number, :noms_no, :nomis_offender_id]
-        .map { |key| message.govuk_notify_personalisation[key] }
-        .find(&:itself)
-
-      email = message.to.first
-
-      EmailHistory.create!(event:, nomis_offender_id:, prison:, email:, name: email)
+      EmailHistory.create!(event:, **EmailHistoryDetailsFromMessage.new(message).as_attributes)
     end
+  end
+
+  class EmailHistoryDetailsFromMessage < SimpleDelegator
+    def nomis_offender_id
+      [:prisoner_number, :noms_no, :nomis_offender_id]
+        .map { |key| govuk_notify_personalisation[key] }
+        .find(&:itself)
+    end
+    def prison = Prison.find_by(name: govuk_notify_personalisation[:prison_name])&.code
+    def email = to.first
+    def name = to.first
+    def as_attributes = { prison:, nomis_offender_id:, email:, name: }
   end
 end
