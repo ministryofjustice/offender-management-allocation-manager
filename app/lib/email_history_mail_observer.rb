@@ -1,26 +1,25 @@
 class EmailHistoryMailObserver
+  # This is not an exhustive list of all created EmailHistory, some services
+  # will also create them
+  EVENT_FOR_REFERENCE = {
+    'email.pom.responsibility_override' => EmailHistory::RESPONSIBILITY_OVERRIDE,
+    'email.community.open_prison_supporting_com_needed' => EmailHistory::OPEN_PRISON_SUPPORTING_COM_NEEDED,
+    'email.community.urgent_pipeline_to_community' => EmailHistory::URGENT_PIPELINE_TO_COMMUNITY,
+    'email.community.assign_com_less_than_10_months' => EmailHistory::ASSIGN_COM_LESS_THAN_10_MONTHS,
+    'email.early_allocation.community_early_allocation' => EmailHistory::COMMUNITY_EARLY_ALLOCATION
+  }.freeze
+
   def self.delivered_email(message)
-    email_history_from_message = EmailHistoryFromMessage.new(message)
-    email_history_from_message.log_history_if_valid
-  end
+    return if (event = EVENT_FOR_REFERENCE[message.govuk_notify_reference]).blank?
 
-  class EmailHistoryFromMessage < SimpleDelegator
-    def log_history_if_valid
-      email_hsitory = EmailHistory.new(event:, prison:, nomis_offender_id:, email:, name:)
-      email_hsitory.save if email_hsitory.valid?
+    prison = Prison.find_by(name: message.govuk_notify_personalisation[:prison_name])&.code
+
+    nomis_offender_id = [:prisoner_number, :noms_no, :nomis_offender_id]
+      .map { |key| message.govuk_notify_personalisation[key] }
+      .find(&:itself)
+
+    message.to.each do |email|
+      EmailHistory.create!(event:, nomis_offender_id:, prison:, email:, name: email)
     end
-
-  private
-
-    def nomis_offender_id
-      [:prisoner_number, :noms_no, :nomis_offender_id]
-        .map { |key| govuk_notify_personalisation[key] }
-        .find(&:itself)
-    end
-
-    def event = String(govuk_notify_reference).split('.').last
-    def prison = Prison.find_by(name: govuk_notify_personalisation[:prison_name])&.code
-    def email = to.first
-    def name = to.first
   end
 end

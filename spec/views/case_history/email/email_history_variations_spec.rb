@@ -9,7 +9,9 @@ describe "Email history partials" do
     EmailHistory::ASSIGN_COM_LESS_THAN_10_MONTHS => \
       "Request for COM to be allocated as this person has less than 10 months to serve sent to test@email.com",
     EmailHistory::COMMUNITY_EARLY_ALLOCATION => \
-      "Notification that early allocation assessment submitted for review sent to test@email.com"
+      "Notification that early allocation assessment submitted for review sent to test@email.com",
+    EmailHistory::AUTO_EARLY_ALLOCATION => \
+      "Notification that early allocation assessment has been approved sent to test@email.com"
   }
 
   emails_and_descriptions.each do |event, expected_description|

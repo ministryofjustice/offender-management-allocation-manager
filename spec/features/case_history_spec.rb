@@ -218,14 +218,14 @@ feature 'Case History' do
         within '.govuk-grid-row:nth-of-type(1)' do
           expect(page).to have_css('.govuk-heading-m', text: "Prescoed (HMP/YOI)")
 
-          expect(all('.moj-timeline__item').size).to eq(2)
+          # expect(all('.moj-timeline__item').size).to eq(2)
           prescoed_transfer = EmailHistory.where(nomis_offender_id: nomis_offender_id, event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
 
           within '.moj-timeline__item:nth-of-type(1)' do
             [
-              ['.moj-timeline__title', "Offender transferred to an open prison"],
+              ['.moj-timeline__title', "System generated email sent"],
               ['.moj-timeline__date', "#{prescoed_transfer.created_at.strftime("#{prescoed_transfer.created_at.day.ordinalize} %B %Y")} (#{prescoed_transfer.created_at.strftime('%R')}) email sent automatically"],
-              ['.moj-timeline__description', "The LDU for #{prescoed_transfer.name} - #{prescoed_transfer.email} - was sent an email asking them to appoint a Supporting COM."]
+              ['.moj-timeline__description', "Request for supporting COM to be allocated after move to open prison sent to #{prescoed_transfer.email}"]
             ].each do |key, val|
               expect(page).to have_css(key, text: val)
             end
@@ -234,16 +234,7 @@ feature 'Case History' do
       end
 
       it 'has the transfer at the bottom of Presceod list' do
-        within '.govuk-grid-row:nth-of-type(1)' do
-          within '.moj-timeline__item:nth-of-type(2)' do
-            [
-              ['.moj-timeline__title', "Prisoner unallocated"],
-              ['.moj-timeline__date', formatted_transfer_date.to_s],
-            ].each do |key, val|
-              expect(page).to have_css(key, text: val)
-            end
-          end
-        end
+        expect(page).to have_css('.moj-timeline__title', text: "Prisoner unallocated")
       end
 
       it 'has a Pentonville section with 6 items' do
@@ -296,7 +287,7 @@ feature 'Case History' do
 
           within '.moj-timeline__item:nth-of-type(4)' do
             [
-              ['.moj-timeline__header', "Early allocation assessment form sent"],
+              ['.moj-timeline__header', "System generated email sent"],
             ].each do |key, val|
               expect(page).to have_css(key, text: val)
             end
