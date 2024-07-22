@@ -18,7 +18,8 @@ describe "Emails sent are logged in EmailHistory" do
       prisoner_number: offender.nomis_offender_id,
       prisoner_crn: "CRN123",
       prison_name: prison.name,
-      ldu_email: "test1@email.com"
+      ldu_email: "test1@email.com",
+      email_history_name: "Email Recipient"
     ).open_prison_supporting_com_needed
   end
   let(:urgent_pipeline_to_community) do
@@ -114,6 +115,14 @@ describe "Emails sent are logged in EmailHistory" do
 
       expect { mailer.deliver_later }
         .to change { email_histories.where(event:).count }
+        .from(0).to(1)
+    end
+  end
+
+  context 'when poersonalisation has email_history_name field' do
+    it 'sets that as the name' do
+      expect { open_prison_supporting_com_needed.deliver_later }
+        .to change { email_histories.where(name: "Email Recipient").count }
         .from(0).to(1)
     end
   end
