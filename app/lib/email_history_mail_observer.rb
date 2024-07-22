@@ -3,7 +3,7 @@ class EmailHistoryMailObserver
     'email.pom.responsibility_override' => EmailHistory::RESPONSIBILITY_OVERRIDE,
     'email.community.open_prison_supporting_com_needed' => EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
     'email.community.urgent_pipeline_to_community' => EmailHistory::URGENT_PIPELINE_TO_COMMUNITY,
-    'email.community.assign_com_less_than_10_months' => EmailHistory::ASSIGN_COM_LESS_THAN_10_MONTHS,
+    'email.community.assign_com_less_than_10_months' => EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION,
     'email.early_allocation.community_early_allocation' => EmailHistory::COMMUNITY_EARLY_ALLOCATION,
     'email.early_allocation.auto_early_allocation' => EmailHistory::AUTO_EARLY_ALLOCATION,
     'email.early_allocation.review_early_allocation' => EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION,

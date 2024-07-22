@@ -6,7 +6,7 @@ describe "Email history partials" do
       "Request for supporting COM to be allocated after move to open prison sent to test@email.com",
     EmailHistory::URGENT_PIPELINE_TO_COMMUNITY => \
       "Reminder that COM allocation still needed after handover sent to test@email.com",
-    EmailHistory::ASSIGN_COM_LESS_THAN_10_MONTHS => \
+    EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION => \
       "Request for COM to be allocated as this person has less than 10 months to serve sent to test@email.com",
     EmailHistory::COMMUNITY_EARLY_ALLOCATION => \
       "Notification that early allocation assessment submitted for review sent to test@email.com",

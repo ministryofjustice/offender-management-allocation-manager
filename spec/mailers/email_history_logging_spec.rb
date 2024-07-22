@@ -107,7 +107,8 @@ describe "Emails sent are logged in EmailHistory" do
     # The following events do not have a 1:1 map of (Mailer.action_name => EmailHistory.event)
     event_overrides = {
       review_early_allocation: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION,
-      open_prison_supporting_com_needed: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION
+      open_prison_supporting_com_needed: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
+      assign_com_less_than_10_months: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
     }
 
     it "is logs #{action} emails as EmailHistory records" do
@@ -120,7 +121,7 @@ describe "Emails sent are logged in EmailHistory" do
     end
   end
 
-  context 'when poersonalisation has email_history_name field' do
+  context 'when personalisation has email_history_name field' do
     it 'sets that as the name' do
       expect { open_prison_supporting_com_needed.deliver_later }
         .to change { email_histories.where(name: "Email Recipient").count }

@@ -4,7 +4,7 @@ class AuditEventsMailObserver
     personalisation = message.govuk_notify_personalisation
     template = message.govuk_notify_template
     to = message.to
-    nomis_offender_id = personalisation[:nomis_offender_id] || personalisation[:prisoner_number]
+    nomis_offender_id = personalisation[:nomis_offender_id] || personalisation[:prisoner_number] || personalisation[:noms_no]
 
     Rails.logger.error "event=audit_event_created,nomis_offender_id=#{nomis_offender_id}|#{message.inspect}"
 

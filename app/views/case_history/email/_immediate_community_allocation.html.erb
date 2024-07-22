@@ -1,0 +1,9 @@
+<% description = capture do %>
+  <p>
+    Request for COM to be allocated as this person has less than 10 months to serve sent to <%= immediate_community_allocation.email %>
+  </p>
+<% end %>
+<%= render 'case_history/email_history',
+           title: 'System generated email sent',
+           description: description,
+           object: immediate_community_allocation %>

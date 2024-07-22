@@ -132,35 +132,36 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
         let(:one_day_later) { today + 1.day }
         let(:two_days_later) { today + 2.days }
 
-        it 'sends an email and records the fact', :aggregate_failures do
-          expect {
-            described_class.perform_now(offender_no)
-          }.to change(EmailHistory, :count).by(1)
-          expect(CommunityMailer).to have_received(:with).with(
-            email: ldu.email_address,
-            prisoner_name: "#{nomis_offender.fetch(:firstName)} #{nomis_offender.fetch(:lastName)}",
-            prisoner_number: offender_no,
-            crn_number: case_info.crn,
-            prison_name: PrisonService.name_for(nomis_offender.fetch(:prisonId)),
-          )
-          expect(assign_com_less_than_10_months_mailer).to have_received(:deliver_later)
-        end
-
         it 'nags the LDU 48 hours later' do
-          expect {
-            described_class.perform_now(offender_no)
-          }.to change(EmailHistory, :count).by(1)
+          allow(CommunityMailer).to receive(:with).and_call_original
+
+          expected_params = {
+            params: {
+              email: ldu.email_address,
+              email_history_name: ldu.name,
+              prison_name: PrisonService.name_for(nomis_offender.fetch(:prisonId)),
+              prisoner_name: "#{nomis_offender.fetch(:firstName)} #{nomis_offender.fetch(:lastName)}",
+              prisoner_number: offender_no,
+              crn_number: case_info.crn
+            },
+            args: []
+          }
+
+          expect { described_class.perform_now(offender_no) }
+            .to have_enqueued_job(ActionMailer::MailDeliveryJob)
+            .with('CommunityMailer', 'assign_com_less_than_10_months', 'deliver_now', expected_params)
+
+          create(:email_history, event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION, nomis_offender_id: offender_no)
 
           Timecop.travel one_day_later do
-            expect {
-              described_class.perform_now(offender_no)
-            }.not_to change(EmailHistory, :count)
+            expect { described_class.perform_now(offender_no) }
+            .not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
           end
 
           Timecop.travel two_days_later do
-            expect {
-              described_class.perform_now(offender_no)
-            }.to change(EmailHistory, :count).by(1)
+            expect { described_class.perform_now(offender_no) }
+            .to have_enqueued_job(ActionMailer::MailDeliveryJob)
+            .with('CommunityMailer', 'assign_com_less_than_10_months', 'deliver_now', expected_params)
           end
         end
       end
@@ -338,7 +339,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
       it 'emails the LDU to notify them that a COM is now needed', :aggregate_failures do
         described_class.perform_now(offender_no)
-        
+
         expect(CommunityMailer).to have_received(:with)
                                      .with(hash_including(
                                              prisoner_crn: case_information.crn,

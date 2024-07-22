@@ -31,11 +31,7 @@ private
         nomis_offender.ldu_email_address.present? &&
         nomis_offender.allocated_com_name.blank?
 
-        # send email for the first time, or resend it if we haven't recently
-        last_com_email = db_offender.email_histories.immediate_community_allocation.last
-        if last_com_email.nil? || last_com_email.created_at < 2.days.ago
-          assign_com_email(db_offender:, nomis_offender:, case_info:)
-        end
+        assign_com_email(db_offender:, nomis_offender:, case_info:)
       end
 
       if record.changed?
@@ -61,7 +57,7 @@ private
       # This avoids 404 Not Found errors for offenders who don't exist in nDelius (they could be Scottish, etc.)
       push_to_delius record unless case_info.manual_entry?
 
-      request_supporting_com record, db_offender, nomis_offender
+      request_supporting_com record, nomis_offender
     end
   end
 
@@ -74,7 +70,7 @@ private
     end
   end
 
-  def request_supporting_com(record, offender, nomis_offender)
+  def request_supporting_com(record, nomis_offender)
     reason_change = %w[indeterminate indeterminate_open]
     responsibility_change = [CalculatedHandoverDate::CUSTODY_ONLY, CalculatedHandoverDate::CUSTODY_WITH_COM]
 
@@ -95,22 +91,18 @@ private
   end
 
   def assign_com_email(db_offender:, nomis_offender:, case_info:)
-    # create the history first so that the validations will help with hard failures due to coding errors
-    # rather than waiting for the mailer to object
-    db_offender.email_histories.create!(
-      prison: nomis_offender.prison_id,
-      name: case_info.ldu_name,
-      email: case_info.ldu_email_address,
-      event: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
-    )
+    last_com_email = db_offender.email_histories.immediate_community_allocation.last
 
-    # This is queued so that soft failures don't kill the whole job
-    CommunityMailer.with(
-      email: case_info.ldu_email_address,
-      crn_number: case_info.crn,
-      prison_name: PrisonService.name_for(nomis_offender.prison_id),
-      prisoner_name: "#{nomis_offender.first_name} #{nomis_offender.last_name}",
-      prisoner_number: nomis_offender.offender_no
-    ).assign_com_less_than_10_months.deliver_later
+    # send email for the first time, or resend it if we haven't recently
+    if last_com_email.nil? || last_com_email.created_at < 2.days.ago
+      CommunityMailer.with(
+        email: case_info.ldu_email_address,
+        email_history_name: case_info.ldu_name,
+        prison_name: PrisonService.name_for(nomis_offender.prison_id),
+        prisoner_name: "#{nomis_offender.first_name} #{nomis_offender.last_name}",
+        prisoner_number: nomis_offender.offender_no,
+        crn_number: case_info.crn,
+      ).assign_com_less_than_10_months.deliver_later
+    end
   end
 end
