@@ -58,6 +58,19 @@ describe "Emails sent are logged in EmailHistory" do
       email: "test1@email.com"
     ).community_early_allocation
   end
+  let(:auto_early_allocation) do
+    EarlyAllocationMailer.with(
+      pdf: "DOCUMENT STREAM",
+      pom_email: "pom@email.com",
+      prisoner_name: "Prisoner Name",
+      prisoner_number: offender.nomis_offender_id,
+      pom_name: "Pom Name",
+      pom_email_address: "pom@email_address.com",
+      prison_name: prison.name,
+      link_to_document: "link to doc",
+      email: "test1@email.com"
+    ).auto_early_allocation
+  end
   let(:email_histories) do
     EmailHistory.where(
       nomis_offender_id: offender.nomis_offender_id,
@@ -75,7 +88,8 @@ describe "Emails sent are logged in EmailHistory" do
     :open_prison_supporting_com_needed,
     :urgent_pipeline_to_community,
     :assign_com_less_than_10_months,
-    :community_early_allocation
+    :community_early_allocation,
+    :auto_early_allocation
   ]
   actions.each do |action|
     it "is logs action #{action} appropriately" do
