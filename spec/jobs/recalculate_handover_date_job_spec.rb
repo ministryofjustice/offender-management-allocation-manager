@@ -317,13 +317,14 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
     context 'when in a male prison' do
       it 'emails the LDU to notify them that a COM is now needed', :aggregate_failures do
-        expect { described_class.perform_now(offender_no) }.to change(EmailHistory, :count).by(1)
+        described_class.perform_now(offender_no)
+
         expect(CommunityMailer).to have_received(:with).with(
           hash_including(
             prisoner_number: offender_no,
             prisoner_crn: case_information.crn,
             ldu_email: case_information.ldu_email_address,
-            prison_name: prison.name,
+            prison_name: prison.name
           )
         )
         expect(open_prison_supporting_com_needed_mailer).to have_received(:deliver_later)
@@ -336,7 +337,8 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
       let(:policy_start_date) { Offenders::PrisonPolicies::WOMENS_POLICY_START_DATE }
 
       it 'emails the LDU to notify them that a COM is now needed', :aggregate_failures do
-        expect { described_class.perform_now(offender_no) }.to change(EmailHistory, :count).by(1)
+        described_class.perform_now(offender_no)
+        
         expect(CommunityMailer).to have_received(:with)
                                      .with(hash_including(
                                              prisoner_crn: case_information.crn,

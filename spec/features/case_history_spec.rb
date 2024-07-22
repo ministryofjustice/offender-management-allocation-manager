@@ -184,7 +184,7 @@ feature 'Case History' do
           # Puy the offender in Pentonville to calculate handover dates
           # then put them back so that the transfer looks like it works
           stub_offender(nomis_pentonville_offender)
-          RecalculateHandoverDateJob.perform_now nomis_offender_id
+          perform_enqueued_jobs { RecalculateHandoverDateJob.perform_now nomis_offender_id }
           stub_offender(nomis_offender)
           stub_movements_for(nomis_offender_id, offender_movements)
         end
@@ -192,7 +192,7 @@ feature 'Case History' do
         Timecop.travel(transfer_date) do
           # create Email History for welsh offender transferring to Prescoed open prison by moving the prisoner
           MovementService.process_transfer build(:movement, :transfer, offenderNo: nomis_offender_id, toAgency: open_prison.code)
-          RecalculateHandoverDateJob.perform_now nomis_offender_id
+          perform_enqueued_jobs { RecalculateHandoverDateJob.perform_now nomis_offender_id }
         end
         visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
       end
@@ -218,7 +218,6 @@ feature 'Case History' do
         within '.govuk-grid-row:nth-of-type(1)' do
           expect(page).to have_css('.govuk-heading-m', text: "Prescoed (HMP/YOI)")
 
-          # expect(all('.moj-timeline__item').size).to eq(2)
           prescoed_transfer = EmailHistory.where(nomis_offender_id: nomis_offender_id, event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
 
           within '.moj-timeline__item:nth-of-type(1)' do

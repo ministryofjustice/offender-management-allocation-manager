@@ -106,7 +106,8 @@ describe "Emails sent are logged in EmailHistory" do
   actions.each do |action|
     # The following events do not have a 1:1 map of (Mailer.action_name => EmailHistory.event)
     event_overrides = {
-      review_early_allocation: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION
+      review_early_allocation: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION,
+      open_prison_supporting_com_needed: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION
     }
 
     it "is logs #{action} emails as EmailHistory records" do

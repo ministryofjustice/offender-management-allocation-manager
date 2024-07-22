@@ -83,18 +83,13 @@ private
       nomis_offender.ldu_email_address.present? &&
       nomis_offender.allocated_com_name.blank?
 
-      # Offender has moved to Open Prison conditions and now needs a supporting COM
-      # Note: this covers both Male and Female offenders
-      offender.email_histories.create! name: nomis_offender.ldu_name,
-                                       email: nomis_offender.ldu_email_address,
-                                       event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
-                                       prison: nomis_offender.prison_id
       CommunityMailer.with(
         prisoner_name: nomis_offender.full_name,
         prisoner_number: nomis_offender.offender_no,
         prisoner_crn: nomis_offender.crn,
         prison_name: PrisonService.name_for(nomis_offender.prison_id),
-        ldu_email: nomis_offender.ldu_email_address
+        ldu_email: nomis_offender.ldu_email_address,
+        email_history_name: nomis_offender.ldu_name
       ).open_prison_supporting_com_needed.deliver_later
     end
   end

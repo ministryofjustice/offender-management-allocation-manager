@@ -8,7 +8,6 @@ class EmailHistory < ApplicationRecord
     OPEN_PRISON_COMMUNITY_ALLOCATION = 'open_prison_community_allocation',
     IMMEDIATE_COMMUNITY_ALLOCATION = 'immediate_community_allocation',
     RESPONSIBILITY_OVERRIDE = 'responsibility_override',
-    OPEN_PRISON_SUPPORTING_COM_NEEDED = 'open_prison_supporting_com_needed',
     URGENT_PIPELINE_TO_COMMUNITY = 'urgent_pipeline_to_community',
     ASSIGN_COM_LESS_THAN_10_MONTHS = 'assign_com_less_than_10_months',
     COMMUNITY_EARLY_ALLOCATION = 'community_early_allocation'

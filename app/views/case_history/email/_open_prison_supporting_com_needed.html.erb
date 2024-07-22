@@ -1,9 +1,0 @@
-<% description = capture do %>
-  <p>
-    Request for supporting COM to be allocated after move to open prison sent to <%= open_prison_supporting_com_needed.email %>
-  </p>
-<% end %>
-<%= render 'case_history/email_history',
-           title: 'System generated email sent',
-           description: description,
-           object: open_prison_supporting_com_needed %>
