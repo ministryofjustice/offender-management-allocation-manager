@@ -71,6 +71,16 @@ describe "Emails sent are logged in EmailHistory" do
       email: "test1@email.com"
     ).auto_early_allocation
   end
+  let(:review_early_allocation) do
+    EarlyAllocationMailer.with(
+      email: "test1@email.com",
+      prisoner_name: "Prisoner Name",
+      prisoner_number: offender.nomis_offender_id,
+      prison_name: prison.name,
+      start_page_link: "start_page_link",
+      equip_guidance_link: 'EQUIP_URL'
+    ).review_early_allocation
+  end
   let(:email_histories) do
     EmailHistory.where(
       nomis_offender_id: offender.nomis_offender_id,
@@ -89,13 +99,22 @@ describe "Emails sent are logged in EmailHistory" do
     :urgent_pipeline_to_community,
     :assign_com_less_than_10_months,
     :community_early_allocation,
-    :auto_early_allocation
+    :auto_early_allocation,
+    :review_early_allocation
   ]
   actions.each do |action|
-    it "is logs action #{action} appropriately" do
+    # The following events do not have a 1:1 map of (Mailer.action_name => EmailHistory.event)
+    event_overrides = {
+      review_early_allocation: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION
+    }
+
+    it "is logs #{action} emails as EmailHistory records" do
       mailer = send(action)
+      event = event_overrides.fetch(action, action)
+
       expect { mailer.deliver_later }
-        .to change { email_histories.where(event: action).count }.from(0).to(1)
+        .to change { email_histories.where(event:).count }
+        .from(0).to(1)
     end
   end
 end
