@@ -54,7 +54,7 @@ RSpec.describe DomainEventsConsumer do
     aggregate_failures do
       expect(event.noms_number).to eq 'X1111XX'
       expect(event.crn_number).to eq 'CRN001'
-      expect(event.message['eventType']).to eq 'testapp.domain.action'
+      expect(event.event_type).to eq 'testapp.domain.action'
       expect(event.message['additionalInformation']).to eq({ 'foo' => 'bar' })
       expect(event.message['version']).to eq 2
       expect(event.message['description']).to eq 'test_description'
@@ -90,11 +90,46 @@ RSpec.describe DomainEventsConsumer do
 
     aggregate_failures do
       expect(event.noms_number).to eq nil
-      expect(event.message['eventType']).to eq 'testapp.domain.action'
+      expect(event.crn_number).to eq nil
+      expect(event.event_type).to eq 'testapp.domain.action'
       expect(event.message['additionalInformation']).to eq(nil)
       expect(event.message['version']).to eq 3
       expect(event.message['description']).to eq nil
       expect(event.message['detailUrl']).to eq nil
+    end
+  end
+
+  it 'processes a probation event' do
+    sns_msg_raw = {
+      'Type' => 'Notification',
+      'MessageId' => 'sns_msg_id',
+      'TopicArn' => 'arn:::::',
+      'Message' => {
+        'offenderId' => 123_456,
+        'crn' => 'W123456',
+        'sourceId' => 998_877_665,
+        'eventDatetime' => '2024-07-23T13:37:25+01:00',
+      }.to_json,
+      'MessageAttributes' => {
+        'eventType' => {
+          'Type' => 'String',
+          'Value' => 'testapp.domain.action',
+        },
+      },
+      'Timestamp' => '',
+      'SignatureVersion' => '',
+      'Signature' => '',
+      'SigningCertURL' => '',
+      'UnsubscribeURL' => '',
+    }.to_json
+
+    consumer.perform(sqs_msg, sns_msg_raw)
+    event = DomainEventTestHandler.handled_events.fetch(0)
+
+    aggregate_failures do
+      expect(event.noms_number).to eq nil
+      expect(event.crn_number).to eq 'W123456'
+      expect(event.event_type).to eq 'testapp.domain.action'
     end
   end
 

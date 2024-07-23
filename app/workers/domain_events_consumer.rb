@@ -10,35 +10,37 @@ class DomainEventsConsumer
 
     begin
       sns_msg = ActiveSupport::JSON.decode(sns_msg_raw)
-      event_raw = ActiveSupport::JSON.decode(sns_msg.fetch('Message'))
+      event_type = sns_msg.dig('MessageAttributes', 'eventType', 'Value')
 
-      if event_raw['eventType'].blank?
+      if event_type.blank?
         log sqs_msg, 'skip', append: "reason=missing_event_type,sns_message_id=#{sns_msg['MessageId']}"
         return
       end
 
-      log sqs_msg, 'decoded', append: "sns_message_id=#{sns_msg['MessageId']},event_type=#{event_raw['eventType']}"
+      event_raw = ActiveSupport::JSON.decode(sns_msg.fetch('Message'))
+
+      log sqs_msg, 'decoded', append: "sns_message_id=#{sns_msg['MessageId']},event_type=#{event_type}"
 
       event = DomainEvents::Event.new(
-        event_type: event_raw.fetch('eventType'),
-        version: event_raw.fetch('version'),
+        event_type:,
+        version: event_raw['version'],
         description: event_raw['description'],
         detail_url: event_raw['detailUrl'],
         additional_information: event_raw['additionalInformation'],
         noms_number: extract_identifier(event_raw, 'NOMS'),
-        crn_number: extract_identifier(event_raw, 'CRN'),
+        crn_number: extract_identifier(event_raw, 'CRN').presence || event_raw['crn'].presence,
         external_event: true,
       )
 
       consume(event)
 
-      log sqs_msg, 'success', append: "sns_message_id=#{sns_msg['MessageId']},event_type=#{event_raw['eventType']}"
+      log sqs_msg, 'success', append: "sns_message_id=#{sns_msg['MessageId']},event_type=#{event_type}"
     rescue StandardError => e
       log sqs_msg, 'error', append: "reason=exception|#{e.inspect},#{e.backtrace.join(',')}", brief: true
       Sentry.capture_exception(e,
                                tags: {
                                  domain_event: true,
-                                 domain_event_type: event_raw ? event_raw['eventType'] : nil,
+                                 domain_event_type: event_type,
                                })
       raise
     end
