@@ -74,12 +74,11 @@ module Handover::HandoverCalculation
         ted = NamedDate[tariff_date, 'TED']
         thd = NamedDate[target_hearing_date, 'THD']
         [ted, thd].compact.min
-      else parole_eligibility_date
-        NamedDate[parole_eligibility_date, 'PED']
       else
+        ped = NamedDate[parole_eligibility_date, 'PED']
         crd = NamedDate[conditional_release_date, 'CRD']
         ard = NamedDate[automatic_release_date, 'ARD']
-        [ard, crd].compact.min
+        ped || [ard, crd].compact.min
       end
     end
   end
