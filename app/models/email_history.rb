@@ -9,7 +9,6 @@ class EmailHistory < ApplicationRecord
     IMMEDIATE_COMMUNITY_ALLOCATION = 'immediate_community_allocation',
     RESPONSIBILITY_OVERRIDE = 'responsibility_override',
     URGENT_PIPELINE_TO_COMMUNITY = 'urgent_pipeline_to_community',
-    ASSIGN_COM_LESS_THAN_10_MONTHS = 'assign_com_less_than_10_months',
     COMMUNITY_EARLY_ALLOCATION = 'community_early_allocation'
   ].freeze
 
