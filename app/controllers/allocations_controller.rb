@@ -44,7 +44,7 @@ class AllocationsController < PrisonsApplicationController
                            end
                          end
     complexity_history = [] if complexity_history.nil?
-    email_history = EmailHistory.in_offender_timeline.where(nomis_offender_id: nomis_offender_id_from_url)
+    email_history = EmailHistory.where(nomis_offender_id: nomis_offender_id_from_url)
     early_allocations = Offender.includes(:early_allocations).find_by!(nomis_offender_id: nomis_offender_id_from_url).early_allocations
 
     ea_history = early_allocations.map { |ea|

@@ -20,6 +20,7 @@ class AuditEventsMailObserver
     def personalisation = govuk_notify_personalisation
     def tags = String(govuk_notify_reference).split('.')
     def template = govuk_notify_template
+
     def nomis_offender_id
       [:prisoner_number, :noms_no, :nomis_offender_id]
         .map { |key| personalisation[key] }
