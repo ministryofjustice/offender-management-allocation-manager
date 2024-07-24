@@ -323,87 +323,19 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
     end
 
     describe 'when case is indeterminate' do
-      before do
-        args[:is_indeterminate] = true
-      end
+      before { args[:is_indeterminate] = true }
 
-      example 'earliest release date is tariff date if it exists regardless of other dates' do
-        aggregate_failures do
-          [
-            [today, nil, nil],
-            [today, today + 1, nil],
-            [today, nil, today + 1],
-            [today, today + 1, today + 1],
-          ].each do |ted, thd, ped|
-            args[:tariff_date] = ted
-            args[:target_hearing_date] = thd
-            args[:parole_eligibility_date] = ped
-            expect(described_class.calculate_earliest_release(**args))
-              .to eq NamedDate[args[:tariff_date], 'TED']
-          end
-        end
-      end
+      [
+        [Date.today, nil,             'TED', 'TED alone exists'],
+        [Date.today - 1, Date.today,  'TED', 'TED and THD both exist but TED is earlier'],
+        [Date.today, Date.today - 1,  'THD', 'TED and TED both exist but THD is earlier'],
+        [nil, Date.today,             'THD', 'TED does not exist but THD does'],
+      ].each do |ted, thd, expected_date, reason|
+        example "earliest date is #{expected_date} when #{reason}" do
+          args[:tariff_date] = ted
+          args[:target_hearing_date] = thd
 
-      describe 'when tariff date is nil' do
-        before do
-          args[:tariff_date] = nil
-        end
-
-        example 'there is no earliest release if THD, or PED are nil or not in the future' do
-          aggregate_failures do
-            [
-              [today, today],
-              [nil, today],
-              [today, nil],
-              [nil, nil],
-            ].each do |thd, ped|
-              args[:target_hearing_date] = thd
-              args[:parole_eligibility_date] = ped
-              expect(described_class.calculate_earliest_release(**args))
-                .to eq nil
-            end
-          end
-        end
-
-        example 'earliest release is earliest of target hearing date or parole eligibility date that is in the future' do
-          aggregate_failures do
-            args[:target_hearing_date] = today + 2
-            args[:parole_eligibility_date] = today + 1
-            expect(described_class.calculate_earliest_release(**args))
-              .to eq NamedDate[args[:parole_eligibility_date], 'PED']
-
-            args[:target_hearing_date] = today
-            args[:parole_eligibility_date] = today + 1
-            expect(described_class.calculate_earliest_release(**args))
-              .to eq NamedDate[args[:parole_eligibility_date], 'PED']
-
-            args[:target_hearing_date] = nil
-            args[:parole_eligibility_date] = today + 1
-            expect(described_class.calculate_earliest_release(**args))
-              .to eq NamedDate[args[:parole_eligibility_date], 'PED']
-
-            args[:target_hearing_date] = today + 1
-            args[:parole_eligibility_date] = today + 2
-            expect(described_class.calculate_earliest_release(**args))
-              .to eq NamedDate[args[:target_hearing_date], 'THD']
-
-            args[:target_hearing_date] = today + 1
-            args[:parole_eligibility_date] = today
-            expect(described_class.calculate_earliest_release(**args))
-              .to eq NamedDate[args[:target_hearing_date], 'THD']
-
-            args[:target_hearing_date] = today + 1
-            args[:parole_eligibility_date] = nil
-            expect(described_class.calculate_earliest_release(**args))
-              .to eq NamedDate[args[:target_hearing_date], 'THD']
-          end
-        end
-
-        example 'earliest release is target hearing date if it is on qualified and same as parole eligibility date' do
-          args[:target_hearing_date] = today + 1
-          args[:parole_eligibility_date] = today + 1
-          expect(described_class.calculate_earliest_release(**args))
-            .to eq NamedDate[args[:parole_eligibility_date], 'THD']
+          expect(described_class.calculate_earliest_release(**args).name).to eq(expected_date)
         end
       end
     end

@@ -71,14 +71,10 @@ module Handover::HandoverCalculation
                                    automatic_release_date:,
                                    today: Time.zone.now.utc.to_date)
       if is_indeterminate
-        if tariff_date
-          NamedDate[tariff_date, 'TED']
-        else
-          ped = NamedDate[parole_eligibility_date, 'PED']
-          thd = NamedDate[target_hearing_date, 'THD']
-          [thd, ped].keep_if { |d| d && d.date > today }.min
-        end
-      elsif parole_eligibility_date
+        ted = NamedDate[tariff_date, 'TED']
+        thd = NamedDate[target_hearing_date, 'THD']
+        [ted, thd].compact.min
+      else parole_eligibility_date
         NamedDate[parole_eligibility_date, 'PED']
       else
         crd = NamedDate[conditional_release_date, 'CRD']
