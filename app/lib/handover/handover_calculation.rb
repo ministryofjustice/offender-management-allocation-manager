@@ -71,7 +71,7 @@ module Handover::HandoverCalculation
                                    automatic_release_date:,
                                    today: Time.zone.now.utc.to_date)
       if is_indeterminate
-        if tariff_date && tariff_date > today
+        if tariff_date
           NamedDate[tariff_date, 'TED']
         else
           ped = NamedDate[parole_eligibility_date, 'PED']

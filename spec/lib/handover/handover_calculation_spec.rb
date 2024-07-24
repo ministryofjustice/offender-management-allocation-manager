@@ -327,37 +327,15 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
         args[:is_indeterminate] = true
       end
 
-      example 'there is no earliest release if TED, THD, or PED are nil or not in the future' do
+      example 'earliest release date is tariff date if it exists regardless of other dates' do
         aggregate_failures do
           [
-            [today, today, today],
-            [today, today, nil],
-            [today, nil, today],
-            [nil, today, today],
             [today, nil, nil],
-            [nil, nil, today],
-            [nil, today, nil],
-            [nil, nil, nil],
+            [today, today + 1, nil],
+            [today, nil, today + 1],
+            [today, today + 1, today + 1],
           ].each do |ted, thd, ped|
             args[:tariff_date] = ted
-            args[:target_hearing_date] = thd
-            args[:parole_eligibility_date] = ped
-            expect(described_class.calculate_earliest_release(**args))
-              .to eq nil
-          end
-        end
-      end
-
-      example 'earliest release date is tariff date if it is in the future regardless of other dates' do
-        aggregate_failures do
-          args[:tariff_date] = today + 1
-
-          [
-            [nil, nil],
-            [today + 1, nil],
-            [nil, today + 1],
-            [today + 1, today + 1],
-          ].each do |thd, ped|
             args[:target_hearing_date] = thd
             args[:parole_eligibility_date] = ped
             expect(described_class.calculate_earliest_release(**args))
@@ -369,6 +347,22 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
       describe 'when tariff date is nil' do
         before do
           args[:tariff_date] = nil
+        end
+
+        example 'there is no earliest release if THD, or PED are nil or not in the future' do
+          aggregate_failures do
+            [
+              [today, today],
+              [nil, today],
+              [today, nil],
+              [nil, nil],
+            ].each do |thd, ped|
+              args[:target_hearing_date] = thd
+              args[:parole_eligibility_date] = ped
+              expect(described_class.calculate_earliest_release(**args))
+                .to eq nil
+            end
+          end
         end
 
         example 'earliest release is earliest of target hearing date or parole eligibility date that is in the future' do
