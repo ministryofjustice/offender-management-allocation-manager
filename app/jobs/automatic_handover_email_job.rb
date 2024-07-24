@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class AutomaticHandoverEmailJob < ApplicationJob
-  queue_as :default
+  queue_as :mailers
+
   HEADERS = ['Prisoner', 'CRN', 'Prisoner number', 'Handover completion due', 'Release/Parole Date', 'Prison', 'Current POM', 'POM email', 'COM'].freeze
   # Turns out that between? is inclusive at both ends, so a 45-day gap needs a 44-day threshold
   SEND_THRESHOLD = 44.days.freeze

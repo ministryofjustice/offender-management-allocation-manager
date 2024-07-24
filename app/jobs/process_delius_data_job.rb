@@ -15,9 +15,9 @@ class ProcessDeliusDataJob < ApplicationJob
   # trigger_method can be :batch (default), or :event
   def perform(identifier, identifier_type: :nomis_offender_id, trigger_method: :batch)
     ApplicationRecord.transaction do
-      logger.info("#{identifier_type}=#{identifier},job=process_delius_data_job,event=started")
+      logger.info("#{identifier_type}=#{identifier},trigger_method=#{trigger_method},job=process_delius_data_job,event=started")
       import_data(identifier, identifier_type, trigger_method)
-      logger.info("#{identifier_type}=#{identifier},job=process_delius_data_job,event=finished")
+      logger.info("#{identifier_type}=#{identifier},trigger_method=#{trigger_method},job=process_delius_data_job,event=finished")
     end
   end
 
@@ -66,16 +66,19 @@ private
 
   def process_record(probation_record, nomis_offender_id, trigger_method)
     DeliusImportError.where(nomis_offender_id: nomis_offender_id).destroy_all
+
     prisoner = Offender.find_by!(nomis_offender_id: nomis_offender_id)
     case_info = prisoner.case_information || prisoner.build_case_information
-    atts_to_ignore = %w[id created_at updated_at]
-    case_info_atts_before = case_info.attributes.except(*atts_to_ignore)
-    case_information_after = map_delius_to_case_info(probation_record, case_info)
 
-    if case_information_after.changed?
-      if case_information_after.save
+    map_delius_to_case_info!(probation_record, case_info)
+
+    if case_info.changed?
+      case_info_attrs_before = case_info.changed_attributes
+
+      if case_info.save
         # Recalculate the offender's handover dates
         RecalculateHandoverDateJob.perform_later(nomis_offender_id)
+
         tags = %w[job process_delius_data_job case_information changed]
         tags << trigger_method.to_s
 
@@ -84,12 +87,12 @@ private
           tags: tags,
           system_event: true,
           data: {
-            'before' => case_info_atts_before,
-            'after' => case_information_after.attributes.except(*atts_to_ignore)
+            'before' => case_info_attrs_before,
+            'after' => case_info.slice(case_info_attrs_before.keys)
           }
         )
       else
-        case_information_after.errors.each do |error|
+        case_info.errors.each do |error|
           DeliusImportError.create! nomis_offender_id: nomis_offender_id,
                                     error_type: error_type(error.attribute)
         end
@@ -97,7 +100,7 @@ private
     end
   end
 
-  def map_delius_to_case_info(probation_record, case_info)
+  def map_delius_to_case_info!(probation_record, case_info)
     ldu_code = probation_record.dig(:manager, :team, :local_delivery_unit, :code)
 
     # We only populate tier if it's a new record because this is subsequently

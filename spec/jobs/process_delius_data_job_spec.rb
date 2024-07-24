@@ -49,8 +49,7 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       team_name: team_name,
       com_name: "#{com_surname}, #{com_forename}",
       com_email: com_email,
-      tier: "A",
-      active_vlo: false
+      tier: "A"
     }
   end
 
@@ -76,7 +75,8 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
 
     it 'includes the CaseInformation attribute diffs in the audit event data' do
       described_class.perform_now nomis_offender_id
-      expect(audit_event.data).to eq(expected_data)
+      expect(audit_event.data['before']).to eq(expected_data['before'])
+      expect(audit_event.data['after']).to eq(expected_data['after'])
     end
 
     it 'includes the word batch in the tags' do
@@ -95,8 +95,11 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
         described_class.perform_now nomis_offender_id
       }.to change(CaseInformation, :count).by(1)
 
-      expect(case_info.attributes.symbolize_keys.except(:created_at, :id, :updated_at, :target_hearing_date, :prisoner_id, :welsh_offender))
-          .to eq(new_case_information_attributes)
+      expect(
+        case_info.attributes.symbolize_keys.except(
+          :created_at, :id, :updated_at, :target_hearing_date, :prisoner_id, :welsh_offender, :active_vlo
+        )
+      ).to eq(new_case_information_attributes)
     end
 
     include_examples 'audit event' do
@@ -109,10 +112,9 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
             'ldu_code' => nil,
             'com_email' => nil,
             'team_name' => nil,
-            'active_vlo' => false,
             'mappa_level' => nil,
             'manual_entry' => nil,
-            'nomis_offender_id' => nomis_offender_id,
+            'nomis_offender_id' => nil,
             'probation_service' => nil,
             'enhanced_resourcing' => nil,
             'local_delivery_unit_id' => nil
@@ -277,10 +279,11 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
     end
 
     include_examples 'audit event' do
+      let(:attrs_not_changing) { %w[id created_at updated_at active_vlo nomis_offender_id tier] }
       let(:expected_data) do
         {
-          'before' => c1.attributes.except('id', 'created_at', 'updated_at'),
-          'after' => (new_case_information_attributes.tap { |a| a[:tier] = c1.tier }).stringify_keys
+          'before' => c1.attributes.except(*attrs_not_changing),
+          'after' => new_case_information_attributes.except(:tier, :nomis_offender_id).stringify_keys
         }
       end
     end
