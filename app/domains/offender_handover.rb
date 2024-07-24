@@ -18,8 +18,6 @@ private
       CalculatedHandoverDate.new(responsibility: pom_with_com, reason: :thd_over_12_months)
     elsif sentenced_to_an_additional_isp?
       CalculatedHandoverDate.new(responsibility: pom_only, reason: :additional_isp)
-    elsif recalled?
-      CalculatedHandoverDate.new(responsibility: com, reason: :recall_case, **general_rules.slice(:handover_date, :start_date))
     end
   end
 
