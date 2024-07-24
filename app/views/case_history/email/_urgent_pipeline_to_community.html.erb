@@ -1,9 +1,9 @@
 <% description = capture do %>
   <p>
-    Notification that early allocation assessment has been approved sent to <%= auto_early_allocation.email %>
+    Reminder that COM allocation still needed after handover sent to <%= urgent_pipeline_to_community.email %>
   </p>
 <% end %>
 <%= render 'case_history/email_history',
            title: 'System generated email sent',
            description: description,
-           object: auto_early_allocation %>
+           object: urgent_pipeline_to_community %>

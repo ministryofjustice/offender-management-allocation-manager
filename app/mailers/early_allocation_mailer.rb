@@ -23,7 +23,7 @@ class EarlyAllocationMailer < ApplicationMailer
 
   def review_early_allocation
     set_template('502e057c-a875-4653-9b33-63dcfd33e582')
-    set_personalisation(**params.slice(:prisoner_name, :start_page_link, :equip_guidance_link))
+    set_personalisation(**params.slice(:prisoner_name, :prisoner_number, :prison_name, :start_page_link, :equip_guidance_link))
     mail(to: params.fetch(:email))
   end
 end

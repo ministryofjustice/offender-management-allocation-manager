@@ -17,10 +17,5 @@ class AutoEarlyAllocationEmailJob < ApplicationJob
                                pom_email: pom.email_address,
                                prison_name: prison.name,
                                pdf: pdf).auto_early_allocation.deliver_now
-    EmailHistory.create! nomis_offender_id: offender.offender_no,
-                         name: offender.ldu_name,
-                         email: offender.ldu_email_address,
-                         event: EmailHistory::AUTO_EARLY_ALLOCATION,
-                         prison: prison.code
   end
 end

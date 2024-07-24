@@ -166,11 +166,10 @@ RSpec.describe EarlyAllocationsController, type: :controller do
         context 'when any one boolean true' do
           scenario 'declares assessment complete and eligible' do
             s1_boolean_param_names.each do |field|
-              expect {
-                post :eligible, params: { prison_id: prison,
-                                          prisoner_id: nomis_offender_id,
-                                          early_allocation: eligible_params.merge(field => true) }
-              }.to change(EmailHistory, :count).by(1)
+              post :eligible, params: { prison_id: prison,
+                                        prisoner_id: nomis_offender_id,
+                                        early_allocation: eligible_params.merge(field => true) }
+
               assert_template('landing_eligible')
 
               expect(early_allocation.prison).to eq(prison)

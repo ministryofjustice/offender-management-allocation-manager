@@ -1,9 +1,9 @@
 <% description = capture do %>
   <p>
-    Notification that early allocation assessment has been approved sent to <%= auto_early_allocation.email %>
+    Notification that early allocation assessment submitted for review sent to <%= community_early_allocation.email %>
   </p>
 <% end %>
 <%= render 'case_history/email_history',
            title: 'System generated email sent',
            description: description,
-           object: auto_early_allocation %>
+           object: community_early_allocation %>

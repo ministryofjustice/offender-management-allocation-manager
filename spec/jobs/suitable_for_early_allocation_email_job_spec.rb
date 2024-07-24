@@ -95,13 +95,14 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
                                          .with(
                                            email: pom.email_address,
                                            prisoner_name: api_offender.full_name,
+                                           prisoner_number: api_offender.offender_no,
+                                           prison_name: prison.name,
                                            start_page_link: "http://localhost:3000/prisons/#{api_offender.prison_id}/prisoners/#{api_offender.offender_no}/early_allocations",
                                            equip_guidance_link: "https://equip-portal.rocstac.com/CtrlWebIsapi.dll/?__id=webDiagram.show&map=0%3A9A63E167DE4B400EA07F81A9271E1944&dgm=4F984B45CBC447B1A304B2FFECABB777"
                                          )
                                          .and_return(double(review_early_allocation: mailer))
             expect(mailer).to receive(:deliver_now)
-
-            expect { described_class.perform_now(api_offender.offender_no) }.to change(EmailHistory, :count).by(1)
+            described_class.perform_now(api_offender.offender_no)
           end
         end
 
@@ -136,12 +137,14 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
                                                  .with(
                                                    email: pom.email_address,
                                                    prisoner_name: api_offender.full_name,
+                                                   prisoner_number: api_offender.offender_no,
+                                                   prison_name: prison.name,
                                                    start_page_link: "http://localhost:3000/prisons/#{api_offender.prison_id}/prisoners/#{api_offender.offender_no}/early_allocations",
                                                    equip_guidance_link: "https://equip-portal.rocstac.com/CtrlWebIsapi.dll/?__id=webDiagram.show&map=0%3A9A63E167DE4B400EA07F81A9271E1944&dgm=4F984B45CBC447B1A304B2FFECABB777"
                                                  )
                                                  .and_return(double(review_early_allocation: mailer))
               expect(mailer).to receive(:deliver_now)
-              expect { described_class.perform_now(api_offender.offender_no) }.to change(EmailHistory, :count).by(1)
+              described_class.perform_now(api_offender.offender_no)
             end
           end
         end

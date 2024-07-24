@@ -38,6 +38,7 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = false
   config.example_status_persistence_file_path = "#{ENV.fetch('SPEC_STATUS_PATH', 'tmp/spec_status')}/#{ENV.fetch('TEST_ENV_NUMBER', 'all')}.txt"
   config.include FactoryBot::Syntax::Methods
+  config.include ActiveJob::TestHelper
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)

@@ -1,10 +1,9 @@
 <% description = capture do %>
   <p>
-    The LDU for <%= open_prison_community_allocation.name %> - <%=  format_email(open_prison_community_allocation.email) %> - was sent an email asking them to appoint a Supporting COM.
+    Request for supporting COM to be allocated after move to open prison sent to <%= open_prison_community_allocation.email %>
   </p>
 <% end %>
 <%= render 'case_history/email_history',
-           title: 'Offender transferred to an open prison',
+           title: 'System generated email sent',
            description: description,
-           object: open_prison_community_allocation
-%>
+           object: open_prison_community_allocation %>

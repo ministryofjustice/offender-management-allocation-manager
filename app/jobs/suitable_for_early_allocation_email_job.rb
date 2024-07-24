@@ -21,16 +21,14 @@ class SuitableForEarlyAllocationEmailJob < ApplicationJob
         EarlyAllocationMailer.with(
           email: pom.email_address,
           prisoner_name: prisoner.full_name,
+          prisoner_number: prisoner.offender_no,
+          prison_name: prison.name,
           start_page_link: Rails.application.routes.url_helpers.prison_prisoner_early_allocations_url(
             prison_id: prisoner.prison_id,
-            prisoner_id: prisoner.offender_no),
-          equip_guidance_link: EQUIP_URL).review_early_allocation.deliver_now
-
-        EmailHistory.create! nomis_offender_id: prisoner.offender_no,
-                             name: pom.full_name,
-                             email: pom.email_address,
-                             event: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION,
-                             prison: prisoner.prison_id
+            prisoner_id: prisoner.offender_no
+          ),
+          equip_guidance_link: EQUIP_URL
+        ).review_early_allocation.deliver_now
       end
     end
   end
