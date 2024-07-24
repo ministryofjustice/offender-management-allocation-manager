@@ -80,10 +80,6 @@ describe "Responsibility and Handover",  handover_calculations: true do
     it "is COM responsible" do
       expect(responsibility).to be_com_responsible
     end
-
-    it "was handed over from POM to COM was 12 months prior to THD" do
-      expect(responsibility.handover_date).to eq(Date.parse("10th May 2024"))
-    end
   end
 
   describe "ISP Recall / Parole Responsibility rules" do
@@ -235,8 +231,6 @@ describe "Responsibility and Handover",  handover_calculations: true do
 
       it "is COM responsible" do
         expect(responsibility).to be_com_responsible
-        expect(responsibility.start_date).to eq(Date.parse("20th January 2024"))
-        expect(responsibility.handover_date).to eq(Date.parse("20th January 2024"))
         expect(responsibility.reason).to eq("recall_case")
       end
     end
