@@ -68,8 +68,7 @@ module Handover::HandoverCalculation
                                    target_hearing_date:,
                                    parole_eligibility_date:,
                                    conditional_release_date:,
-                                   automatic_release_date:,
-                                   today: Time.zone.now.utc.to_date)
+                                   automatic_release_date:)
       if is_indeterminate
         ted = NamedDate[tariff_date, 'TED']
         thd = NamedDate[target_hearing_date, 'THD']

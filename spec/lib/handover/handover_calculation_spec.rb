@@ -313,7 +313,6 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
     let(:args) do
       {
         is_indeterminate: false,
-        today: today,
         tariff_date: Faker::Date.forward,
         target_hearing_date: Faker::Date.forward,
         parole_eligibility_date: Faker::Date.forward,
@@ -326,12 +325,12 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
       before { args[:is_indeterminate] = true }
 
       [
-        [Date.today, nil,             'TED', 'TED alone exists'],
-        [Date.today - 1, Date.today,  'TED', 'TED and THD both exist but TED is earlier'],
-        [Date.today, Date.today - 1,  'THD', 'TED and TED both exist but THD is earlier'],
-        [nil, Date.today,             'THD', 'TED does not exist but THD does'],
-      ].each do |ted, thd, expected_date, reason|
-        example "earliest date is #{expected_date} when #{reason}" do
+        [Time.zone.today, nil,                  'TED', 'TED alone exists'],
+        [Time.zone.today - 1, Time.zone.today,  'TED', 'TED and THD both exist but TED is earlier'],
+        [Time.zone.today, Time.zone.today - 1,  'THD', 'TED and TED both exist but THD is earlier'],
+        [nil, Time.zone.today,                  'THD', 'TED does not exist but THD does'],
+      ].each do |ted, thd, expected_date, situation|
+        example "earliest date is #{expected_date} when #{situation}" do
           args[:tariff_date] = ted
           args[:target_hearing_date] = thd
 

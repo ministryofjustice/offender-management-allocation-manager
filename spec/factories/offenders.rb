@@ -171,7 +171,6 @@ FactoryBot.define do
     # = COM responsibility (to be released)
     trait :paul_mccain do
       isp { true }
-      ped { Date.parse("15th July 2024") }
 
       after(:build) do |mpc_offender|
         hearing_outcomes = [
@@ -180,7 +179,7 @@ FactoryBot.define do
           { hearing_outcome_received_on: Date.parse("15th May 2023"),
             hearing_outcome: "Not Applicable" },
           { hearing_outcome_received_on: Date.parse("15th May 2024"),
-            hearing_outcome: "Release [*]" },
+            hearing_outcome: "Release [*]", target_hearing_date: Date.parse("15th May 2023")  },
         ]
         hearing_outcomes.each do |hearing_outcome|
           create(:parole_review,
