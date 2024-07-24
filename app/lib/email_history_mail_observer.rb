@@ -13,12 +13,12 @@ class EmailHistoryMailObserver
     email_history_details = EmailHistoryDetails.new(message)
 
     if email_history_details.event.present?
-      EmailHistory.create!(**email_history_details.as_attribtes)
+      EmailHistory.create!(**email_history_details.as_attributes)
     end
   end
 
   class EmailHistoryDetails < SimpleDelegator
-    def as_attribtes = { event:, nomis_offender_id:, prison:, email:, name: }
+    def as_attributes = { event:, nomis_offender_id:, prison:, email:, name: }
     def event = EVENT_FOR_REFERENCE[govuk_notify_reference]
     def prison = Prison.find_by(name: govuk_notify_personalisation[:prison_name])&.code
     def email = to.first
