@@ -97,6 +97,10 @@ private
                                     error_type: error_type(error.attribute)
         end
       end
+    else
+      logger.info(
+        "nomis_offender_id=#{nomis_offender_id},trigger_method=#{trigger_method},job=process_delius_data_job,event=case_information_unchanged"
+      )
     end
   end
 
