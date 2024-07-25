@@ -33,7 +33,7 @@ generic-service:
 
   ingress:
     hosts:
-      - moic2.service.justice.gov.uk
+      - moic.service.justice.gov.uk
     tlsSecretName: allocation-manager-hostname
 
   env:

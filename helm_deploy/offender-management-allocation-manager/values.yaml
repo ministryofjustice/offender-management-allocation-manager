@@ -78,11 +78,10 @@ generic-service:
   # https://github.com/ministryofjustice/hmpps-ip-allowlists/blob/main/ip-allowlist-groups.yaml
   allowlist:
     groups:
-      - moj_cloud_platform
       - digital_staff_and_mojo
-      - private_prisons
+      - moj_cloud_platform
       - prisons
-      - probation
+      - private_prisons
 
   custommetrics:
     enabled: true
