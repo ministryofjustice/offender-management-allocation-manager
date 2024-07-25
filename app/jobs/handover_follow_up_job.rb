@@ -1,5 +1,5 @@
 class HandoverFollowUpJob < ApplicationJob
-  queue_as :default
+  queue_as :mailers
 
   def perform(ldu)
     offenders_due_handover_follow_up = OffenderService
