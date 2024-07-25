@@ -163,8 +163,6 @@ workflows:
       - hmpps/build_docker:
           <<: *build_and_push_docker_image_config
           filters: { branches: { only: [ main, test, staging, preprod ] } }
-          context:
-            - offender-management-shared
           requires:
             - helm_lint
       - hmpps/deploy_env:
@@ -172,7 +170,6 @@ workflows:
           env: test
           filters: { branches: { only: [ test ] } }
           context:
-            - hmpps-common-vars
             - offender-management-test
           requires:
             - build_and_push_docker_image
@@ -180,9 +177,6 @@ workflows:
           name: deploy_staging
           env: staging
           filters: { branches: { only: [ main, staging ] } }
-          context:
-            - hmpps-common-vars
-            - offender-management-staging
           requires:
             - build_and_push_docker_image
       - hmpps/deploy_env:
@@ -190,7 +184,6 @@ workflows:
           env: preprod
           filters: { branches: { only: [ main, preprod ] } }
           context:
-            - hmpps-common-vars
             - offender-management-preprod
           requires:
             - build_and_push_docker_image
