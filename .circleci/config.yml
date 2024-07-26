@@ -170,6 +170,7 @@ workflows:
           env: test
           filters: { branches: { only: [ test ] } }
           context:
+            - hmpps-common-vars # needed to fetch the ip-allowlist-groups
             - offender-management-test
           requires:
             - build_and_push_docker_image
@@ -177,6 +178,8 @@ workflows:
           name: deploy_staging
           env: staging
           filters: { branches: { only: [ main, staging ] } }
+          context:
+            - hmpps-common-vars # needed to fetch the ip-allowlist-groups
           requires:
             - build_and_push_docker_image
       - hmpps/deploy_env:
@@ -184,6 +187,7 @@ workflows:
           env: preprod
           filters: { branches: { only: [ main, preprod ] } }
           context:
+            - hmpps-common-vars # needed to fetch the ip-allowlist-groups
             - offender-management-preprod
           requires:
             - build_and_push_docker_image
@@ -196,7 +200,7 @@ workflows:
           name: deploy_production
           env: production
           context:
-            - hmpps-common-vars
+            - hmpps-common-vars # needed to fetch the ip-allowlist-groups, and slack notification
             - offender-management-production
           requires:
             - deploy_production_approval
