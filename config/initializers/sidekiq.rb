@@ -4,7 +4,12 @@ if Rails.env.production?
     if ENV['PROMETHEUS_METRICS']&.strip == 'on'
       config.on :startup do
         require 'prometheus_exporter/instrumentation'
-        PrometheusExporter::Instrumentation::Process.start type: 'sidekiq'
+        PrometheusExporter::Instrumentation::Process.start(
+          type: 'sidekiq', labels: { hostname: ENV['HOSTNAME'] }
+        )
+        PrometheusExporter::Instrumentation::SidekiqProcess.start
+        PrometheusExporter::Instrumentation::SidekiqQueue.start
+        PrometheusExporter::Instrumentation::SidekiqStats.start
       end
 
       at_exit do
