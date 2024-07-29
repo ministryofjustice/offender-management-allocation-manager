@@ -27,7 +27,7 @@ class MetricsService
   include Singleton
 
   def initialize
-    @client = ClientClass.new(host: 'localhost', port: 9394)
+    @client = ClientClass.new
   end
 
   def increment_search_count(by: 1)
