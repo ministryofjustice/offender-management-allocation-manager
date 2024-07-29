@@ -10,8 +10,6 @@ if Rails.configuration.collect_prometheus_metrics
   # :nocov:
 else
   ClientClass = Class.new do
-    def initialize(_opts); end
-
     # rubocop:disable Style/MissingRespondToMissing
     def method_missing(_method, *_args, &_block); end
     # rubocop:enable Style/MissingRespondToMissing
