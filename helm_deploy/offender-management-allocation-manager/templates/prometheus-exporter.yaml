@@ -1,0 +1,102 @@
+{{- if .Values.custom_templates_config.prometheus_exporter.enabled }}
+{{- $appName := "offender-management-prometheus-exporter" }}
+{{- $appPort := 9394 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $appName }}
+  labels:
+    app: {{ $appName }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  strategy:
+    {{- with index .Values "generic-service" }}{{ toYaml .strategy | nindent 4 }}{{ end }}
+  selector:
+    matchLabels:
+      app: {{ $appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ $appName }}
+    spec:
+      serviceAccountName: {{ index .Values "generic-service" "serviceAccountName" }}
+      containers:
+      - name: {{ $appName }}
+        image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
+        imagePullPolicy: Always
+        securityContext:
+          {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
+        command: ['sh', '-c', 'bundle exec prometheus_exporter --bind 0.0.0.0']
+        ports:
+          - name: metrics
+            containerPort: {{ $appPort }}
+            protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: {{ $appPort }}
+          periodSeconds: 60
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: {{ $appPort }}
+          periodSeconds: 60
+        resources:
+          limits:
+            memory: 200Mi
+            cpu: 50m
+          requests:
+            memory: 100Mi
+            cpu: 10m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $appName }}
+  labels:
+    app: {{ $appName }}
+spec:
+  selector:
+    app: {{ $appName }}
+  ports:
+    - port: {{ $appPort }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ $appName }}
+  labels:
+    app: {{ $appName }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ $appName }}
+  endpoints:
+    - port: metrics
+      interval: 15s
+      path: /metrics
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ $appName }}
+  labels:
+    app: {{ $appName }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ $appName }}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            component: monitoring
+---
+{{- end }}

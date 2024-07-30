@@ -28,7 +28,7 @@ spec:
         securityContext:
           {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
         command: ['sh', '-c', 'bin/rake shoryuken:start']
-          {{- include "moic-helpers.envs_without_prometheus_metrics" . | nindent 8 }}
+          {{- include "moic-helpers.envs" . | nindent 8 }}
         resources:
           {{- with index .Values "generic-service" }}{{ toYaml .resources | nindent 10 }}{{ end }}
 ---

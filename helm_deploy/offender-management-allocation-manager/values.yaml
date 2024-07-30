@@ -11,6 +11,9 @@ custom_templates_config:
     enabled: true
   domain_events_consumer:
     enabled: true
+  prometheus_exporter:
+    enabled: true
+
   # One grafana dashboard covers all namespaces, so only needs
   # to be applied in one environment, usually `staging`
   grafana_dashboard:
@@ -83,11 +86,6 @@ generic-service:
       - prisons
       - private_prisons
 
-  custommetrics:
-    enabled: true
-    metricsPort: &metricsPort 9394
-    metricsPath: /metrics
-
   livenessProbe:
     httpGet:
       path: /health/ping
@@ -115,43 +113,6 @@ generic-service:
       memory: 500Mi
       cpu: 50m
 
-  extraContainers:
-    - name: offender-management-metrics
-      image: quay.io/hmpps/offender-management:latest
-      imagePullPolicy: IfNotPresent
-      command: ['sh', '-c', 'bundle exec prometheus_exporter --bind 0.0.0.0']
-      ports:
-        - name: metrics
-          containerPort: *metricsPort
-          protocol: TCP
-      securityContext:
-        capabilities:
-          drop:
-            - ALL
-        runAsNonRoot: true
-        allowPrivilegeEscalation: false
-        seccompProfile:
-          type: RuntimeDefault
-      resources:
-        limits:
-          memory: 200Mi
-          cpu: 50m
-        requests:
-          memory: 100Mi
-          cpu: 10m
-      livenessProbe:
-        httpGet:
-          path: /ping
-          port: *metricsPort
-        initialDelaySeconds: 10
-        periodSeconds: 60
-      readinessProbe:
-        httpGet:
-          path: /ping
-          port: *metricsPort
-        initialDelaySeconds: 10
-        periodSeconds: 60
-
   # Environment variables to load into the deployment
   env:
     RAILS_ENV: production
@@ -159,6 +120,7 @@ generic-service:
     RAILS_LOG_TO_STDOUT: on
     RAILS_SERVE_STATIC_FILES: on
     PROMETHEUS_METRICS: "on" # do not remove quotes!
+    PROMETHEUS_EXPORTER_HOST: offender-management-prometheus-exporter
     USE_PPUD_PAROLE_DATA: "1"
     LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
 

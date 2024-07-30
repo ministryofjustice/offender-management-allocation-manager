@@ -18,7 +18,13 @@ if ENV['PROMETHEUS_METRICS']&.strip == 'on'
   after_worker_boot do
     require 'prometheus_exporter/instrumentation'
     require 'prometheus_exporter/client'
-    PrometheusExporter::Instrumentation::Puma.start
+
+    unless PrometheusExporter::Instrumentation::Puma.started?
+      PrometheusExporter::Instrumentation::Puma.start(
+        labels: { type: 'puma_worker', hostname: ENV['HOSTNAME'] }
+      )
+    end
+
     PrometheusExporter::Instrumentation::Process.start(type: 'web')
 
     PrometheusExporter::Instrumentation::ActiveRecord.start(

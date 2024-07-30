@@ -2,6 +2,11 @@ Shoryuken.configure_server do |config|
   # NOTE: this entire block is only run by the processor, so we don't overwrite
   #       the logger when the app is running as usual.
 
+  config.server_middleware do |chain|
+    require 'prometheus_exporter/instrumentation'
+    chain.add PrometheusExporter::Instrumentation::Shoryuken
+  end
+
   Shoryuken::Logging.logger.formatter = lambda do |severity, datetime, _, msg|
     "[#{datetime.strftime('%Y-%m-%d %H:%M:%S')}] #{severity.ljust(5)}: #{msg}\n"
   end
