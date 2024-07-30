@@ -18,11 +18,24 @@ module HmppsApi
     end
 
     def has_concurrent_sentence_of_12_months_or_under?
-      cases = @offender_sentence_terms
-        .group_by(&:case_id)
-        .values
-        .map(&:first)
-      cases.count > 1 && cases.any? { |term| term.duration < 12.months }
+      unique_term_durations.count > 1 && unique_term_durations.any? { |duration| duration < 12.months }
+    end
+
+    def has_concurrent_sentence_of_20_months_or_over?
+      unique_term_durations.count > 1 && unique_term_durations.any? { |duration| duration >= 20.months }
+    end
+
+    private
+
+    def unique_term_durations
+      @offender_sentence_terms.group_by(&:case_id)
+        .values.map {|terms| TermsDuration.new(terms) }
+    end
+
+    class TermsDuration
+      def initialize(terms) = @terms = terms
+      def <(duration) = @terms.any? { |term| term.duration < duration }
+      def >=(duration) = @terms.any? { |term| term.duration >= duration }
     end
   end
 end

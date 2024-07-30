@@ -142,4 +142,77 @@ describe HmppsApi::OffenderSentenceTerms do
       end
     end
   end
+
+  describe '#concurrent_sentence_of_20_months_or_over?' do
+    subject { described_class.new(offender_sentence_terms) }
+
+    context 'when there are no sentences' do
+      let(:offender_sentence_terms) { [] }
+
+      it 'has no concurrent sentences of 20 months or over' do
+        expect(subject).not_to have_concurrent_sentence_of_20_months_or_over
+      end
+    end
+
+    context 'when there is only one sentence' do
+      let(:offender_sentence_terms) { [HmppsApi::OffenderSentenceTerm.new('caseId' => 1)] }
+
+      it 'has no concurrent sentences of 20 months or over' do
+        expect(subject).not_to have_concurrent_sentence_of_20_months_or_over
+      end
+    end
+
+    context 'when there are multiple sentences for the same case' do
+      let(:offender_sentence_terms) {
+        [
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1),
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1),
+        ]
+      }
+
+      it 'has no concurrent sentences of 20 months or over' do
+        expect(subject).not_to have_concurrent_sentence_of_20_months_or_over
+      end
+    end
+
+    context 'when there are multiple sentences for different cases but none are under 12 months long' do
+      let(:offender_sentence_terms) {
+        [
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 19),
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 2, 'months' => 13),
+        ]
+      }
+
+      it 'has no concurrent sentences of 20 months or over' do
+        expect(subject).not_to have_concurrent_sentence_of_20_months_or_over
+      end
+    end
+
+    context 'when there are multiple sentences for different cases' do
+      {
+        '20 months using months field' => [
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 20),
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 2),
+        ],
+        '21 months using months field' => [
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 21),
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 2),
+        ],
+        'over 20 months using months and days field' => [
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 20, 'days' => 1),
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 2),
+        ],
+        '20 months using months and year field'  => [
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 8, 'years' => 1),
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 2),
+        ]
+      }.each do |reason, terms|
+        context "when one of the sentences is #{reason}" do
+          it 'has no concurrent sentences of 20 months or over' do
+            expect(described_class.new(terms)).to have_concurrent_sentence_of_20_months_or_over
+          end
+        end
+      end
+    end
+  end
 end
