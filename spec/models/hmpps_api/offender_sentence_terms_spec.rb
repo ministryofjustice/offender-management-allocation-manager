@@ -18,7 +18,7 @@ describe HmppsApi::OffenderSentenceTerms do
           end
 
           it 'is sentenced to an additional isp' do
-            expect(subject).to be_additional_isp
+            expect(subject).to have_additional_isp
           end
         end
 
@@ -34,7 +34,7 @@ describe HmppsApi::OffenderSentenceTerms do
           end
 
           it 'is not sentenced to an additional isp' do
-            expect(subject).not_to be_additional_isp
+            expect(subject).not_to have_additional_isp
           end
         end
       end
@@ -48,7 +48,7 @@ describe HmppsApi::OffenderSentenceTerms do
         end
 
         it 'is not sentenced to an additional isp' do
-          expect(subject).not_to be_additional_isp
+          expect(subject).not_to have_additional_isp
         end
       end
     end
@@ -57,7 +57,7 @@ describe HmppsApi::OffenderSentenceTerms do
       let(:offender_sentence_terms) { [HmppsApi::OffenderSentenceTerm.new('lifeSentence' => true, 'caseId' => 1, 'sentenceStartDate' => nil)] }
 
       it 'is not sentenced to an additional isp' do
-        expect(subject).not_to be_additional_isp
+        expect(subject).not_to have_additional_isp
       end
     end
 
@@ -65,7 +65,7 @@ describe HmppsApi::OffenderSentenceTerms do
       let(:offender_sentence_terms) { [HmppsApi::OffenderSentenceTerm.new(indeterminate?: false, 'caseId' => 1, 'sentenceStartDate' => nil)] }
 
       it 'is not sentenced to an additional isp' do
-        expect(subject).not_to be_additional_isp
+        expect(subject).not_to have_additional_isp
       end
     end
 
@@ -73,7 +73,72 @@ describe HmppsApi::OffenderSentenceTerms do
       let(:offender_sentence_terms) { [] }
 
       it 'is not sentenced to an additional isp' do
-        expect(subject).not_to be_additional_isp
+        expect(subject).not_to have_additional_isp
+      end
+    end
+  end
+
+  describe '#concurrent_sentence_of_12_months_or_under?' do
+    subject { described_class.new(offender_sentence_terms) }
+
+    context 'when there are no sentences' do
+      let(:offender_sentence_terms) { [] }
+
+      it 'has no concurrent sentences of 12 months or under' do
+        expect(subject).not_to have_concurrent_sentence_of_12_months_or_under
+      end
+    end
+
+    context 'when there is only one sentence' do
+      let(:offender_sentence_terms) { [HmppsApi::OffenderSentenceTerm.new('caseId' => 1)] }
+
+      it 'has no concurrent sentences of 12 months or under' do
+        expect(subject).not_to have_concurrent_sentence_of_12_months_or_under
+      end
+    end
+
+    context 'when there are multiple sentences for the same case' do
+      let(:offender_sentence_terms) {
+        [
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1),
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1),
+        ]
+      }
+
+      it 'has no concurrent sentences of 12 months or under' do
+        expect(subject).not_to have_concurrent_sentence_of_12_months_or_under
+      end
+    end
+
+    context 'when there are multiple sentences for different cases but none are under 12 months long' do
+      let(:offender_sentence_terms) {
+        [
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 13),
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 2, 'months' => 13),
+        ]
+      }
+
+      it 'has no concurrent sentences of 12 months or under' do
+        expect(subject).not_to have_concurrent_sentence_of_12_months_or_under
+      end
+    end
+
+    context 'when there are multiple sentences for different cases' do
+      {
+        '12 months using months field' => [
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 12),
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 2),
+        ],
+        'over 12 months using year field'  => [
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 2, 'years' => 1),
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 2),
+        ]
+      }.each do |reason, terms|
+        context "when one of the sentences is #{reason}" do
+          it 'has no concurrent sentences of 12 months or under' do
+            expect(described_class.new(terms)).to have_concurrent_sentence_of_12_months_or_under
+          end
+        end
       end
     end
   end
