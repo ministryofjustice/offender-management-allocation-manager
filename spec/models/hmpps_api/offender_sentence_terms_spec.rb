@@ -215,4 +215,42 @@ describe HmppsApi::OffenderSentenceTerms do
       end
     end
   end
+
+  describe '#has_single_sentence?' do
+    subject { described_class.new(offender_sentence_terms) }
+
+    context 'when there is only one sentence term' do
+      let(:offender_sentence_terms) { [HmppsApi::OffenderSentenceTerm.new('caseId' => 1)] }
+
+      it 'has a single sentence' do
+        expect(subject).to have_single_sentence
+      end
+    end
+
+    context 'when there are multiple sentence terms in the same case' do
+      let(:offender_sentence_terms) do
+        [
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1),
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1)
+        ]
+      end
+
+      it 'has a single sentence' do
+        expect(subject).to have_single_sentence
+      end
+    end
+
+    context 'when there are multiple sentence terms in the difference cases' do
+      let(:offender_sentence_terms) do
+        [
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 1),
+          HmppsApi::OffenderSentenceTerm.new('caseId' => 2)
+        ]
+      end
+
+      it 'does not have a single sentence' do
+        expect(subject).not_to have_single_sentence
+      end
+    end
+  end
 end

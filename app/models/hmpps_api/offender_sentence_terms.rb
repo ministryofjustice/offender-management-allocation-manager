@@ -11,6 +11,10 @@ module HmppsApi
 
     delegate :count, :[], to: :@offender_sentence_terms
 
+    def has_single_sentence?
+      !sentences.multiple?
+    end
+
     def has_additional_isp?
       isp_sentences.multiple? && isp_sentences.earliest_start_dates.sort.then { |dates| dates.last > dates.first }
     end
