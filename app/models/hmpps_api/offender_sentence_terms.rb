@@ -5,37 +5,46 @@ module HmppsApi
     end
 
     def initialize(offender_sentence_terms = [])
-      @offender_sentence_terms = offender_sentence_terms
+      @sentences = Sentences.new(offender_sentence_terms)
+      @isp_sentences = Sentences.new(offender_sentence_terms.select(&:indeterminate?))
     end
 
     delegate :count, :[], to: :@offender_sentence_terms
 
     def has_additional_isp?
-      @offender_sentence_terms.select(&:indeterminate?)
-        .group_by(&:case_id).values
-        .map  { |terms| terms.first.sentence_start_date }.sort
-        .then { |dates| dates.count > 1 && dates.last > dates.first }
+      isp_sentences.multiple? && isp_sentences.earliest_start_dates.sort.then { |dates| dates.last > dates.first }
     end
 
     def has_concurrent_sentence_of_12_months_or_under?
-      unique_term_durations.count > 1 && unique_term_durations.any? { |duration| duration < 12.months }
+      sentences.multiple? && sentences.any_with_term? { |term| term.duration < 12.months }
     end
 
     def has_concurrent_sentence_of_20_months_or_over?
-      unique_term_durations.count > 1 && unique_term_durations.any? { |duration| duration >= 20.months }
+      sentences.multiple? && sentences.any_with_term? { |term| term.duration >= 20.months }
     end
 
-    private
+  private
 
-    def unique_term_durations
-      @offender_sentence_terms.group_by(&:case_id)
-        .values.map {|terms| TermsDuration.new(terms) }
-    end
+    attr_reader :sentences, :isp_sentences
 
-    class TermsDuration
-      def initialize(terms) = @terms = terms
-      def <(duration) = @terms.any? { |term| term.duration < duration }
-      def >=(duration) = @terms.any? { |term| term.duration >= duration }
+    class Sentences
+      def initialize(offender_sentence_terms = [])
+        @sentence_terms = offender_sentence_terms.group_by(&:case_id)
+      end
+
+      def multiple?
+        @sentence_terms.count > 1
+      end
+
+      def earliest_start_dates
+        @sentence_terms.values.map { |terms| terms.map(&:sentence_start_date).min }
+      end
+
+      def any_with_term?(&block)
+        @sentence_terms.values.any? do |terms_for_case|
+          terms_for_case.any?(&block)
+        end
+      end
     end
   end
 end

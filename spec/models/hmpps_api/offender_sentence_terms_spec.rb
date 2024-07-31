@@ -98,12 +98,12 @@ describe HmppsApi::OffenderSentenceTerms do
     end
 
     context 'when there are multiple sentences for the same case' do
-      let(:offender_sentence_terms) {
+      let(:offender_sentence_terms) do
         [
           HmppsApi::OffenderSentenceTerm.new('caseId' => 1),
           HmppsApi::OffenderSentenceTerm.new('caseId' => 1),
         ]
-      }
+      end
 
       it 'has no concurrent sentences of 12 months or under' do
         expect(subject).not_to have_concurrent_sentence_of_12_months_or_under
@@ -111,12 +111,12 @@ describe HmppsApi::OffenderSentenceTerms do
     end
 
     context 'when there are multiple sentences for different cases but none are under 12 months long' do
-      let(:offender_sentence_terms) {
+      let(:offender_sentence_terms) do
         [
           HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 13),
           HmppsApi::OffenderSentenceTerm.new('caseId' => 2, 'months' => 13),
         ]
-      }
+      end
 
       it 'has no concurrent sentences of 12 months or under' do
         expect(subject).not_to have_concurrent_sentence_of_12_months_or_under
@@ -129,7 +129,7 @@ describe HmppsApi::OffenderSentenceTerms do
           HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 12),
           HmppsApi::OffenderSentenceTerm.new('caseId' => 2),
         ],
-        'over 12 months using year field'  => [
+        'over 12 months using year field' => [
           HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 2, 'years' => 1),
           HmppsApi::OffenderSentenceTerm.new('caseId' => 2),
         ]
@@ -163,12 +163,12 @@ describe HmppsApi::OffenderSentenceTerms do
     end
 
     context 'when there are multiple sentences for the same case' do
-      let(:offender_sentence_terms) {
+      let(:offender_sentence_terms) do
         [
           HmppsApi::OffenderSentenceTerm.new('caseId' => 1),
           HmppsApi::OffenderSentenceTerm.new('caseId' => 1),
         ]
-      }
+      end
 
       it 'has no concurrent sentences of 20 months or over' do
         expect(subject).not_to have_concurrent_sentence_of_20_months_or_over
@@ -176,12 +176,12 @@ describe HmppsApi::OffenderSentenceTerms do
     end
 
     context 'when there are multiple sentences for different cases but none are under 12 months long' do
-      let(:offender_sentence_terms) {
+      let(:offender_sentence_terms) do
         [
           HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 19),
           HmppsApi::OffenderSentenceTerm.new('caseId' => 2, 'months' => 13),
         ]
-      }
+      end
 
       it 'has no concurrent sentences of 20 months or over' do
         expect(subject).not_to have_concurrent_sentence_of_20_months_or_over
@@ -202,7 +202,7 @@ describe HmppsApi::OffenderSentenceTerms do
           HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 20, 'days' => 1),
           HmppsApi::OffenderSentenceTerm.new('caseId' => 2),
         ],
-        '20 months using months and year field'  => [
+        '20 months using months and year field' => [
           HmppsApi::OffenderSentenceTerm.new('caseId' => 1, 'months' => 8, 'years' => 1),
           HmppsApi::OffenderSentenceTerm.new('caseId' => 2),
         ]
