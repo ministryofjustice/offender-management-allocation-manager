@@ -98,9 +98,7 @@ module OffenderManagementAllocationClient
       Date,
     ]
 
-    config.action_dispatch.default_headers = {
-      'X-Robots-Tag' => 'noindex, nofollow'
-    }
+    config.action_dispatch.default_headers['X-Robots-Tag'] = 'noindex, nofollow'
 
     config.domain_event_handlers = {
       # event_type               => handler class (as a string)
