@@ -156,3 +156,5 @@ generic-service:
       REDIS_URL: url
     hmpps-domain-events-topic:
       DOMAIN_EVENTS_TOPIC_ARN: topic_arn
+    offender-management-allocation-manager:
+      APPINSIGHTS_INSTRUMENTATIONKEY: APPINSIGHTS_INSTRUMENTATIONKEY
