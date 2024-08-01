@@ -59,6 +59,9 @@ gem 'matrix' # App does not use it directly but it has to be explicitly declared
 gem 'shoryuken', '~> 6.0'
 gem 'aws-sdk-sqs', '~> 1.55'
 
+# Microsoft Application Insights
+gem 'application_insights'
+
 # these default gems will be removed in ruby 3.4
 gem 'drb'
 gem 'mutex_m'
