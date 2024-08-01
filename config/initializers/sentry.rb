@@ -5,6 +5,7 @@ if sentry_dsn
 
   Sentry.init do |config|
     config.dsn = sentry_dsn
+    config.release = ENV['BUILD_NUMBER']
     config.excluded_exceptions << 'JWT::ExpiredSignature'
 
     config.before_send = lambda do |event, _hint|
