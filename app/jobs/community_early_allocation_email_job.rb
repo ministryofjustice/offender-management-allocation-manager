@@ -3,6 +3,8 @@
 class CommunityEarlyAllocationEmailJob < ApplicationJob
   queue_as :mailers
 
+  self.log_arguments = false
+
   def perform(prison, offender_no, encoded_pdf)
     offender = OffenderService.get_offender(offender_no)
     allocation = AllocationHistory.find_by!(nomis_offender_id: offender_no)

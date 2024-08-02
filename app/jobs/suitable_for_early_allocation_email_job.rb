@@ -3,6 +3,8 @@
 class SuitableForEarlyAllocationEmailJob < ApplicationJob
   queue_as :mailers
 
+  self.log_arguments = false
+
   EQUIP_URL = 'https://equip-portal.rocstac.com/CtrlWebIsapi.dll/?__id=webDiagram.show&map=0%3A9A63E167DE4B400EA07F81A9271E1944&dgm=4F984B45CBC447B1A304B2FFECABB777'
 
   def perform(offender_no)

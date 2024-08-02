@@ -1,8 +1,6 @@
 require "rails_helper"
 
 describe HandoverFollowUpJob, vcr: { cassette_name: "prison_api/handover_follow_up_email" } do
-  before { allow(CommunityMailer).to receive(:with).and_return(double("CommunityMailer", urgent_pipeline_to_community: nil)) }
-
   around do |example|
     cassettes = [
       { name: 'prison_api/offender_api' },
@@ -14,15 +12,23 @@ describe HandoverFollowUpJob, vcr: { cassette_name: "prison_api/handover_follow_
     end
   end
 
+  let(:local_delivery_unit) { FactoryBot.create(:local_delivery_unit, email_address: "ldu@email.com") }
+  let(:mailer_double) { double("CommunityMailer", deliver_now: true) }
+
+  before do
+    allow(CommunityMailer).to receive(:with).and_return(
+      double("CommunityMailer", urgent_pipeline_to_community: mailer_double)
+    )
+  end
+
   def expect_to_have_sent_email_to(offender)
     expect(CommunityMailer).to have_received(:with).with(include(nomis_offender_id: offender.nomis_offender_id, ldu_email: "ldu@email.com"))
+    expect(mailer_double).to have_received(:deliver_now)
   end
 
   def expect_not_to_have_sent_email_to(offender)
     expect(CommunityMailer).not_to have_received(:with).with(include(nomis_offender_id: offender.nomis_offender_id))
   end
-
-  let(:local_delivery_unit) { FactoryBot.create(:local_delivery_unit, email_address: "ldu@email.com") }
 
   context "when the offender is at an active prison and handover date was a week ago" do
     it "sends the follow up email to that offender" do
