@@ -58,6 +58,12 @@ class ParoleReview < ApplicationRecord
     hearing_outcome.blank? || hearing_outcome.in?(['Not Applicable', 'Not Specified'])
   end
 
+  def has_hearing_outcome? = !no_hearing_outcome?
+
+  def cancelled?
+    review_status.starts_with?('Cancelled')
+  end
+
   def outcome_is_release?
     hearing_outcome == 'Release [*]'
   end

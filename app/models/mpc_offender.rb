@@ -191,6 +191,10 @@ class MpcOffender
     end
   end
 
+  def no_parole_outcome?
+    most_recent_completed_parole_review&.no_hearing_outcome?
+  end
+
   def parole_outcome_not_release?
     most_recent_completed_parole_review&.outcome_is_not_release?
   end

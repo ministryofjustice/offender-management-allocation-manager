@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe OffenderHandover do
+describe OffenderHandoverWithStandardRecalls do
   describe '#as_calculated_handover_date' do
     subject(:responsibility) { described_class.new(offender).as_calculated_handover_date }
 
@@ -21,6 +21,8 @@ describe OffenderHandover do
     let(:sentence_start_date) { double }
     let(:category_active_since) { double }
     let(:prison_arrival_date) { double }
+    let(:offender_sentence_terms) { HmppsApi::OffenderSentenceTerms.new }
+    let(:most_recent_parole_review) { nil }
 
     let(:offender) do
       double(:offender,
@@ -40,7 +42,9 @@ describe OffenderHandover do
              in_womens_prison?: in_womens_prison,
              sentence_start_date: sentence_start_date,
              category_active_since: category_active_since,
-             prison_arrival_date: prison_arrival_date
+             prison_arrival_date: prison_arrival_date,
+             offender_sentence_terms: offender_sentence_terms,
+             most_recent_parole_review: most_recent_parole_review
             )
     end
 
@@ -49,7 +53,7 @@ describe OffenderHandover do
     context 'when offender is an ISP' do
       let(:indeterminate_sentence) { true }
 
-      context 'when Parole outcome is not release, THD is 12 months from now' do
+      context 'and Parole outcome is not release, THD is 12 months from now' do
         let(:parole_outcome_not_release) { true }
         let(:thd_12_or_more_months_from_now) { true }
 
@@ -90,9 +94,82 @@ describe OffenderHandover do
     context 'when offender is recalled' do
       let(:recalled) { true }
 
-      it 'is COM responsible as recall_case' do
-        expect(subject).to be_com_responsible
-        expect(subject.reason).to eq('recall_case')
+      context 'when most recent parole review has an outcome' do
+        let(:most_recent_parole_review) { double(has_hearing_outcome?: true) }
+
+        context 'with no other concurrent sentence' do
+          let(:offender_sentence_terms) do
+            double(
+              has_single_sentence?: true,
+              has_concurrent_sentence_of_12_months_or_under?: false
+            )
+          end
+
+          it 'is COM responsible as recall_release_soon' do
+            expect(subject).to be_com_responsible
+            expect(subject.reason).to eq('recall_release_soon')
+          end
+        end
+
+        context 'with a concurrent sentence of under 12 months' do
+          let(:offender_sentence_terms) do
+            double(
+              has_single_sentence?: false,
+              has_concurrent_sentence_of_12_months_or_under?: true
+            )
+          end
+
+          it 'is COM responsible as recall_release_soon' do
+            expect(subject).to be_com_responsible
+            expect(subject.reason).to eq('recall_release_soon')
+          end
+        end
+      end
+
+      context 'when offender has a concurrent sentence of 20 months or over' do
+        let(:offender_sentence_terms) do
+          double(
+            has_single_sentence?: false,
+            has_concurrent_sentence_of_12_months_or_under?: false,
+            has_concurrent_sentence_of_20_months_or_over?: true
+          )
+        end
+
+        context 'when most recent parole review is cancelled' do
+          let(:most_recent_parole_review) { double(has_hearing_outcome?: true, cancelled?: true) }
+
+          context 'and mappa level is 2 or 3' do
+            [2, 3].each do |mappa|
+              let(:mappa_level) { mappa }
+
+              it 'is COM responsible as recall_release_later_mappa_2_3' do
+                expect(subject).to be_com_responsible
+                expect(subject.reason).to eq('recall_release_later_mappa_2_3')
+              end
+            end
+          end
+
+          context 'and mappa level is empty or 1' do
+            [nil, 1].each do |mappa|
+              let(:mappa_level) { mappa }
+
+              it 'is POM responsible as recall_release_later_mappa_empty_1' do
+                expect(subject).to be_pom_responsible
+                expect(subject).to be_com_supporting # TODO: query this...
+                expect(subject.reason).to eq('recall_release_later_mappa_empty_1')
+              end
+            end
+          end
+        end
+
+        context 'when most recent parole review exists at all' do
+          let(:most_recent_parole_review) { double(has_hearing_outcome?: false, cancelled?: false) }
+
+          it 'is COM responsible as recall_release_later_no_outcome' do
+            expect(subject).to be_com_responsible
+            expect(subject.reason).to eq('recall_release_later_no_outcome')
+          end
+        end
       end
     end
 
