@@ -69,8 +69,6 @@ Rails.application.configure do
 
   config.active_record.dump_schema_after_migration = false
 
-  config.notify_api_key = ENV['LIVE_NOTIFY_API_KEY']
-
   # Use a different logger for distributed setups.
   # require 'syslog/logger'
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
