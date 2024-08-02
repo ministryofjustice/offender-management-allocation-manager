@@ -113,6 +113,7 @@ jobs:
 
   test:
     <<: *test_container_config
+    circleci_ip_ranges: true
     steps:
       - checkout
       - attach_workspace:
