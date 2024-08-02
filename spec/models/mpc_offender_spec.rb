@@ -574,62 +574,6 @@ RSpec.describe MpcOffender, type: :model do
     end
   end
 
-  describe '#sentenced_to_an_additional_isp?' do
-    before { allow(OffenderService).to receive(:get_offender_sentences_and_offences).with(12_345_678).and_return(offender_sentence_terms) }
-
-    context "when the offender has multiple indeterminate sentence terms" do
-      context "and those ISP terms are over different cases" do
-        context "and one term appears after the other" do
-          let(:offender_sentence_terms) do
-            sentence_start_date = 2.years.ago
-            [
-              double(indeterminate?: true, case_id: 1, sentence_start_date:),
-              double(indeterminate?: true, case_id: 1, sentence_start_date:),
-              double(indeterminate?: true, case_id: 2, sentence_start_date:), # same as case 1
-              double(indeterminate?: true, case_id: 3, sentence_start_date: sentence_start_date + 1.day), # greater than case 2
-            ]
-          end
-
-          it 'is sentenced to an additional isp' do
-            expect(subject).to be_sentenced_to_an_additional_isp
-          end
-        end
-
-        context "and all term dates are the same" do
-          let(:offender_sentence_terms) do
-            sentence_start_date = 1.year.ago
-            [
-              double(indeterminate?: true, case_id: 1, sentence_start_date:),
-              double(indeterminate?: true, case_id: 1, sentence_start_date:),
-              double(indeterminate?: true, case_id: 2, sentence_start_date:),
-              double(indeterminate?: true, case_id: 3, sentence_start_date:)
-            ]
-          end
-
-          it 'is not sentenced to an additional isp' do
-            expect(subject).not_to be_sentenced_to_an_additional_isp
-          end
-        end
-      end
-
-      context "and those IPS terms are all the same case" do
-        let(:offender_sentence_terms) { [double(indeterminate?: true, case_id: 1, sentence_start_date: nil), double(indeterminate?: true, case_id: 1, sentence_start_date: nil)] }
-
-        it 'is not sentenced to an additional isp' do
-          expect(subject).not_to be_sentenced_to_an_additional_isp
-        end
-      end
-    end
-
-    context "when the offender does not have multiple indeterminate sentence terms" do
-      let(:offender_sentence_terms) { [double(indeterminate?: true, case_id: 1, sentence_start_date: nil)] }
-
-      it 'is not sentenced to an additional isp' do
-        expect(subject).not_to be_sentenced_to_an_additional_isp
-      end
-    end
-  end
-
   {
     pom_responsible: [
       Responsibility.new(value: Responsibility::PRISON),

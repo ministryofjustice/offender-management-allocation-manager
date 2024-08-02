@@ -29,8 +29,11 @@ class OffenderService
     end
 
     def get_offender_sentences_and_offences(booking_id)
-      HmppsApi::PrisonApi::OffenderApi.get_offender_sentences_and_offences(booking_id)
-        .map { |payload| HmppsApi::OffenderSentenceTerm.new(payload) }
+      HmppsApi::OffenderSentenceTerms.from_payload(
+        HmppsApi::PrisonApi::OffenderApi.get_offender_sentences_and_offences(
+          booking_id
+        )
+      )
     end
 
     def get_offenders_in_prison(prison, ignore_legal_status: false)

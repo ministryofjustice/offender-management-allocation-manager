@@ -2,7 +2,7 @@ require "rails_helper"
 
 describe "Responsibility and Handover",  handover_calculations: true do
   let(:responsibility) { HandoverDateService.handover(mpc_offender) }
-  let(:isps) { [] }
+  let(:isps) { HmppsApi::OffenderSentenceTerms.new([]) }
 
   before do
     stub_const('USE_PPUD_PAROLE_DATA', true)
@@ -207,7 +207,7 @@ describe "Responsibility and Handover",  handover_calculations: true do
     end
 
     context "with an additional ISP" do
-      let(:isps) { [double(indeterminate?: true, case_id: 1, sentence_start_date: 2.years.ago), double(indeterminate?: true, case_id: 2, sentence_start_date: 1.year.ago)] }
+      let(:isps) { HmppsApi::OffenderSentenceTerms.new([double(indeterminate?: true, case_id: 1, sentence_start_date: 2.years.ago), double(indeterminate?: true, case_id: 2, sentence_start_date: 1.year.ago)]) }
       let(:mpc_offender) { build(:mpc_offender, :with_persona, isp: true, recall: true, ted: Date.parse("20th January 2025")) }
 
       it "is POM only responsible" do

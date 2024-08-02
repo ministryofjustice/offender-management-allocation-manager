@@ -191,6 +191,10 @@ class MpcOffender
     end
   end
 
+  def no_parole_outcome?
+    most_recent_completed_parole_review&.no_hearing_outcome?
+  end
+
   def parole_outcome_not_release?
     most_recent_completed_parole_review&.outcome_is_not_release?
   end
@@ -208,7 +212,11 @@ class MpcOffender
   end
 
   def sentenced_to_an_additional_isp?
-    @sentenced_to_an_additional_isp ||= Offenders::AdditionalIsps.new(booking_id).any?
+    @sentenced_to_an_additional_isp ||= offender_sentence_terms.has_additional_isp?
+  end
+
+  def offender_sentence_terms
+    @offender_sentence_terms ||= OffenderService.get_offender_sentences_and_offences(booking_id)
   end
 
   def pom_tasks

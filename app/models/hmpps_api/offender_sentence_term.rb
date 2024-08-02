@@ -7,6 +7,8 @@ module HmppsApi
                 :sentence_type_description,
                 :start_date,
                 :days,
+                :months,
+                :years,
                 :life_sentence,
                 :case_id,
                 :sentence_term_code,
@@ -31,5 +33,7 @@ module HmppsApi
     end
 
     def indeterminate? = life_sentence || sentence_type.indeterminate?
+
+    def duration = (years || 0).years + (months || 0).months + (days || 0).days
   end
 end
