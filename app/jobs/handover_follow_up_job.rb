@@ -1,8 +1,6 @@
 class HandoverFollowUpJob < ApplicationJob
   queue_as :mailers
 
-  self.log_arguments = false
-
   def perform(ldu)
     offenders_due_handover_follow_up = OffenderService
       .get_offenders(ldu.case_information.without_com.pluck(:nomis_offender_id))

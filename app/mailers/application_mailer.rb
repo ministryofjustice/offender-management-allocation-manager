@@ -1,4 +1,8 @@
 class ApplicationMailer < GovukNotifyRails::Mailer
+  # Disable logging of arguments when sending emails
+  # as they usually contain PII details
+  delivery_job.log_arguments = false
+
   before_action :store_default_tags
 
   class << self
