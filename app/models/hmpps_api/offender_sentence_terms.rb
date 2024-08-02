@@ -9,8 +9,6 @@ module HmppsApi
       @isp_sentences = Sentences.new(offender_sentence_terms.select(&:indeterminate?))
     end
 
-    delegate :count, :[], to: :@offender_sentence_terms
-
     def has_single_sentence?
       !sentences.multiple?
     end

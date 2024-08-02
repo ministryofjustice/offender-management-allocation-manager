@@ -212,7 +212,7 @@ class MpcOffender
   end
 
   def sentenced_to_an_additional_isp?
-    @sentenced_to_an_additional_isp ||= offender_sentence_terms.additional_isp?
+    @sentenced_to_an_additional_isp ||= offender_sentence_terms.has_additional_isp?
   end
 
   def offender_sentence_terms

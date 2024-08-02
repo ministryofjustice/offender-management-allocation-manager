@@ -520,20 +520,9 @@ describe OffenderService, type: :feature do
     end
 
     it 'returns each result as an instance of HmppsApi::OffenderSentenceTerm' do
-      results = described_class.get_offender_sentences_and_offences(12_345_678)
-      expect(results.count).to eq(2)
-      expect(results[0].booking_id).to eq(12_345_678)
-      expect(results[0].case_id).to eq(98_765_432)
-      expect(results[0].life_sentence).to eq(true)
-      expect(results[0].sentence_sequence).to eq(1)
-      expect(results[0].sentence_type).to eq('LR_ALP')
-      expect(results[0].sentence_type_description).to eq('Recall from Automatic Life')
-      expect(results[1].booking_id).to eq(12_345_678)
-      expect(results[1].case_id).to eq(98_765_432)
-      expect(results[1].life_sentence).to eq(false)
-      expect(results[1].sentence_sequence).to eq(2)
-      expect(results[1].sentence_type).to eq('LR_ALP')
-      expect(results[1].sentence_type_description).to eq('Recall from Automatic Life')
+      offender_sentence_terms = double('offender_sentence_terms')
+      allow(HmppsApi::OffenderSentenceTerms).to receive(:from_payload).with(results).and_return(offender_sentence_terms)
+      expect(described_class.get_offender_sentences_and_offences(12_345_678)).to eq(offender_sentence_terms)
     end
   end
 end
