@@ -3,6 +3,8 @@
 class RecalculateHandoverDateJob < ApplicationJob
   queue_as :default
 
+  self.log_arguments = false
+
   def perform(nomis_offender_id)
     offender = OffenderService.get_offender(nomis_offender_id)
     if offender&.inside_omic_policy?
