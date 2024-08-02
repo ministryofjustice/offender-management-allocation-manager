@@ -18,8 +18,12 @@ class AuditEventsMailObserver
 
   class AuditDetails < SimpleDelegator
     def personalisation = govuk_notify_personalisation
-    def tags = String(govuk_notify_reference).split('.')
     def template = govuk_notify_template
+
+    def tags
+      tags = String(govuk_notify_reference).split('.')
+      tags << "perform_deliveries_#{perform_deliveries}"
+    end
 
     def nomis_offender_id
       [:prisoner_number, :noms_no, :nomis_offender_id]

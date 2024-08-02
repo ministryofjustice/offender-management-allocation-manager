@@ -43,10 +43,22 @@ RSpec.describe 'Audit events' do
   end
 
   describe 'when delivering email' do
-    it 'contain the govuk notify details for each emails' do
-      TestOnlyMailer.with(to: 'test@example.org', template: 'test-template-x', personalisation: { 'test' => 'value' })
-                    .test_mail.deliver_now
-      expect(AuditEvent.first.data['govuk_notify_message']).to eq({
+    let(:test_email) do
+      TestOnlyMailer.with(
+        to: 'test@example.org', template: 'test-template-x', personalisation: { 'test' => 'value' }
+      ).test_mail
+    end
+
+    let(:audit_event) { AuditEvent.first }
+
+    before do
+      test_email.deliver_now
+    end
+
+    it 'is tagged and contains the govuk notify details' do
+      expect(audit_event.tags).to eq(%w[email test_only test_mail perform_deliveries_false])
+
+      expect(audit_event.data['govuk_notify_message']).to eq({
         'to' => ['test@example.org'],
         'template' => 'test-template-x',
         'personalisation' => { 'test' => 'value' }
