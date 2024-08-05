@@ -30,6 +30,12 @@ private
     pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
 
     { pom_name: pom.full_name, pom_email: pom.email_address || 'unknown' }
+  rescue StandardError => e
+    # `get_single_pom` can raise an exception if the `primary_pom_nomis_id`
+    # is not found in the list of all poms for this prison
+    Rails.logger.error(e.message)
+
+    { pom_name: 'unknown', pom_email: 'unknown' }
   end
 
   def no_active_pom_details
