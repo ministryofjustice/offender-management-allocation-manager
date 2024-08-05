@@ -59,6 +59,19 @@ describe HandoverFollowUpJob::FollowUpEmailDetails, vcr: { cassette_name: "priso
       end
     end
 
+    context "when the offender has a POM allocated but is not included in the list of POMs for that prison" do
+      before { FactoryBot.create(:allocation_history, nomis_offender_id: offender.offender_no, prison: prison.code, primary_pom_nomis_id: "9999") }
+
+      it "includes fallback POM details in the email" do
+        details = described_class.for(offender:)
+
+        expect(details).to include(
+          pom_email: "unknown",
+          pom_name: "unknown",
+        )
+      end
+    end
+
     context "when the offender has no POM allocated" do
       it "does not include the POM details in the email" do
         details = described_class.for(offender:)

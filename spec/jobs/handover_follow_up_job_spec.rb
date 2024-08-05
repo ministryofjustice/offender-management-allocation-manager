@@ -13,7 +13,7 @@ describe HandoverFollowUpJob, vcr: { cassette_name: "prison_api/handover_follow_
   end
 
   let(:local_delivery_unit) { FactoryBot.create(:local_delivery_unit, email_address: "ldu@email.com") }
-  let(:mailer_double) { double("CommunityMailer", deliver_now: true) }
+  let(:mailer_double) { double("CommunityMailer", deliver_later: true) }
 
   before do
     allow(CommunityMailer).to receive(:with).and_return(
@@ -23,7 +23,7 @@ describe HandoverFollowUpJob, vcr: { cassette_name: "prison_api/handover_follow_
 
   def expect_to_have_sent_email_to(offender)
     expect(CommunityMailer).to have_received(:with).with(include(nomis_offender_id: offender.nomis_offender_id, ldu_email: "ldu@email.com"))
-    expect(mailer_double).to have_received(:deliver_now)
+    expect(mailer_double).to have_received(:deliver_later)
   end
 
   def expect_not_to_have_sent_email_to(offender)
