@@ -19,7 +19,10 @@
     <% end %>
   </head>
 
-  <body class="govuk-template__body js-enabled">
+  <body class="govuk-template__body">
+    <%= javascript_tag nonce: true do %>
+      document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');
+    <% end %>
     <%= render 'layouts/gtm/body' %>
     <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link" style="outline: none">
       <%= I18n.t('views.navigation.skip_to_main_content') %>
@@ -37,6 +40,9 @@
     </div>
 
     <%= render '/layouts/footer' %>
-    <script>window.GOVUKFrontend.initAll()</script>
+    <%= javascript_tag nonce: true, type: 'module' do %>
+      window.GOVUKFrontend.initAll()
+      window.initHeader() // DPS common header
+    <% end %>
   </body>
 </html>

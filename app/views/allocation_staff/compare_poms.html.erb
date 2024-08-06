@@ -81,7 +81,7 @@
   <%= render layout: 'grid_compare_row', locals: {poms: @poms, current_pom_id: @current_pom_id} do |pom| %>
     <% if @coworking %>
       <% if @current_pom_id == pom.staff_id %>
-        <button disabled="disabled" aria-disabled="true" class="govuk-button govuk-button--disabled" data-module="govuk-button">
+        <button disabled="disabled" aria-disabled="true" class="govuk-button" data-module="govuk-button">
           Allocate co-working POM
         </button>
       <% else %>
