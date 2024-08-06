@@ -35,7 +35,7 @@ gem 'sentry-ruby'
 gem 'sentry-rails'
 gem 'sentry-sidekiq'
 gem 'turbolinks', '~> 5'
-gem 'uglifier', '>= 1.3.0'
+gem 'terser' # javascript compressor
 gem 'typhoeus'
 gem 'redis', '~> 4.6.0'
 gem 'fast_underscore', require: false
