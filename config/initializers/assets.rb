@@ -8,8 +8,9 @@ Rails.application.config.assets.version = '1.1'
 # Add Yarn node_modules folder to the asset load path.
 Rails.application.config.assets.paths << Rails.root.join('node_modules')
 Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-frontend')
-Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-frontend/govuk/assets/images')
-Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-frontend/govuk/assets/fonts/')
+Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-frontend/dist')
+Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-frontend/dist/govuk/assets/images')
+Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-frontend/dist/govuk/assets/fonts/')
 
 Rails.application.config.assets.paths << Rails.root.join('node_modules/@ministryofjustice/frontend')
 Rails.application.config.assets.paths << Rails.root.join('node_modules/@ministryofjustice/frontend/moj/assets/images')
