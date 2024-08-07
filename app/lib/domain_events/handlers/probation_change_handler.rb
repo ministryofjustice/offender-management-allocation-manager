@@ -5,7 +5,7 @@ module DomainEvents
         case event.event_type
         when /probation-case\.registration\..+/
           handle_registration_change(event, logger)
-        when 'OFFENDER_MANAGER_CHANGED'
+        when 'OFFENDER_MANAGER_CHANGED', 'OFFENDER_OFFICER_CHANGED', 'OFFENDER_DETAILS_CHANGED'
           call_delius_data_job(event, logger)
         end
       end
@@ -25,7 +25,7 @@ module DomainEvents
 
       def call_delius_data_job(event, logger)
         logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
-        ProcessDeliusDataJob.perform_now(event.crn_number, identifier_type: :crn, trigger_method: :event)
+        ProcessDeliusDataJob.perform_now(event.crn_number, identifier_type: :crn, trigger_method: :event, event_type: event.event_type)
         logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
       end
     end

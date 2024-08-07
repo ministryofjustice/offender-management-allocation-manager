@@ -33,7 +33,9 @@ RSpec.describe DomainEvents::Handlers::ProbationChangeHandler do
 
       it 'updates case information' do
         handler.handle(event)
-        expect(ProcessDeliusDataJob).to have_received(:perform_now).with(crn, identifier_type: :crn, trigger_method: :event)
+        expect(ProcessDeliusDataJob).to have_received(:perform_now).with(
+          crn, identifier_type: :crn, trigger_method: :event, event_type:
+        )
       end
     end
 
@@ -58,7 +60,33 @@ RSpec.describe DomainEvents::Handlers::ProbationChangeHandler do
 
     it 'updates case information' do
       handler.handle(event)
-      expect(ProcessDeliusDataJob).to have_received(:perform_now).with(crn, identifier_type: :crn, trigger_method: :event)
+      expect(ProcessDeliusDataJob).to have_received(:perform_now).with(
+        crn, identifier_type: :crn, trigger_method: :event, event_type:
+      )
+    end
+  end
+
+  context 'with event type OFFENDER_OFFICER_CHANGED' do
+    let(:event_type) { 'OFFENDER_OFFICER_CHANGED' }
+    let(:additional_information) { {} }
+
+    it 'updates case information' do
+      handler.handle(event)
+      expect(ProcessDeliusDataJob).to have_received(:perform_now).with(
+        crn, identifier_type: :crn, trigger_method: :event, event_type:
+      )
+    end
+  end
+
+  context 'with event type OFFENDER_DETAILS_CHANGED' do
+    let(:event_type) { 'OFFENDER_DETAILS_CHANGED' }
+    let(:additional_information) { {} }
+
+    it 'updates case information' do
+      handler.handle(event)
+      expect(ProcessDeliusDataJob).to have_received(:perform_now).with(
+        crn, identifier_type: :crn, trigger_method: :event, event_type:
+      )
     end
   end
 end

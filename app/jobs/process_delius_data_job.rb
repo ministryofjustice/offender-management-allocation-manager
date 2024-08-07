@@ -13,17 +13,17 @@ class ProcessDeliusDataJob < ApplicationJob
 
   # identifier_type can be :nomis_offender_id (default), or :crn
   # trigger_method can be :batch (default), or :event
-  def perform(identifier, identifier_type: :nomis_offender_id, trigger_method: :batch)
+  def perform(identifier, identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil)
     ApplicationRecord.transaction do
       logger.info("#{identifier_type}=#{identifier},trigger_method=#{trigger_method},job=process_delius_data_job,event=started")
-      import_data(identifier, identifier_type, trigger_method)
+      import_data(identifier, identifier_type, trigger_method, event_type)
       logger.info("#{identifier_type}=#{identifier},trigger_method=#{trigger_method},job=process_delius_data_job,event=finished")
     end
   end
 
 private
 
-  def import_data(identifier, identifier_type, trigger_method)
+  def import_data(identifier, identifier_type, trigger_method, event_type)
     probation_record = OffenderService.get_probation_record(identifier)
 
     if probation_record.nil?
@@ -61,10 +61,10 @@ private
       return
     end
 
-    process_record(probation_record, nomis_offender_id, trigger_method) if offender.inside_omic_policy?
+    process_record(probation_record, nomis_offender_id, trigger_method, event_type) if offender.inside_omic_policy?
   end
 
-  def process_record(probation_record, nomis_offender_id, trigger_method)
+  def process_record(probation_record, nomis_offender_id, trigger_method, event_type)
     DeliusImportError.where(nomis_offender_id: nomis_offender_id).destroy_all
 
     prisoner = Offender.find_by!(nomis_offender_id: nomis_offender_id)
@@ -81,6 +81,7 @@ private
 
         tags = %w[job process_delius_data_job case_information changed]
         tags << trigger_method.to_s
+        tags << event_type.downcase if event_type.present?
 
         AuditEvent.publish(
           nomis_offender_id: nomis_offender_id,
