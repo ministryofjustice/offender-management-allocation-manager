@@ -21,11 +21,11 @@ feature 'Navigation' do
       end
 
       it 'has a help tile' do
-        expect(page).to have_css('h1.card__heading a', text: 'Get help with this service')
+        expect(page).to have_css('h3.card__heading a', text: 'Get help with this service')
       end
 
       it 'has a parole tile' do
-        expect(page).to have_css('h1.card__heading a', text: 'Parole cases')
+        expect(page).to have_css('h3.card__heading a', text: 'Parole cases')
       end
     end
 
@@ -40,11 +40,11 @@ feature 'Navigation' do
       end
 
       it 'has a help tile' do
-        expect(page).to have_css('h1.card__heading a', text: 'Get help with this service')
+        expect(page).to have_css('h3.card__heading a', text: 'Get help with this service')
       end
 
       it 'has a parole tile' do
-        expect(page).to have_css('h1.card__heading a', text: 'Parole cases')
+        expect(page).to have_css('h3.card__heading a', text: 'Parole cases')
       end
     end
 
