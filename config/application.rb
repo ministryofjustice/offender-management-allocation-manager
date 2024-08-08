@@ -110,6 +110,8 @@ module OffenderManagementAllocationClient
       'probation-case.registration.updated' => 'DomainEvents::Handlers::ProbationChangeHandler',
       'tier.calculation.complete' => 'DomainEvents::Handlers::TierChangeHandler',
       'OFFENDER_MANAGER_CHANGED' => 'DomainEvents::Handlers::ProbationChangeHandler',
+      'OFFENDER_OFFICER_CHANGED' => 'DomainEvents::Handlers::ProbationChangeHandler',
+      'OFFENDER_DETAILS_CHANGED' => 'DomainEvents::Handlers::ProbationChangeHandler',
     }
   end
 end
