@@ -81,7 +81,7 @@ feature "staff pages" do
     end
 
     it "has a heading" do
-      expect(page).to have_css('h1', text: 'Overview')
+      expect(page).to have_css('h2', text: 'Overview')
     end
 
     it "has 4 sub-navigation tab links" do
