@@ -39,14 +39,10 @@ module OffenderManagementAllocationClient
         'http://localhost:3000'
       )
     Rails.application.routes.default_url_options[:host] =
-      if ENV['HEROKU_APP_NAME'].present?
-        "#{ENV.fetch('HEROKU_APP_NAME')}.herokuapp.com"
-      else
-        ENV.fetch(
-          'ALLOCATION_MANAGER_HOST',
-          'http://localhost:3000'
-        )
-      end
+      ENV.fetch(
+        'ALLOCATION_MANAGER_HOST',
+        'http://localhost:3000'
+      )
 
     # Sentry environment set with SENTRY_CURRENT_ENV
     config.sentry_dsn = ENV['SENTRY_DSN']&.strip
@@ -74,7 +70,6 @@ module OffenderManagementAllocationClient
     config.support_email = ENV['SUPPORT_EMAIL']&.strip
     config.redis_url = ENV['REDIS_URL']&.strip
     config.redis_auth = ENV['REDIS_AUTH']&.strip
-    config.connection_pool_size = ENV['RAILS_WEB_CONCURRENCY']&.strip || 5
 
     config.cache_expiry = (ENV['CACHE_TIMEOUT']&.strip || 60.minutes).to_i
 

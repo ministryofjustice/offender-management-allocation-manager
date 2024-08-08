@@ -1,9 +1,14 @@
 $govuk-global-styles: true;
+$govuk-new-typography-scale: true;
 $govuk-image-url-function: "image-url";
 $govuk-font-url-function: "asset-url";
 
-@import "govuk/all";
-@import "moj/all";
+$govuk-suppressed-warnings: (
+  govuk-typography-scale-14
+);
+
+@import "govuk-frontend/dist/govuk/index";
+@import "@ministryofjustice/frontend/moj/all";
 
 .govuk-data-value {
    @extend .govuk-heading-l;
