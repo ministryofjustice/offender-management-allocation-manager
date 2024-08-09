@@ -50,7 +50,7 @@ GEM
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activeadmin (3.2.2)
+    activeadmin (3.2.3)
       arbre (~> 1.2, >= 1.2.1)
       csv
       formtastic (>= 3.1)
@@ -95,8 +95,8 @@ GEM
     auto_strip_attributes (2.6.0)
       activerecord (>= 4.0)
     aws-eventstream (1.3.0)
-    aws-partitions (1.960.0)
-    aws-sdk-core (3.201.3)
+    aws-partitions (1.962.0)
+    aws-sdk-core (3.201.4)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.651.0)
       aws-sigv4 (~> 1.8)
@@ -117,7 +117,7 @@ GEM
     bigdecimal (3.1.8)
     binding_of_caller (1.0.1)
       debug_inspector (>= 1.2.0)
-    bootsnap (1.18.3)
+    bootsnap (1.18.4)
       msgpack (~> 1.2)
     brakeman (6.1.2)
       racc
@@ -135,7 +135,8 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
-    childprocess (5.0.0)
+    childprocess (5.1.0)
+      logger (~> 1.5)
     coderay (1.1.3)
     coffee-rails (5.0.0)
       coffee-script (>= 2.2.0)
@@ -218,8 +219,8 @@ GEM
       activemodel (>= 6.0)
       activesupport (>= 6.0)
       deep_merge (~> 1.2.1)
-    govuk_notify_rails (2.2.0)
-      notifications-ruby-client (~> 5.1)
+    govuk_notify_rails (3.0.0)
+      notifications-ruby-client (~> 6.2)
       rails (>= 4.1.0)
     guard (2.18.1)
       formatador (>= 0.2.4)
@@ -241,7 +242,7 @@ GEM
     has_scope (0.8.2)
       actionpack (>= 5.2)
       activesupport (>= 5.2)
-    hashdiff (1.1.0)
+    hashdiff (1.1.1)
     hashie (5.0.0)
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
@@ -340,7 +341,7 @@ GEM
     notiffany (0.1.3)
       nenv (~> 0.1)
       shellany (~> 0.0)
-    notifications-ruby-client (5.4.0)
+    notifications-ruby-client (6.2.0)
       jwt (>= 1.5, < 3)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
@@ -358,10 +359,10 @@ GEM
     paper_trail (15.1.0)
       activerecord (>= 6.1)
       request_store (~> 1.4)
-    parallel (1.25.1)
+    parallel (1.26.1)
     parallel_tests (4.7.1)
       parallel
-    parser (3.3.4.0)
+    parser (3.3.4.2)
       ast (~> 2.4.1)
       racc
     pdf-core (0.10.0)
@@ -669,7 +670,7 @@ DEPENDENCIES
   fast_underscore
   flamegraph
   govuk_design_system_formbuilder (~> 2.5)
-  govuk_notify_rails
+  govuk_notify_rails (~> 3.0.0)
   guard-rspec
   guard-rubocop
   hashdiff (>= 1.0.0.beta1, < 2.0.0)
@@ -686,7 +687,6 @@ DEPENDENCIES
   memory_profiler
   mutex_m
   net-http
-  notifications-ruby-client (>= 5.2, < 6.0.0)
   omniauth (~> 1.9.2)
   omniauth-oauth2
   paper_trail (~> 15.1.0)

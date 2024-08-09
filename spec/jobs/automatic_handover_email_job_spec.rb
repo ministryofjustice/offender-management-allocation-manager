@@ -71,7 +71,7 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
              pipeline_to_community_no_handovers: mail_instance)
     end
 
-    context 'when it finds handovers' do
+    context 'when it finds LDU offenders and there are handovers' do
       let(:mpc_offenders) do
         [
           double(MpcOffender, prison_id: prison_code, sentenced?: true,
@@ -90,11 +90,21 @@ RSpec.describe AutomaticHandoverEmailJob, type: :job do
 
       it 'sends email with CSV' do
         expect(CommunityMailer).to have_received(:with)
-          .with(ldu_name: 'X', ldu_email: 'x@x.com', csv_data: anything)
+          .with(ldu:, csv_data: anything)
       end
     end
 
-    context 'when it finds no handovers' do
+    context 'when it finds LDU offenders but none are handovers' do
+      let(:mpc_offenders) do
+        [double(MpcOffender, prison_id: prison_code, sentenced?: false)]
+      end
+
+      it 'sends email without CSV' do
+        expect(CommunityMailer).to have_received(:with).with(ldu:)
+      end
+    end
+
+    context 'when the LDU is empty with no offenders' do
       let(:mpc_offenders) { [] }
 
       it 'sends no email' do
