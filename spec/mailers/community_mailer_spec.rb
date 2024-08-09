@@ -54,29 +54,30 @@ RSpec.describe CommunityMailer, type: :mailer do
   end
 
   describe '#pipeline_to_community' do
-    subject { described_class.with(**params).pipeline_to_community }
+    subject { described_class.with(ldu:, csv_data: 'Comma, Separated, Values').pipeline_to_community }
 
     let(:ldu) { build(:local_delivery_unit) }
-
-    let(:params) do
-      {
-        ldu_name: ldu.name,
-        ldu_email: ldu.email_address,
-        csv_data: "Comma, Separated, Values"
-      }
-    end
 
     it 'sends to the LDU email address' do
       expect(subject.to).to eq([ldu.email_address])
     end
 
-    it 'sets the LDU name' do
-      expect(subject.govuk_notify_personalisation).to include(ldu_name: ldu.name)
+    it 'sets the personalisation' do
+      expect(
+        subject.govuk_notify_personalisation
+      ).to include(
+        ldu_name: ldu.name,
+        link_to_document: hash_including(
+          filename: "community_allocation_cases_#{ldu.code}.csv",
+          confirm_email_before_download: nil,
+          retention_period: nil
+        )
+      )
     end
   end
 
   describe '#pipeline_to_community_no_handovers' do
-    subject { described_class.with(ldu_name: ldu.name, ldu_email: ldu.email_address).pipeline_to_community_no_handovers }
+    subject { described_class.with(ldu:).pipeline_to_community_no_handovers }
 
     let(:ldu) { build(:local_delivery_unit) }
 
