@@ -27,7 +27,7 @@ RSpec.describe "prisoners/show", type: :view do
       let(:complexity) { 'low' }
 
       it 'shows low complexity badge' do
-        expect(page).to have_content 'LOW COMPLEXITY'
+        expect(page).to have_content 'Low complexity'
       end
     end
 
@@ -35,7 +35,7 @@ RSpec.describe "prisoners/show", type: :view do
       let(:complexity) { 'medium' }
 
       it 'shows medium complexity badge' do
-        expect(page).to have_content 'MEDIUM COMPLEXITY'
+        expect(page).to have_content 'Medium complexity'
       end
     end
 
@@ -43,7 +43,7 @@ RSpec.describe "prisoners/show", type: :view do
       let(:complexity) { 'high' }
 
       it 'shows high complexity badge' do
-        expect(page).to have_content 'HIGH COMPLEXITY'
+        expect(page).to have_content 'High complexity'
       end
     end
   end

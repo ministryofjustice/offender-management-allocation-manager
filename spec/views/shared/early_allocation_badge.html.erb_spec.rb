@@ -25,10 +25,10 @@ RSpec.describe "prisoners/show", type: :view do
         let(:early_allocation) { build(:early_allocation, :pre_window) }
         let(:sentence) { attributes_for(:sentence_detail, :outside_early_allocation_window) }
 
-        it 'displays a badge text EARLY ALLOCATION NOTES' do
+        it 'displays corresponding badge' do
           expect(badge_count).to eq(1)
           expect(early_allocation_badge.attributes['class'].value).to include 'govuk-tag--blue'
-          expect(early_allocation_badge.text.strip).to eq 'EARLY ALLOCATION ASSESSMENT SAVED'
+          expect(early_allocation_badge.text.strip).to eq 'Early allocation assessment saved'
         end
       end
 
@@ -39,39 +39,39 @@ RSpec.describe "prisoners/show", type: :view do
         context 'when rejected' do
           let(:early_allocation) { build(:early_allocation, :discretionary_declined) }
 
-          it 'displays badge text EARLY ALLOCATION NOTES' do
+          it 'displays corresponding badge' do
             expect(badge_count).to eq(1)
             expect(early_allocation_badge.attributes['class'].value).to include 'govuk-tag--blue'
-            expect(early_allocation_badge.text.strip).to eq 'EARLY ALLOCATION ASSESSMENT SAVED'
+            expect(early_allocation_badge.text.strip).to eq 'Early allocation assessment saved'
           end
         end
 
         context 'when it is awaiting review by NSD/LDU' do
           let(:early_allocation) { build(:early_allocation, :discretionary) }
 
-          it 'displays badge text EARLY ALLOCATION ACTIVE' do
+          it 'displays corresponding badge' do
             expect(badge_count).to eq(1)
             expect(early_allocation_badge.attributes['class'].value).to include 'govuk-tag--blue'
-            expect(early_allocation_badge.text.strip).to eq 'EARLY ALLOCATION DECISION PENDING'
+            expect(early_allocation_badge.text.strip).to eq 'Early allocation decision pending'
           end
         end
 
         context 'when it has been approved by NSD/LDU' do
           let(:early_allocation) { build(:early_allocation, :discretionary_accepted) }
 
-          it 'displays badge text EARLY ALLOCATION APPROVED' do
+          it 'displays corresponding badge' do
             expect(badge_count).to eq(1)
             expect(early_allocation_badge.attributes['class'].value).to include 'govuk-tag--blue'
-            expect(early_allocation_badge.text.strip).to eq 'EARLY ALLOCATION ELIGIBLE'
+            expect(early_allocation_badge.text.strip).to eq 'Early allocation eligible'
           end
         end
 
         context 'when it is automatic' do
           let(:early_allocation) { build(:early_allocation, :eligible) }
 
-          it 'displays badge text EARLY ALLOCATION APPROVED' do
+          it 'displays corresponding badge' do
             expect(early_allocation_badge.attributes['class'].value).to include 'govuk-tag--blue'
-            expect(early_allocation_badge.text.strip).to eq 'EARLY ALLOCATION ELIGIBLE'
+            expect(early_allocation_badge.text.strip).to eq 'Early allocation eligible'
           end
         end
       end

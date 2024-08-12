@@ -59,7 +59,7 @@ module ApplicationHelper
   def vlo_tag(offender)
     return '' unless offender.active_vlo? || offender.victim_liaison_officers.any?
 
-    tag.span('VLO CONTACT', class: 'govuk-tag govuk-tag--red')
+    tag.span('VLO contact', class: 'govuk-tag govuk-tag--red')
   end
 
   def humanized_bool(bool_value)

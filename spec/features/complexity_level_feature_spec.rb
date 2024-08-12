@@ -28,7 +28,7 @@ feature 'complexity level feature' do
 
       expect(page).to have_text('Complexity of need level')
       expect(page).to have_css('#complexity-level', text: 'High')
-      expect(page).to have_css('#complexity-badge', text: 'HIGH COMPLEXITY')
+      expect(page).to have_css('#complexity-badge', text: 'High complexity')
 
       within(:css, "td#complexity-level") do
         click_link('Change')
@@ -65,7 +65,7 @@ feature 'complexity level feature' do
 
       expect(page).to have_current_path(prison_prisoner_allocation_path(prisoner_id: offender.fetch(:prisonerNumber), prison_id: womens_prison.code), ignore_query: true)
       expect(page).to have_css('#complexity-level', text: 'Low')
-      expect(page).to have_css('#complexity-badge', text: 'LOW COMPLEXITY')
+      expect(page).to have_css('#complexity-badge', text: 'Low complexity')
     end
 
     it 'can click back link to return to the prisoner profile page' do
@@ -130,7 +130,7 @@ feature 'complexity level feature' do
 
         expect(page).to have_current_path(prison_prisoner_allocation_path(womens_prison.code, offender_no))
         expect(page).to have_css('#complexity-level-row', text: 'Low')
-        expect(page).to have_css('#complexity-badge', text: 'LOW COMPLEXITY')
+        expect(page).to have_css('#complexity-badge', text: 'Low complexity')
       end
     end
   end
