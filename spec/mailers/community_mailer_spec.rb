@@ -68,6 +68,7 @@ RSpec.describe CommunityMailer, type: :mailer do
       ).to include(
         ldu_name: ldu.name,
         link_to_document: hash_including(
+          file: a_kind_of(String),
           filename: "community_allocation_cases_#{ldu.code}.csv",
           confirm_email_before_download: nil,
           retention_period: nil

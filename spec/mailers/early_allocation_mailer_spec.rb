@@ -59,6 +59,7 @@ RSpec.describe EarlyAllocationMailer, type: :mailer do
         pom_email_address: 'pom@example.com',
         prison_name: 'PRISONMAME',
         link_to_document: hash_including(
+          file: a_kind_of(String),
           filename: "early_allocation_assessment_review_#{params[:prisoner_number]}.pdf",
           confirm_email_before_download: nil,
           retention_period: nil
@@ -96,6 +97,7 @@ RSpec.describe EarlyAllocationMailer, type: :mailer do
         pom_email_address: 'pom@example.com',
         prison_name: 'PRISONMAME',
         link_to_document: hash_including(
+          file: a_kind_of(String),
           filename: "early_allocation_assessment_approved_#{params[:prisoner_number]}.pdf",
           confirm_email_before_download: nil,
           retention_period: nil
