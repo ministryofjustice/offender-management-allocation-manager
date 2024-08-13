@@ -45,8 +45,42 @@ RSpec.describe EarlyAllocationMailer, type: :mailer do
       }
     end
 
-    before do
-      allow(Notifications).to receive(:prepare_upload)
+    it 'sets the To address of the email using the provided user' do
+      expect(mail.to).to eq(['to@example.com'])
+    end
+
+    it 'personalises the email' do
+      expect(
+        mail.govuk_notify_personalisation
+      ).to include(
+        prisoner_name: 'TESTNAME',
+        prisoner_number: '1111',
+        pom_name: 'POMNAME',
+        pom_email_address: 'pom@example.com',
+        prison_name: 'PRISONMAME',
+        link_to_document: hash_including(
+          file: a_kind_of(String),
+          filename: "early_allocation_assessment_review_#{params[:prisoner_number]}.pdf",
+          confirm_email_before_download: nil,
+          retention_period: nil
+        )
+      )
+    end
+  end
+
+  describe 'auto_early_allocation' do
+    subject(:mail) { described_class.with(**params).auto_early_allocation }
+
+    let(:params) do
+      {
+        prisoner_name: 'TESTNAME',
+        prisoner_number: '1111',
+        pom_name: 'POMNAME',
+        pom_email: 'pom@example.com',
+        prison_name: 'PRISONMAME',
+        email: 'to@example.com',
+        pdf: 'FAKEPDF',
+      }
     end
 
     it 'sets the To address of the email using the provided user' do
@@ -54,11 +88,21 @@ RSpec.describe EarlyAllocationMailer, type: :mailer do
     end
 
     it 'personalises the email' do
-      expect(mail.govuk_notify_personalisation).to include(prisoner_name: 'TESTNAME',
-                                                           prisoner_number: '1111',
-                                                           pom_name: 'POMNAME',
-                                                           pom_email_address: 'pom@example.com',
-                                                           prison_name: 'PRISONMAME')
+      expect(
+        mail.govuk_notify_personalisation
+      ).to include(
+        prisoner_name: 'TESTNAME',
+        prisoner_number: '1111',
+        pom_name: 'POMNAME',
+        pom_email_address: 'pom@example.com',
+        prison_name: 'PRISONMAME',
+        link_to_document: hash_including(
+          file: a_kind_of(String),
+          filename: "early_allocation_assessment_approved_#{params[:prisoner_number]}.pdf",
+          confirm_email_before_download: nil,
+          retention_period: nil
+        )
+      )
     end
   end
 end
