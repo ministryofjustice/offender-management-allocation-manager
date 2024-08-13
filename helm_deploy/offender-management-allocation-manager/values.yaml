@@ -116,7 +116,7 @@ generic-service:
   # Environment variables to load into the deployment
   env:
     RAILS_ENV: production
-    RAILS_WEB_CONCURRENCY: 5
+    RAILS_MAX_THREADS: 5 # number of Puma threads
     RAILS_LOG_TO_STDOUT: on
     RAILS_SERVE_STATIC_FILES: on
     PROMETHEUS_METRICS: "on" # do not remove quotes!

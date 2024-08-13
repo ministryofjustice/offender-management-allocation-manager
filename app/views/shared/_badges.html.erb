@@ -5,7 +5,7 @@
 <% status = offender.early_allocation_state %>
 <% if EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.key?(status) %>
   <span id="early-allocation-badge" class="govuk-tag govuk-tag--blue">
-    EARLY ALLOCATION <%= EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.fetch(status) %>
+    Early allocation <%= EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.fetch(status) %>
   </span>
 <% end %>
 <% if offender.restricted_patient? %>
@@ -13,10 +13,10 @@
 <% end %>
 <% if @prison.womens? %>
   <% if offender.complexity_level == 'high' %>
-    <%= render('shared/badges/complexity_badge', complexity_badge_text: 'HIGH COMPLEXITY') %>
+    <%= render('shared/badges/complexity_badge', complexity_badge_text: 'High complexity') %>
   <% elsif offender.complexity_level == 'medium' %>
-    <%= render('shared/badges/complexity_badge', complexity_badge_text: 'MEDIUM COMPLEXITY') %>
+    <%= render('shared/badges/complexity_badge', complexity_badge_text: 'Medium complexity') %>
   <% elsif offender.complexity_level == 'low' %>
-    <%= render('shared/badges/complexity_badge', complexity_badge_text: 'LOW COMPLEXITY') %>
+    <%= render('shared/badges/complexity_badge', complexity_badge_text: 'Low complexity') %>
   <% end %>
 <% end %>

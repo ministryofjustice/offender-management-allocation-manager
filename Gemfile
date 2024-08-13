@@ -13,7 +13,7 @@ gem 'date_validator'
 gem 'faraday', '~> 1.10.3'
 gem 'net-http' # needed to undo a conflict with system libs
 gem 'govuk_notify_rails', '~> 3.0.0'
-gem 'govuk_design_system_formbuilder', '~> 2.5'
+gem 'govuk_design_system_formbuilder', '~> 5.4.1'
 gem 'json-schema', '~> 4.0'
 gem 'jsonb_accessor'
 gem 'jwt'
@@ -32,7 +32,7 @@ gem 'sentry-ruby'
 gem 'sentry-rails'
 gem 'sentry-sidekiq'
 gem 'turbolinks', '~> 5'
-gem 'uglifier', '>= 1.3.0'
+gem 'terser' # javascript compressor
 gem 'typhoeus'
 gem 'redis', '~> 4.6.0'
 gem 'fast_underscore', require: false

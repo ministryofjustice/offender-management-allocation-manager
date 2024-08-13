@@ -70,10 +70,10 @@ module EarlyAllocationHelper
   end
 
   EARLY_ALLOCATION_STATUSES = {
-    eligible: 'ELIGIBLE',
-    decision_pending: 'DECISION PENDING',
-    assessment_saved: 'ASSESSMENT SAVED',
+    eligible: 'eligible',
+    decision_pending: 'decision pending',
+    assessment_saved: 'assessment saved',
     # in status terms we don't care about the need to make a new assessment
-    call_to_action: 'ASSESSMENT SAVED'
+    call_to_action: 'assessment saved'
   }.freeze
 end
