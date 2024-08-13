@@ -18,8 +18,7 @@ feature 'case information feature', flaky: true do
     context 'when add missing details the first time (create journey)' do
       before do
         visit new_prison_case_information_path(prison.code, offender.fetch(:prisonerNumber))
-        find('label[for=case-information-probation-service-england-field]').click
-        find('label[for=case-information-enhanced-handover-true-field]').click
+        find('label[for=case-information-enhanced-resourcing-true-field]').click
         find('label[for=case-information-tier-a-field]').click
       end
 
@@ -68,8 +67,7 @@ feature 'case information feature', flaky: true do
         click_link 'Add missing details'
       end
 
-      find('label[for=case-information-probation-service-england-field]').click
-      find('label[for=case-information-enhanced-handover-true-field]').click
+      find('label[for=case-information-enhanced-resourcing-true-field]').click
       find('label[for=case-information-tier-a-field]').click
       click_button 'Save'
 
@@ -106,7 +104,6 @@ feature 'case information feature', flaky: true do
 
       expect(CaseInformation.count).to eq(0)
       expect(page).to have_content("Select the handover type for this case")
-      expect(page).to have_content("Select yes if the prisoner’s last known address was in Wales")
     end
 
     it 'complains if all data is missing', vcr: { cassette_name: 'prison_api/case_information_missing_all_feature' } do
@@ -120,7 +117,6 @@ feature 'case information feature', flaky: true do
       expect(CaseInformation.count).to eq(0)
       expect(page).to have_content("Select the handover type for this case")
       expect(page).to have_content("Select the prisoner’s tier")
-      expect(page).to have_content("Select yes if the prisoner’s last known address was in Wales")
     end
 
     it 'complains if tier data is missing', vcr: { cassette_name: 'prison_api/case_information_missing_tier_feature' } do
@@ -129,7 +125,7 @@ feature 'case information feature', flaky: true do
       visit new_prison_case_information_path('LEI', nomis_offender_id)
       expect(page).to have_current_path new_prison_case_information_path('LEI', nomis_offender_id)
 
-      find('label[for=case-information-enhanced-handover-true-field]').click
+      find('label[for=case-information-enhanced-resourcing-true-field]').click
       click_button 'Save'
 
       expect(CaseInformation.count).to eq(0)
@@ -146,8 +142,7 @@ feature 'case information feature', flaky: true do
       end
       expect(page).to have_selector('h1', text: 'Case information')
 
-      find('label[for=case-information-probation-service-england-field]').click
-      find('label[for=case-information-enhanced-handover-true-field]').click
+      find('label[for=case-information-enhanced-resourcing-true-field]').click
       find('label[for=case-information-tier-a-field]').click
       click_button 'Save'
 

@@ -46,18 +46,6 @@ feature "womens missing info journey" do
           expect(all('li').map(&:text))
             .to match_array(
               [
-                "Select yes if the prisoner’s last known address was in Wales",
-                "Select the prisoner’s tier",
-              ])
-        end
-
-        find('label[for=case-information-probation-service-england-field]').click
-        click_button 'Update'
-        # defect goes away once we fill in welshness correctly
-        within '.govuk-error-summary' do
-          expect(all('li').map(&:text))
-            .to match_array(
-              [
                 "Select the prisoner’s tier",
               ])
         end
@@ -112,7 +100,6 @@ feature "womens missing info journey" do
         click_link 'Add missing details'
       end
 
-      find('label[for=case-information-probation-service-england-field]').click
       find('label[for=case-information-enhanced-resourcing-true-field]').click
       find('label[for=case-information-tier-a-field]').click
       click_button 'Update'
@@ -150,7 +137,6 @@ feature "womens missing info journey" do
     end
 
     def fill_in_missing_case_information
-      find('label[for=case-information-probation-service-england-field]').click
       find('label[for=case-information-enhanced-resourcing-true-field]').click
       find('label[for=case-information-tier-a-field]').click
 

@@ -37,7 +37,6 @@ class CaseInformationController < PrisonsApplicationController
     @case_info = prisoner.build_case_information(
       nomis_offender_id: case_information_params[:nomis_offender_id],
       tier: case_information_params[:tier],
-      probation_service: case_information_params[:probation_service],
       enhanced_resourcing: case_information_params[:enhanced_resourcing],
       manual_entry: true
     )
@@ -86,7 +85,7 @@ private
 
   def case_information_params
     params.require(:case_information)
-      .permit(:nomis_offender_id, :tier, :enhanced_resourcing, :probation_service)
+      .permit(:nomis_offender_id, :tier, :enhanced_resourcing)
   end
 
   def target_hearing_date_params

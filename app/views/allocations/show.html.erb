@@ -59,14 +59,6 @@
         <% end %>
       </td>
     </tr>
-
-    <tr class="govuk-table__row" id="welsh-offender-row">
-      <td class="govuk-table__cell">Last known address in Wales</td>
-      <td class="govuk-table__cell table_cell__left_align">
-        <%= humanized_bool(@prisoner.welsh_offender) %>
-        <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link pull-right' if @prisoner.manual_entry? %>
-      </td>
-    </tr>
     <tr class="govuk-table__row" id="service-provider-row">
       <td class="govuk-table__cell">Handover type</td>
       <td class="govuk-table__cell table_cell__left_align">

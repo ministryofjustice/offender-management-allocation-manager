@@ -56,25 +56,6 @@ RSpec.describe CaseInformation, type: :model do
     end
   end
 
-  context 'when probation service' do
-    subject do
-      build(:case_information, probation_service: nil)
-    end
-
-    it 'gives the correct validation error message' do
-      expect(subject).not_to be_valid
-      expect(subject.errors.messages)
-        .to eq(probation_service: ["Select yes if the prisoner’s last known address was in Wales"])
-    end
-
-    it 'allows England, Wales' do
-      ['England', 'Wales'].each do |service|
-        subject.probation_service = service
-        expect(subject).to be_valid
-      end
-    end
-  end
-
   it 'validates that enhanced_resourcing is always set to true or false, or "nil"' do
     aggregate_failures do
       ci = FactoryBot.build :case_information, enhanced_resourcing: false
