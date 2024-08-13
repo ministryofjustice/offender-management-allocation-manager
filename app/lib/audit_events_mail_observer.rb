@@ -17,8 +17,13 @@ class AuditEventsMailObserver
   end
 
   class AuditDetails < SimpleDelegator
-    def personalisation = govuk_notify_personalisation
     def template = govuk_notify_template
+
+    def personalisation
+      Hash(govuk_notify_personalisation).tap do |hash|
+        hash.deep_merge!(link_to_document: { file: 'REDACTED' }) if hash.key?(:link_to_document)
+      end
+    end
 
     def tags
       tags = String(govuk_notify_reference).split('.')
