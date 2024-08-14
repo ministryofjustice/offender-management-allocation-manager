@@ -120,12 +120,8 @@ Rails.application.routes.draw do
     end
     get('/coworking/confirm/:nomis_offender_id/:primary_pom_id/:secondary_pom_id' => 'coworking#confirm', as: 'confirm_coworking_allocation')
 
-    resources :case_information, only: %i[new create edit update show], param: :prisoner_id, controller: 'case_information', path_names: {
-      new: 'new/:prisoner_id',
-    } do
-      get('edit_thd' => 'case_information#edit_thd', as: 'edit_thd', on: :member)
-      put('update_thd' => 'case_information#update_thd', as: 'update_thd', on: :member)
-    end
+    resources :case_information, only: %i[new create edit update show], param: :prisoner_id, controller: 'case_information',
+                                 path_names: { new: 'new/:prisoner_id' }
 
     resources :poms, only: %i[index show edit update], param: :nomis_staff_id
     # routes to show the 2 tabs on PomsController#show

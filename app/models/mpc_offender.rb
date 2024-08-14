@@ -147,8 +147,7 @@ class MpcOffender
   # parole methods
 
   def target_hearing_date
-    (USE_PPUD_PAROLE_DATA ? most_recent_parole_review&.target_hearing_date : nil) \
-      || @offender.parole_record&.target_hearing_date
+    most_recent_parole_review&.target_hearing_date
   end
 
   # Returns the target hearing date for the offender's next active parole application, or nil if there isn't one.
