@@ -80,7 +80,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
     <%= render 'prisoner_information' %>
-    <%= render partial: 'shared/offence_info', locals: { editable_thd: true}  %>
+    <%= render partial: 'shared/offence_info' %>
 
     <% if USE_PPUD_PAROLE_DATA %>
       <% if @prisoner.current_parole_review.present? %>

@@ -12,7 +12,6 @@ RSpec.describe MpcOffender, type: :model do
                     nomis_offender_id: nomis_offender_id,
                     case_information: instance_double(CaseInformation),
                     calculated_handover_date: instance_double(CalculatedHandoverDate, handover_date: nil, reason: nil),
-                    parole_record: nil,
                     parole_reviews: [parole_review, completed_parole_review])
   end
   let(:prison) { build(:prison) }

@@ -70,26 +70,6 @@ describe HmppsApi::Offender do
       end
     end
 
-    context 'when PRD < 18 months' do
-      before { stub_const('USE_PPUD_PAROLE_DATA', false) }
-
-      let(:case_info) do
-        build(:case_information, offender: build(:offender,
-                                                 parole_record: build(:parole_record, parole_review_date: Time.zone.today + 17.months)))
-      end
-      let(:api_offender) do
-        build(:hmpps_api_offender,
-              sentence: attributes_for(:sentence_detail,
-                                       conditionalReleaseDate: Time.zone.today + 24.months,
-                                       automaticReleaseDate: Time.zone.today + 24.months))
-      end
-      let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
-
-      it 'is within window' do
-        expect(offender.within_early_allocation_window?).to eq(true)
-      end
-    end
-
     context 'when TED < 18 months' do
       let(:case_info) do
         build(:case_information, offender: build(:offender,

@@ -36,6 +36,7 @@ RSpec.describe "poms/show", type: :view do
       pending_handover_count: 42,
       in_progress_handover_count: 0,
       pending_task_count: 0,
+      parole_cases_count: 0,
       last_allocated_date: allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date
     })
 
