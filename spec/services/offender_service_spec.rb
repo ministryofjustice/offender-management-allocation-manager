@@ -27,7 +27,7 @@ describe OffenderService, type: :feature do
     it "gets a single offender", vcr: { cassette_name: 'prison_api/offender_service_single_offender_spec' } do
       nomis_offender_id = 'G7266VD'
 
-      create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'C', enhanced_resourcing: false, probation_service: 'Wales')
+      create(:case_information, :welsh, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'C', enhanced_resourcing: false)
       offender = described_class.get_offender(nomis_offender_id)
 
       expect(offender.tier).to eq 'C'

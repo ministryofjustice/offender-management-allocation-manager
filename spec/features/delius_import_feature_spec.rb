@@ -64,7 +64,6 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
       expect(page).to have_content(offender_no)
       click_link offender_name
 
-      expect(page.find(:css, '#welsh-offender-row')).not_to have_content('Change')
       expect(page.find(:css, '#service-provider-row')).not_to have_content('Change')
       expect(page.find(:css, '#tier-row')).not_to have_content('Change')
 

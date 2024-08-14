@@ -144,7 +144,7 @@ feature 'Case History' do
         Timecop.travel(current_date) do
           # offender got released - so have to re-create case information record
           # and re-find allocation record as it has been updated
-          create(:case_information, nomis_offender_id: nomis_offender_id, local_delivery_unit: pontypool_ldu)
+          create(:case_information, :welsh, nomis_offender_id: nomis_offender_id, local_delivery_unit: pontypool_ldu)
           allocation = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id)
           allocation.update!(event: AllocationHistory::ALLOCATE_PRIMARY_POM,
                              event_trigger: AllocationHistory::USER,

@@ -27,12 +27,6 @@ class CaseInformation < ApplicationRecord
   # 0 means MAPPA level is known to be not relevant for offender
   validates :mappa_level, inclusion: { in: [0, 1, 2, 3], allow_nil: true }
 
-  validates :probation_service, inclusion: {
-    in: ['Wales', 'England'],
-    allow_nil: false,
-    message: 'Select yes if the prisoner’s last known address was in Wales'
-  }
-
   scope :without_com, -> { where(com_name: nil) }
 
   def welsh_offender

@@ -439,37 +439,6 @@
           </table>
         </div>
       </div>
-      <div class="govuk-accordion__section ">
-        <div class="govuk-accordion__section-header">
-          <h2 class="govuk-accordion__section-heading">
-            <span class="govuk-accordion__section-button" id="accordion-default-heading-4">
-              Case management
-            </span>
-          </h2>
-        </div>
-        <div id="accordion-default-content-4" class="govuk-accordion__section-content">
-          <table class="govuk-table">
-            <thead class="govuk-table__head">
-              <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header"></th>
-                <th scope="col" class="govuk-table__header"></th>
-                <th scope="col" class="govuk-table__header"></th>
-              </tr>
-            </thead>
-            <tbody class="govuk-table__body">
-              <tr class="govuk-table__row">
-                <td class="govuk-table__cell govuk-!-width-one-third">Last known address in Wales?</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">
-                  <%= humanized_bool(@prisoner.welsh_offender) if @prisoner.probation_record.present? %>
-                </td>
-                <td class="govuk-table__cell govuk-!-width-one-third">
-                  <%= link_to 'Change', edit_prison_case_information_path(@prison.code, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state' if @prisoner.manual_entry? %>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
     <!-- /Accordians -->
     <!-- /More info -->

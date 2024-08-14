@@ -123,10 +123,9 @@ context 'when NOMIS is missing information' do
 
         create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)
         create(
-          :case_information,
+          :case_information, language,
           offender: build(:offender, nomis_offender_id: offender_no),
-          enhanced_resourcing: true,
-          probation_service: welsh == 'Yes' ? 'Wales' : 'England'
+          enhanced_resourcing: true
         )
       end
 
@@ -137,7 +136,7 @@ context 'when NOMIS is missing information' do
         end
 
         context 'with a welsh offender' do
-          let(:welsh) { 'Yes' }
+          let(:language) { :welsh }
 
           context 'with a sentence start date post-policy' do
             let(:sentence_start) { Time.zone.now }
@@ -157,7 +156,7 @@ context 'when NOMIS is missing information' do
         end
 
         context 'with an english offender' do
-          let(:welsh) { 'No' }
+          let(:language) { :english }
 
           context 'with a sentence start date post-policy' do
             let(:sentence_start) { Time.zone.now }

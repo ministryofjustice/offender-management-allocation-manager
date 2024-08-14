@@ -62,12 +62,6 @@
           <%= handover_type_label(@offender) %>
         </td>
       </tr>
-      <tr class="govuk-table__row" id="welsh_offender">
-        <td class="govuk-table__cell">Last known address in Wales</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= humanized_bool(@offender.welsh_offender) if @offender.probation_record.present? %>
-        </td>
-      </tr>
       <tr id="oasys-date" class="govuk-table__row">
         <td class="govuk-table__cell">Last completed OASys</td>
         <td class="govuk-table__cell table_cell__left_align">

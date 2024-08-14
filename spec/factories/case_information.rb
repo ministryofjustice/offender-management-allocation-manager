@@ -3,16 +3,13 @@ require 'faker'
 FactoryBot.define do
   factory :case_information do
     association :offender
+    association :local_delivery_unit
 
     tier { 'A' }
 
     manual_entry { true }
 
-    association :local_delivery_unit
-
     crn { Faker::Alphanumeric.alpha(number: 10) }
-
-    probation_service { 'Wales' }
 
     enhanced_resourcing { false }
 
