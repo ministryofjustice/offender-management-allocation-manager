@@ -5,7 +5,6 @@ describe "Responsibility and Handover",  handover_calculations: true do
   let(:isps) { [Sentences::SentenceSequence.new] }
 
   before do
-    stub_const('USE_PPUD_PAROLE_DATA', true)
     allow(Sentences).to receive(:for).with(booking_id: mpc_offender.booking_id).and_return(isps)
     Timecop.freeze(Time.zone.local(2024, 5, 20))
   end

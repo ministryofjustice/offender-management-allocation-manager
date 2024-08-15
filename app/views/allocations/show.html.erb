@@ -83,14 +83,13 @@
 
   <%= render partial: 'shared/offence_info' %>
 
-  <% if USE_PPUD_PAROLE_DATA %>
-    <% if @prisoner.display_current_parole_info? %>
-      <%= render partial: 'shared/parole_info' %>
-    <% end %>
-    <% if @prisoner.previous_parole_reviews.any? %>
-      <%= render partial: 'shared/historical_parole' %>
-    <% end %>
+  <% if @prisoner.display_current_parole_info? %>
+    <%= render partial: 'shared/parole_info' %>
   <% end %>
+
+  <% if @prisoner.previous_parole_reviews.any? %>
+    <%= render partial: 'shared/historical_parole' %>
+  <% end%>
 
   <table class="govuk-table">
     <tbody class="govuk-table__body">

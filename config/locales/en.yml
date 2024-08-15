@@ -59,12 +59,6 @@ en:
   activemodel:
     errors:
       models:
-        target_hearing_date_form:
-          format: "%{message}"
-          attributes:
-            target_hearing_date:
-              date_after: The new target hearing date must be in the future
-              blank: Enter a new target hearing date
         complexity_form:
           format: "%{message}"
           attributes:
@@ -177,8 +171,6 @@ en:
         ldu_uncontactable: "We can’t automatically contact the LDU because their details are missing. You need to find an alternative way of contacting them."
   helpers:
     fieldset:
-      case_information:
-        target_hearing_date: "What is the next target hearing date?"
       early_allocation:
         oasys_risk_assessment_date: 'When was the last OASys risk assessment?'
     page_entries_info:

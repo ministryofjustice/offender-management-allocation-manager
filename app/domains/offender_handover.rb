@@ -10,7 +10,7 @@ class OffenderHandover < SimpleDelegator
 private
 
   def indeterminate_sentences
-    return unless USE_PPUD_PAROLE_DATA && indeterminate_sentence?
+    return unless indeterminate_sentence?
 
     if parole_outcome_not_release? && thd_12_or_more_months_from_now? && mappa_level.in?([2, 3])
       CalculatedHandoverDate.new(responsibility: com, reason: :parole_mappa_2_3)

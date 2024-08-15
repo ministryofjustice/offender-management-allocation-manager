@@ -18,7 +18,7 @@
     <% end %>
     <% if @prisoner.parole_eligibility_date.present? %>
       <tr class="govuk-table__row">
-        <td class="govuk-table__cell govuk-!-width-one-half">Parole Eligibility Date</td>
+        <td class="govuk-table__cell govuk-!-width-one-half">Parole eligibility date</td>
         <td id='parole-eligibility-date' class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= format_date(@prisoner.parole_eligibility_date) %></td>
       </tr>
     <% end %>

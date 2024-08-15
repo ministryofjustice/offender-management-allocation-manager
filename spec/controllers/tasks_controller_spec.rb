@@ -25,7 +25,6 @@ RSpec.describe TasksController, :allocation, type: :controller do
   end
 
   before do
-    stub_const('USE_PPUD_PAROLE_DATE', true)
     stub_poms(prison, pom)
     stub_signed_in_pom(prison, staff_id)
     stub_offenders_for_prison(prison, offenders)
@@ -44,8 +43,6 @@ RSpec.describe TasksController, :allocation, type: :controller do
   end
 
   context 'when showing early allocation decisions required' do
-    before { stub_const('USE_PPUD_PAROLE_DATA', false) }
-
     let(:offender_nos) { %w[G1234AB G1234GG G1234VV] }
     let(:test_offender_no) { 'G1234AB' }
 
@@ -74,8 +71,6 @@ RSpec.describe TasksController, :allocation, type: :controller do
   end
 
   context 'when showing missing hearing outcome confirmed date' do
-    before { stub_const('USE_PPUD_PAROLE_DATA', true) }
-
     let(:offender_nos) { %w[G1234AB G1234GG G1234VV] }
     let(:test_offender_no) { 'G1234AB' }
 
@@ -110,8 +105,6 @@ RSpec.describe TasksController, :allocation, type: :controller do
 
   context 'when showing tasks' do
     before do
-      stub_const('USE_PPUD_PAROLE_DATA', true)
-
       create(:case_information, tier: 'A', mappa_level: 1,
                                 offender: build(:offender, nomis_offender_id: 'G1234AB', parole_reviews: [build(:parole_review, hearing_outcome_received_on: today)]))
       create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: staff_id, prison: prison)

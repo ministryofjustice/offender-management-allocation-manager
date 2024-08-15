@@ -4,7 +4,7 @@ FactoryBot.define do
 
     sequence(:review_id) { |x| x + 300_000 }
 
-    # Defaults a parole record to be the currently active record
+    # Defaults a parole review to be the currently active record
     review_status {'Active'}
     hearing_outcome {'Not Specified'} # = no hearing outcome
 

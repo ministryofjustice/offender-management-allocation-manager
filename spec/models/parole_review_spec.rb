@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe ParoleReview, type: :model do
   it 'always belongs to an offender' do
-    expect(build(:parole_record).offender).not_to be_nil
+    expect(build(:parole_review).offender).not_to be_nil
   end
 
   describe '#hearing_outcome_as_current' do

@@ -71,9 +71,4 @@ private
     params.require(:case_information)
       .permit(:nomis_offender_id, :tier, :enhanced_resourcing)
   end
-
-  def target_hearing_date_params
-    params.require(:target_hearing_date_form)
-      .permit(:target_hearing_date)
-  end
 end

@@ -35,7 +35,6 @@ RSpec.describe MpcOffender, type: :model do
   let(:recalled) { false }
 
   before do
-    stub_const('USE_PPUD_PAROLE_DATA', true)
     allow(offender_model).to receive(:most_recent_parole_review).and_return(parole_review)
     allow(offender_model).to receive(:parole_review_awaiting_hearing).and_return(parole_review)
     allow(offender_model).to receive(:most_recent_completed_parole_review).and_return(completed_parole_review)
@@ -517,13 +516,13 @@ RSpec.describe MpcOffender, type: :model do
 
     context 'when the offender has an upcoming parole hearing' do
       describe '#next_thd' do
-        it 'returns the target hearing date of the incomplete parole record' do
+        it 'returns the target hearing date of the incomplete parole review' do
           expect(subject.next_thd).to eq(parole_review.target_hearing_date)
         end
       end
 
       describe '#target_hearing_date' do
-        it 'returns the target hearing date of the incomplete parole record' do
+        it 'returns the target hearing date of the incomplete parole review' do
           expect(subject.target_hearing_date).to eq(parole_review.target_hearing_date)
         end
       end
@@ -535,7 +534,7 @@ RSpec.describe MpcOffender, type: :model do
       end
 
       describe '#last_hearing_outcome_received_on' do
-        it 'returns the hearing outcome received date of the most recent completed parole record' do
+        it 'returns the hearing outcome received date of the most recent completed parole review' do
           expect(subject.last_hearing_outcome_received_on).to eq(completed_parole_review.hearing_outcome_received_on)
         end
       end
@@ -554,19 +553,19 @@ RSpec.describe MpcOffender, type: :model do
       end
 
       describe '#target_hearing_date' do
-        it 'returns the target hearing date of the most recent completed parole record' do
+        it 'returns the target hearing date of the most recent completed parole review' do
           expect(subject.target_hearing_date).to eq(completed_parole_review.target_hearing_date)
         end
       end
 
       describe '#hearing_outcome_received_on' do
-        it 'returns the hearing outcome received date of the most recent completed parole record' do
+        it 'returns the hearing outcome received date of the most recent completed parole review' do
           expect(subject.hearing_outcome_received_on).to eq(completed_parole_review.hearing_outcome_received_on)
         end
       end
 
       describe '#last_hearing_outcome_received_on' do
-        it 'returns the hearing outcome received date of the most recent completed parole record' do
+        it 'returns the hearing outcome received date of the most recent completed parole review' do
           expect(subject.last_hearing_outcome_received_on).to eq(completed_parole_review.hearing_outcome_received_on)
         end
       end

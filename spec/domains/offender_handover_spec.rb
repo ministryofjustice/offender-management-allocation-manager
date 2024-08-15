@@ -44,8 +44,6 @@ describe OffenderHandover do
             )
     end
 
-    before { stub_const('USE_PPUD_PAROLE_DATA', true) }
-
     context 'when offender is an ISP' do
       let(:indeterminate_sentence) { true }
 

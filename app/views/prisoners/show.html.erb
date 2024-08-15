@@ -80,16 +80,15 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
     <%= render 'prisoner_information' %>
+
     <%= render partial: 'shared/offence_info' %>
 
-    <% if USE_PPUD_PAROLE_DATA %>
-      <% if @prisoner.current_parole_review.present? %>
-        <%= render 'shared/parole_info' %>
-      <% end %>
+    <% if @prisoner.display_current_parole_info? %>
+      <%= render partial: 'shared/parole_info' %>
+    <% end %>
 
-      <% if @prisoner.previous_parole_reviews.any? %>
-        <%= render 'shared/historical_parole' %>
-      <% end%>
+    <% if @prisoner.previous_parole_reviews.any? %>
+      <%= render partial: 'shared/historical_parole' %>
     <% end%>
 
     <%= render 'prison_allocation' %>

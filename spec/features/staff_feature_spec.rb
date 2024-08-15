@@ -42,8 +42,6 @@ feature "staff pages" do
     let(:offender) { sneaky_instance_double AllocatedOffender, **offender_attrs }
 
     before do
-      stub_const('USE_PPUD_PAROLE_DATA', true)
-
       stub_signin_spo pom, [prison.code]
       stub_offenders_for_prison(prison.code, offenders_in_prison)
       stub_poms(prison.code, (prison_poms + [pom]))
