@@ -7,17 +7,37 @@ describe Offenders::Sentences do
 
   before { allow(Sentences).to receive(:for).with(booking_id: 123_456).and_return(sentence_sequences) }
 
-  describe "#multiple_indeterminate_sentences?" do
-    context 'when there is more than one indeterminate sentence' do
-      let(:sentence_sequences) { [double(indeterminate?: true), double(indeterminate?: true)] }
+  describe "#sentenced_to_additional_future_isp?" do
+    context 'when there is more than one indeterminate sentence but they have the same start date' do
+      let(:sentence_sequences) { [double(indeterminate?: true, sentence_start_date: 1.year.ago.beginning_of_day), double(indeterminate?: true, sentence_start_date: 1.year.ago.beginning_of_day)] }
 
-      it 'returns true' do
-        expect(sentences.multiple_indeterminate_sentences?).to be_truthy
+      it 'returns false' do
+        expect(sentences.sentenced_to_additional_future_isp?).to be_falsey
       end
     end
 
-    it 'returns false' do
-      expect(sentences.multiple_indeterminate_sentences?).to be_falsey
+    context 'when there is more than one indeterminate sentence and they have different start dates' do
+      let(:sentence_sequences) { [double(indeterminate?: true, sentence_start_date: 2.years.ago), double(indeterminate?: true, sentence_start_date: 1.year.ago)] }
+
+      it 'returns true' do
+        expect(sentences.sentenced_to_additional_future_isp?).to be_truthy
+      end
+    end
+
+    context 'when there is one ISP sentence' do
+      let(:sentence_sequences) { [double(indeterminate?: true, sentence_start_date: 1.day.ago)] }
+
+      it 'returns false' do
+        expect(sentences.sentenced_to_additional_future_isp?).to be_falsey
+      end
+    end
+
+    context 'when there are no ISP sentences' do
+      let(:sentence_sequences) { [double(indeterminate?: false, sentence_start_date: 1.day.ago)] }
+
+      it 'returns false' do
+        expect(sentences.sentenced_to_additional_future_isp?).to be_falsey
+      end
     end
   end
 

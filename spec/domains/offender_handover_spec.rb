@@ -78,7 +78,7 @@ describe OffenderHandover do
       end
 
       context 'when offender is sentenced to an additional ISP' do
-        let(:sentences) { double(multiple_indeterminate_sentences?: true) }
+        let(:sentences) { double(sentenced_to_additional_future_isp?: true) }
 
         it 'is POM responsible as additional_isp' do
           expect(subject).to be_pom_responsible
