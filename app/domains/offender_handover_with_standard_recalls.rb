@@ -26,7 +26,7 @@ private
 
     if most_recent_parole_review&.cancelled? && mappa_level.in?([2, 3])
       CalculatedHandoverDate.new(responsibility: com, reason: :recall_release_later_mappa_2_3)
-    elsif most_recent_parole_review&.cancelled? && mappa_level.in?([nil, 1])
+    elsif most_recent_parole_review&.cancelled?
       CalculatedHandoverDate.new(responsibility: pom_with_com, reason: :recall_release_later_mappa_empty_1)
     elsif most_recent_parole_review.present?
       CalculatedHandoverDate.new(responsibility: com, reason: :recall_release_later_no_outcome)
