@@ -14,12 +14,4 @@ module BadgeHelper
       'Determinate'
     end
   end
-
-  def badge_for_parole?(offender)
-    offender.tariff_date.present? || offender.parole_eligibility_date.present? || target_hearing_date?(offender)
-  end
-
-  def target_hearing_date?(offender)
-    offender.indeterminate_sentence? && offender.target_hearing_date.present?
-  end
 end

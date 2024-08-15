@@ -94,6 +94,15 @@ FactoryBot.define do
       indeterminateSentence { false }
     end
 
+    trait :recall do
+      recall { true }
+    end
+
+    trait :approaching_parole do
+      # If this ever fails, check mpc_offender#approaching_parole? logic
+      paroleEligibilityDate { 1.day.from_now }
+    end
+
     trait :indeterminate_recall do
       indeterminateSentence { true }
       recall { true }
