@@ -8,7 +8,7 @@ describe OffenderHandoverWithStandardRecalls do
     let(:parole_outcome_not_release) { false }
     let(:thd_12_or_more_months_from_now) { false }
     let(:mappa_level) { false }
-    let(:sentenced_to_an_additional_isp) { false }
+    let(:sentences) { double('sentences').as_null_object }
     let(:recalled) { false }
     let(:immigration_case) { false }
     let(:earliest_release_for_handover) { NamedDate[1.day.ago, 'TED'] }
@@ -21,7 +21,6 @@ describe OffenderHandoverWithStandardRecalls do
     let(:sentence_start_date) { double }
     let(:category_active_since) { double }
     let(:prison_arrival_date) { double }
-    let(:offender_sentence_terms) { HmppsApi::OffenderSentenceTerms.new }
     let(:most_recent_parole_review) { nil }
 
     let(:offender) do
@@ -30,7 +29,7 @@ describe OffenderHandoverWithStandardRecalls do
              parole_outcome_not_release?: parole_outcome_not_release,
              thd_12_or_more_months_from_now?: thd_12_or_more_months_from_now,
              mappa_level: mappa_level,
-             sentenced_to_an_additional_isp?: sentenced_to_an_additional_isp,
+             sentences: sentences,
              recalled?: recalled,
              immigration_case?: immigration_case,
              earliest_release_for_handover: earliest_release_for_handover,
@@ -43,7 +42,6 @@ describe OffenderHandoverWithStandardRecalls do
              sentence_start_date: sentence_start_date,
              category_active_since: category_active_since,
              prison_arrival_date: prison_arrival_date,
-             offender_sentence_terms: offender_sentence_terms,
              most_recent_parole_review: most_recent_parole_review
             )
     end
@@ -98,10 +96,10 @@ describe OffenderHandoverWithStandardRecalls do
         let(:most_recent_parole_review) { double(has_hearing_outcome?: true) }
 
         context 'with no other concurrent sentence' do
-          let(:offender_sentence_terms) do
+          let(:sentences) do
             double(
-              has_single_sentence?: true,
-              has_concurrent_sentence_of_12_months_or_under?: false
+              single_sentence?: true,
+              concurrent_sentence_of_12_months_or_under?: false
             )
           end
 
@@ -112,10 +110,10 @@ describe OffenderHandoverWithStandardRecalls do
         end
 
         context 'with a concurrent sentence of under 12 months' do
-          let(:offender_sentence_terms) do
+          let(:sentences) do
             double(
-              has_single_sentence?: false,
-              has_concurrent_sentence_of_12_months_or_under?: true
+              single_sentence?: false,
+              concurrent_sentence_of_12_months_or_under?: true
             )
           end
 
@@ -127,11 +125,11 @@ describe OffenderHandoverWithStandardRecalls do
       end
 
       context 'when offender has a concurrent sentence of 20 months or over' do
-        let(:offender_sentence_terms) do
+        let(:sentences) do
           double(
-            has_single_sentence?: false,
-            has_concurrent_sentence_of_12_months_or_under?: false,
-            has_concurrent_sentence_of_20_months_or_over?: true
+            single_sentence?: false,
+            concurrent_sentence_of_12_months_or_under?: false,
+            concurrent_sentence_of_20_months_or_over?: true
           )
         end
 
@@ -170,6 +168,11 @@ describe OffenderHandoverWithStandardRecalls do
             expect(subject.reason).to eq('recall_release_later_no_outcome')
           end
         end
+      end
+
+      it 'is COM responsible as recall_case' do
+        expect(subject).to be_com_responsible
+        expect(subject.reason).to eq('recall_case')
       end
     end
 

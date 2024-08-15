@@ -8,7 +8,7 @@ describe OffenderHandover do
     let(:parole_outcome_not_release) { false }
     let(:thd_12_or_more_months_from_now) { false }
     let(:mappa_level) { false }
-    let(:sentenced_to_an_additional_isp) { false }
+    let(:sentences) { double('sentences').as_null_object }
     let(:recalled) { false }
     let(:immigration_case) { false }
     let(:earliest_release_for_handover) { NamedDate[1.day.ago, 'TED'] }
@@ -28,7 +28,7 @@ describe OffenderHandover do
              parole_outcome_not_release?: parole_outcome_not_release,
              thd_12_or_more_months_from_now?: thd_12_or_more_months_from_now,
              mappa_level: mappa_level,
-             sentenced_to_an_additional_isp?: sentenced_to_an_additional_isp,
+             sentences: sentences,
              recalled?: recalled,
              immigration_case?: immigration_case,
              earliest_release_for_handover: earliest_release_for_handover,
@@ -78,7 +78,7 @@ describe OffenderHandover do
       end
 
       context 'when offender is sentenced to an additional ISP' do
-        let(:sentenced_to_an_additional_isp) { true }
+        let(:sentences) { double(multiple_indeterminate_sentences?: true) }
 
         it 'is POM responsible as additional_isp' do
           expect(subject).to be_pom_responsible

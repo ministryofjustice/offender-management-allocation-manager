@@ -210,12 +210,8 @@ class MpcOffender
     most_recent_parole_review&.current_record_hearing_outcome == 'Release'
   end
 
-  def sentenced_to_an_additional_isp?
-    @sentenced_to_an_additional_isp ||= offender_sentence_terms.has_additional_isp?
-  end
-
-  def offender_sentence_terms
-    @offender_sentence_terms ||= OffenderService.get_offender_sentences_and_offences(booking_id)
+  def sentences
+    @sentences ||= Offenders::Sentences.new(booking_id:)
   end
 
   def pom_tasks
