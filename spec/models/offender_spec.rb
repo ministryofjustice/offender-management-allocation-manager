@@ -183,7 +183,7 @@ RSpec.describe Offender, type: :model do
       end
     end
 
-    describe '#build_parole_record_sections' do
+    describe '#build_parole_review_sections' do
       let(:completed_parole_review_1) do
         create(:parole_review, custody_report_due: Time.zone.today - 2.years,
                                target_hearing_date: Time.zone.today - 2.years,
@@ -206,24 +206,24 @@ RSpec.describe Offender, type: :model do
 
       before { offender.build_parole_review_sections }
 
-      context 'with a completed parole record whose outcome was received within the last 14 days' do
-        it 'sets current_parole_record to the most recent completed parole record' do
+      context 'with a completed parole review whose outcome was received within the last 14 days' do
+        it 'sets current_parole_review to the most recent completed parole review' do
           expect(offender.current_parole_review).to eq(completed_parole_review_2)
         end
 
-        it 'adds any older parole records to the previous_parole_records' do
+        it 'adds any older parole reviews to the previous parole reviews' do
           expect(offender.previous_parole_reviews).to match_array([completed_parole_review_1])
         end
       end
 
-      context 'with a completed parole record whose outcome was received over 14 days ago' do
+      context 'with a completed parole review whose outcome was received over 14 days ago' do
         let(:completed_parole_review_2) { create(:parole_review, custody_report_due: Time.zone.today - 15.days, target_hearing_date: Time.zone.today - 15.days, hearing_outcome: 'Stay in closed [*]', hearing_outcome_received_on: Time.zone.today - 15.days, review_status: 'Inactive') }
 
-        it 'sets the current_parole_record to the incomplete parole record' do
+        it 'sets the current_parole_review to the incomplete parole review' do
           expect(offender.current_parole_review).to eq(incomplete_parole_review)
         end
 
-        it 'adds any older parole records to the previous_parole_records, in descending date order' do
+        it 'adds any older parole reviews to the previous parole reviews, in descending date order' do
           expect(offender.previous_parole_reviews).to eq([completed_parole_review_2, completed_parole_review_1])
         end
       end

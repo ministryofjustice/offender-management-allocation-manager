@@ -77,10 +77,6 @@ RSpec.describe "shared/badges", type: :view do
 
   context "when there is a parole review date" do
     let(:offender_no) { 'G7514GW' }
-    let(:case_info) do
-      build(:case_information, offender: build(:offender, nomis_offender_id: offender_no,
-                                                          parole_record: build(:parole_record, parole_review_date: Date.new(2019, 0o1, 3).to_s)))
-    end
     let(:api_offender) do
       build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate), prisonerNumber: offender_no)
     end

@@ -50,7 +50,7 @@ class Offender < ApplicationRecord
     (handover_progress_checklist || build_handover_progress_checklist).task_completion_data
   end
 
-  # Returns the most recent parole record (can be a future parole application), regardless of activity status and outcome.
+  # Returns the most recent parole review (can be a future parole application), regardless of activity status and outcome.
   def most_recent_parole_review
     @most_recent_parole_review ||= parole_reviews.ordered_by_sortable_date.to_a.last
   end
@@ -60,7 +60,7 @@ class Offender < ApplicationRecord
     most_recent_parole_review.no_hearing_outcome? ? most_recent_parole_review : nil
   end
 
-  # Returns the most recent parole record that has an outcome
+  # Returns the most recent parole review that has an outcome
   def most_recent_completed_parole_review
     @most_recent_completed_parole_review ||= parole_reviews.ordered_by_sortable_date.with_hearing_outcome.to_a.last
   end
@@ -75,13 +75,13 @@ class Offender < ApplicationRecord
     @previous_parole_reviews
   end
 
-  # @current_parole_review is the most recent parole record and will either be
+  # @current_parole_review is the most recent parole review and will either be
   # currently active, or will have had its hearing outcome within the last 14 days
   #
-  # @previous_parole_reviews are all other parole records, those that are inactive
+  # @previous_parole_reviews are all other parole reviews, those that are inactive
   # and/or had hearing outcomes more than 14 days ago.
   #
-  # There are situations where parole records will be inactive and not have
+  # There are situations where parole reviews will be inactive and not have
   # hearing outcomes.
   def build_parole_review_sections
     @parole_review_sections_built = true
