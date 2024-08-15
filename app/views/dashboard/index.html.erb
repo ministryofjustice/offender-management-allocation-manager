@@ -48,13 +48,11 @@
                content: "Track the progress of cases being handed over to the community probation team."
     %>
 
-    <% if USE_PPUD_PAROLE_DATA %>
-      <%= render 'dashboard_partition',
-                 title: "Parole cases",
-                 link: prison_parole_cases_path(@prison.code),
-                 content: t('parole.upcoming.spo')
-      %>
-    <% end %>
+    <%= render 'dashboard_partition',
+               title: "Parole cases",
+               link: prison_parole_cases_path(@prison.code),
+               content: t('parole.upcoming.spo')
+    %>
 
     <%= render 'dashboard_partition',
                title: "Newly arrived cases",
@@ -106,13 +104,11 @@
   </div>
 
   <div class="govuk-grid-row card-group">
-    <% if USE_PPUD_PAROLE_DATA %>
-      <%= render 'dashboard_partition',
-                 title: 'Parole cases',
-                 link: prison_staff_caseload_parole_cases_path(@prison.code, @staff_id),
-                 content: t('parole.upcoming.pom')
-      %>
-    <% end %>
+    <%= render 'dashboard_partition',
+               title: 'Parole cases',
+               link: prison_staff_caseload_parole_cases_path(@prison.code, @staff_id),
+               content: t('parole.upcoming.pom')
+    %>
 
     <%= render 'dashboard_partition',
                title: "Case updates needed",

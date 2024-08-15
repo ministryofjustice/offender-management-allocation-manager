@@ -7,7 +7,6 @@ RSpec.describe 'Parole set hearing outcome date', type: :feature do
   let!(:parole_review) { create(:parole_review, :pom_task, nomis_offender_id: offender.nomis_offender_id) }
 
   before do
-    stub_const('USE_PPUD_PAROLE_DATA', true)
     stub_keyworker(prison_code, offender_no, build(:keyworker))
     stub_signin_spo(pom, [prison_code])
     stub_poms(prison_code, [pom])

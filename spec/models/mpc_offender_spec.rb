@@ -35,7 +35,6 @@ RSpec.describe MpcOffender, type: :model do
   let(:recalled) { false }
 
   before do
-    stub_const('USE_PPUD_PAROLE_DATA', true)
     allow(offender_model).to receive(:most_recent_parole_review).and_return(parole_review)
     allow(offender_model).to receive(:parole_review_awaiting_hearing).and_return(parole_review)
     allow(offender_model).to receive(:most_recent_completed_parole_review).and_return(completed_parole_review)

@@ -98,7 +98,6 @@ RSpec.describe ParoleCasesController, type: :controller do
 
     describe '#index' do
       before do
-        stub_const('USE_PPUD_PAROLE_DATA', true)
         stub_movements
       end
 

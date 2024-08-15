@@ -65,7 +65,6 @@ RSpec.describe "allocations/show", type: :view do
 
   describe 'Parole section' do
     before do
-      stub_const('USE_PPUD_PAROLE_DATA', true)
       stub_template 'shared/_vlo_information.html.erb' => ''
       render
     end
