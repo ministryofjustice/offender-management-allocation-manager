@@ -28,6 +28,14 @@ cronjobs:
     enabled: true
     schedule: 0 6 * * *
 
+generic-prometheus-alerts:
+  rdsAlertsDatabases:
+    cloud-platform-0fe5d72ea3e106e5: production
+  sqsOldestAlertQueueNames:
+    - offender-management-production-domain-events
+  sqsNumberAlertQueueNames:
+    - offender-management-production-domain-events-dlq
+
 generic-service:
   replicaCount: 5
 
