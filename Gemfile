@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby File.read('.ruby-version').chomp
+ruby file: '.ruby-version'
 
 gem 'rails', '~> 7.1.3'
 gem 'auto_strip_attributes'

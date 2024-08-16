@@ -7,6 +7,14 @@ cronjobs:
   community_api_import:
     enabled: true
 
+generic-prometheus-alerts:
+  rdsAlertsDatabases:
+    cloud-platform-aaaaa93fa5e829b2: preprod
+  sqsOldestAlertQueueNames:
+    - offender-management-preprod-domain-events
+  sqsNumberAlertQueueNames:
+    - offender-management-preprod-domain-events-dlq
+
 generic-service:
   ingress:
     hosts:

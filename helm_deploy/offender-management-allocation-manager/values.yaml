@@ -58,6 +58,16 @@ cronjob_resources:
     memory: 500Mi
     cpu: 100m
 
+generic-prometheus-alerts:
+  targetApplication: offender-management
+  alertSeverity: moic
+  hpaTargetOverride: ".*"
+  podTargetOverride: ".*"
+  deploymentTargetOverride: ".*"
+  applicationCronJobStatusFailedWindowMinutes: 30
+  sqsAlertsOldestThreshold: 30 # minutes
+  sqsAlertsTotalMessagesThreshold: "0" # DLQ alert triggers if messages > 0
+
 generic-service:
   replicaCount: 2
 
@@ -100,7 +110,7 @@ generic-service:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 100%
-      maxUnavailable: 25%
+      maxUnavailable: 40%
 
   podSecurityContext:
     fsGroup: 1001

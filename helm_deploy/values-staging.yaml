@@ -13,6 +13,14 @@ cronjobs:
   community_api_import:
     enabled: true
 
+generic-prometheus-alerts:
+  rdsAlertsDatabases:
+    cloud-platform-75ec3c1f26a64520: staging
+  sqsOldestAlertQueueNames:
+    - offender-management-staging-domain-events
+  sqsNumberAlertQueueNames:
+    - offender-management-staging-domain-events-dlq
+
 generic-service:
   ingress:
     hosts:
