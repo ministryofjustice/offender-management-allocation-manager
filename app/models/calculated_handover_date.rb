@@ -8,6 +8,10 @@ class CalculatedHandoverDate < ApplicationRecord
   REASONS = {
     com_responsibility: 'COM Responsibility',
     recall_case: 'Recall case',
+    recall_release_soon: 'Recall case',
+    recall_release_later_mappa_2_3: 'Recall case',
+    recall_release_later_mappa_empty_1: 'Recall case',
+    recall_release_later_no_outcome: 'Recall case',
     immigration_case: 'Immigration Case',
     release_date_unknown: 'Release Date Unknown',
 

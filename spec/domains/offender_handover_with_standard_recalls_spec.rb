@@ -145,8 +145,8 @@ describe OffenderHandoverWithStandardRecalls do
             end
           end
 
-          context 'and mappa level is empty or 1' do
-            [nil, 1].each do |mappa|
+          context 'and mappa level is empty, 0, or 1' do
+            [nil, 0, 1].each do |mappa|
               let(:mappa_level) { mappa }
 
               it 'is POM responsible as recall_release_later_mappa_empty_1' do
