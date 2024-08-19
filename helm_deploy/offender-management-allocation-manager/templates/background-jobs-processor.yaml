@@ -30,6 +30,11 @@ spec:
         command: ['sh', '-c', "bundle exec sidekiq -C config/sidekiq.yml"]
           {{- include "moic-helpers.envs" . | nindent 8 }}
         resources:
-          {{- with index .Values "generic-service" }}{{ toYaml .resources | nindent 10 }}{{ end }}
+          limits:
+            memory: 2Gi
+            cpu: 1000m
+          requests:
+            memory: 500Mi
+            cpu: 100m
 ---
 {{- end }}
