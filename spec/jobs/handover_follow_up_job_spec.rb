@@ -35,7 +35,7 @@ describe HandoverFollowUpJob, vcr: { cassette_name: "prison_api/handover_follow_
       valid_offender = FactoryBot.create(:offender, nomis_offender_id: "G7266VD")
       FactoryBot.create(:calculated_handover_date, start_date: Time.zone.today - 1.week, offender: valid_offender)
       FactoryBot.create(:case_information, local_delivery_unit:, offender: valid_offender)
-      FactoryBot.create(:allocation_history, nomis_offender_id: valid_offender.nomis_offender_id, prison: "LEI", primary_pom_nomis_id: "485982")
+      FactoryBot.create(:allocation_history, nomis_offender_id: valid_offender.nomis_offender_id, prison: "LEI", primary_pom_nomis_id: "486154")
 
       described_class.new.perform(local_delivery_unit)
 
@@ -47,7 +47,7 @@ describe HandoverFollowUpJob, vcr: { cassette_name: "prison_api/handover_follow_
     it "does not send the follow up email to that offender" do
       offender_without_a_handover_date = FactoryBot.create(:offender, nomis_offender_id: "G7260UD")
       FactoryBot.create(:case_information, local_delivery_unit:, offender: offender_without_a_handover_date)
-      FactoryBot.create(:allocation_history, nomis_offender_id: offender_without_a_handover_date.nomis_offender_id, prison: "LEI", primary_pom_nomis_id: "485982")
+      FactoryBot.create(:allocation_history, nomis_offender_id: offender_without_a_handover_date.nomis_offender_id, prison: "LEI", primary_pom_nomis_id: "486154")
 
       described_class.new.perform(local_delivery_unit)
 
@@ -60,7 +60,7 @@ describe HandoverFollowUpJob, vcr: { cassette_name: "prison_api/handover_follow_
       offender_with_a_handover_in_future = FactoryBot.create(:offender, nomis_offender_id: "G5241UH")
       FactoryBot.create(:calculated_handover_date, start_date: 1.week.from_now, offender: offender_with_a_handover_in_future)
       FactoryBot.create(:case_information, local_delivery_unit:, offender: offender_with_a_handover_in_future)
-      FactoryBot.create(:allocation_history, nomis_offender_id: offender_with_a_handover_in_future.nomis_offender_id, prison: "LEI", primary_pom_nomis_id: "485982")
+      FactoryBot.create(:allocation_history, nomis_offender_id: offender_with_a_handover_in_future.nomis_offender_id, prison: "LEI", primary_pom_nomis_id: "486154")
 
       described_class.new.perform(local_delivery_unit)
 
