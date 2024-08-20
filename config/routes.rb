@@ -194,4 +194,8 @@ Rails.application.routes.draw do
   end
   # Redirect to 'unauthorized' page if user isn't an admin
   get '/sidekiq', to: redirect('/401')
+
+  # catch-all route
+  match '*path', to: 'errors#not_found', via: :all, constraints:
+    ->(_req) { !Rails.application.config.consider_all_requests_local }
 end
