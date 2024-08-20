@@ -64,8 +64,8 @@ generic-prometheus-alerts:
   hpaTargetOverride: ".*"
   podTargetOverride: ".*"
   deploymentTargetOverride: ".*"
-  applicationCronJobStatusFailedWindowMinutes: 30
-  sqsAlertsOldestThreshold: 30 # minutes
+  applicationCronJobStatusFailedWindowMinutes: 60
+  sqsAlertsOldestThreshold: 45 # minutes
   sqsAlertsTotalMessagesThreshold: "0" # DLQ alert triggers if messages > 0
 
 generic-service:

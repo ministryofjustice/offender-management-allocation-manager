@@ -12,7 +12,6 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
-      ttlSecondsAfterFinished: 120
       template:
         spec:
           serviceAccountName: {{ index .Values "generic-service" "serviceAccountName" }}

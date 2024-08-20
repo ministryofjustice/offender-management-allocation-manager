@@ -47,14 +47,14 @@ describe HandoverFollowUpJob::FollowUpEmailDetails, vcr: { cassette_name: "priso
     end
 
     context "when the offender has a POM allocated" do
-      before { FactoryBot.create(:allocation_history, nomis_offender_id: offender.offender_no, prison: prison.code, primary_pom_nomis_id: "485982") }
+      before { FactoryBot.create(:allocation_history, nomis_offender_id: offender.offender_no, prison: prison.code, primary_pom_nomis_id: "486154") }
 
       it "includes the POM details in the email" do
         details = described_class.for(offender:)
 
         expect(details).to include(
-          pom_email: "jon.hindle@digital.justice.gov.uk", # comes from the elite2_staff_api_get_email VCR
-          pom_name: "Hindle, Jon", # comes from the pom_api_list_spec VCR
+          pom_email: "tom.rooker@digital.justice.gov.uk", # comes from the elite2_staff_api_get_email VCR
+          pom_name: "Rooker, Tom", # comes from the pom_api_list_spec VCR
         )
       end
     end
