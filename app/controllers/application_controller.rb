@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  delegate :current_user, to: :sso_identity
+  delegate :current_user, to: :sso_identity, allow_nil: true
 
   delegate :current_user_is_spo?, to: :sso_identity
   helper_method :current_user_is_spo?
@@ -62,7 +62,7 @@ class ApplicationController < ActionController::Base
         'footer' => HmppsApi::DpsFrontendComponentsApi.footer(sso_identity.token),
         'status' => 'ok',
       }
-    rescue Faraday::ServerError, Faraday::ResourceNotFound, Faraday::TimeoutError, Faraday::UnauthorizedError => e
+    rescue Faraday::ServerError, Faraday::ClientError, NoMethodError => e
       logger.error "event=dps_header_footer_retrieval_error|#{e.inspect},#{e.backtrace.join(',')}"
       @dps_header_footer ||= { 'status' => 'fallback' }
     end
