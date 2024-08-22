@@ -76,4 +76,13 @@ RSpec.describe SessionsController, type: :controller do
       expect(session[:sso_data]).to be_nil
     end
   end
+
+  describe 'failure' do
+    it 'renders the error page' do
+      get :failure
+
+      expect(response).to render_template('failure')
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
 end

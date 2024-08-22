@@ -1,0 +1,22 @@
+<% content_for :title, 'There has been a problem signing you in – Digital Prison Services' %>
+
+<h1 class="govuk-heading-l">
+  Sorry, there has been a problem signing you in
+</h1>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <p class="govuk-body">
+      <%= link_to 'Try signing in again', "#{Rails.configuration.nomis_oauth_host}/auth" %>.
+    </p>
+    <p class="govuk-body">
+      If this problem continues, contact service desk on <%= SERVICE_DESK_NUMBER %> or #<%= SERVICE_DESK_EXTENSION %>
+      from inside an establishment.
+    </p>
+  </div>
+</div>
+
+<script>
+  // Make error details available to Google Tag Manager
+  dataLayer.push({ "event": "error_page", "error_page_type": "401 Unauthorized" });
+</script>
