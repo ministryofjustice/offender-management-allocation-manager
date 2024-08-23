@@ -17,6 +17,10 @@ class SessionsController < ApplicationController
     redirect_to sso_signout_url, allow_other_host: true
   end
 
+  def failure
+    render(status: :unauthorized)
+  end
+
 private
 
   def sso_signout_url
