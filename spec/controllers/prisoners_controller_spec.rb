@@ -27,13 +27,6 @@ RSpec.describe PrisonersController, type: :controller do
       let(:allocated_offender_one) { build(:nomis_offender) }
       let(:allocated_offender_two) { build(:nomis_offender) }
 
-      # new arrival - it's new and haven't matched with delius yet.
-      let(:today) { Time.zone.today }
-
-      let(:offender_arrived_today_with_no_complexity_or_case_info) do
-        build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: today), complexityLevel: nil)
-      end
-
       let(:offenders) do
         [offender_with_case_info_but_no_complexity_level,
          offender_with_complexity_level_but_no_case_info,
@@ -41,7 +34,6 @@ RSpec.describe PrisonersController, type: :controller do
          offender_with_complexity_level_and_case_info,
          allocated_offender_one,
          allocated_offender_two,
-         offender_arrived_today_with_no_complexity_or_case_info
         ]
       end
       let(:missing_info_offenders) do
@@ -54,7 +46,6 @@ RSpec.describe PrisonersController, type: :controller do
          allocated_offender_two]
       end
       let(:unallocated_offenders) { [offender_with_complexity_level_and_case_info] }
-      let(:new_arrival_offenders) { [offender_arrived_today_with_no_complexity_or_case_info] }
 
       it 'gives you the total count for each bucket and the offenders in the missing info bucket' do
         get :missing_information, params: { prison_id: prison.code }
@@ -79,19 +70,10 @@ RSpec.describe PrisonersController, type: :controller do
         check_bucket_counts
       end
 
-      it 'gives you the total count for each bucket and the offenders in the new arrivals bucket' do
-        get :new_arrivals, params: { prison_id: prison.code }
-        expect(response).to be_successful
-
-        expect(assigns(:offenders).map(&:offender_no)).to match_array(new_arrival_offenders.map { |o| o.fetch(:prisonerNumber) })
-        check_bucket_counts
-      end
-
       def check_bucket_counts
         expect(assigns(:missing_info).size).to eq(3)
         expect(assigns(:allocated).size).to eq(2)
         expect(assigns(:unallocated).size).to eq(1)
-        expect(assigns(:new_arrivals).size).to eq(1)
       end
     end
 
@@ -469,162 +451,6 @@ RSpec.describe PrisonersController, type: :controller do
           get :unallocated, params: { prison_id: prison, sort: 'case_owner desc' }
           expect(assigns(:offenders).first.pom_responsible?).to eq(true)
           expect(assigns(:offenders).last.pom_supporting?).to eq(true)
-        end
-      end
-    end
-
-    describe 'new arrivals feature' do
-      before do
-        inmates = offenders.map do |offender|
-          build(:nomis_offender,
-                prisonerNumber: offender[:nomis_id],
-                sentence: attributes_for(:sentence_detail,
-                                         sentenceStartDate: offender.fetch(:sentence_start_date).strftime('%F')))
-        end
-
-        stub_offenders_for_prison(prison, inmates)
-
-        stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN")
-          .to_return(body: movements.to_json)
-      end
-
-      context 'with no movements and four offenders' do
-        let(:offenders) { [offender_one, offender_two, offender_three, offender_four] }
-        let(:offender_one) do
-          {
-            nomis_id: 'A1111AA',
-            booking_id: 111_111,
-            sentence_start_date: today
-          }
-        end
-
-        let(:offender_two) do
-          {
-            nomis_id: 'B1111BB',
-            booking_id: 222_222,
-            sentence_start_date: today - 1.day
-          }
-        end
-
-        let(:offender_three) do
-          {
-            nomis_id: 'C1111CC',
-            booking_id: 333_333,
-            sentence_start_date: today - 2.days
-          }
-        end
-
-        let(:offender_four) do
-          {
-            nomis_id: 'D1111DD',
-            booking_id: 444_444,
-            sentence_start_date: today - 3.days
-          }
-        end
-
-        let(:movements) { [] }
-
-        context 'when today is Thursday' do
-          let(:today) { 'Thu 17 Jan 2019'.to_date }
-
-          it 'shows one new arrival' do
-            Timecop.travel(today) do
-              get :new_arrivals, params: { prison_id: prison }
-              expect(assigns(:offenders).count).to eq 1
-            end
-          end
-
-          it 'includes how recent those arrivals are' do
-            Timecop.travel(today) do
-              get :new_arrivals, params: { prison_id: prison }
-              summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-              expect(summary_offenders).to include(
-                'A1111AA' => 0
-              )
-            end
-          end
-
-          it 'excludes arrivals from yesterday' do
-            Timecop.travel(today) do
-              get :new_arrivals, params: { prison_id: prison }
-              summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-              expect(summary_offenders.keys).not_to include('B1111BB')
-            end
-          end
-
-          it 'includes yesterday arrivals in missing_information instead' do
-            Timecop.travel(today) do
-              get :missing_information, params: { prison_id: prison }
-              summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-              expect(summary_offenders.keys).to include('B1111BB')
-            end
-          end
-
-          context 'with case information' do
-            it 'does not show in new arrivals' do
-              create(:case_information, offender: build(:offender, nomis_offender_id: 'A1111AA'))
-
-              Timecop.travel(today) do
-                get :new_arrivals, params: { prison_id: prison }
-                summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-                expect(summary_offenders.keys).not_to include('A1111AA')
-              end
-            end
-          end
-        end
-      end
-
-      context 'with a movement arriving on Monday, 5pm' do
-        let(:offenders) do
-          [{
-            nomis_id: 'A1111AA',
-            booking_id: 111_111,
-            sentence_start_date: '1 Jan 1980'.to_date,
-            prison_id: prison
-          }]
-        end
-
-        let(:movements) do
-          [
-            attributes_for(:movement,
-                           offenderNo: 'A1111AA',
-                           toAgency: prison,
-                           movementDate: '14-01-2020')
-          ]
-        end
-
-        context 'when today is Tuesday, 8pm' do
-          let(:today) { Time.zone.parse 'Tue 14 Jan 2020 20:00' }
-
-          it 'shows that offender in new arrivals' do
-            Timecop.travel(today) do
-              get :new_arrivals, params: { prison_id: prison }
-
-              expect(assigns(:offenders).map(&:offender_no)).to include('A1111AA')
-            end
-          end
-        end
-
-        context 'when today is Wed, 10am' do
-          let(:today) { Time.zone.parse 'Wed 15 Jan 2020 10:00' }
-
-          it 'does not show that offender in new arrivals' do
-            Timecop.travel(today) do
-              get :new_arrivals, params: { prison_id: prison }
-
-              expect(assigns(:offenders).map(&:offender_no)).not_to include('A1111AA')
-            end
-          end
-
-          it 'shows that offender as arriving one day ago' do
-            Timecop.travel(today) do
-              get :missing_information, params: { prison_id: prison }
-
-              summary_offenders = assigns(:offenders).map { |o| [o.offender_no, o.awaiting_allocation_for] }.to_h
-
-              expect(summary_offenders).to include('A1111AA' => 1)
-            end
-          end
         end
       end
     end

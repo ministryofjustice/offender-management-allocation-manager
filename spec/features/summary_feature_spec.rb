@@ -29,7 +29,6 @@ feature 'male prisoners summary navigation tabs' do
   let(:allocated_offender_one) { build(:nomis_offender) }
   let(:allocated_offender_two) { build(:nomis_offender) }
   let(:offender_ready_to_allocate) { build(:nomis_offender) }
-  let(:newly_arrived_offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: today)) }
 
   let(:offenders) do
     [offender_with_missing_info_one,
@@ -38,7 +37,6 @@ feature 'male prisoners summary navigation tabs' do
      allocated_offender_one,
      allocated_offender_two,
      offender_ready_to_allocate,
-     newly_arrived_offender
     ]
   end
 
@@ -52,7 +50,6 @@ feature 'male prisoners summary navigation tabs' do
     expect(page).to have_content('See allocations (2)')
     expect(page).to have_content('Make allocations (1)')
     expect(page).to have_content('Add missing details (3)')
-    expect(page).to have_content('Newly arrived (1)')
   end
 
   it 'shows unallocated offenders' do
@@ -61,16 +58,6 @@ feature 'male prisoners summary navigation tabs' do
     expect(page).to have_content('See allocations (2)')
     expect(page).to have_content('Make allocations (1)')
     expect(page).to have_content('Add missing details (3)')
-    expect(page).to have_content('Newly arrived (1)')
-  end
-
-  it 'shows newly arrived offenders' do
-    visit new_arrivals_prison_prisoners_path(prison.code)
-    expect(active_tab).to eq('Newly arrived (1)')
-    expect(page).to have_content('See allocations (2)')
-    expect(page).to have_content('Make allocations (1)')
-    expect(page).to have_content('Add missing details (3)')
-    expect(page).to have_content('Newly arrived (1)')
   end
 
   it 'shows offenders with missing information' do
@@ -79,6 +66,5 @@ feature 'male prisoners summary navigation tabs' do
     expect(page).to have_content('See allocations (2)')
     expect(page).to have_content('Make allocations (1)')
     expect(page).to have_content('Add missing details (3)')
-    expect(page).to have_content('Newly arrived (1)')
   end
 end

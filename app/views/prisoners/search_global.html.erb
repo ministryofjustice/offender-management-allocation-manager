@@ -133,8 +133,6 @@
                   <%= link_to "Add missing details", prison_prisoner_new_missing_info_path(@prison.code, offender.offender_no) %>
                 <% elsif @unallocated.map(&:offender_no).include?(offender.offender_no) %>
                   <%= link_to 'Allocate', prison_prisoner_staff_index_path(@prison.code, offender.offender_no) %>
-                <% elsif @new_arrivals.map(&:offender_no).include?(offender.offender_no) %>
-                  Wait
                 <% else %>
                   -
                 <% end %>

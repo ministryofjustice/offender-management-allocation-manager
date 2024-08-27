@@ -58,7 +58,6 @@ Rails.application.routes.draw do
         get 'allocated'
         get 'unallocated'
         get 'missing_information'
-        get 'new_arrivals'
         get 'search'
       end
 

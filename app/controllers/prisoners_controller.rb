@@ -5,7 +5,7 @@ class PrisonersController < PrisonsApplicationController
 
   before_action :ensure_spo_user, except: [:show, :image, :search]
 
-  before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :new_arrivals, :search]
+  before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :search]
 
   def allocated
     retrieve_latest_allocation_details
@@ -19,10 +19,6 @@ class PrisonersController < PrisonsApplicationController
   def unallocated
     retrieve_latest_allocation_details
     load_summary :unallocated
-  end
-
-  def new_arrivals
-    load_summary :new_arrivals
   end
 
   def search
@@ -106,7 +102,6 @@ private
   def load_all_offenders
     @missing_info = @prison.missing_info
     @unallocated = @prison.unallocated
-    @new_arrivals = @prison.new_arrivals
     @allocated = @prison.allocated.map do |offender|
       OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
     end
@@ -116,7 +111,6 @@ private
     bucket = {
       unallocated: @unallocated,
       missing_information: @missing_info,
-      new_arrivals: @new_arrivals,
       allocated: @allocated
     }.fetch(summary_type)
 

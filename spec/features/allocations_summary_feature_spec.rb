@@ -59,12 +59,5 @@ feature 'summary summary feature' do
         expect(all('.govuk-hint').map(&:text)).to eq [first, last]
       end
     end
-
-    it 'displays offenders just arrived allocated', vcr: { cassette_name: 'prison_api/new_offenders_feature' } do
-      visit new_arrivals_prison_prisoners_path(prison)
-
-      expect(page).to have_css('.moj-sub-navigation__item')
-      expect(page).to have_content('Newly arrived')
-    end
   end
 end
