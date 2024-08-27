@@ -28,7 +28,6 @@ feature "female prison index page" do
   let(:allocated_offender_one) { build(:nomis_offender) }
   let(:allocated_offender_two) { build(:nomis_offender) }
   let(:offender_ready_to_allocate) { build(:nomis_offender, complexityLevel: 'medium') }
-  let(:newly_arrived_offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, sentenceStartDate: Time.zone.today)) }
 
   let(:offenders) do
     [offender_with_missing_info_one,
@@ -37,7 +36,6 @@ feature "female prison index page" do
      allocated_offender_one,
      allocated_offender_two,
      offender_ready_to_allocate,
-     newly_arrived_offender
     ]
   end
 
@@ -86,11 +84,6 @@ feature "female prison index page" do
     it 'shows unallocated offenders' do
       click_link('Make allocations (1)')
       expect(page).to have_css("h1", text: "Allocations")
-    end
-
-    it 'shows newly arrived offenders' do
-      click_link('Newly arrived (1)')
-      expect(page).to have_content("Newly arrived")
     end
 
     it 'shows offenders with missing information' do

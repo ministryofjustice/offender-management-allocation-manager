@@ -8,7 +8,7 @@
             <%= render 'layouts/controller_nav_link',
                        text: 'Allocations',
                        path: unallocated_prison_prisoners_path(@prison.code),
-                       controllers: { allocation_staff: [], allocations: [:index], prisoners: [:allocated, :unallocated, :missing_information, :new_arrivals, :search] }
+                       controllers: { allocation_staff: [], allocations: [:index], prisoners: [:allocated, :unallocated, :missing_information, :search] }
             %>
           <% end %>
           <% if @is_pom %>

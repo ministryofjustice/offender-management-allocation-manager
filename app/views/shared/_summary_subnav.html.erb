@@ -15,13 +15,6 @@
     </li>
 
     <li class="moj-sub-navigation__item">
-      <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :new_arrivals %>
-         href="<%= new_arrivals_prison_prisoners_path(@prison.code) %>">
-        Newly arrived (<%= new_arrivals_count %>)
-      </a>
-    </li>
-
-    <li class="moj-sub-navigation__item">
       <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :allocated %>
       href="<%= allocated_prison_prisoners_path(@prison.code) %>">
         See allocations (<%= allocated_count %>)

@@ -45,7 +45,6 @@ RSpec.describe DashboardController, type: :controller do
           expect(response.body).not_to have_content('All allocated cases')
           expect(response.body).not_to have_content('Make allocations')
           expect(response.body).not_to have_content('Add missing details')
-          expect(response.body).not_to have_content('Newly arrived cases')
           expect(response.body).not_to have_content('View all POMs')
           expect(response.body).not_to have_content('View all handover cases')
         end
@@ -77,7 +76,6 @@ RSpec.describe DashboardController, type: :controller do
         expect(response.body).to have_content('All allocated cases')
         expect(response.body).to have_content('Make allocations')
         expect(response.body).to have_content('Add missing details')
-        expect(response.body).to have_content('Newly arrived cases')
         expect(response.body).to have_content('View all POMs')
         expect(response.body).to have_text('View all handover cases')
       end

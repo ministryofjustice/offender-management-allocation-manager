@@ -78,7 +78,6 @@ class Prison < ApplicationRecord
 
   delegate :allocated, to: :summary
   delegate :unallocated, to: :summary
-  delegate :new_arrivals, to: :summary
   delegate :missing_info, to: :summary
 
 private

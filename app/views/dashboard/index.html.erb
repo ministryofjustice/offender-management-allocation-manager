@@ -55,12 +55,6 @@
     %>
 
     <%= render 'dashboard_partition',
-               title: "Newly arrived cases",
-               link: new_arrivals_prison_prisoners_path(@prison.code),
-               content: "Cases waiting to be matched with NDelius records before they can be allocated."
-    %>
-
-    <%= render 'dashboard_partition',
                title: "Get help with this service",
                link: help_dashboard_path,
                content: "Adding staff members, missing cases and problems with case responsibility."
