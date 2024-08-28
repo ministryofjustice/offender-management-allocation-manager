@@ -27,8 +27,7 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
     @vlo = @offender.victim_liaison_officers.new vlo_parameters
 
     if @vlo.save
-      flash[:notice] = 'VLO contact added'
-      redirect_to referrer
+      redirect_to referrer, notice: 'VLO contact added'
     else
       render 'new'
     end
@@ -38,8 +37,7 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
 
   def update
     if @vlo.update vlo_parameters
-      flash[:notice] = 'VLO contact updated'
-      redirect_to referrer
+      redirect_to referrer, notice: 'VLO contact updated'
     else
       render 'edit'
     end

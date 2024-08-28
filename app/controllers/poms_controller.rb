@@ -53,7 +53,8 @@ class PomsController < PrisonStaffApplicationController
         AllocationHistory.deallocate_primary_pom(nomis_staff_id, active_prison_id)
         AllocationHistory.deallocate_secondary_pom(nomis_staff_id, active_prison_id)
       end
-      redirect_to prison_pom_path(active_prison_id, id: nomis_staff_id)
+      redirect_to prison_pom_path(active_prison_id, id: nomis_staff_id),
+                  notice: "Profile updated for #{helpers.full_name_ordered(@pom)}"
     else
       @errors = pom_detail.errors
       render :edit
