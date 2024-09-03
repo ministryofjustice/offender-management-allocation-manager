@@ -2,6 +2,8 @@
 
 module Api
   class AllocationApiController < Api::ApiController
+    rescue_from HmppsApi::Error::Unauthorized, with: :unauthorized_error
+
     def show
       render_404('Not ready for allocation') && return if allocation.nil?
       render_404('Not allocated') && return unless offender_allocated?

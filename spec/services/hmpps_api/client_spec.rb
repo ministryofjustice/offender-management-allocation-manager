@@ -41,8 +41,17 @@ describe HmppsApi::Client do
         .to_return(status: status)
     end
 
-    describe 'a 4xx error' do
+    describe 'a 401 error' do
       let(:status) { 401 }
+
+      it 'raises a HmppsApi::Error::Unauthorized error' do
+        expect { client.get(route) }
+          .to raise_error(HmppsApi::Error::Unauthorized, "the server responded with status #{status}")
+      end
+    end
+
+    describe 'a 4xx error' do
+      let(:status) { 403 }
 
       it 'raises a Faraday::ClientError error' do
         expect { client.get(route) }

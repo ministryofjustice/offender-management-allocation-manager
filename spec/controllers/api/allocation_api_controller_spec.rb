@@ -8,6 +8,13 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
     end
   end
 
+  shared_examples 'returns 401' do |message|
+    it 'returns 401 with correct message' do
+      expect(response).to have_http_status(:unauthorized)
+      expect(JSON.parse(response.body)).to eq("message" => message, "status" => "error")
+    end
+  end
+
   let(:prison) { create(:prison) }
   let(:primary_pom) { build(:pom) }
   let(:secondary_pom) { build(:pom) }
@@ -128,6 +135,26 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
 
         it_behaves_like 'returns 404', 'Not allocated'
       end
+    end
+  end
+
+  describe 'unauthorized errors' do
+    let(:offender) { build(:nomis_offender, prisonId: prison.code, sentence: attributes_for(:sentence_detail)) }
+
+    before do
+      co_working_allocation
+
+      allow(
+        OffenderService
+      ).to receive(:get_offender).and_raise(HmppsApi::Error::Unauthorized, 'Invalid token because reasons')
+    end
+
+    context 'when a call to a downstream API produces an unauthorized error' do
+      before do
+        get :show, params: { offender_no: offender.fetch(:prisonerNumber) }
+      end
+
+      it_behaves_like 'returns 401', 'Invalid token because reasons'
     end
   end
 end
