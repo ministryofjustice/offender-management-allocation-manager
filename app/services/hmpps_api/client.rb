@@ -93,14 +93,22 @@ module HmppsApi
     end
 
     def send_request(method, route, queryparams:, extra_headers:, body:)
+      url = @root + route
+      bearer = @user_token || token.access_token
+
       @connection.send(method) do |req|
-        req.url(@root + route)
-        req.headers['Authorization'] = "Bearer #{@user_token || token.access_token}"
+        req.url(url)
+        req.headers['Authorization'] = "Bearer #{bearer}"
         req.headers['Content-Type'] = 'application/json' unless body.nil?
         req.headers.merge!(extra_headers)
         req.params.update(queryparams)
         req.body = body.to_json unless body.nil?
       end
+    rescue Faraday::UnauthorizedError => e
+      Rails.logger.error("[#{self.class}] #{url} -- #{e.message}")
+
+      # cast and re-raise as it is handled up the chain
+      raise HmppsApi::Error::Unauthorized, e
     end
 
     def cache_key(method, route, queryparams:, extra_headers:, body:)

@@ -10,19 +10,23 @@ module Api
       render json: { status: 'ok' }
     end
 
-    def render_404(msg = 'Not found')
-      render json:  { status: 'error', message: msg }, status: :not_found
-    end
-
   private
 
-    def render_error(msg)
-      render json: { status: 'error', message: msg }, status: :unauthorized
+    def render_404(message = 'Not found')
+      render_error(message, :not_found)
+    end
+
+    def unauthorized_error(exception)
+      render_error(exception.message, :unauthorized)
+    end
+
+    def render_error(message, status)
+      render json: { status: 'error', message: }, status:
     end
 
     def verify_token
       unless token.valid_token_with_scope?('read', role: API_ROLE)
-        render_error('Valid authorisation token required')
+        render_error('Valid authorisation token required', :unauthorized)
       end
     end
 
