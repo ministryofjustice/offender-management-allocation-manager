@@ -38,13 +38,11 @@ class CoworkingController < PrisonsApplicationController
   end
 
   def confirm_removal
-    @prisoner = offender(coworking_nomis_offender_id_from_url)
-
     @allocation = AllocationHistory.find_by!(
       nomis_offender_id: coworking_nomis_offender_id_from_url
     )
-    @primary_pom = @prison.get_single_pom(@allocation.primary_pom_nomis_id
-                                         )
+    @prisoner = offender(@allocation.nomis_offender_id)
+    @primary_pom = @prison.get_single_pom(@allocation.primary_pom_nomis_id)
   end
 
   def destroy
@@ -63,10 +61,19 @@ class CoworkingController < PrisonsApplicationController
 
     # stop double-bounces from sending invalid emails.
     if secondary_pom_name.present?
-      EmailService.send_cowork_deallocation_email(allocation: @allocation, pom_nomis_id: @allocation.primary_pom_nomis_id, secondary_pom_name: secondary_pom_name)
+      EmailService.send_cowork_deallocation_email(
+        allocation: @allocation,
+        pom_nomis_id: @allocation.primary_pom_nomis_id,
+        secondary_pom_name: secondary_pom_name
+      )
+
+      prisoner = offender(@allocation.nomis_offender_id)
+      notice = "#{secondary_pom_name} removed as co-working POM for #{prisoner.full_name_ordered}"
+    else
+      notice = nil
     end
 
-    redirect_to prison_prisoner_allocation_path(active_prison_id, nomis_offender_id_from_url)
+    redirect_to prison_prisoner_allocation_path(active_prison_id, nomis_offender_id_from_url), notice:
   end
 
 private
