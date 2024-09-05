@@ -1,0 +1,21 @@
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Parole</h2>
+  </div>
+  <div class="govuk-summary-card__content">
+    <dl class="govuk-summary-list">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">PED Parole eligiblity date</dt>
+        <dd class="govuk-summary-list__value"><%= @offender.parole_eligibility_date&.strftime('%d/%m/%Y') %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Approaching parole?</dt>
+        <dd class="govuk-summary-list__value"><%= humanized_bool @offender.approaching_parole? %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Next parole date</dt>
+        <dd class="govuk-summary-list__value"><%= @offender.next_parole_date&.strftime('%d/%m/%Y') %><%= " (#{@offender.next_parole_date_type})" if @offender.next_parole_date_type %></dd>
+      </div>
+    </dl>
+  </div>
+</div>

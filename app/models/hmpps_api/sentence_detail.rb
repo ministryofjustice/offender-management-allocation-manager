@@ -10,7 +10,8 @@ module HmppsApi
                 :recall,
                 :release_date,
                 :sentence_start_date,
-                :tariff_date
+                :tariff_date,
+                :legal_status
 
     delegate :criminal_sentence?, :immigration_case?, :civil_sentence?, to: :@sentence_type
 
@@ -111,6 +112,7 @@ module HmppsApi
       @recall = payload.fetch('recall', false)
       @indeterminate_sentence = payload['indeterminateSentence']
       @description = payload.fetch('imprisonmentStatusDescription', 'Unknown Sentenced')
+      @legal_status = payload['legalStatus']
     end
 
     def indeterminate_sentence?

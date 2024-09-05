@@ -1,0 +1,33 @@
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Last recorded movement</h2>
+  </div>
+  <div class="govuk-summary-card__content">
+    <% if movements %>
+      <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Movement date</dt>
+          <dd class="govuk-summary-list__value"><%= format_date(@movements.movement_date) %></dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Starting point</dt>
+          <dd class="govuk-summary-list__value"><%= agency(@movements.from_agency) %> (<%= @movements.from_agency %>)</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Destination</dt>
+          <dd class="govuk-summary-list__value"><%= agency(@movements.to_agency) %> (<%= @movements.to_agency %>)</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Movement direction</dt>
+          <dd class="govuk-summary-list__value"><%= @movements.in? ? 'In' : 'Out' %></dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Movement type</dt>
+          <dd class="govuk-summary-list__value"><%= @movements.movement_type %></dd>
+        </div>
+      </dl>
+    <% else %>
+      <p class="govuk-body">No movements</p>
+    <% end %>
+  </div>
+</div>

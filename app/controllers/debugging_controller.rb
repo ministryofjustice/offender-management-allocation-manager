@@ -6,15 +6,16 @@ class DebuggingController < PrisonsApplicationController
   def debugging
     return unless id
 
-    prisoner = OffenderService.get_offender(id, ignore_legal_status: true)
+    @nomis_id = id
+    @offender = OffenderService.get_offender(@nomis_id, ignore_legal_status: true)
 
-    if prisoner.present?
-      @offender = prisoner
-      @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@offender.offender_no)
-
-      @allocation = AllocationHistory.find_by(nomis_offender_id: @offender.offender_no)
-      @movements =
-        HmppsApi::PrisonApi::MovementApi.movements_for(@offender.offender_no, %w[ADM TRN REL]).last_movement
+    if @offender
+      @persisted_handover = CalculatedHandoverDate.find_by(nomis_offender_id: @nomis_id)
+      @sentences = Sentences.for(booking_id: @offender.booking_id)
+      @parole_reviews = ParoleReview.where(nomis_offender_id: @nomis_id).order('updated_at DESC')
+      @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@nomis_id)
+      @allocation = AllocationHistory.find_by(nomis_offender_id: @nomis_id)
+      @movements = HmppsApi::PrisonApi::MovementApi.movements_for(@nomis_id, %w[ADM TRN REL]).last_movement
     end
   end
 

@@ -1,0 +1,35 @@
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Prison allocation</h2>
+  </div>
+  <div class="govuk-summary-card__content">
+    <% if allocation.try(:active?) %>
+      <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">POM role</dt>
+          <dd class="govuk-summary-list__value">
+            <% if @offender.inside_omic_policy? %>
+              <%= pom_responsibility_label(@offender) if @offender.probation_record.present? %>
+            <% else %>
+              Information unavailable as this case is outside OMIC policy
+            <% end %>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">POM</dt>
+          <dd class="govuk-summary-list__value"><%= allocation.primary_pom_name.titleize %></dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Last allocation event</dt>
+          <dd class="govuk-summary-list__value"><%= last_event(allocation) %></dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Early Allocation?</dt>
+          <dd class="govuk-summary-list__value"><%= humanized_bool(@offender.early_allocation?) %></dd>
+        </div>
+      </dl>
+    <% else %>
+      <p class="govuk-body">Not currently allocated</p>
+    <% end %>
+  </div>
+</div>

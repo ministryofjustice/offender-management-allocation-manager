@@ -19,6 +19,7 @@ module HmppsApi
              :automatic_release_date, :licence_expiry_date,
              :post_recall_release_date, :earliest_release_date, :earliest_release,
              :indeterminate_sentence?, :immigration_case?, :civil_sentence?, :describe_sentence,
+             :legal_status,
              to: :sentence
 
     delegate :code, :label, :active_since, to: :@category, prefix: :category, allow_nil: true

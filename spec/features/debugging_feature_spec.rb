@@ -6,6 +6,7 @@ feature 'Provide debugging information for our team to use' do
 
   before do
     allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).and_return(nil)
+    allow(Sentences).to receive(:for).and_return([])
     signin_global_admin_user
   end
 
@@ -34,7 +35,7 @@ feature 'Provide debugging information for our team to use' do
       fill_in 'offender_no', with: 'A1234BC'
       click_on('search-button')
 
-      expect(page).to have_content('No offender was found')
+      expect(page).to have_content('Could not find offender')
     end
 
     it 'can handle no offender number being entered', vcr: { cassette_name: 'prison_api/debugging_no_offender_feature' } do
@@ -44,7 +45,7 @@ feature 'Provide debugging information for our team to use' do
       fill_in 'offender_no', with: ''
       click_on('search-button')
 
-      expect(page).to have_content('No offender was found')
+      expect(page).to have_content('Could not find offender')
     end
   end
 end

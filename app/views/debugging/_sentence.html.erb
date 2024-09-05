@@ -1,0 +1,76 @@
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Sentencing information</h2>
+  </div>
+  <div class="govuk-summary-card__content">
+    <dl class="govuk-summary-list">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Main offence</dt>
+        <dd class="govuk-summary-list__value"><%= @offender.main_offence %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Category</dt>
+        <dd class="govuk-summary-list__value">
+          <% if @offender.category_code %>
+            <%= @offender.category_label %> (<%= @offender.category_code %>)
+            (since <%= format_date(@offender.category_active_since) %>)
+          <% else %>
+            Unknown
+          <% end %>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Imprisonment status</dt>
+        <dd class="govuk-summary-list__value"><%= @offender.describe_sentence %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Sentence type</dt>
+        <dd class="govuk-summary-list__value"><%= sentence_type_label(@offender) %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Sentence start date</dt>
+        <dd class="govuk-summary-list__value"><%= format_date(@offender.sentence_start_date, replacement: 'N/A') %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">ERD Earliest release date</dt>
+        <dd class="govuk-summary-list__value">
+          <%=
+            if @offender.earliest_release_for_handover
+              "#{@offender.earliest_release_for_handover.date.strftime('%d/%m/%Y')} (#{@offender.earliest_release_for_handover.name})"
+            else
+              'N/A'
+            end
+          %>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">CRD Conditional release date</dt>
+        <dd class="govuk-summary-list__value"><%= format_date(@offender.conditional_release_date, replacement: 'N/A') %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">TED Tariff end date</dt>
+        <dd class="govuk-summary-list__value"><%= format_date(@offender.tariff_date, replacement: 'N/A') %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">ARD Automatic release date</dt>
+        <dd class="govuk-summary-list__value"><%= format_date(@offender.automatic_release_date, replacement: 'N/A') %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">PED Parole eligibility date</dt>
+        <dd class="govuk-summary-list__value"><%= format_date(@offender.parole_eligibility_date, replacement: 'N/A') %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">HDCED Home detention curfew eligibility date</dt>
+        <dd class="govuk-summary-list__value"><%= format_date(@offender.home_detention_curfew_eligibility_date, replacement: 'N/A') %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Post recall release date</dt>
+        <dd class="govuk-summary-list__value"><%= format_date(@offender.post_recall_release_date, replacement: 'N/A') %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Licence expiry date</dt>
+        <dd class="govuk-summary-list__value"><%= format_date(@offender.licence_expiry_date, replacement: 'N/A') %></dd>
+      </div>
+    </dl>
+  </div>
+</div>
