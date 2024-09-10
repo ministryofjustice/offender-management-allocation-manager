@@ -1,45 +1,61 @@
 # As these tests hit the actual components API, these tests will need updating if service owners change things around,
 # but it seems prudent to test the actual API responses at most once and stub them everywhere else
 feature 'DPS standard header and footer:', :aggregate_failures, :skip_dps_header_footer_stubbing do
-  before :each, :mock_api_error do
-    stub_request(:get, "#{Rails.configuration.dps_frontend_components_api_host}/header").to_return(status: 503)
-    stub_request(:get, "#{Rails.configuration.dps_frontend_components_api_host}/footer").to_return(status: 503)
+  let(:api_host) { Rails.configuration.dps_frontend_components_api_host }
+  let(:header_endpoint) { "#{api_host}/header" }
+  let(:footer_endpoint) { "#{api_host}/footer" }
+
+  let(:header_body) do
+    {
+      html: '<header class="connect-dps-common-header govuk-!-display-none-print" role="banner">...</header>',
+      css: ['https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/stylesheets/header.css'],
+      javascript: ['https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/js/header.js']
+    }.to_json
   end
 
-  scenario 'standard DPS header is used',
-           vcr: { cassette_name: 'dps_header_footer/standard_header' } do
+  let(:footer_body) do
+    {
+      html: '<footer class="connect-dps-common-footer govuk-!-display-none-print" role="contentinfo">...</footer>',
+      css: ['https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/stylesheets/footer.css'],
+      javascript: []
+    }.to_json
+  end
+
+  before :each, :mock_api_error do
+    stub_request(:get, header_endpoint).to_return(status: 503)
+    stub_request(:get, footer_endpoint).to_return(status: 503)
+  end
+
+  before :each, :mock_api_success do
+    stub_request(:get, header_endpoint).to_return(status: 200, body: header_body)
+    stub_request(:get, footer_endpoint).to_return(status: 200, body: footer_body)
+  end
+
+  scenario 'standard DPS header is used', :mock_api_success do
     signin_pom_user
     visit '/'
 
-    expect(page).to have_css('header.connect-dps-external-header')
+    expect(page).to have_css('header.connect-dps-common-header')
     expect(page).to have_css('link[rel=stylesheet][href="https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/stylesheets/header.css"]', visible: :all)
-
-    # For when they add some JS
-    # expect(page).to have_css('script[src="https://frontend-components-dev.hmpps.service.justice.gov.uk/......."]', visible: :all)
+    expect(page).to have_css('script[src="https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/js/header.js"]', visible: :all)
   end
 
-  scenario 'fallback DPS header is used when DPS components API is not available', :mock_api_error,
-           vcr: { cassette_name: 'dps_header_footer/fallback_header' } do
+  scenario 'fallback DPS header is used when DPS components API is not available', :mock_api_error do
     signin_pom_user
     visit '/'
 
     expect(page).to have_css('header.govuk-header--fallback')
   end
 
-  scenario 'standard DPS footer is used',
-           vcr: { cassette_name: 'dps_header_footer/standard_footer' } do
+  scenario 'standard DPS footer is used', :mock_api_success do
     signin_pom_user
     visit '/'
 
-    expect(page).to have_css('footer.govuk-footer a.govuk-footer__link[href="https://sign-in-dev.hmpps.service.justice.gov.uk/auth/terms"]')
+    expect(page).to have_css('footer.connect-dps-common-footer')
     expect(page).to have_css('link[rel=stylesheet][href="https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/stylesheets/footer.css"]', visible: :all)
-
-    # For when they add some JS
-    # expect(page).to have_css('script[src="https://frontend-components-dev.hmpps.service.justice.gov.uk/......."]', visible: :all)
   end
 
-  scenario 'fallback DPS footer is used when DPS components API is not available', :mock_api_error,
-           vcr: { cassette_name: 'dps_header_footer/fallback_footer' } do
+  scenario 'fallback DPS footer is used when DPS components API is not available', :mock_api_error do
     signin_pom_user
     visit '/'
 
