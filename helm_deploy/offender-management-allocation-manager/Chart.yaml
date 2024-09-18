@@ -11,8 +11,8 @@ version: 1.0.0
 
 dependencies:
   - name: generic-service
-    version: ~3.4.0
+    version: ~3.5.0
     repository: https://ministryofjustice.github.io/hmpps-helm-charts
   - name: generic-prometheus-alerts
-    version: ~1.8.0
+    version: ~1.9.0
     repository: https://ministryofjustice.github.io/hmpps-helm-charts

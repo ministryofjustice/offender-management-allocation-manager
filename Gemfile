@@ -85,7 +85,7 @@ group :test do
   gem 'launchy'
   gem 'rails-controller-testing'
   gem 'ruby-prof', '>= 0.16.0', require: false
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '4.23.0'
   gem 'shoulda-matchers'
   gem 'simplecov'
   # we can't use the branch coverage version of simplecov, (due to code climate)
