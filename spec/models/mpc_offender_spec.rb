@@ -489,6 +489,18 @@ RSpec.describe MpcOffender, type: :model do
 
   describe 'parole-related methods' do
     describe '#next_parole_date_type' do
+      let(:target_hearing_date) { 3.days.from_now.to_date }
+
+      context 'when next_parole_date is nil' do
+        let(:parole_eligibility_date) { nil }
+
+        it 'returns nil' do
+          allow(subject).to receive(:next_parole_date).and_return(nil)
+
+          expect(subject.next_parole_date_type).to be_nil
+        end
+      end
+
       context 'when next_parole_date is tariff_date' do
         it 'returns "TED"' do
           allow(subject).to receive(:next_parole_date).and_return(tariff_date)
@@ -498,7 +510,7 @@ RSpec.describe MpcOffender, type: :model do
       end
 
       context 'when next_parole_date is parole_eligibility_date' do
-        it 'returns "TED"' do
+        it 'returns "PED"' do
           allow(subject).to receive(:next_parole_date).and_return(parole_eligibility_date)
 
           expect(subject.next_parole_date_type).to eq 'PED'
@@ -506,7 +518,7 @@ RSpec.describe MpcOffender, type: :model do
       end
 
       context 'when next_parole_date is target_hearing_date' do
-        it 'returns "TED"' do
+        it 'returns "Target hearing date"' do
           allow(subject).to receive(:next_parole_date).and_return(target_hearing_date)
 
           expect(subject.next_parole_date_type).to eq 'Target hearing date'
