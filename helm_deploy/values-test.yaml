@@ -7,6 +7,9 @@ custom_templates_config:
   domain_events_consumer:
     enabled: false
 
+generic-prometheus-alerts:
+  businessHoursOnly: true
+
 generic-service:
   ingress:
     hosts:
