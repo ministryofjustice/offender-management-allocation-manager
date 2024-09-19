@@ -1,0 +1,60 @@
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Calculated responsibility & handover history</h2>
+  </div>
+  <div class="govuk-summary-card__content">
+    <% if history %>
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Calculated at</th>
+            <th scope="col" class="govuk-table__header">Responsibility</th>
+            <th scope="col" class="govuk-table__header">Reason</th>
+            <th scope="col" class="govuk-table__header">Handover</th>
+            <th scope="col" class="govuk-table__header">ERD</th>
+            <th scope="col" class="govuk-table__header">Mappa</th>
+            <th scope="col" class="govuk-table__header">Recall?</th>
+            <th scope="col" class="govuk-table__header">ISP?</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          <% history.each do |item| %>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header"><%= item.updated_at.strftime('%d/%m/%Y %H:%M:%S') %></th>
+              <td class="govuk-table__cell"><%= item.responsibility %></td>
+              <td class="govuk-table__cell"><%= item.reason.humanize %></td>
+              <td class="govuk-table__cell"><%= item.handover_date&.strftime('%d/%m/%Y') %></td>
+              <td class="govuk-table__cell"><%= item.earliest_release_date %></td>
+              <td class="govuk-table__cell"><%= item.mappa_level %></td>
+              <td class="govuk-table__cell"><%= humanized_bool item.recalled? %></td>
+              <td class="govuk-table__cell"><%= humanized_bool item.indeterminate_sentence? %></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell" colspan="8">
+                <details class="govuk-details">
+                  <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                      Offender details recorded at this point
+                    </span>
+                  </summary>
+                  <div class="govuk-details__text">
+                    <dl class="govuk-summary-list">
+                      <% item.offender_attributes.sort.each do |key, value| %>
+                        <div class="govuk-summary-list__row">
+                          <dt class="govuk-summary-list__key"><%= key.humanize %></dt>
+                          <dd class="govuk-summary-list__value"><%= value %></dd>
+                        </div>
+                      <% end %>
+                    </dl>
+                  </div>
+                </details>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="govuk-body">No history recorded</p>
+    <% end %>
+  </div>
+</div>

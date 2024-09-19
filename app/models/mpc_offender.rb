@@ -3,7 +3,7 @@
 class MpcOffender
   delegate :get_image,
            :recalled?, :immigration_case?, :indeterminate_sentence?,
-           :sentenced?, :over_18?, :describe_sentence, :civil_sentence?,
+           :sentenced?, :over_18?, :describe_sentence, :legal_status, :civil_sentence?,
            :sentence_start_date, :conditional_release_date, :automatic_release_date, :parole_eligibility_date,
            :tariff_date, :post_recall_release_date, :licence_expiry_date,
            :home_detention_curfew_actual_date, :home_detention_curfew_eligibility_date,

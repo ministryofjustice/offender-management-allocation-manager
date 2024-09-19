@@ -130,4 +130,8 @@ class CalculatedHandoverDate < ApplicationRecord
         .where(':relative_to::date >= "handover_date"::date + \'2 days\'::interval', relative_to: relative_to_date)
     end
   end
+
+  def history
+    History.new(self)
+  end
 end

@@ -1,0 +1,25 @@
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Sentences</h2>
+  </div>
+  <div class="govuk-summary-card__content">
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">ISP / SD</th>
+          <th scope="col" class="govuk-table__header">Sentence Start Date</th>
+          <th scope="col" class="govuk-table__header">Duration</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        <% sentences.each do |sentence| %>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><%= sentence.indeterminate? ? 'ISP' : 'SD' %></td>
+            <td class="govuk-table__cell"><%= sentence.sentence_start_date&.strftime('%d/%m/%Y') %></td>
+            <td class="govuk-table__cell"><%= sentence.duration > 0.days ? sentence.duration.inspect : '' %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

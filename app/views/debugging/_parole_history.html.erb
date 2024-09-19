@@ -1,0 +1,48 @@
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Parole review history</h2>
+  </div>
+  <div class="govuk-summary-card__content">
+    <% if parole_reviews.any? %>
+
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Updated at</th>
+            <th scope="col" class="govuk-table__header">Status</th>
+            <th scope="col" class="govuk-table__header">Outcome</th>
+            <th scope="col" class="govuk-table__header">Outcome received</th>
+            <th scope="col" class="govuk-table__header">THD</th>
+            <th scope="col" class="govuk-table__header">Custody report due</th>
+            <th scope="col" class="govuk-table__header">Note</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          <% parole_reviews.each do |parole_review| %>
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header" data-record-id="<%= parole_review.id %>">
+                <%= parole_review.updated_at.strftime('%d/%m/%Y %H:%M:%S') %>
+              </th>
+              <td class="govuk-table__cell"><%= parole_review.review_status %></td>
+              <td class="govuk-table__cell"><%= parole_review.hearing_outcome %></td>
+              <td class="govuk-table__cell"><%= parole_review.hearing_outcome_received_on&.strftime('%d/%m/%Y') %></td>
+              <td class="govuk-table__cell"><%= parole_review.target_hearing_date&.strftime('%d/%m/%Y') %></td>
+              <td class="govuk-table__cell"><%= parole_review.custody_report_due&.strftime('%d/%m/%Y') %></td>
+              <td class="govuk-table__cell">
+                <%=
+                  case parole_review.id
+                  when @offender.most_recent_completed_parole_review&.id then 'MRC'
+                  when @offender.most_recent_parole_review&.id           then 'MR'
+                  when @offender.parole_review_awaiting_hearing&.id      then 'AH'
+                  end
+                %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="govuk-body">No history recorded</p>
+    <% end %>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 <% content_for :title, "Debugging – #{t('global.default_page_title')}" %>
 
-<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Debugging</h1>
+<h2 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Debugging</h2>
 
 <div class="search-box govuk-grid-row">
   <%= form_tag(prison_debugging_path(@prison.code), method: :get, id: "debugging_form") do %>
@@ -8,360 +8,43 @@
       <label class="govuk-label" for="offender_no">
         Enter a prisoner number
       </label>
-      <input class="govuk-input" id="offender_no" name="offender_no" type="text" value="<%= @offender_no %>" autofocus="true">
-
-      <input id="search-button" type="submit" class="govuk-button" value="    Search    "/>
+      <input class="govuk-input" id="offender_no" name="offender_no" type="text" value="<%= @nomis_id %>" autofocus="true">
+      <input id="search-button" type="submit" class="govuk-button" value="Search"/>
     </div>
   <% end %>
 </div>
 
-<% if @offender.blank? %>
-  <p>
-    No offender was found, please check the offender number and try again
-  </p>
+<% if @offender %>
+
+  <%= render partial: "offender_details",
+    locals: { oasys_assessment: @oasys_assessment } %>
+
+  <%= render partial: @offender.responsibility_override? ? "responsibility_overridden" : "responsibility",
+    locals: { responsibility: @offender.send(:responsibility) } %>
+
+  <%= render partial: "responsibility_history",
+    locals: { history: @persisted_handover.try(:history) } %>
+
+  <%= render partial: "sentence" %>
+
+  <%= render partial: "sentence_history",
+    locals: { sentences: @sentences.reverse } %>
+
+  <%= render partial: "parole" %>
+
+  <%= render partial: "parole_history",
+    locals: { parole_reviews: @parole_reviews } %>
+
+  <%= render partial: "allocation",
+    locals: { allocation: @allocation } %>
+
+  <%= render partial: "community" %>
+
+  <%= render partial: "movements",
+    locals: { movements: @movements } %>
+
 <% else %>
 
-  <div class="govuk-!-margin-top-1" id="prisoner-information">
-    <table class="govuk-table">
-      <tbody class="govuk-table__body">
-      <tr class="govuk-table__row">
-        <td class="govuk-table__header" scope="row">Prisoner information</td>
-        <td class="govuk-table__cell"></td>
-      </tr>
-      <tr class="govuk-table__row" id="name">
-        <td class="govuk-table__cell govuk-!-width-one-half">Name</td>
-        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= @offender.full_name %></td>
-      </tr>
-      <tr class="govuk-table__row" id="dob">
-        <td class="govuk-table__cell govuk-!-width-one-half">DOB</td>
-        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= format_date(@offender.date_of_birth) %></td>
-      </tr>
-      <tr class="govuk-table__row" id="sentenced">
-        <td class="govuk-table__cell">Sentenced?</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= humanized_bool(@offender.sentenced?) %>
-      </tr>
-      <tr class="govuk-table__row" id="recalled">
-        <td class="govuk-table__cell">Recalled?</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= humanized_bool(@offender.recalled?) %>
-      </tr>
-      <tr class="govuk-table__row" id="over-18">
-        <td class="govuk-table__cell govuk-!-width-one-half">Over 18?</td>
-        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half"><%= humanized_bool(@offender.over_18?) %></td>
-      </tr>
-      <tr class="govuk-table__row" id="tier">
-        <td class="govuk-table__cell">Tiering calculation</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= probation_field(@offender, :tier) || 'Not provided' %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id=service-provider">
-        <td class="govuk-table__cell">Handover type</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= handover_type_label(@offender) %>
-        </td>
-      </tr>
-      <tr id="oasys-date" class="govuk-table__row">
-        <td class="govuk-table__cell">Last completed OASys</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <% if @oasys_assessment.nil? %>
-            No OASys information
-            <% %>
-          <% elsif @oasys_assessment.fetch(:assessment_type) == Faraday::ConflictError %>
-            This prisoner has more than one OASys record linked to their prison number. Merge these records or delete
-            one so we can display their OASys information.
-          <% elsif @oasys_assessment.fetch(:assessment_type) == Faraday::ServerError %>
-            We cannot show this right now. Please try again later.
-          <% else %>
-            Layer <%= @oasys_assessment.fetch(:assessment_type)[-1] %>
-            – <%= format_date(@oasys_assessment.fetch(:completed)) %>
-          <% end %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id="restricted-patient">
-        <td class="govuk-table__cell">Restricted Patient Service</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= humanized_bool(@offender.restricted_patient?) %>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+  <p class="govuk-body">Could not find offender with NOMIS ID <code><%= @nomis_id %></code></p>
 
-    <table class="govuk-table">
-      <tbody class="govuk-table__body">
-      <tr class="govuk-table__row">
-        <td class="govuk-table__header govuk-!-width-one-half" scope="row">Responsibility & handover information</td>
-        <td class="govuk-table__cell govuk-!-width-one-half"></td>
-      </tr>
-      <% if @offender.inside_omic_policy? %>
-        <tr class="govuk-table__row" id="responsibility">
-          <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
-          <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-            <%= case_owner_label(@offender) if @offender.probation_record.present? %>
-          </td>
-        <tr class="govuk-table__row" id="responsibility-override">
-          <td class="govuk-table__cell govuk-!-width-one-half">Responsibility overridden?</td>
-          <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-            <%= humanized_bool(@offender.responsibility_override?) if @offender.probation_record.present? %>
-          </td>
-        </tr>
-        <tr class="govuk-table__row" id="handover-start-date">
-          <td class="govuk-table__cell govuk-!-width-one-half">Handover start date</td>
-          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-            <%= format_date(probation_field(@offender, :handover_start_date), replacement: 'N/A') %>
-          </td>
-        </tr>
-        <tr class="govuk-table__row" id="responsibility-handover-date">
-          <td class="govuk-table__cell govuk-!-width-one-half">Handover completion due</td>
-          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-            <%= format_date(probation_field(@offender, :handover_date), replacement: 'N/A') %>
-          </td>
-        </tr>
-        <tr class="govuk-table__row" id="handover-reason">
-          <td class="govuk-table__cell govuk-!-width-one-half">Reason for handover dates</td>
-          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-            <%= probation_field(@offender, :handover_reason) %>
-          </td>
-        </tr>
-        <tr class="govuk-table__row" id="release-date-for-handover">
-          <td class="govuk-table__cell govuk-!-width-one-half">Release date and type used in handover calculations</td>
-          <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-            <%= values = probation_field(@offender, :earliest_release_for_handover)
-                values ? "#{format_date(values.date)} (#{values.name})" : 'N/A' %>
-          </td>
-        </tr>
-      <% else %>
-        <tr class="govuk-table__row" id="outside-omic-policy">
-          <td class="govuk-table__cell" colspan="2">
-            OMIC policy does not apply to this offender
-          </td>
-        </tr>
-      <% end %>
-      </tbody>
-    </table>
-
-    <table class="govuk-table" id="sentence-information">
-      <tbody class="govuk-table__body">
-      <tr class="govuk-table__row">
-        <td class="govuk-table__header govuk-!-width-one-half" scope="row">Sentence information</td>
-        <td class="govuk-table__cell govuk-!-width-one-half"></td>
-      </tr>
-      <tr class="govuk-table__row" id="offence">
-        <td class="govuk-table__cell govuk-!-width-one-half">Main offence</td>
-        <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half"><%= @offender.main_offence %></td>
-      </tr>
-      <tr class="govuk-table__row" id="category">
-        <td class="govuk-table__cell govuk-!-width-one-half">Category</td>
-        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-          <% if @offender.category_code %>
-            <%= @offender.category_label %> (<%= @offender.category_code %>)
-            (since <%= format_date(@offender.category_active_since) %>)
-          <% else %>
-            Unknown
-          <% end %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id="imprisonment-status">
-        <td class="govuk-table__cell govuk-!-width-one-half">Imprisonment status</td>
-        <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-          <%= @offender.describe_sentence %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id="sentence-type">
-        <td class="govuk-table__cell">Sentence type</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= sentence_type_label(@offender) %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id="sentence-start-date">
-        <td class="govuk-table__cell">Sentence start date</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= format_date(@offender.sentence_start_date, replacement: 'N/A') %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id="earliest-release-date">
-        <td class="govuk-table__cell">Earliest release date</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= format_date(@offender.earliest_release_date, replacement: 'N/A') %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id="conditional-release-date">
-        <td class="govuk-table__cell">Conditional release date</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= format_date(@offender.conditional_release_date, replacement: 'N/A') %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id="automatic-release-date">
-        <td class="govuk-table__cell">Automatic release date</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= format_date(@offender.automatic_release_date, replacement: 'N/A') %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id="parole=eligibility-date">
-        <td class="govuk-table__cell">Parole eligibility</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= format_date(@offender.parole_eligibility_date, replacement: 'N/A') %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id="hdc-date">
-        <td class="govuk-table__cell">Home detention curfew eligibility</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= format_date(@offender.home_detention_curfew_eligibility_date, replacement: 'N/A') %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id="tariff-date">
-        <td class="govuk-table__cell">Tariff date</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= format_date(@offender.tariff_date, replacement: 'N/A') %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id="post-recall-release-date">
-        <td class="govuk-table__cell">Post recall release date</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= format_date(@offender.post_recall_release_date, replacement: 'N/A') %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row" id="licence-expiry-date">
-        <td class="govuk-table__cell">Sentence/ licence end date</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= format_date(@offender.licence_expiry_date, replacement: 'N/A') %>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-
-    <% if @allocation.present? && @allocation.active? %>
-      <table class="govuk-table">
-        <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-          <td class="govuk-table__header govuk-!-width-one-half" scope="row">Prison allocation</td>
-          <td class="govuk-table__cell govuk-!-width-one-half"></td>
-        </tr>
-        <tr class="govuk-table__row" id="pom-role">
-          <td class="govuk-table__cell">POM role</td>
-          <td class="govuk-table__cell table_cell__left_align">
-            <% if @offender.inside_omic_policy? %>
-              <%= pom_responsibility_label(@offender) if @offender.probation_record.present? %>
-            <% else %>
-              Information unavailable as this case is outside OMIC policy
-            <% end %>
-          </td>
-        </tr>
-        <tr class="govuk-table__row" id="pom">
-          <td class="govuk-table__cell govuk-!-width-one-half">POM</td>
-          <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-            <%= @allocation.primary_pom_name.titleize %>
-          </td>
-        </tr>
-        <tr class="govuk-table__row" id="co-working-pom">
-          <td class="govuk-table__cell govuk-!-width-one-half">Co-working POM</td>
-          <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-            <% if @coworker.nil? %>
-              N/A
-            <% else %>
-              <%= @allocation.secondary_pom_name %>
-            <% end %>
-          </td>
-        </tr>
-        <tr class="govuk-table__row" id="allocation-event">
-          <td class="govuk-table__cell govuk-!-width-one-half">Last allocation event</td>
-          <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-            <%= last_event(@allocation) %>
-          </td>
-        </tr>
-        <tr class="govuk-table__row" id="is-early-allocation">
-          <td class="govuk-table__cell govuk-!-width-one-half">Early Allocation?</td>
-          <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-            <%= humanized_bool(@offender.early_allocation?) %>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    <% else %>
-      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-      <h2 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-4">Not currently allocated</h2>
-      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-    <% end %>
-
-    <table class="govuk-table" id="community_information">
-      <tbody class="govuk-table__body">
-      <tr class="govuk-table__row">
-        <td class="govuk-table__header govuk-!-width-one-half" scope="row">Community information</td>
-        <td class="govuk-table__cell govuk-!-width-one-half"></td>
-      </tr>
-      <tr class="govuk-table__row">
-        <td class="govuk-table__cell">Local divisional unit (LDU)</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= @offender.ldu_name || "Unknown" %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row">
-        <td class="govuk-table__cell">Local divisional unit (LDU) email address</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <% if @offender.ldu_email_address.present? %>
-            <%= mail_to(@offender.ldu_email_address, @offender.ldu_email_address) %>
-          <% else %>
-            Unknown
-          <% end %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row">
-        <td class="govuk-table__cell">Team</td>
-        <td class="govuk-table__cell table_cell__left_align">
-          <%= @offender.team_name || "Unknown" %>
-        </td>
-      </tr>
-      <tr class="govuk-table__row">
-        <td class="govuk-table__cell govuk-!-width-one-half">COM</td>
-        <td class="govuk-table__cell table_cell__left_align  govuk-!-width-one-half">
-          <%= probation_field(@offender, :allocated_com_name) || "Unknown" %>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-
-    <% unless @movements.blank? %>
-      <table class="govuk-table">
-        <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-          <td class="govuk-table__header govuk-!-width-one-half" scope="row">Last recorded movement</td>
-          <td class="govuk-table__cell govuk-!-width-one-half"></td>
-        </tr>
-        <tr class="govuk-table__row" id="movement_date">
-          <td class="govuk-table__cell">Movement date</td>
-          <td class="govuk-table__cell table_cell__left_align">
-            <%= format_date(@movements.movement_date) %>
-          </td>
-        </tr>
-        <tr class="govuk-table__row" id="from-agency">
-          <td class="govuk-table__cell">Starting point</td>
-          <td class="govuk-table__cell table_cell__left_align">
-            <%= agency(@movements.from_agency) %> (<%= @movements.from_agency %>)
-          </td>
-        </tr>
-        <tr class="govuk-table__row" id="to-agency">
-          <td class="govuk-table__cell govuk-!-width-one-half">Destination</td>
-          <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-            <%= agency(@movements.to_agency) %> (<%= @movements.to_agency %>)
-          </td>
-        </tr>
-        <tr class="govuk-table__row" id="movement-direction">
-          <td class="govuk-table__cell govuk-!-width-one-half">Movement direction</td>
-          <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-            <%= @movements.in? ? 'In' : 'Out' %>
-          </td>
-        </tr>
-        <tr class="govuk-table__row" id="movement-type">
-          <td class="govuk-table__cell govuk-!-width-one-half">Movement type</td>
-          <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-            <%= @movements.movement_type %>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    <% end %>
-
-    <%= render 'handover_calculations', offender: @offender %>
-  </div>
 <% end %>

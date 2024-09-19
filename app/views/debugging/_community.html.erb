@@ -1,0 +1,31 @@
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Community information</h2>
+  </div>
+  <div class="govuk-summary-card__content">
+    <dl class="govuk-summary-list">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Local divisional unit (LDU)</dt>
+        <dd class="govuk-summary-list__value"><%= @offender.ldu_name || "Unknown" %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Local divisional unit (LDU) email address</dt>
+        <dd class="govuk-summary-list__value">
+          <% if @offender.ldu_email_address.present? %>
+            <%= mail_to(@offender.ldu_email_address, @offender.ldu_email_address) %>
+          <% else %>
+            Unknown
+          <% end %>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Team</dt>
+        <dd class="govuk-summary-list__value"><%= @offender.team_name || "Unknown" %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">COM</dt>
+        <dd class="govuk-summary-list__value"><%= probation_field(@offender, :allocated_com_name) || "Unknown" %></dd>
+      </div>
+    </dl>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-third">
+    <div class="moj-search govuk-!-margin-bottom-8">
+      <%= form_for(:offender_search, url: '/debugging/offenders', builder: GOVUKDesignSystemFormBuilder::FormBuilder, method: :post) do |f| %>
+        <%= f.govuk_text_field :nomis_id, label: { text: 'Enter an offender nomis id', class: 'moj-search__label', size: 's' }, value: @nomis_id, class: 'moj-search__input' %>
+        <%= f.govuk_submit "Debug", class: 'moj-search__button' %>
+      <% end %>
+    </div>
+  </div>
+</div>
