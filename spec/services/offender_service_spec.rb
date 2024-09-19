@@ -72,24 +72,7 @@ describe OffenderService, type: :feature do
   end
 
   describe '#get_community_data' do
-    # This offender has been set up in nDelius test especially for this test
     let(:nomis_offender_id) { 'A5194DY' }
-
-    # This test can only be run inside the VPN as nDelius test isn't globally accessible
-    context 'when hitting API', :vpn_only, vcr: { cassette_name: 'delius/get_community_data' } do
-      it 'gets some data' do
-        expect(described_class.get_community_data(nomis_offender_id))
-            .to eq('crn' => "X349420",
-                   'ldu_code' => "N07NPSA",
-                   'mappa_levels' => [],
-                   'noms_no' => nomis_offender_id,
-                   'offender_manager' => "TestUpdate01Surname, TestUpdate01Forname",
-                   'enhanced_resourcing' => true,
-                   'team_name' => "OMU A",
-                   'tier' => "B-2",
-                   'active_vlo' => false)
-      end
-    end
 
     describe '[with some stubbing]' do
       before do
@@ -255,24 +238,7 @@ describe OffenderService, type: :feature do
   end
 
   describe '#get_com' do
-    # This offender has been set up in nDelius test especially for this test
     let(:nomis_offender_id) { 'A5194DY' }
-
-    # This test can only be run inside the VPN as nDelius test isn't globally accessible
-    context 'when hitting API', :vpn_only, vcr: { cassette_name: 'delius/get_all_offender_managers_data' } do
-      it 'gets some data' do
-        expected = {
-          'name' => 'TestUpdate01Surname, TestUpdate01Forname',
-          'email' => 'test-update-01-email@example.org ',
-          'ldu_code' => 'N07NPSA',
-          'team_name' => 'OMU A',
-          'is_responsible' => true,
-          'is_unallocated' => false,
-        }
-
-        expect(described_class.get_com(nomis_offender_id)).to eq expected
-      end
-    end
 
     context 'with stubbing' do
       before do
