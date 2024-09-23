@@ -28,11 +28,6 @@ module HmppsApi
       client.get(route)
     end
 
-    def self.get_offender_mappa_details(crn)
-      route = "/offenders/crn/#{crn}/risk/mappa"
-      client.get(route)
-    end
-
     def self.get_all_offender_managers(nomis_offender_id)
       safe_offender_no = URI.encode_www_form_component(nomis_offender_id)
       route = "/offenders/nomsNumber/#{safe_offender_no}/allOffenderManagers"
