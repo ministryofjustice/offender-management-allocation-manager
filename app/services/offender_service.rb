@@ -102,7 +102,7 @@ class OffenderService
 
       return nil_details if crn.blank?
 
-      details = HmppsApi::CommunityApi.get_offender_mappa_details(crn)
+      details = HmppsApi::ManagePomCasesAndDeliusApi.get_mappa_details(crn)
 
       {
         category: details['category'],

@@ -299,7 +299,7 @@ describe OffenderService, type: :feature do
 
   describe 'get_mappa_details' do
     before do
-      allow(HmppsApi::CommunityApi).to receive(:get_offender_mappa_details)
+      allow(HmppsApi::ManagePomCasesAndDeliusApi).to receive(:get_mappa_details)
         .and_return(api_mappa)
     end
 
@@ -331,7 +331,7 @@ describe OffenderService, type: :feature do
       }
     end
 
-    it 'gets short descripton' do
+    it 'gets short description' do
       expect(result[:short_description]).to eq('CAT 3/LEVEL 1')
     end
 
