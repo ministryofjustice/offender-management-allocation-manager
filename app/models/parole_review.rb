@@ -12,8 +12,7 @@ class ParoleReview < ApplicationRecord
   # If neither the THD or custody_report_due date are defined, we have no method
   # of determining when the parole hearing was, which is vital for MPC.
   scope :ordered_by_sortable_date, lambda {
-    where(Arel.sql('COALESCE(target_hearing_date, custody_report_due) IS NOT NULL'))
-    .order(Arel.sql('COALESCE(target_hearing_date, custody_report_due)'))
+    order(Arel.sql('COALESCE(target_hearing_date, custody_report_due, \'1900-01-01\')') => :asc)
   }
 
   scope :with_hearing_outcome, -> { where.not(hearing_outcome: ['Not Applicable', 'Not Specified', nil]).or(where.not(hearing_outcome_received_on: nil)) }
