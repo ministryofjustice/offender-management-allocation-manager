@@ -6,7 +6,9 @@ class ParoleCasesController < PrisonsApplicationController
   before_action :ensure_spo_user
 
   def index
-    sorted_offenders_with_allocs = sort_collection offenders_with_allocs, default_sort: :last_name
+    offenders = params[:old].present? ? offenders_with_allocs_old : offenders_with_allocs_new
+
+    sorted_offenders_with_allocs = sort_collection offenders, default_sort: :last_name
     @offenders = Kaminari.paginate_array(sorted_offenders_with_allocs).page(page)
   end
 
@@ -14,7 +16,7 @@ private
 
   # Find the allocated offenders in this prison which are approaching parole
 
-  def offenders_with_allocs
+  def offenders_with_allocs_new
     allocations = AllocationHistory.active_allocations_for_prison(@prison.code).index_by(&:nomis_offender_id)
     offenders   = @prison.offenders.select(&:approaching_parole?)
 
@@ -23,5 +25,22 @@ private
         OffenderWithAllocationPresenter.new(offender, allocation)
       end
     }.compact
+  end
+
+  def offenders_with_allocs_old
+    parole_offenders.map { |offender|
+      parole_allocation = parole_allocations.detect { |alloc| alloc.nomis_offender_id == offender.offender_no }
+      next if parole_allocation.nil? # Only show allocated offenders
+
+      OffenderWithAllocationPresenter.new(offender, parole_allocation)
+    }.compact
+  end
+
+  def parole_offenders
+    @prison.offenders.select(&:approaching_parole?)
+  end
+
+  def parole_allocations
+    @prison.allocations.where(nomis_offender_id: parole_offenders.map(&:offender_no))
   end
 end
