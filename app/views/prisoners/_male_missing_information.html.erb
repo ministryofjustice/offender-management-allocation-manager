@@ -51,7 +51,7 @@
             <%= offender.offender_no %>
           </span>
         </td>
-        <td aria-label="Waiting" class="govuk-table__cell"><%= offender.awaiting_allocation_for %></td>
+        <td aria-label="Waiting" class="govuk-table__cell"><%= offender.awaiting_allocation_for.presence || 'N/A' %> days</td>
         <td aria-label="Action" class="govuk-table__cell" id="<%= "edit_#{offender.offender_no}" %>">
           <%= link_to "Add missing details", new_prison_case_information_path(@prison.code, offender.offender_no, sort: params[:sort], page: params[:page] || 1) %>
         </td>
