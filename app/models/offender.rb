@@ -51,7 +51,7 @@ class Offender < ApplicationRecord
 
   # Returns the most recent parole review (can be a future parole application), regardless of activity status and outcome.
   def most_recent_parole_review
-    @most_recent_parole_review ||= parole_reviews.ordered_by_sortable_date.to_a.last
+    @most_recent_parole_review ||= parole_reviews.ordered_by_sortable_date.last
   end
 
   # Returns the most recent parole application if it has not yet had a hearing.
@@ -61,7 +61,7 @@ class Offender < ApplicationRecord
 
   # Returns the most recent parole review that has an outcome
   def most_recent_completed_parole_review
-    @most_recent_completed_parole_review ||= parole_reviews.ordered_by_sortable_date.with_hearing_outcome.to_a.last
+    @most_recent_completed_parole_review ||= parole_reviews.ordered_by_sortable_date.with_hearing_outcome.last
   end
 
   def current_parole_review
