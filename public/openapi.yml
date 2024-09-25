@@ -62,7 +62,6 @@ components:
           - emailHistories
           - handoverProgressChecklist
           - offenderEmailSent
-          - paroleRecord
           - responsibility
           - victimLiaisonOfficers
           properties:
@@ -432,20 +431,6 @@ components:
                     type: string
                   updatedAt:
                     type: string
-            paroleRecord:
-              type: object
-              nullable: true
-              required:
-              - paroleReviewDate
-              - createdAt
-              - updatedAt
-              properties:
-                paroleReviewDate:
-                  type: string
-                createdAt:
-                  type: string
-                updatedAt:
-                  type: string
             responsibility:
               type: object
               nullable: true

@@ -70,7 +70,6 @@ RSpec.configure do |config|
                   emailHistories
                   handoverProgressChecklist
                   offenderEmailSent
-                  paroleRecord
                   responsibility
                   victimLiaisonOfficers
                 ],
@@ -335,20 +334,6 @@ RSpec.configure do |config|
                         createdAt: { type: :string },
                         updatedAt: { type: :string },
                       }
-                    }
-                  },
-                  paroleRecord: {
-                    type: :object,
-                    nullable: true,
-                    required: %w[
-                      paroleReviewDate
-                      createdAt
-                      updatedAt
-                    ],
-                    properties: {
-                      paroleReviewDate: { type: :string },
-                      createdAt: { type: :string },
-                      updatedAt: { type: :string },
                     }
                   },
                   responsibility: {

@@ -526,18 +526,6 @@ CREATE TABLE public.offenders (
 
 
 --
--- Name: parole_records; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.parole_records (
-    nomis_offender_id character varying NOT NULL,
-    parole_review_date date NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
 -- Name: parole_review_imports; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1045,14 +1033,6 @@ ALTER TABLE ONLY public.offenders
 
 
 --
--- Name: parole_records parole_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.parole_records
-    ADD CONSTRAINT parole_records_pkey PRIMARY KEY (nomis_offender_id);
-
-
---
 -- Name: parole_review_imports parole_review_imports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1279,6 +1259,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20240924134717'),
 ('20240724134026'),
 ('20240614083226'),
 ('20240416124347'),

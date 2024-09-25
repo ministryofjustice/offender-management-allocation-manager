@@ -28,7 +28,6 @@ private
       emailHistories: by_offender_id(EmailHistory, :event),
       handoverProgressChecklist: by_offender_id(HandoverProgressChecklist, :state).first,
       offenderEmailSent: by_offender_id(OffenderEmailSent, :event),
-      paroleRecord: by_offender_id(ParoleRecord, :state).first,
       responsibility: by_offender_id(Responsibility, :state).first,
       victimLiaisonOfficers: by_offender_id(VictimLiaisonOfficer, :state),
     }

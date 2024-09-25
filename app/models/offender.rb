@@ -33,7 +33,6 @@ class Offender < ApplicationRecord
           inverse_of: :offender,
           dependent: :destroy
 
-  has_one :parole_record, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
   has_many :parole_reviews, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 
   has_one :calculated_early_allocation_status, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy

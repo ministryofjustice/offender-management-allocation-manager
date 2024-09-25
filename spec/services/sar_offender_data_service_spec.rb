@@ -28,7 +28,6 @@ RSpec.describe SarOffenderDataService do
         create_historic_list(:email_history, nomis_offender_id, trait: :auto_early_allocation)
         create_historic(:handover_progress_checklist, nomis_offender_id)
         create_historic_list(:offender_email_sent, nomis_offender_id)
-        create_historic(:parole_record, nomis_offender_id)
         create_historic(:responsibility, nomis_offender_id)
         create_historic_list(:victim_liaison_officer, nomis_offender_id)
 
@@ -69,7 +68,6 @@ RSpec.describe SarOffenderDataService do
           expect(result[:calculatedHandoverDate].keys).to include('handoverDate')
           expect(result[:caseInformation].keys).to include('tier')
           expect(result[:handoverProgressChecklist].keys).to include('reviewedOasys')
-          expect(result[:paroleRecord].keys).to include('paroleReviewDate')
           expect(result[:responsibility].keys).to include('reasonText')
         end
       end
@@ -132,7 +130,6 @@ RSpec.describe SarOffenderDataService do
               calculatedHandoverDate
               caseInformation
               handoverProgressChecklist
-              paroleRecord
               responsibility
             ].each do |key|
               context "with date range before #{key} creation" do

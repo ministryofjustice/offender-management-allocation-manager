@@ -143,7 +143,6 @@ describe 'SAR API' do
             create(:email_history, :auto_early_allocation, nomis_offender_id: prn)
             create(:handover_progress_checklist, nomis_offender_id: prn)
             create(:offender_email_sent, nomis_offender_id: prn)
-            create(:parole_record, nomis_offender_id: prn)
             create(:responsibility, nomis_offender_id: prn)
             create(:victim_liaison_officer, nomis_offender_id: prn)
           end
