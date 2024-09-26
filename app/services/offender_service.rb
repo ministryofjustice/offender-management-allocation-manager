@@ -150,21 +150,16 @@ class OffenderService
   private
 
     def find_or_create_offenders(nomis_ids)
-      offenders = Offender
+      Offender.upsert_all(
+        nomis_ids.map do |nomis_offender_id|
+          { nomis_offender_id: }
+        end,
+        unique_by: :nomis_offender_id
+      )
+
+      Offender
         .includes(:early_allocations, :responsibility, :parole_reviews, case_information: [:local_delivery_unit])
         .where(nomis_offender_id: nomis_ids)
-
-      if offenders.count != nomis_ids.count
-        # Create Offender records for (presumably new) prisoners who don't have one yet
-        existing_ids = offenders.map(&:nomis_offender_id)
-        (nomis_ids - existing_ids).each do |new_id|
-          # use create_or_find_by! to prevent race conditions
-          new_offender = Offender.create_or_find_by! nomis_offender_id: new_id
-          offenders += [new_offender]
-        end
-      end
-
-      offenders
     end
   end
 end
