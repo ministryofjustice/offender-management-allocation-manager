@@ -13,7 +13,7 @@ class ParoleReview < ApplicationRecord
   # of determining when the parole hearing was, which is vital for MPC.
   scope :ordered_by_sortable_date, lambda {
     where(Arel.sql('target_hearing_date IS NOT NULL OR custody_report_due IS NOT NULL'))
-    .order(Arel.sql('target_hearing_date ASC, custody_report_due ASC'))
+    .order(Arel.sql('COALESCE(target_hearing_date, custody_report_due)') => :asc)
   }
 
   scope :with_hearing_outcome, -> { where.not(hearing_outcome: ['Not Applicable', 'Not Specified', nil]).or(where.not(hearing_outcome_received_on: nil)) }
