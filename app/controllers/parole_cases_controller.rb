@@ -18,10 +18,12 @@ private
 
   def offenders_with_allocs_new
     allocations = AllocationHistory.active_allocations_for_prison(@prison.code)
+    allocations = AllocationHistory.active_allocations_for_prison(@prison.code).index_by(&:nomis_offender_id) if params[:lookup] == "index"
     offenders   = @prison.offenders.select(&:approaching_parole?)
 
     offenders.map { |offender|
       allocation = allocations.find_by(nomis_offender_id: offender.nomis_offender_id)            if params[:lookup] == "query"
+      allocation = allocations[offender.nomis_offender_id]                                       if params[:lookup] == "index"
       allocation = allocations.find {|all| all.nomis_offender_id == offender.nomis_offender_id } if params[:lookup] == "find" || params[:lookup].nil?
       OffenderWithAllocationPresenter.new(offender, allocation) if allocation
     }.compact
