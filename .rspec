@@ -1,3 +1,2 @@
 --require rails_helper
 -t ~flaky
---exclude-pattern "spec/features/allocate_feature_spec.rb, spec/features/dps_header_footer_feature_spec.rb, spec/jobs/handover_follow_up_job/follow_up_email_details_spec.rb, spec/views/allocations/allocation_history.html.erb_spec.rb"
