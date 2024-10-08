@@ -5,6 +5,8 @@ require 'working_day_calculator'
 module HmppsApi
   class Offender
     def awaiting_allocation_for(only_working_days: false)
+      return if prison_arrival_date.nil?
+
       if only_working_days
         WorkingDayCalculator.working_days_between(prison_arrival_date, Time.zone.today)
       else

@@ -117,7 +117,7 @@
           <%= offender.additional_information.join('<br />').html_safe %>
         </td>
         <td aria-label="Working days since entering this prison" class="govuk-table__cell">
-          <%= offender.awaiting_allocation_for(only_working_days: true) %> days
+          <%= offender.awaiting_allocation_for(only_working_days: true).presence || 'N/A' %> days
         </td>
       </tr>
     <% end %>
