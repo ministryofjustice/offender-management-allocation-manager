@@ -45,7 +45,7 @@ class ParoleDataProcessService
                                         import_row.snapshot_date
                                       end
 
-        record.target_hearing_date = import_row.curr_target_date
+        record.target_hearing_date = import_row.review_date
         record.custody_report_due = import_row.ms13_target_date
         record.review_status = import_row.review_status
         record.hearing_outcome_received_on = hearing_outcome_received_on

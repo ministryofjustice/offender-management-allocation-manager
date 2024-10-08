@@ -274,4 +274,27 @@ RSpec.describe ParoleDataProcessService do
       expect(results[:other_error_count]).to eq(1)
     end
   end
+
+  describe 'target hearing date' do
+    it 'is populated with the review_date value' do
+      create(:offender, nomis_offender_id: 'A1111AA')
+      create(:parole_review_import, nomis_id: 'A1111AA',
+                                    review_type: 'GPP ISP OnPost Tariff',
+                                    review_date: '10/10/2021',
+                                    review_id: '123456',
+                                    review_milestone_date_id: '12345678',
+                                    review_status: 'Active - Referred',
+                                    curr_target_date: '2/1/2022',
+                                    ms13_target_date: '2/1/2021',
+                                    ms13_completion_date: 'NULL',
+                                    final_result: 'Not Applicable',
+                                    snapshot_date: snapshot_date,
+                                    single_day_snapshot: false)
+
+      described_class.process
+
+      parole_review = ParoleReview.find_by(nomis_offender_id: 'A1111AA')
+      expect(parole_review.target_hearing_date).to eq(Date.parse('10/10/2021'))
+    end
+  end
 end
