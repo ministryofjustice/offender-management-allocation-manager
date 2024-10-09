@@ -1,6 +1,6 @@
 <% information = capture do %>
   <span class="card__heading--large"><%= @summary.fetch(:in_progress_handover_count) %></span>
-  <p>handovers in progress</p>
+  <p><%= 'handover'.pluralize(@summary.fetch(:in_progress_handover_count)) %> in progress</p>
 <% end %>
 
 <div class="card--caseload card-total">
