@@ -1259,6 +1259,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20241008145210'),
 ('20240924134717'),
 ('20240724134026'),
 ('20240614083226'),
