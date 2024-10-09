@@ -2,147 +2,140 @@ require "rails_helper"
 
 describe OffenderHandover do
   describe '#as_calculated_handover_date' do
-    subject(:responsibility) { described_class.new(offender).as_calculated_handover_date }
-
-    let(:indeterminate_sentence) { false }
-    let(:parole_outcome_not_release) { false }
-    let(:thd_12_or_more_months_from_now) { false }
-    let(:mappa_level) { false }
-    let(:sentences) { double('sentences').as_null_object }
-    let(:recalled) { false }
-    let(:immigration_case) { false }
-    let(:earliest_release_for_handover) { NamedDate[1.day.ago, 'TED'] }
-    let(:policy_case) { true }
-    let(:early_allocation) { false }
-    let(:in_open_conditions) { false }
-    let(:determinate_parole) { false }
-    let(:open_prison_rules_apply) { false }
-    let(:in_womens_prison) { false }
-    let(:sentence_start_date) { double }
-    let(:category_active_since) { double }
-    let(:prison_arrival_date) { double }
-
-    let(:offender) do
-      double(:offender,
-             indeterminate_sentence?: indeterminate_sentence,
-             parole_outcome_not_release?: parole_outcome_not_release,
-             thd_12_or_more_months_from_now?: thd_12_or_more_months_from_now,
-             mappa_level: mappa_level,
-             sentences: sentences,
-             recalled?: recalled,
-             immigration_case?: immigration_case,
-             earliest_release_for_handover: earliest_release_for_handover,
-             policy_case?: policy_case,
-             early_allocation?: early_allocation,
-             in_open_conditions?: in_open_conditions,
-             determinate_parole?: determinate_parole,
-             open_prison_rules_apply?: open_prison_rules_apply,
-             in_womens_prison?: in_womens_prison,
-             sentence_start_date: sentence_start_date,
-             category_active_since: category_active_since,
-             prison_arrival_date: prison_arrival_date
-            )
+    def responsibility_of(offender)
+      described_class.new(offender).as_calculated_handover_date
     end
 
-    context 'when offender is an ISP' do
-      let(:indeterminate_sentence) { true }
+    def an_offender_who_is(**attributes)
+      attributes_with_defaults = {
+        indeterminate_sentence?: attributes.fetch(:isp, false),
+        parole_outcome_not_release?: attributes.fetch(:parole_outcome_not_release, false),
+        thd_12_or_more_months_from_now?: attributes.fetch(:thd_12_or_more_months_from_now, false),
+        mappa_level: attributes.fetch(:mappa_level, nil),
+        sentences: attributes.fetch(:sentences, double(sentenced_to_additional_future_isp?: false)),
+        recalled?: attributes.fetch(:recalled, false),
+        immigration_case?: attributes.fetch(:immigration_case, false),
+        earliest_release_for_handover: attributes.fetch(:earliest_release_for_handover, NamedDate[1.day.ago, 'TED']),
+        policy_case?: attributes.fetch(:policy_case, true),
+        early_allocation?: attributes.fetch(:early_allocation, false),
+        in_open_conditions?: attributes.fetch(:in_open_conditions, false),
+        determinate_parole?: attributes.fetch(:determinate_parole, false),
+        open_prison_rules_apply?: attributes.fetch(:open_prison_rules_apply, false),
+        in_womens_prison?: attributes.fetch(:in_womens_prison, false),
+        sentence_start_date: attributes.fetch(:sentence_start_date, double),
+        category_active_since: attributes.fetch(:category_active_since, double),
+        prison_arrival_date: attributes.fetch(:prison_arrival_date, double)
+      }
 
-      context 'when Parole outcome is not release, THD is 12 months from now' do
-        let(:parole_outcome_not_release) { true }
-        let(:thd_12_or_more_months_from_now) { true }
+      double(:mpc_offender, **attributes_with_defaults)
+    end
 
-        context 'when mappa is either 2 or 3' do
-          [2, 3].each do |mappa|
-            let(:mappa_level) { mappa }
+    describe "responsibility overrides" do
+      describe "an offender is COM responsible" do
+        specify "if they have been recalled" do
+          expect(responsibility_of an_offender_who_is(recalled: true))
+            .to be_com_responsible.and have_no_handover_dates
+        end
 
-            it 'is COM responsible as parole_mappa_2_3' do
-              expect(subject).to be_com_responsible
-              expect(subject.reason).to eq('parole_mappa_2_3')
-            end
+        specify 'if they are an immigration_case' do
+          expect(responsibility_of an_offender_who_is(immigration_case: true))
+            .to be_com_responsible.and have_no_handover_dates
+        end
+
+        specify 'if they not a policy case' do
+          expect(responsibility_of an_offender_who_is(policy_case: false))
+            .to be_com_responsible.and have_no_handover_dates
+        end
+
+        specify "if they are ISP and awaiting a parole decision" do
+          expect(responsibility_of an_offender_who_is(isp: true, awaiting_parole_outcome: true))
+            .to be_com_responsible.and have_handover_dates
+        end
+
+        specify "if they are ISP and the parole decision is to release" do
+          expect(responsibility_of an_offender_who_is(isp: true, parole_outcome_release: true))
+            .to be_com_responsible.and have_handover_dates
+        end
+
+        specify "if they are ISP and the parole decision is not to release and THD is less than 12 months from now" do
+          expect(responsibility_of an_offender_who_is(
+            isp: true,
+            parole_outcome_release: false,
+            parole_outcome_not_release: true,
+            thd_12_or_more_months_from_now: false
+          )).to be_com_responsible.and have_handover_dates
+        end
+
+        [2, 3].each do |mappa|
+          specify "if they are ISP and the parole decision is not to release and THD is more than 12 months from now and they are mappa level #{mappa}" do
+            expect(responsibility_of an_offender_who_is(
+              isp: true,
+              parole_outcome_release: false,
+              parole_outcome_not_release: true,
+              thd_12_or_more_months_from_now: true,
+              mappa_level: mappa
+            )).to be_com_responsible.and have_no_handover_dates
           end
         end
+      end
 
-        context 'when mappa is empty or 1' do
-          [nil, 1].each do |mappa|
-            let(:mappa_level) { mappa }
+      describe "an offender is POM responsible" do
+        specify "if they are ISP with an additional ISP sentance" do
+          responsibility = responsibility_of an_offender_who_is(
+            isp: true,
+            sentences: double(sentenced_to_additional_future_isp?: true)
+          )
+          expect(responsibility).to be_pom_responsible
+          expect(responsibility).not_to be_com_supporting
+          expect(responsibility).to have_no_handover_dates
+        end
 
-            it 'is POM responsible with COM supporting as thd_over_12_months' do
-              expect(subject).to be_pom_responsible
-              expect(subject).to be_com_supporting
-              expect(subject.reason).to eq('thd_over_12_months')
-            end
+        specify 'if they have no earliest_release_for_handover' do
+          responsibility = responsibility_of an_offender_who_is(earliest_release_for_handover: nil)
+          expect(responsibility).to be_pom_responsible
+          expect(responsibility).not_to be_com_supporting
+          expect(responsibility).to have_no_handover_dates
+        end
+      end
+
+      describe "an offender is POM responsible with COM supporting" do
+        [nil, 0, 1].each do |mappa|
+          specify "if they are ISP and the parole decision is not to release and THD is more than 12 months from now and they are mappa level #{mappa}" do
+            expect(responsibility_of an_offender_who_is(
+              isp: true,
+              parole_outcome_release: false,
+              parole_outcome_not_release: true,
+              thd_12_or_more_months_from_now: true,
+              mappa_level: mappa
+            )).to be_pom_responsible.and be_com_supporting.and have_no_handover_dates
           end
         end
-      end
-
-      context 'when offender is sentenced to an additional ISP' do
-        let(:sentences) { double(sentenced_to_additional_future_isp?: true) }
-
-        it 'is POM responsible as additional_isp' do
-          expect(subject).to be_pom_responsible
-          expect(subject.reason).to eq('additional_isp')
-        end
-      end
-    end
-
-    context 'when offender is recalled' do
-      let(:recalled) { true }
-
-      it 'is COM responsible as recall_case' do
-        expect(subject).to be_com_responsible
-        expect(subject.reason).to eq('recall_case')
-      end
-    end
-
-    context 'when offender is immigration_case' do
-      let(:immigration_case) { true }
-
-      it 'is COM responsible as immigration_case' do
-        expect(subject).to be_com_responsible
-        expect(subject.reason).to eq('immigration_case')
-      end
-    end
-
-    context 'when there is no earliest_release_for_handover' do
-      let(:earliest_release_for_handover) { nil }
-
-      it 'is POM responsible as release_date_unknown' do
-        expect(subject).to be_pom_responsible
-        expect(subject).not_to be_com_supporting
-        expect(subject.reason).to eq('release_date_unknown')
-      end
-    end
-
-    context 'when the offender is not a policy case' do
-      let(:policy_case) { false }
-
-      it 'is COM responsible as pre_omic_rules' do
-        expect(subject).to be_com_responsible
-        expect(subject.reason).to eq('pre_omic_rules')
       end
     end
 
     context 'when none of the above' do
       it 'calculates the responsibility based on the handover dates' do
+        offender = an_offender_who_is
+
         handover_date = Date.parse('25/12/2024')
         reason = 'reason_is_as_such'
         allow(Handover::HandoverCalculation).to receive(:calculate_handover_date).with(
-          sentence_start_date:,
-          earliest_release_date: earliest_release_for_handover.date,
-          is_early_allocation: early_allocation,
-          is_indeterminate: indeterminate_sentence,
-          in_open_conditions:,
-          is_determinate_parole: determinate_parole,
+          sentence_start_date: offender.sentence_start_date,
+          earliest_release_date: offender.earliest_release_for_handover.date,
+          is_early_allocation: offender.early_allocation?,
+          is_indeterminate: offender.indeterminate_sentence?,
+          in_open_conditions: offender.in_open_conditions?,
+          is_determinate_parole: offender.determinate_parole?,
         ).and_return([handover_date, reason])
 
         start_date = Date.parse('01/01/2025')
         allow(Handover::HandoverCalculation).to receive(:calculate_handover_start_date).with(
           handover_date:,
-          category_active_since_date: category_active_since,
-          prison_arrival_date:,
-          is_indeterminate: indeterminate_sentence,
-          open_prison_rules_apply:,
-          in_womens_prison:,
+          category_active_since_date: offender.category_active_since,
+          prison_arrival_date: offender.prison_arrival_date,
+          is_indeterminate: offender.indeterminate_sentence?,
+          open_prison_rules_apply: offender.open_prison_rules_apply?,
+          in_womens_prison: offender.in_womens_prison?,
         ).and_return(start_date)
 
         responsibility = 'responsibility_of_whom'
@@ -151,10 +144,11 @@ describe OffenderHandover do
           handover_start_date: start_date
         ).and_return(responsibility)
 
-        expect(subject.responsibility).to eq(responsibility)
-        expect(subject.handover_date).to eq(handover_date)
-        expect(subject.start_date).to eq(start_date)
-        expect(subject.reason).to eq(reason)
+        calculated_responsibility = responsibility_of offender
+        expect(calculated_responsibility.responsibility).to eq(responsibility)
+        expect(calculated_responsibility.handover_date).to eq(handover_date)
+        expect(calculated_responsibility.start_date).to eq(start_date)
+        expect(calculated_responsibility.reason).to eq(reason)
       end
     end
   end
