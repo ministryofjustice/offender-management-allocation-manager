@@ -83,6 +83,14 @@ class CalculatedHandoverDate < ApplicationRecord
     end
   end
 
+  def has_no_handover_dates?
+    handover_date.nil? && start_date.nil?
+  end
+
+  def has_handover_dates?
+    handover_date.present? && start_date.present?
+  end
+
   attr_accessor :offender_attributes_to_archive
 
   class << self
