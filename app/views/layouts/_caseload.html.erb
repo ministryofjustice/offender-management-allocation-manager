@@ -34,7 +34,7 @@
           %>
         </li>
         <li class="moj-sub-navigation__item">
-          <%= link_to "All allocations in this prison (#{@summary.fetch(:all_prison_cases)})",
+          <%= link_to "Allocations in this prison (#{@summary.fetch(:all_prison_cases)})",
                       { controller: :caseload_global },
                       class: "moj-sub-navigation__link govuk-link--no-visited-state",
                       aria: { current: current_page?(controller: :caseload_global) ? 'page' : '' }
