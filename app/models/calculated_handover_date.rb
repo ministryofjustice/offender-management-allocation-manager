@@ -12,6 +12,7 @@ class CalculatedHandoverDate < ApplicationRecord
     recall_release_later_mappa_2_3: 'Recall case',
     recall_release_later_mappa_empty_1: 'Recall case',
     recall_release_later_no_outcome: 'Recall case',
+    recall_thd_over_12_months: 'Next parole hearing more than 12 months away',
     immigration_case: 'Immigration Case',
     release_date_unknown: 'Release Date Unknown',
 
