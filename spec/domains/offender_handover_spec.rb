@@ -37,6 +37,11 @@ describe OffenderHandover do
             .to be_com_responsible.and have_no_handover_dates
         end
 
+        specify "if they are an ISP who has been recalled and their THD is less than 12 months" do
+          expect(responsibility_of an_offender_who_is(isp: true, recalled: true, thd_12_or_more_months_from_now: false))
+            .to be_com_responsible.and have_no_handover_dates
+        end
+
         specify 'if they are an immigration_case' do
           expect(responsibility_of an_offender_who_is(immigration_case: true))
             .to be_com_responsible.and have_no_handover_dates
@@ -95,6 +100,13 @@ describe OffenderHandover do
           expect(responsibility).to be_pom_responsible
           expect(responsibility).not_to be_com_supporting
           expect(responsibility).to have_no_handover_dates
+        end
+      end
+
+      [nil, 0, 1].each do |mappa|
+        specify "if they are an ISP who has been recalled and their THD is greater than 12 months from now and they are mappa level #{mappa}" do
+          expect(responsibility_of an_offender_who_is(isp: true, recalled: true, thd_12_or_more_months_from_now: true, mappa_level: mappa))
+            .to be_pom_responsible.and be_com_supporting.and have_no_handover_dates
         end
       end
 

@@ -12,12 +12,22 @@ private
   def indeterminate_sentences
     return unless indeterminate_sentence?
 
-    if parole_outcome_not_release? && thd_12_or_more_months_from_now? && mappa_level.in?([2, 3])
-      CalculatedHandoverDate.new(responsibility: com, reason: :parole_mappa_2_3)
-    elsif parole_outcome_not_release? && thd_12_or_more_months_from_now?
-      CalculatedHandoverDate.new(responsibility: pom_with_com, reason: :thd_over_12_months)
-    elsif sentences.sentenced_to_additional_future_isp?
-      CalculatedHandoverDate.new(responsibility: pom_only, reason: :additional_isp)
+    if sentences.sentenced_to_additional_future_isp?
+      return CalculatedHandoverDate.new(responsibility: pom_only, reason: :additional_isp)
+    end
+
+    # Anything after 12 months has no handover dates
+    return unless thd_12_or_more_months_from_now?
+
+    if recalled? && mappa_level.in?([nil, 0, 1])
+      CalculatedHandoverDate.new(responsibility: pom_with_com, reason: :recall_thd_over_12_months)
+
+    elsif parole_outcome_not_release?
+      if mappa_level.in?([2, 3])
+        CalculatedHandoverDate.new(responsibility: com, reason: :parole_mappa_2_3)
+      else
+        CalculatedHandoverDate.new(responsibility: pom_with_com, reason: :thd_over_12_months)
+      end
     end
   end
 
