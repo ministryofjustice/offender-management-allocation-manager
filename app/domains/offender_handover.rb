@@ -38,8 +38,6 @@ private
       CalculatedHandoverDate.new(responsibility: com, reason: :immigration_case)
     elsif !earliest_release_for_handover
       CalculatedHandoverDate.new(responsibility: pom_only, reason: :release_date_unknown)
-    elsif !policy_case?
-      CalculatedHandoverDate.new(responsibility: com, reason: :pre_omic_rules)
     end
   end
 

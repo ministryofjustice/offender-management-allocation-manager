@@ -47,11 +47,6 @@ describe OffenderHandover do
             .to be_com_responsible.and have_no_handover_dates
         end
 
-        specify 'if they not a policy case' do
-          expect(responsibility_of an_offender_who_is(policy_case: false))
-            .to be_com_responsible.and have_no_handover_dates
-        end
-
         specify "if they are ISP and awaiting a parole decision" do
           expect(responsibility_of an_offender_who_is(isp: true, awaiting_parole_outcome: true))
             .to be_com_responsible.and have_handover_dates
