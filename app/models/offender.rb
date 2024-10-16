@@ -54,11 +54,6 @@ class Offender < ApplicationRecord
     @most_recent_parole_review ||= parole_reviews.ordered_by_sortable_date.last
   end
 
-  # Returns the most recent parole application if it has not yet had a hearing.
-  def parole_review_awaiting_hearing
-    most_recent_parole_review.no_hearing_outcome? ? most_recent_parole_review : nil
-  end
-
   # Returns the most recent parole review that has an outcome
   def most_recent_completed_parole_review
     @most_recent_completed_parole_review ||= parole_reviews.ordered_by_sortable_date.with_hearing_outcome.last

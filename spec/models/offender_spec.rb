@@ -171,12 +171,6 @@ RSpec.describe Offender, type: :model do
       end
     end
 
-    describe '#parole_review_awaiting_hearing' do
-      it 'returns the most recent parole review that does not have a hearing outcome' do
-        expect(offender.parole_review_awaiting_hearing).to eq(incomplete_parole_review)
-      end
-    end
-
     describe '#most_recent_completed_parole_review' do
       it 'returns the most recently completed parole review' do
         expect(offender.most_recent_completed_parole_review).to eq(completed_parole_review)
