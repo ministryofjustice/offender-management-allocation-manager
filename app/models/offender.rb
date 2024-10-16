@@ -65,8 +65,7 @@ class Offender < ApplicationRecord
   end
 
   def current_parole_review
-    build_parole_review_sections unless @parole_review_sections_built
-    @current_parole_review
+    @current_parole_review ||= parole_reviews.ordered_by_sortable_date.current.first
   end
 
   def previous_parole_reviews
@@ -84,19 +83,10 @@ class Offender < ApplicationRecord
   # hearing outcomes.
   def build_parole_review_sections
     @parole_review_sections_built = true
-    @current_parole_review = nil
     @previous_parole_reviews = []
 
     parole_reviews.ordered_by_sortable_date.reverse_each do |record|
-      if record.no_hearing_outcome?
-        if record.active?
-          @current_parole_review = record
-        else
-          @previous_parole_reviews << record
-        end
-      elsif record.hearing_outcome_received_on && record.hearing_outcome_received_on > Time.zone.today - 14.days
-        @current_parole_review = record
-      else
+      unless record.no_hearing_outcome? || record.active?
         @previous_parole_reviews << record
       end
     end
