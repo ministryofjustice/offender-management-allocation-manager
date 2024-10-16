@@ -13,4 +13,26 @@ RSpec.describe AllocatedOffender do
       expect(described_class.all).to match_array(allocations1 + allocations2)
     end
   end
+
+  describe '#formatted_pom_name' do
+    subject { described_class.new(staff_id, allocation, offender) }
+
+    let(:staff_id) { 123 }
+    let(:allocation) { instance_double(AllocationHistory, primary_pom_name:) }
+    let(:offender) { instance_double(Offender) }
+
+    let(:primary_pom_name) { 'DOE, JOHN' }
+
+    it 'formats the POM name' do
+      expect(subject.formatted_pom_name).to eq('John Doe')
+    end
+
+    context 'when there is no comma separator' do
+      let(:primary_pom_name) { 'JOHN' }
+
+      it 'formats the POM name' do
+        expect(subject.formatted_pom_name).to eq('John')
+      end
+    end
+  end
 end
