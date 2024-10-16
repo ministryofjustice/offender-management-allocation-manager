@@ -18,7 +18,7 @@ class AllocatedOffender
            :earliest_release_for_handover, :handover_type,
            :early_allocation?, :licence_expiry_date, :approaching_parole?, :allocated_pom_role, :next_parole_date, :next_parole_date_type,
            :pom_tasks, to: :@offender
-  delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison, :primary_pom_nomis_id,
+  delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison, :primary_pom_nomis_id, :primary_pom_name,
            to: :@allocation
 
   COMPLEXITIES = { 'high' => 3, 'medium' => 2, 'low' => 1 }.freeze
@@ -32,6 +32,11 @@ class AllocatedOffender
   # this is required for sorting only
   def complexity_level_number
     ComplexityLevelHelper::COMPLEXITIES.fetch(complexity_level)
+  end
+
+  # this is required for sorting only
+  def formatted_pom_name
+    primary_pom_name.split(',').reverse.map(&:strip).join(' ').titleize
   end
 
   def high_complexity?
