@@ -71,4 +71,24 @@ RSpec.describe ParoleReview, type: :model do
       end
     end
   end
+
+  describe '.previous' do
+    describe 'it returns parole reviews' do
+      specify 'that have a hearing_outcome_received_on earlier than 14 days ago' do
+        parole_review_1 = create(:parole_review, review_status: "Not Active", hearing_outcome_received_on: 15.days.ago)
+        _parole_review_2 = create(:parole_review, review_status: "Not Active", hearing_outcome_received_on: 13.days.ago)
+        _parole_review_3 = create(:parole_review, review_status: "Not Active",  hearing_outcome_received_on: 1.week.from_now)
+
+        expect(described_class.previous).to match_array([parole_review_1])
+      end
+
+      specify 'that have no hearing outcome and are not active' do
+        _parole_review_1 = create(:parole_review, hearing_outcome: 'Not Applicable', review_status: 'Active - Future')
+        _parole_review_2 = create(:parole_review, hearing_outcome: nil, review_status: 'Active')
+        parole_review_3 = create(:parole_review, hearing_outcome: 'Not Applicable', review_status: "Not Active")
+
+        expect(described_class.previous).to match_array([parole_review_3])
+      end
+    end
+  end
 end

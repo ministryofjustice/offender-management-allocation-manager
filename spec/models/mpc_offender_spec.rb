@@ -38,7 +38,6 @@ RSpec.describe MpcOffender, type: :model do
     allow(offender_model).to receive(:most_recent_parole_review).and_return(parole_review)
     allow(offender_model).to receive(:parole_review_awaiting_hearing).and_return(parole_review)
     allow(offender_model).to receive(:most_recent_completed_parole_review).and_return(completed_parole_review)
-    allow(offender_model).to receive(:build_parole_review_sections)
     allow(offender_model).to receive(:early_allocations).and_return(Offender.none)
   end
 

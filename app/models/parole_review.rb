@@ -25,6 +25,8 @@ class ParoleReview < ApplicationRecord
       where(hearing_outcome: ['Not Applicable', 'Not Specified', nil], review_status: ACTIVE_REVIEW_STATUS))
   }
 
+  scope :previous, -> { where.not(id: current.pluck(:id)) }
+
   validate :hearing_outcome_received_on_must_be_in_past, on: :manual_update
 
   # Used when POM manually enters this date

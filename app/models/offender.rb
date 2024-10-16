@@ -69,27 +69,7 @@ class Offender < ApplicationRecord
   end
 
   def previous_parole_reviews
-    build_parole_review_sections unless @parole_review_sections_built
-    @previous_parole_reviews
-  end
-
-  # @current_parole_review is the most recent parole review and will either be
-  # currently active, or will have had its hearing outcome within the last 14 days
-  #
-  # @previous_parole_reviews are all other parole reviews, those that are inactive
-  # and/or had hearing outcomes more than 14 days ago.
-  #
-  # There are situations where parole reviews will be inactive and not have
-  # hearing outcomes.
-  def build_parole_review_sections
-    @parole_review_sections_built = true
-    @previous_parole_reviews = []
-
-    parole_reviews.ordered_by_sortable_date.reverse_each do |record|
-      unless record.no_hearing_outcome? || record.active?
-        @previous_parole_reviews << record
-      end
-    end
+    @previous_parole_reviews ||= parole_reviews.ordered_by_sortable_date.previous.reverse_order
   end
 
   # This logic follows the rules defined here: https://dsdmoj.atlassian.net/wiki/spaces/OCM/pages/4524311161/Handover+Type+Calculation
