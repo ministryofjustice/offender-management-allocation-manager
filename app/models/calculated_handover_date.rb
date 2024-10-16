@@ -12,6 +12,7 @@ class CalculatedHandoverDate < ApplicationRecord
     recall_release_later_mappa_2_3: 'Recall case',
     recall_release_later_mappa_empty_1: 'Recall case',
     recall_release_later_no_outcome: 'Recall case',
+    recall_thd_over_12_months: 'Next parole hearing more than 12 months away',
     immigration_case: 'Immigration Case',
     release_date_unknown: 'Release Date Unknown',
 
@@ -81,6 +82,14 @@ class CalculatedHandoverDate < ApplicationRecord
     when CUSTODY_ONLY, CUSTODY_WITH_COM then 'POM'
     when COMMUNITY_RESPONSIBLE          then 'COM'
     end
+  end
+
+  def has_no_handover_dates?
+    handover_date.nil? && start_date.nil?
+  end
+
+  def has_handover_dates?
+    handover_date.present? && start_date.present?
   end
 
   attr_accessor :offender_attributes_to_archive
