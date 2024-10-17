@@ -18,6 +18,15 @@ class ParoleReview < ApplicationRecord
 
   scope :with_hearing_outcome, -> { where.not(hearing_outcome: ['Not Applicable', 'Not Specified', nil]).or(where.not(hearing_outcome_received_on: nil)) }
 
+  scope :for_sentences_starting, ->(sentence_start_date) { where('target_hearing_date >= ?', sentence_start_date) }
+
+  scope :current, lambda {
+    where('hearing_outcome_received_on > ?', 14.days.ago).or(
+      where(hearing_outcome: ['Not Applicable', 'Not Specified', nil], review_status: ACTIVE_REVIEW_STATUS))
+  }
+
+  scope :previous, -> { where.not(id: current.pluck(:id)) }
+
   validate :hearing_outcome_received_on_must_be_in_past, on: :manual_update
 
   # Used when POM manually enters this date

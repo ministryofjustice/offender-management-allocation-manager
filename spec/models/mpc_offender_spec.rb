@@ -36,9 +36,7 @@ RSpec.describe MpcOffender, type: :model do
 
   before do
     allow(offender_model).to receive(:most_recent_parole_review).and_return(parole_review)
-    allow(offender_model).to receive(:parole_review_awaiting_hearing).and_return(parole_review)
     allow(offender_model).to receive(:most_recent_completed_parole_review).and_return(completed_parole_review)
-    allow(offender_model).to receive(:build_parole_review_sections)
     allow(offender_model).to receive(:early_allocations).and_return(Offender.none)
   end
 
@@ -527,12 +525,6 @@ RSpec.describe MpcOffender, type: :model do
     end
 
     context 'when the offender has an upcoming parole hearing' do
-      describe '#next_thd' do
-        it 'returns the target hearing date of the incomplete parole review' do
-          expect(subject.next_thd).to eq(parole_review.target_hearing_date)
-        end
-      end
-
       describe '#target_hearing_date' do
         it 'returns the target hearing date of the incomplete parole review' do
           expect(subject.target_hearing_date).to eq(parole_review.target_hearing_date)
@@ -555,13 +547,6 @@ RSpec.describe MpcOffender, type: :model do
     context 'when the offender does not have an upcoming parole hearing' do
       before do
         allow(offender_model).to receive(:most_recent_parole_review).and_return(completed_parole_review)
-        allow(offender_model).to receive(:parole_review_awaiting_hearing).and_return(nil)
-      end
-
-      describe '#next_thd' do
-        it 'returns nil' do
-          expect(subject.next_thd).to eq(nil)
-        end
       end
 
       describe '#target_hearing_date' do

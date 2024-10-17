@@ -54,52 +54,17 @@ class Offender < ApplicationRecord
     @most_recent_parole_review ||= parole_reviews.ordered_by_sortable_date.last
   end
 
-  # Returns the most recent parole application if it has not yet had a hearing.
-  def parole_review_awaiting_hearing
-    most_recent_parole_review.no_hearing_outcome? ? most_recent_parole_review : nil
-  end
-
   # Returns the most recent parole review that has an outcome
   def most_recent_completed_parole_review
     @most_recent_completed_parole_review ||= parole_reviews.ordered_by_sortable_date.with_hearing_outcome.last
   end
 
   def current_parole_review
-    build_parole_review_sections unless @parole_review_sections_built
-    @current_parole_review
+    @current_parole_review ||= parole_reviews.ordered_by_sortable_date.current.first
   end
 
   def previous_parole_reviews
-    build_parole_review_sections unless @parole_review_sections_built
-    @previous_parole_reviews
-  end
-
-  # @current_parole_review is the most recent parole review and will either be
-  # currently active, or will have had its hearing outcome within the last 14 days
-  #
-  # @previous_parole_reviews are all other parole reviews, those that are inactive
-  # and/or had hearing outcomes more than 14 days ago.
-  #
-  # There are situations where parole reviews will be inactive and not have
-  # hearing outcomes.
-  def build_parole_review_sections
-    @parole_review_sections_built = true
-    @current_parole_review = nil
-    @previous_parole_reviews = []
-
-    parole_reviews.ordered_by_sortable_date.reverse_each do |record|
-      if record.no_hearing_outcome?
-        if record.active?
-          @current_parole_review = record
-        else
-          @previous_parole_reviews << record
-        end
-      elsif record.hearing_outcome_received_on && record.hearing_outcome_received_on > Time.zone.today - 14.days
-        @current_parole_review = record
-      else
-        @previous_parole_reviews << record
-      end
-    end
+    @previous_parole_reviews ||= parole_reviews.ordered_by_sortable_date.previous.reverse_order
   end
 
   # This logic follows the rules defined here: https://dsdmoj.atlassian.net/wiki/spaces/OCM/pages/4524311161/Handover+Type+Calculation

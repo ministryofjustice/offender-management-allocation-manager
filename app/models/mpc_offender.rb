@@ -19,7 +19,7 @@ class MpcOffender
 
   delegate :victim_liaison_officers, :handover_progress_task_completion_data, :handover_progress_complete?,
            :handover_type, :current_parole_review, :previous_parole_reviews, :build_parole_review_sections,
-           :most_recent_parole_review, :parole_review_awaiting_hearing, :most_recent_completed_parole_review, to: :@offender
+           :most_recent_parole_review, :most_recent_completed_parole_review, to: :@offender
 
   attr_reader :case_information, :prison
 
@@ -151,10 +151,6 @@ class MpcOffender
   end
 
   # Returns the target hearing date for the offender's next active parole application, or nil if there isn't one.
-  # Used to exclude THDs of previous (completed/inactive) parole applications.
-  def next_thd
-    parole_review_awaiting_hearing&.target_hearing_date
-  end
 
   # Returns the date that the most recent hearing outcome was received.
   def hearing_outcome_received_on
