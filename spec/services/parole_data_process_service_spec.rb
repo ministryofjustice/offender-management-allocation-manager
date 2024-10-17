@@ -280,7 +280,7 @@ RSpec.describe ParoleDataProcessService do
       create(:offender, nomis_offender_id: 'A1111AA')
       create(:parole_review_import, nomis_id: 'A1111AA',
                                     review_type: 'GPP ISP OnPost Tariff',
-                                    review_date: '10/10/2021',
+                                    review_date: '10/10/21',
                                     review_id: '123456',
                                     review_milestone_date_id: '12345678',
                                     review_status: 'Active - Referred',
