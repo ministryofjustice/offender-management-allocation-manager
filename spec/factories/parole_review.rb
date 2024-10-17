@@ -8,6 +8,14 @@ FactoryBot.define do
     review_status {'Active'}
     hearing_outcome {'Not Specified'} # = no hearing outcome
 
+    trait :active do
+      hearing_outcome { 'Not Specified' }
+    end
+
+    trait :complete do
+      hearing_outcome { 'Return to Open' }
+    end
+
     trait :approaching_parole do
       target_hearing_date { Time.zone.today + 7.days } # Must be within the next 10 months
       hearing_outcome { 'Not Specified' } # = no hearing outcome

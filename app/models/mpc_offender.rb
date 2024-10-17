@@ -18,8 +18,11 @@ class MpcOffender
   delegate :ldu_email_address, :team_name, :ldu_name, :active_vlo?, :welsh_offender, to: :@case_information, allow_nil: true
 
   delegate :victim_liaison_officers, :handover_progress_task_completion_data, :handover_progress_complete?,
-           :handover_type, :current_parole_review, :previous_parole_reviews, :build_parole_review_sections,
-           :most_recent_parole_review, :most_recent_completed_parole_review, to: :@offender
+           :handover_type, :current_parole_review, :previous_parole_reviews,
+           :most_recent_parole_review, :most_recent_completed_parole_review,
+           :target_hearing_date,
+           :thd_12_or_more_months_from_now?,
+           to: :@offender
 
   attr_reader :case_information, :prison
 
@@ -144,35 +147,19 @@ class MpcOffender
     handover.handover_date
   end
 
-  # parole methods
-
-  def target_hearing_date
-    most_recent_parole_review&.target_hearing_date
-  end
-
-  # Returns the target hearing date for the offender's next active parole application, or nil if there isn't one.
-
-  # Returns the date that the most recent hearing outcome was received.
-  def hearing_outcome_received_on
-    most_recent_parole_review&.hearing_outcome_received_on
-  end
-
-  # Returns the date that the most recent COMPLETED hearing outcome was received.
-  # Used to exclude any active parole applications.
-  def last_hearing_outcome_received_on
-    most_recent_completed_parole_review&.hearing_outcome_received_on
-  end
-
+  # TODO: extract method to Offender::Parole when tariff_date & parole_eligibility_date are available there
   def approaching_parole?
     next_parole_date.present?
   end
 
+  # TODO: extract method to Offender::Parole when tariff_date & parole_eligibility_date are available there
   def next_parole_date
     [target_hearing_date, tariff_date, parole_eligibility_date].compact.sort.find do |date|
       date.between?(Time.zone.now, 10.months.from_now.end_of_day)
     end
   end
 
+  # TODO: extract method to Offender::Parole when tariff_date & parole_eligibility_date are available there
   # Separate from next_parole_date as parole case index view sorts by next_parole_date, so it seemed sensible to avoid changing default rails behaviour
   # for the sake of saving a couple of simple, albeit slightly inefficient, comparisons.
   def next_parole_date_type
@@ -188,24 +175,8 @@ class MpcOffender
     end
   end
 
-  def no_parole_outcome?
-    most_recent_completed_parole_review&.no_hearing_outcome?
-  end
-
-  def parole_outcome_not_release?
-    most_recent_completed_parole_review&.outcome_is_not_release?
-  end
-
-  def thd_12_or_more_months_from_now?
-    target_hearing_date && target_hearing_date >= 12.months.from_now
-  end
-
   def display_current_parole_info?
     tariff_date.present? || parole_eligibility_date.present? || current_parole_review.present?
-  end
-
-  def due_for_release?
-    most_recent_parole_review&.current_record_hearing_outcome == 'Release'
   end
 
   def sentences
