@@ -27,16 +27,15 @@ gem 'paper_trail', '~> 15.1.0'
 gem 'pg'
 gem 'puma', '~> 6.4.2'
 gem 'prometheus_exporter'
-gem 'sidekiq', '>= 6.4.0', '< 6.5.0'
+gem 'sidekiq', '~> 7.2.4'
 gem 'sentry-ruby'
 gem 'sentry-rails'
 gem 'sentry-sidekiq'
 gem 'turbolinks', '~> 5'
 gem 'terser' # javascript compressor
 gem 'typhoeus'
-gem 'redis', '~> 4.6.0'
+gem 'redis'
 gem 'fast_underscore', require: false
-gem 'hashdiff', ['>= 1.0.0.beta1', '< 2.0.0']
 gem 'rubyzip', '< 3'
 gem 'turnout'
 gem 'kaminari' # pagination

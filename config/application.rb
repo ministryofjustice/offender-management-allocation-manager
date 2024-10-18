@@ -69,7 +69,6 @@ module OffenderManagementAllocationClient
     config.collect_prometheus_metrics = ENV['PROMETHEUS_METRICS']&.strip == 'on'
     config.support_email = ENV['SUPPORT_EMAIL']&.strip
     config.redis_url = ENV['REDIS_URL']&.strip
-    config.redis_auth = ENV['REDIS_AUTH']&.strip
 
     config.cache_expiry = (ENV['CACHE_TIMEOUT']&.strip || 60.minutes).to_i
 
