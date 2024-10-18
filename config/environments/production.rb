@@ -85,7 +85,6 @@ Rails.application.configure do
     config.cache_store = :redis_cache_store,
                          {
                            url: config.redis_url.to_s,
-                           network_timeout: 5,
                            read_timeout: 1.0,
                            write_timeout: 1.0,
 
