@@ -27,8 +27,24 @@ spec:
         imagePullPolicy: Always
         securityContext:
           {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
-        command: ['sh', '-c', "bundle exec sidekiq -C config/sidekiq.yml"]
+        command: ["./sidekiq.sh", "start"]
           {{- include "moic-helpers.envs" . | nindent 8 }}
+        readinessProbe:
+          exec:
+            command: ["./sidekiq.sh", "probe"]
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          timeoutSeconds: 5
+        livenessProbe:
+          exec:
+            command: ["./sidekiq.sh", "probe"]
+          initialDelaySeconds: 45
+          periodSeconds: 60
+          timeoutSeconds: 5
+        lifecycle:
+          preStop:
+            exec:
+              command: ["./sidekiq.sh", "stop"]
         resources:
           limits:
             memory: 2Gi
