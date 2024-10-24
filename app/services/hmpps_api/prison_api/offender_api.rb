@@ -9,10 +9,14 @@ module HmppsApi
       # Used to filter out offenders who are on remand, civil prisoners, unsentenced, etc.
       ALLOWED_LEGAL_STATUSES = %w[SENTENCED INDETERMINATE_SENTENCE RECALL IMMIGRATION_DETAINEE].freeze
 
+      # Despite filtering out civil cases (legal status `CIVIL_PRISONER`) some civil cases
+      # will show up as `SENTENCED` legal status, and we need to filter by their sentence type code.
+      EXCLUDED_IMPRISONMENT_STATUSES = %w[A_FINE].freeze
+
       def self.get_offenders_in_prison(prison, ignore_legal_status: false)
         # Get offenders from the Prisoner Offender Search API - and filter out those with unwanted legal statuses
         unfiltered = get_search_api_offenders_in_prison(prison)
-        offenders = ignore_legal_status ? unfiltered : unfiltered.select { |o| ALLOWED_LEGAL_STATUSES.include?(o['legalStatus']) }
+        offenders = ignore_legal_status ? unfiltered : filtered_offenders(unfiltered)
 
         return [] if offenders.empty?
 
@@ -56,11 +60,10 @@ module HmppsApi
       # normally appear within the service. This should only be done under certain circumstances –
       # e.g. when deallocating an offender who has since left the service due to a change in legal status
       def self.get_offender(raw_offender_no, ignore_legal_status: false)
-        # Get offender from the Prisoner Offender Search API
-        offender = get_search_api_offenders([raw_offender_no]).first
+        unfiltered = get_search_api_offenders([raw_offender_no])
+        offender = (ignore_legal_status ? unfiltered : filtered_offenders(unfiltered)).first
 
-        return nil unless offender.present? &&
-          (ALLOWED_LEGAL_STATUSES.include?(offender['legalStatus']) || ignore_legal_status)
+        return nil if offender.blank?
 
         offender_no = offender.fetch('prisonerNumber')
 
@@ -143,6 +146,13 @@ module HmppsApi
       def self.get_offender_sentences_and_offences(booking_id)
         path = "/offender-sentences/booking/#{booking_id}/sentenceTerms"
         client.get(path)
+      end
+
+      def self.filtered_offenders(offenders)
+        offenders.select do |o|
+          ALLOWED_LEGAL_STATUSES.include?(o['legalStatus']) &&
+            EXCLUDED_IMPRISONMENT_STATUSES.exclude?(o['imprisonmentStatus'])
+        end
       end
 
     private
