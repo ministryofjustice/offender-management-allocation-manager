@@ -1,6 +1,29 @@
 require 'rails_helper'
 
 describe HmppsApi::PrisonApi::OffenderApi do
+  # These offenders should be allowed in because of their legal status
+  let(:accepted_offenders) do
+    [
+      build(:nomis_offender, legalStatus: 'IMMIGRATION_DETAINEE'),
+      build(:nomis_offender, legalStatus: 'INDETERMINATE_SENTENCE'),
+      build(:nomis_offender, legalStatus: 'RECALL'),
+      build(:nomis_offender, legalStatus: 'SENTENCED'),
+    ]
+  end
+
+  # These offenders should be filtered out because of their legal status or imprisonment code
+  let(:rejected_offenders) do
+    [
+      build(:nomis_offender, legalStatus: 'CIVIL_PRISONER'),
+      build(:nomis_offender, legalStatus: 'CONVICTED_UNSENTENCED'),
+      build(:nomis_offender, legalStatus: 'DEAD'),
+      build(:nomis_offender, legalStatus: 'OTHER'),
+      build(:nomis_offender, legalStatus: 'REMAND'),
+      build(:nomis_offender, legalStatus: 'UNKNOWN'),
+      build(:nomis_offender, legalStatus: 'SENTENCED', sentence: { imprisonmentStatus: 'A_FINE' })
+    ]
+  end
+
   describe 'List of offenders' do
     describe 'using VCR', vcr: { cassette_name: 'prison_api/offender_hmpps_api_offender_list' } do
       subject { described_class.get_offenders_in_prison('LEI') }
@@ -24,28 +47,6 @@ describe HmppsApi::PrisonApi::OffenderApi do
       subject { described_class.get_offenders_in_prison(prison) }
 
       let(:prison) { create(:prison).code }
-
-      # These offenders should be allowed in because of their legal status
-      let(:accepted_offenders) do
-        [
-          build(:nomis_offender, legalStatus: 'IMMIGRATION_DETAINEE'),
-          build(:nomis_offender, legalStatus: 'INDETERMINATE_SENTENCE'),
-          build(:nomis_offender, legalStatus: 'RECALL'),
-          build(:nomis_offender, legalStatus: 'SENTENCED'),
-        ]
-      end
-
-      # These offenders should be filtered out because of their legal status
-      let(:rejected_offenders) do
-        [
-          build(:nomis_offender, legalStatus: 'CIVIL_PRISONER'),
-          build(:nomis_offender, legalStatus: 'CONVICTED_UNSENTENCED'),
-          build(:nomis_offender, legalStatus: 'DEAD'),
-          build(:nomis_offender, legalStatus: 'OTHER'),
-          build(:nomis_offender, legalStatus: 'REMAND'),
-          build(:nomis_offender, legalStatus: 'UNKNOWN'),
-        ]
-      end
 
       let(:offenders) do
         (accepted_offenders + rejected_offenders).shuffle
@@ -139,28 +140,6 @@ describe HmppsApi::PrisonApi::OffenderApi do
     end
 
     context 'when offender is on remand or unsentenced' do
-      # These offenders should be allowed in because of their legal status
-      let(:accepted_offenders) do
-        [
-          build(:nomis_offender, legalStatus: 'IMMIGRATION_DETAINEE'),
-          build(:nomis_offender, legalStatus: 'INDETERMINATE_SENTENCE'),
-          build(:nomis_offender, legalStatus: 'RECALL'),
-          build(:nomis_offender, legalStatus: 'SENTENCED'),
-        ]
-      end
-
-      # These offenders should be filtered out because of their legal status
-      let(:rejected_offenders) do
-        [
-          build(:nomis_offender, legalStatus: 'CIVIL_PRISONER'),
-          build(:nomis_offender, legalStatus: 'CONVICTED_UNSENTENCED'),
-          build(:nomis_offender, legalStatus: 'DEAD'),
-          build(:nomis_offender, legalStatus: 'OTHER'),
-          build(:nomis_offender, legalStatus: 'REMAND'),
-          build(:nomis_offender, legalStatus: 'UNKNOWN'),
-        ]
-      end
-
       let(:offenders) do
         (accepted_offenders + rejected_offenders).shuffle
       end
