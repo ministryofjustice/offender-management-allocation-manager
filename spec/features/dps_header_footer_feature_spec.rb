@@ -21,6 +21,17 @@ feature 'DPS standard header and footer:', :aggregate_failures, :skip_dps_header
     }.to_json
   end
 
+  let(:poms) { [build(:pom, firstName: 'Alice', position: RecommendationService::PRISON_POM, staffId: 1)] }
+  let(:offenders) { build_list(:nomis_offender, 3) }
+
+  before do
+    stub_poms('LEI', poms)
+    stub_offenders_for_prison('LEI', offenders)
+
+    stub_request(:get, "#{Rails.configuration.prison_api_host}/api/users/MOIC_POM")
+      .to_return(body: { 'staffId': 1 }.to_json)
+  end
+
   before :each, :mock_api_error do
     stub_request(:get, header_endpoint).to_return(status: 503)
     stub_request(:get, footer_endpoint).to_return(status: 503)
