@@ -111,7 +111,13 @@ RSpec.configure do |config|
     end
 
     WebMock.allow_net_connect!
-    example.run
+
+    # Common cassettes for frequently used requests
+    # Avoids cluttering individual cassettes with huge response bodies
+    VCR.use_cassette('prison_api/shared_prisoner_search_request_LEI') do
+      example.run
+    end
+
     WebMock.disable_net_connect!(allow_localhost: true, allow: Rails.configuration.nomis_oauth_host)
   end
 
