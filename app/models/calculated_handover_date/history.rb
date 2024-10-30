@@ -71,7 +71,7 @@ private
   private
 
     def from_handover(key)
-      @changes.has_key?(key) ? @changes[key] : @attrs_before_changes[key]
+      @changes.key?(key) ? @changes[key] : @attrs_before_changes[key]
     end
 
     def from_yaml(yaml)
