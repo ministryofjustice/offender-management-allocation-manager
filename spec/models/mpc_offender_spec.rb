@@ -541,7 +541,6 @@ RSpec.describe MpcOffender, type: :model do
           expect(subject.target_hearing_date).to eq(completed_parole_review.target_hearing_date)
         end
       end
-
     end
   end
 
