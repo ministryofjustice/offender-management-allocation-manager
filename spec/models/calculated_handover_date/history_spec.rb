@@ -30,6 +30,21 @@ describe CalculatedHandoverDate::History do
     expect(history.second.mappa_level).to eq(2)
   end
 
+  specify 'handover_date can be changed from having a value to nil' do
+    calculated_handover_date = CalculatedHandoverDate.create(
+      responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+      reason: :recall_case,
+      offender: create(:offender))
+    calculated_handover_date.update!(handover_date: 1.day.ago.to_date)
+    calculated_handover_date.update!(handover_date: nil)
+
+    history = calculated_handover_date.history.to_a
+    expect(history.count).to eq(3)
+    expect(history.first.handover_date).to be_nil
+    expect(history.second.handover_date).to eq(1.day.ago.to_date)
+    expect(history.third.handover_date).to be_nil
+  end
+
   describe CalculatedHandoverDate::History::Item do
     describe '#earliest_release_date' do
       let(:item) { described_class.new(OpenStruct.new(offender_attributes_to_archive:)) }

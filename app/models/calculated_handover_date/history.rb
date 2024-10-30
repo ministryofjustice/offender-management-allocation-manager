@@ -19,9 +19,9 @@ private
 
   class Item
     def initialize(version)
-      @version         = version
-      @base_attributes = from_yaml(version.object)
-      @changes         = from_yaml(version.object_changes)
+      @version               = version
+      @attrs_before_changes  = from_yaml(version.object)
+      @changes               = from_yaml(version.object_changes)
     end
 
     def updated_at
@@ -71,7 +71,7 @@ private
   private
 
     def from_handover(key)
-      [@changes, @base_attributes].reduce(nil) { |value, attempt| value || attempt[key] }
+      @changes.has_key?(key) ? @changes[key] : @attrs_before_changes[key]
     end
 
     def from_yaml(yaml)
