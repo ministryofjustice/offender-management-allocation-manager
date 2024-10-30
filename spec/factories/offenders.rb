@@ -99,9 +99,7 @@ FactoryBot.define do
           prison: build(:prison),
           offender: create(:offender,
             nomis_offender_id: api_offender.offender_no,
-            case_information: build(:case_information,
-              mappa_level:
-            )
+            case_information: build(:case_information, mappa_level:)
           ),
           prison_record: api_offender
         )

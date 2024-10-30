@@ -171,12 +171,6 @@ RSpec.describe Offender, type: :model do
       end
     end
 
-    describe '#most_recent_completed_parole_review' do
-      it 'returns the most recently completed parole review' do
-        expect(offender.most_recent_completed_parole_review).to eq(completed_parole_review)
-      end
-    end
-
     describe 'Parole queries' do
       let(:completed_parole_review_1) do
         create(:parole_review, custody_report_due: Time.zone.today - 2.years,
