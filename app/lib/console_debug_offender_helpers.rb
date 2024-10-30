@@ -49,7 +49,7 @@ module ConsoleDebugOffenderHelpers
               display_date(parole_review.target_hearing_date),
               display_tick_cross(parole_review.id == offender.current_parole_review&.id),
               display_tick_cross(parole_review.id == offender.most_recent_parole_review&.id),
-              display_tick_cross(parole_review.id == offender.most_recent_completed_parole_review&.id),
+              display_tick_cross(parole_review.id == offender.most_recent_completed_parole_review_for_sentence&.id),
             ]
           end
         )

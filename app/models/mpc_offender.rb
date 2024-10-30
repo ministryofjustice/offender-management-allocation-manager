@@ -175,19 +175,20 @@ class MpcOffender
     end
   end
 
-  def most_recent_completed_parole_review
+  def most_recent_completed_parole_review_for_sentence
     @most_recent_completed_parole_review_for_sentence ||= parole_reviews
+      .ordered_by_sortable_date
       .completed
       .for_sentences_starting(sentence_start_date)
       .last
   end
 
   def no_parole_outcome?
-    most_recent_completed_parole_review&.no_hearing_outcome?
+    most_recent_completed_parole_review_for_sentence&.no_hearing_outcome?
   end
 
   def parole_outcome_not_release?
-    most_recent_completed_parole_review&.outcome_is_not_release?
+    most_recent_completed_parole_review_for_sentence&.outcome_is_not_release?
   end
 
   def thd_12_or_more_months_from_now?
