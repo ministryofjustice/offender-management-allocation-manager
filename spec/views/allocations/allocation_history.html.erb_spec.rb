@@ -36,12 +36,12 @@ RSpec.describe "allocations/history", type: :view do
     let(:history) { [] }
 
     context 'with an ineligible early allocation' do
-      let(:ea) { create(:early_allocation, :ineligible, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :ineligible, created_at: Time.zone.local(2060, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Early allocation assessment form completed"]
-        expect(page.css('.moj-timeline__date')).to have_text("19th November 2019 (11:28)")
+        expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
         expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome: not eligible.')
@@ -51,12 +51,12 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with an eligible unsent early alloc' do
-      let(:ea) { create(:early_allocation, :pre_window, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :pre_window, created_at: Time.zone.local(2060, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Early allocation assessment form completed"]
-        expect(page.css('.moj-timeline__date')).to have_text("19th November 2019 (11:28)")
+        expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
         expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome: eligible.')
@@ -68,12 +68,12 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with an ineligible unsent early alloc' do
-      let(:ea) { create(:early_allocation, :pre_window, :ineligible, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :pre_window, :ineligible, created_at: Time.zone.local(2060, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Early allocation assessment form completed"]
-        expect(page.css('.moj-timeline__date')).to have_text("19th November 2019 (11:28)")
+        expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
         expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome: not eligible.')
@@ -83,12 +83,12 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with a discretionary unsent early alloc' do
-      let(:ea) { create(:early_allocation, :pre_window, :discretionary, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :pre_window, :discretionary, created_at: Time.zone.local(2060, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Early allocation assessment form completed"]
-        expect(page.css('.moj-timeline__date')).to have_text("19th November 2019 (11:28)")
+        expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
         expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome: discretionary.')
@@ -100,12 +100,12 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with an eligible early allocation' do
-      let(:ea) { create(:early_allocation, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, created_at: Time.zone.local(2060, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Early allocation assessment form completed"]
-        expect(page.css('.moj-timeline__date')).to have_text("19th November 2019 (11:28)")
+        expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
         expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome: eligible.')
@@ -116,12 +116,12 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'with a disretionary early allocation' do
-      let(:ea) { create(:early_allocation, :discretionary, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0)) }
+      let(:ea) { create(:early_allocation, :discretionary, created_at: Time.zone.local(2060, 11, 19, 11, 28, 0)) }
       let(:early_allocations) { [ea] }
 
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Early allocation assessment form completed"]
-        expect(page.css('.moj-timeline__date')).to have_text("19th November 2019 (11:28)")
+        expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
         expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome is discretionary.')
@@ -132,14 +132,14 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'when community accept the case' do
-      let(:ea) { create(:early_allocation, :discretionary_accepted, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0), updated_at: Time.zone.local(2019, 11, 21, 11, 35, 0)) }
+      let(:ea) { create(:early_allocation, :discretionary_accepted, created_at: Time.zone.local(2060, 11, 19, 11, 28, 0), updated_at: Time.zone.local(2060, 11, 21, 11, 35, 0)) }
       let(:early_allocations) { [] }
       let(:history) { [EarlyAllocationHistory.new(ea), EarlyAllocationDecision.new(ea)] }
 
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ['Early allocation decision recorded', "Early allocation assessment form completed"]
-        expect(page.css('.moj-timeline__date')).to have_text("19th November 2019 (11:28)")
-        expect(page.css('.moj-timeline__date')).to have_text("21st November 2019 (11:35)")
+        expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
+        expect(page.css('.moj-timeline__date')).to have_text("21st November 2060 (11:35)")
         expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
         expect(page.css('.moj-timeline__date')).to have_text("by #{ea.updated_by_lastname}, #{ea.updated_by_firstname}")
 
@@ -153,14 +153,14 @@ RSpec.describe "allocations/history", type: :view do
     end
 
     context 'when community reject the case' do
-      let(:ea) { create(:early_allocation, :discretionary_declined, created_at: Time.zone.local(2019, 11, 19, 11, 28, 0), updated_at: Time.zone.local(2019, 11, 21, 11, 35, 0)) }
+      let(:ea) { create(:early_allocation, :discretionary_declined, created_at: Time.zone.local(2060, 11, 19, 11, 28, 0), updated_at: Time.zone.local(2060, 11, 21, 11, 35, 0)) }
       let(:early_allocations) { [] }
       let(:history) { [EarlyAllocationHistory.new(ea), EarlyAllocationDecision.new(ea)] }
 
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ['Early allocation decision recorded', "Early allocation assessment form completed",]
-        expect(page.css('.moj-timeline__date')).to have_text("19th November 2019 (11:28)")
-        expect(page.css('.moj-timeline__date')).to have_text("21st November 2019 (11:35)")
+        expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
+        expect(page.css('.moj-timeline__date')).to have_text("21st November 2060 (11:35)")
         expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
         expect(page.css('.moj-timeline__date')).to have_text("by #{ea.updated_by_lastname}, #{ea.updated_by_firstname}")
 
@@ -236,12 +236,12 @@ RSpec.describe "allocations/history", type: :view do
       end
 
       let(:released_version) { PaperTrail::Version.new(object_changes: { 'updated_at' => [release_date_and_time, release_date_and_time] }.to_yaml) }
-      let(:release_date_and_time) { Time.zone.local(2019, 11, 19, 11, 28, 0) }
+      let(:release_date_and_time) { Time.zone.local(2060, 11, 19, 11, 28, 0) }
 
       it 'displays a release label and the release date and time in the allocation history' do
         render
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Prisoner unallocated", "Prisoner allocated"]
-        expect(page.css('.moj-timeline__date')).to have_text('19th November 2019 (11:28)')
+        expect(page.css('.moj-timeline__date')).to have_text('19th November 2060 (11:28)')
       end
     end
   end
