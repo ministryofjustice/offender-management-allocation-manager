@@ -130,8 +130,8 @@ jobs:
           name: Run tests
           command: |
             export SPEC_STATUS_PATH=~/spec_status
-            bundle exec parallel_test -t rspec -- -t ~flaky -t ~local_only --format progress -- spec || \
-              (echo "Flaky tests detected, trying again..." && sleep 30 && bundle exec parallel_test -t rspec -- -t ~flaky -t ~local_only --format progress --only-failures -- spec)
+            bundle exec parallel_test -t rspec -- -t ~flaky --format progress -- spec || \
+              (echo "Flaky tests detected, trying again..." && sleep 30 && bundle exec parallel_test -t rspec -- -t ~flaky --format progress --only-failures -- spec)
           environment:
             MOZ_HEADLESS: 1
             RAILS_ENV: test
