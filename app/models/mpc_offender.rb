@@ -19,7 +19,7 @@ class MpcOffender
 
   delegate :victim_liaison_officers, :handover_progress_task_completion_data, :handover_progress_complete?,
            :handover_type, :current_parole_review, :previous_parole_reviews, :build_parole_review_sections,
-           :most_recent_parole_review, :most_recent_completed_parole_review, to: :@offender
+           :most_recent_parole_review, :parole_reviews, to: :@offender
 
   attr_reader :case_information, :prison
 
@@ -150,19 +150,6 @@ class MpcOffender
     most_recent_parole_review&.target_hearing_date
   end
 
-  # Returns the target hearing date for the offender's next active parole application, or nil if there isn't one.
-
-  # Returns the date that the most recent hearing outcome was received.
-  def hearing_outcome_received_on
-    most_recent_parole_review&.hearing_outcome_received_on
-  end
-
-  # Returns the date that the most recent COMPLETED hearing outcome was received.
-  # Used to exclude any active parole applications.
-  def last_hearing_outcome_received_on
-    most_recent_completed_parole_review&.hearing_outcome_received_on
-  end
-
   def approaching_parole?
     next_parole_date.present?
   end
@@ -188,12 +175,20 @@ class MpcOffender
     end
   end
 
+  def most_recent_completed_parole_review_for_sentence
+    @most_recent_completed_parole_review_for_sentence ||= parole_reviews
+      .ordered_by_sortable_date
+      .completed
+      .for_sentences_starting(sentence_start_date)
+      .last
+  end
+
   def no_parole_outcome?
-    most_recent_completed_parole_review&.no_hearing_outcome?
+    most_recent_completed_parole_review_for_sentence&.no_hearing_outcome?
   end
 
   def parole_outcome_not_release?
-    most_recent_completed_parole_review&.outcome_is_not_release?
+    most_recent_completed_parole_review_for_sentence&.outcome_is_not_release?
   end
 
   def thd_12_or_more_months_from_now?

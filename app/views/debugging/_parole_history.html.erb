@@ -21,7 +21,7 @@
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header" data-record-id="<%= parole_review.id %>" data-note="<%=
                 case parole_review.id
-                when @offender.most_recent_completed_parole_review&.id then 'MRC'
+                when @offender.most_recent_completed_parole_review_for_sentence&.id then 'MRC'
                 when @offender.most_recent_parole_review&.id           then 'MR'
                 end
               %>" title="<%= parole_review.updated_at.strftime('%d/%m/%Y %H:%M:%S') %>">

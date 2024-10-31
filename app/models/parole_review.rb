@@ -27,6 +27,8 @@ class ParoleReview < ApplicationRecord
 
   scope :previous, -> { where.not(id: current.pluck(:id)) }
 
+  scope :completed, -> { ordered_by_sortable_date.with_hearing_outcome }
+
   validate :hearing_outcome_received_on_must_be_in_past, on: :manual_update
 
   # Used when POM manually enters this date
