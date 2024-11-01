@@ -171,7 +171,7 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
         AllocationService.create_or_update(params)
         alloc = described_class.find_by!(nomis_offender_id: nomis_offender_id)
 
-        alloc.dealloate_offender_after_transfer
+        alloc.deallocate_offender_after_transfer
         deallocation = alloc.reload
 
         expect(deallocation.primary_pom_nomis_id).to be_nil

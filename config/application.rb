@@ -38,11 +38,8 @@ module OffenderManagementAllocationClient
         'ALLOCATION_MANAGER_HOST',
         'http://localhost:3000'
       )
-    Rails.application.routes.default_url_options[:host] =
-      ENV.fetch(
-        'ALLOCATION_MANAGER_HOST',
-        'http://localhost:3000'
-      )
+
+    Rails.application.default_url_options[:host] = config.allocation_manager_host
 
     # Sentry environment set with SENTRY_CURRENT_ENV
     config.sentry_dsn = ENV['SENTRY_DSN']&.strip
