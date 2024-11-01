@@ -14,10 +14,8 @@ module HmppsApi
       EXCLUDED_IMPRISONMENT_STATUSES = %w[A_FINE].freeze
 
       def self.get_offenders_in_prison(prison, ignore_legal_status: false)
-        # Get offenders from the Prisoner Offender Search API - and filter out those with unwanted legal statuses
         unfiltered = get_search_api_offenders_in_prison(prison)
         offenders = ignore_legal_status ? unfiltered : filtered_offenders(unfiltered)
-
         return [] if offenders.empty?
 
         # Get additional data from other APIs
@@ -31,6 +29,7 @@ module HmppsApi
 
         # Get movement details only for those offenders who are temporarily out of prison (TAP/ROTL)
         temp_out_offenders = offenders.select { |o| temp_out_of_prison?(o) }.map { |o| o.fetch('prisonerNumber') }
+        
         temp_movements = if temp_out_offenders.any?
                            HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(temp_out_offenders)
                          else
@@ -102,10 +101,10 @@ module HmppsApi
         # activeOnly ensures we don't see any category assessments which haven't yet been approved
         queryparams = { 'latestOnly' => true, 'activeOnly' => true, 'mostRecentOnly' => true }
 
-        client.post(route, offender_nos, queryparams: queryparams, cache: true)
-              .map { |assessment|
-                [assessment.fetch('offenderNo'), HmppsApi::OffenderCategory.new(assessment)]
-              }.to_h
+        client
+          .post(route, offender_nos, queryparams:, cache: true)
+          .map { |assessment| [assessment.fetch('offenderNo'), HmppsApi::OffenderCategory.new(assessment)] }
+          .to_h
       end
 
       def self.get_image(booking_id)

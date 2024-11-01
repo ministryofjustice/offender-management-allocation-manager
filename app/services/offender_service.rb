@@ -1,46 +1,37 @@
 # frozen_string_literal: true
 
 class OffenderService
-  class << self
-    def get_offender(offender_no, ignore_legal_status: false)
-      # use find_or_create_by here for performance, but might still have be a small race condition
-      # This isn't find_or_create_by! because our offender_no might be invalid - we want to return nil rather than crash
-      offender = Offender.find_or_create_by(nomis_offender_id: offender_no)
-      return unless offender
+  def self.get_offender(offender_no, ignore_legal_status: false)
+    prison_record = HmppsApi::PrisonApi::OffenderApi.get_offender(offender_no, ignore_legal_status:)
+    return unless prison_record
 
-      api_offender = HmppsApi::PrisonApi::OffenderApi.get_offender(offender_no,
-                                                                   ignore_legal_status: ignore_legal_status)
-      return unless api_offender
+    prison = Prison.find_by(code: prison_record.prison_id)
+    return unless prison
 
-      prison = Prison.find_by(code: api_offender.prison_id)
-      return unless prison
+    offender = Offender.find_or_create_by(nomis_offender_id: offender_no)
+    MpcOffender.new(prison:, offender:, prison_record:)
+  end
 
+  def self.get_offenders_in_prison(prison, ignore_legal_status: false)
+    prison_records = HmppsApi::PrisonApi::OffenderApi
+      .get_offenders_in_prison(prison.code, ignore_legal_status:)
+      .index_by(&:offender_no)
+
+    offenders = find_or_create_offenders(prison_records.keys)
+    offenders.map do |offender|
       MpcOffender.new(
-        prison: prison,
-        offender: offender,
-        prison_record: api_offender
+        prison:,
+        offender:,
+        prison_record: prison_records.fetch(offender.nomis_offender_id)
       )
     end
+  end
 
+  class << self
     def get_offenders(offender_numbers, ignore_legal_status: false)
       Array(offender_numbers)
         .map { |offender_number| get_offender(offender_number, ignore_legal_status:) }
         .compact
-    end
-
-    def get_offenders_in_prison(prison, ignore_legal_status: false)
-      api_offenders = HmppsApi::PrisonApi::OffenderApi.get_offenders_in_prison(prison.code, ignore_legal_status: ignore_legal_status)
-                                                      .index_by(&:offender_no)
-
-      offenders = find_or_create_offenders(api_offenders.keys)
-
-      offenders.map do |offender|
-        MpcOffender.new(
-          prison: prison,
-          offender: offender,
-          prison_record: api_offenders.fetch(offender.nomis_offender_id)
-        )
-      end
     end
 
     def get_community_data(nomis_offender_id)
@@ -150,21 +141,17 @@ class OffenderService
   private
 
     def find_or_create_offenders(nomis_ids)
-      offenders = Offender
-        .includes(:early_allocations, :responsibility, :parole_reviews, case_information: [:local_delivery_unit])
-        .where(nomis_offender_id: nomis_ids)
+      Offender.upsert_all(
+        nomis_ids.map { |id| { nomis_offender_id: id } },
+        unique_by: :nomis_offender_id
+      )
 
-      if offenders.count != nomis_ids.count
-        # Create Offender records for (presumably new) prisoners who don't have one yet
-        existing_ids = offenders.map(&:nomis_offender_id)
-        (nomis_ids - existing_ids).each do |new_id|
-          # use create_or_find_by! to prevent race conditions
-          new_offender = Offender.create_or_find_by! nomis_offender_id: new_id
-          offenders += [new_offender]
-        end
-      end
-
-      offenders
+      Offender.includes(
+        :early_allocations,
+        :responsibility,
+        :parole_reviews,
+        case_information: [:local_delivery_unit]
+      ).where(nomis_offender_id: nomis_ids)
     end
   end
 end
