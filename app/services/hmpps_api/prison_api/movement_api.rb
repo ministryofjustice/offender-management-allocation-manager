@@ -55,6 +55,8 @@ module HmppsApi
       end
 
       def self.latest_temp_movement_for(offender_nos)
+        return {} if offender_nos.empty?
+
         route = '/movements/offenders'
         types = [HmppsApi::MovementType::ADMISSION,
                  HmppsApi::MovementType::TRANSFER,

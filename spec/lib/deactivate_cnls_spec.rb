@@ -7,7 +7,7 @@ RSpec.describe DeactivateCnls do
   let(:nomis_offender) { build(:nomis_offender, prisonerNumber: offender_id).with_indifferent_access }
 
   let(:api_offender) do
-    HmppsApi::Offender.new(offender: nomis_offender, category: nil, latest_temp_movement: nil, complexity_level: 'high')
+    HmppsApi::Offender.new(offender: nomis_offender, category: nil, latest_temp_movement: nil, complexity_level: 'high', movements: [])
   end
 
   before do

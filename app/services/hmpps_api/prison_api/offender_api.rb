@@ -14,41 +14,28 @@ module HmppsApi
       EXCLUDED_IMPRISONMENT_STATUSES = %w[A_FINE].freeze
 
       def self.get_offenders_in_prison(prison, ignore_legal_status: false)
-        # Get offenders from the Prisoner Offender Search API - and filter out those with unwanted legal statuses
         unfiltered = get_search_api_offenders_in_prison(prison)
         offenders = ignore_legal_status ? unfiltered : filtered_offenders(unfiltered)
-
         return [] if offenders.empty?
 
         # Get additional data from other APIs
         offender_nos = offenders.map { |o| o.fetch('prisonerNumber') }
         offender_categories = get_offender_categories(offender_nos)
-        complexities = if Prison.womens.exists?(prison)
-                         HmppsApi::ComplexityApi.get_complexities(offender_nos)
-                       else
-                         {}
-                       end
-
-        # Get movement details only for those offenders who are temporarily out of prison (TAP/ROTL)
-        temp_out_offenders = offenders.select { |o| temp_out_of_prison?(o) }.map { |o| o.fetch('prisonerNumber') }
-        temp_movements = if temp_out_offenders.any?
-                           HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(temp_out_offenders)
-                         else
-                           {}
-                         end
+        complexities = complexities_for(offender_nos, prison)
+        temp_movements = latest_temp_movement_for(offenders)
+        movements = HmppsApi::PrisonApi::MovementApi.admissions_for(offender_nos)
 
         # Create Offender objects
-        offenders.map { |offender|
+        offenders.map do |offender|
           offender_no = offender.fetch('prisonerNumber')
 
           HmppsApi::Offender.new(
-            offender: offender,
+            offender:,
             category: offender_categories[offender_no],
             latest_temp_movement: temp_movements[offender_no],
-            complexity_level: complexities[offender_no]
+            complexity_level: complexities[offender_no],
+            movements: movements[offender_no]
           )
-        }.tap do |offenders_array|
-          add_arrival_dates(offenders_array)
         end
       end
 
@@ -59,34 +46,27 @@ module HmppsApi
       # Warning: when you ignore the offender's legal status, you could potentially receive an offender who wouldn't
       # normally appear within the service. This should only be done under certain circumstances –
       # e.g. when deallocating an offender who has since left the service due to a change in legal status
-      def self.get_offender(raw_offender_no, ignore_legal_status: false)
-        unfiltered = get_search_api_offenders([raw_offender_no])
+      def self.get_offender(offender_no, ignore_legal_status: false)
+        unfiltered = get_search_api_offenders([offender_no])
         offender = (ignore_legal_status ? unfiltered : filtered_offenders(unfiltered)).first
-
         return nil if offender.blank?
 
-        offender_no = offender.fetch('prisonerNumber')
-
         # Restricted Patients use supportingPrisonId, since the offender is currently in hospital
-        prison_id = offender.fetch('restrictedPatient') == true ? offender.fetch('supportingPrisonId') : offender.fetch('prisonId')
-        complexity_level = if Prison.womens.exists?(prison_id)
-                             HmppsApi::ComplexityApi.get_complexity(offender_no)
-                           end
+        prison_id = offender.fetch(offender['restrictedPatient'] ? 'supportingPrisonId' : 'prisonId')
 
         # Get additional data from other APIs
+        complexity_level = complexity_for(offender_no, prison_id)
         offender_categories = get_offender_categories([offender_no])
-        temp_movement = if temp_out_of_prison?(offender)
-                          HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([offender_no])[offender_no]
-                        end
+        temp_movements = latest_temp_movement_for([offender])
+        movements = HmppsApi::PrisonApi::MovementApi.admissions_for([offender_no])
 
         HmppsApi::Offender.new(
-          offender: offender,
+          offender:,
           category: offender_categories[offender_no],
-          latest_temp_movement: temp_movement,
-          complexity_level: complexity_level
-        ).tap do |o|
-          add_arrival_dates([o])
-        end
+          latest_temp_movement: temp_movements[offender_no],
+          complexity_level:,
+          movements: movements[offender_no]
+        )
       end
 
       def self.get_offender_categories(offender_nos)
@@ -102,10 +82,10 @@ module HmppsApi
         # activeOnly ensures we don't see any category assessments which haven't yet been approved
         queryparams = { 'latestOnly' => true, 'activeOnly' => true, 'mostRecentOnly' => true }
 
-        client.post(route, offender_nos, queryparams: queryparams, cache: true)
-              .map { |assessment|
-                [assessment.fetch('offenderNo'), HmppsApi::OffenderCategory.new(assessment)]
-              }.to_h
+        client
+          .post(route, offender_nos, queryparams:, cache: true)
+          .map { |assessment| [assessment.fetch('offenderNo'), HmppsApi::OffenderCategory.new(assessment)] }
+          .to_h
       end
 
       def self.get_image(booking_id)
@@ -127,17 +107,6 @@ module HmppsApi
         default_image
       end
 
-      def self.add_arrival_dates(offenders)
-        movements = HmppsApi::PrisonApi::MovementApi.admissions_for(offenders.map(&:offender_no))
-
-        offenders.each do |offender|
-          arrival = movements.fetch(offender.offender_no, []).reverse.detect do |movement|
-            movement.to_agency == offender.prison_id
-          end
-          offender.prison_arrival_date = [offender.sentence_start_date, arrival&.movement_date].compact.max
-        end
-      end
-
       def self.get_offender_alerts(offender_no)
         path = "/offenders/#{offender_no}/alerts/v2"
         client.get(path)
@@ -153,6 +122,32 @@ module HmppsApi
           ALLOWED_LEGAL_STATUSES.include?(o['legalStatus']) &&
             EXCLUDED_IMPRISONMENT_STATUSES.exclude?(o['imprisonmentStatus'])
         end
+      end
+
+      # Get movement details only for those offenders who are temporarily out of prison (TAP/ROTL)
+      def self.latest_temp_movement_for(offenders)
+        HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(
+          offenders
+            .select { |o| temp_out_of_prison?(o) }
+            .map    { |o| o.fetch('prisonerNumber') }
+        )
+      end
+
+      # Get movement details only for those offenders who are temporarily out of prison (TAP/ROTL)
+      def self.temp_out_of_prison?(offender)
+        offender['inOutStatus'] == 'OUT' && offender['lastMovementTypeCode'] == HmppsApi::MovementType::TEMPORARY
+      end
+
+      def self.complexities_for(offender_nos, prison_id)
+        return {} unless Prison.womens.exists?(prison_id)
+
+        HmppsApi::ComplexityApi.get_complexities(offender_nos)
+      end
+
+      def self.complexity_for(offender_no, prison_id)
+        return {} unless Prison.womens.exists?(prison_id)
+
+        HmppsApi::ComplexityApi.get_complexity(offender_no)
       end
 
     private
@@ -185,10 +180,6 @@ module HmppsApi
 
       def self.default_image
         File.read(Rails.root.join('app/assets/images/default_profile_image.jpg'))
-      end
-
-      def self.temp_out_of_prison?(offender)
-        offender['inOutStatus'] == 'OUT' && offender['lastMovementTypeCode'] == HmppsApi::MovementType::TEMPORARY
       end
     end
   end
