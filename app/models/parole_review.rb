@@ -1,5 +1,5 @@
 class ParoleReview < ApplicationRecord
-  belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :parole_reviews
+  belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :parole_reviews, optional: true
   has_one :previous_review
 
   ACTIVE_REVIEW_STATUS = [
