@@ -26,17 +26,17 @@ module HmppsApi
         movements = HmppsApi::PrisonApi::MovementApi.admissions_for(offender_nos)
 
         # Create Offender objects
-        offenders.map { |offender|
+        offenders.map do |offender|
           offender_no = offender.fetch('prisonerNumber')
 
           HmppsApi::Offender.new(
-            offender: offender,
+            offender:,
             category: offender_categories[offender_no],
             latest_temp_movement: temp_movements[offender_no],
             complexity_level: complexities[offender_no],
             movements: movements[offender_no]
           )
-        }
+        end
       end
 
       # Get a single offender
@@ -46,33 +46,25 @@ module HmppsApi
       # Warning: when you ignore the offender's legal status, you could potentially receive an offender who wouldn't
       # normally appear within the service. This should only be done under certain circumstances –
       # e.g. when deallocating an offender who has since left the service due to a change in legal status
-      def self.get_offender(raw_offender_no, ignore_legal_status: false)
-        unfiltered = get_search_api_offenders([raw_offender_no])
+      def self.get_offender(offender_no, ignore_legal_status: false)
+        unfiltered = get_search_api_offenders([offender_no])
         offender = (ignore_legal_status ? unfiltered : filtered_offenders(unfiltered)).first
-
         return nil if offender.blank?
 
-        offender_no = offender.fetch('prisonerNumber')
-
         # Restricted Patients use supportingPrisonId, since the offender is currently in hospital
-        prison_id = offender.fetch('restrictedPatient') == true ? offender.fetch('supportingPrisonId') : offender.fetch('prisonId')
-        complexity_level = if Prison.womens.exists?(prison_id)
-                             HmppsApi::ComplexityApi.get_complexity(offender_no)
-                           end
+        prison_id = offender.fetch(offender['restrictedPatient'] ? 'supportingPrisonId' : 'prisonId')
 
         # Get additional data from other APIs
+        complexity_level = complexity_for(offender_no, prison_id)
         offender_categories = get_offender_categories([offender_no])
-        temp_movement = if temp_out_of_prison?(offender)
-                          HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([offender_no])[offender_no]
-                        end
-
+        temp_movements = latest_temp_movement_for([offender])
         movements = HmppsApi::PrisonApi::MovementApi.admissions_for([offender_no])
 
         HmppsApi::Offender.new(
-          offender: offender,
+          offender:,
           category: offender_categories[offender_no],
-          latest_temp_movement: temp_movement,
-          complexity_level: complexity_level,
+          latest_temp_movement: temp_movements[offender_no],
+          complexity_level:,
           movements: movements[offender_no]
         )
       end
@@ -147,11 +139,15 @@ module HmppsApi
       end
 
       def self.complexities_for(offender_nos, prison)
-        if Prison.womens.exists?(prison)
-          HmppsApi::ComplexityApi.get_complexities(offender_nos)
-        else
-          {}
-        end
+        return {} unless Prison.womens.exists?(prison)
+
+        HmppsApi::ComplexityApi.get_complexities(offender_nos)
+      end
+
+      def self.complexity_for(offender_no, prison)
+        return {} unless Prison.womens.exists?(prison)
+
+        HmppsApi::ComplexityApi.get_complexity(offender_no)
       end
 
     private
