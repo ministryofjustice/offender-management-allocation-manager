@@ -195,10 +195,6 @@ class MpcOffender
     tariff_date.present? || parole_eligibility_date.present? || current_parole_review.present?
   end
 
-  def due_for_release?
-    most_recent_parole_review&.current_record_hearing_outcome == 'Release'
-  end
-
   def sentences
     @sentences ||= Offenders::Sentences.new(booking_id:)
   end
