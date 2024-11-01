@@ -21,20 +21,8 @@ module HmppsApi
         # Get additional data from other APIs
         offender_nos = offenders.map { |o| o.fetch('prisonerNumber') }
         offender_categories = get_offender_categories(offender_nos)
-        complexities = if Prison.womens.exists?(prison)
-                         HmppsApi::ComplexityApi.get_complexities(offender_nos)
-                       else
-                         {}
-                       end
-
-        # Get movement details only for those offenders who are temporarily out of prison (TAP/ROTL)
-        temp_out_offenders = offenders.select { |o| temp_out_of_prison?(o) }.map { |o| o.fetch('prisonerNumber') }
-        
-        temp_movements = if temp_out_offenders.any?
-                           HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(temp_out_offenders)
-                         else
-                           {}
-                         end
+        complexities = complexities_for(offender_nos, prison)
+        temp_movements = latest_temp_movement_for(offenders)
 
         # Create Offender objects
         offenders.map { |offender|
@@ -154,6 +142,28 @@ module HmppsApi
         end
       end
 
+      # Get movement details only for those offenders who are temporarily out of prison (TAP/ROTL)
+      def self.latest_temp_movement_for(offenders)
+        HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(
+          offenders
+            .select { |o| temp_out_of_prison?(o) }
+            .map    { |o| o.fetch('prisonerNumber') }
+        )
+      end
+
+      # Get movement details only for those offenders who are temporarily out of prison (TAP/ROTL)
+      def self.temp_out_of_prison?(offender)
+        offender['inOutStatus'] == 'OUT' && offender['lastMovementTypeCode'] == HmppsApi::MovementType::TEMPORARY
+      end
+
+      def self.complexities_for(offender_nos, prison)
+        if Prison.womens.exists?(prison)
+          HmppsApi::ComplexityApi.get_complexities(offender_nos)
+        else
+          {}
+        end
+      end
+
     private
 
       def self.get_search_api_offenders_in_prison(prison_code)
@@ -184,10 +194,6 @@ module HmppsApi
 
       def self.default_image
         File.read(Rails.root.join('app/assets/images/default_profile_image.jpg'))
-      end
-
-      def self.temp_out_of_prison?(offender)
-        offender['inOutStatus'] == 'OUT' && offender['lastMovementTypeCode'] == HmppsApi::MovementType::TEMPORARY
       end
     end
   end
