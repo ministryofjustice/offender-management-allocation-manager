@@ -188,7 +188,7 @@ RSpec.describe MpcOffender, type: :model do
 
     context 'when probation record missing' do
       before do
-        subject.instance_variable_set(:@case_information, nil)
+        allow(offender_model).to receive(:case_information).and_return(nil)
       end
 
       it 'returns status unable' do
