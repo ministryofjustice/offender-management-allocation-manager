@@ -92,8 +92,8 @@ FactoryBot.define do
             tariffDate: ted,
             paroleEligibilityDate: ped,
           ).deep_stringify_keys,
+          movements: []
         )
-        api_offender.prison_arrival_date = api_offender.sentence_start_date
 
         MpcOffender.new(
           prison: build(:prison),

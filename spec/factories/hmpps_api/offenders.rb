@@ -11,7 +11,8 @@ FactoryBot.define do
       HmppsApi::Offender.new(offender: values_hash,
                              category: attributes.fetch(:category),
                              latest_temp_movement: nil,
-                             complexity_level: attributes.fetch(:complexityLevel))
+                             complexity_level: attributes.fetch(:complexityLevel),
+                             movements: [])
     end
 
     prisonId { 'LEI' }

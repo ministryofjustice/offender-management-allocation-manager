@@ -23,6 +23,7 @@ module HmppsApi
         offender_categories = get_offender_categories(offender_nos)
         complexities = complexities_for(offender_nos, prison)
         temp_movements = latest_temp_movement_for(offenders)
+        movements = HmppsApi::PrisonApi::MovementApi.admissions_for(offender_nos)
 
         # Create Offender objects
         offenders.map { |offender|
@@ -32,11 +33,10 @@ module HmppsApi
             offender: offender,
             category: offender_categories[offender_no],
             latest_temp_movement: temp_movements[offender_no],
-            complexity_level: complexities[offender_no]
+            complexity_level: complexities[offender_no],
+            movements: movements[offender_no]
           )
-        }.tap do |offenders_array|
-          add_arrival_dates(offenders_array)
-        end
+        }
       end
 
       # Get a single offender
@@ -66,14 +66,15 @@ module HmppsApi
                           HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for([offender_no])[offender_no]
                         end
 
+        movements = HmppsApi::PrisonApi::MovementApi.admissions_for([offender_no])
+
         HmppsApi::Offender.new(
           offender: offender,
           category: offender_categories[offender_no],
           latest_temp_movement: temp_movement,
-          complexity_level: complexity_level
-        ).tap do |o|
-          add_arrival_dates([o])
-        end
+          complexity_level: complexity_level,
+          movements: movements[offender_no]
+        )
       end
 
       def self.get_offender_categories(offender_nos)
@@ -112,17 +113,6 @@ module HmppsApi
         # face, and so when an image can't be found, we will return the default
         # image instead.
         default_image
-      end
-
-      def self.add_arrival_dates(offenders)
-        movements = HmppsApi::PrisonApi::MovementApi.admissions_for(offenders.map(&:offender_no))
-
-        offenders.each do |offender|
-          arrival = movements.fetch(offender.offender_no, []).reverse.detect do |movement|
-            movement.to_agency == offender.prison_id
-          end
-          offender.prison_arrival_date = [offender.sentence_start_date, arrival&.movement_date].compact.max
-        end
       end
 
       def self.get_offender_alerts(offender_no)

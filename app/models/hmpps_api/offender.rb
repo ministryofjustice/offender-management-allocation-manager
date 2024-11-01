@@ -26,18 +26,17 @@ module HmppsApi
 
     delegate :code, :label, :active_since, to: :@category, prefix: :category, allow_nil: true
 
-    attr_accessor :prison_arrival_date
-
     attr_reader :first_name, :last_name, :prison_id, :offender_no, :location, :complexity_level,
-                :date_of_birth, :sentence, :main_offence, :booking_id
+                :date_of_birth, :sentence, :main_offence, :booking_id, :movements
 
-    def initialize(offender:, category:, latest_temp_movement:, complexity_level:)
+    def initialize(offender:, category:, latest_temp_movement:, complexity_level:, movements:)
       restricted_patient = offender['restrictedPatient'] == true
       @first_name = offender.fetch('firstName')
       @last_name = offender.fetch('lastName')
       @offender_no = offender.fetch('prisonerNumber')
       @date_of_birth = offender.fetch('dateOfBirth').to_date
       @latest_temp_movement = latest_temp_movement
+      @movements = Array(movements)
       @location = restricted_patient ? offender['dischargedHospitalDescription'] : offender['cellLocation']
       @main_offence = offender['mostSeriousOffence']
       @complexity_level = complexity_level
@@ -46,6 +45,12 @@ module HmppsApi
       @booking_id = offender.fetch('bookingId').to_i
       @prison_id = restricted_patient ? offender.fetch('supportingPrisonId') : offender.fetch('prisonId')
       @restricted_patient = restricted_patient
+    end
+
+    def prison_arrival_date
+      arrival = movements.reverse.detect { |movement| movement.to_agency == prison_id }
+
+      [sentence_start_date, arrival&.movement_date].compact.max
     end
 
     def get_image
