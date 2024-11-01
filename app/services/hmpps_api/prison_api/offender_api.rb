@@ -138,14 +138,14 @@ module HmppsApi
         offender['inOutStatus'] == 'OUT' && offender['lastMovementTypeCode'] == HmppsApi::MovementType::TEMPORARY
       end
 
-      def self.complexities_for(offender_nos, prison)
-        return {} unless Prison.womens.exists?(prison)
+      def self.complexities_for(offender_nos, prison_id)
+        return {} unless Prison.womens.exists?(prison_id)
 
         HmppsApi::ComplexityApi.get_complexities(offender_nos)
       end
 
-      def self.complexity_for(offender_no, prison)
-        return {} unless Prison.womens.exists?(prison)
+      def self.complexity_for(offender_no, prison_id)
+        return {} unless Prison.womens.exists?(prison_id)
 
         HmppsApi::ComplexityApi.get_complexity(offender_no)
       end
