@@ -48,7 +48,9 @@ Rails.application.configure do
 
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true
-  Rails.application.routes.default_url_options[:host] = 'http://localhost:3000'
+
+  config.allocation_manager_host = 'http://localhost:3000'
+  Rails.application.default_url_options[:host] = config.allocation_manager_host
 
   # It seems that the default cookie store behaves very subtly different to the cache store
   # (the cookie store implicitly serializes objects, where the cache store doesn't)

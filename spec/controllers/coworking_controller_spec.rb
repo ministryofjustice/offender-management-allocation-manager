@@ -94,7 +94,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
           nomis_offender_id: offender_no,
           offender_name: "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}",
           pom_name: primary_pom.firstName.capitalize,
-          url: Rails.application.routes.default_url_options[:host] + prison_staff_caseload_path(prison, primary_pom.staffId)
+          url: Rails.application.routes.url_helpers.prison_staff_caseload_url(prison, primary_pom.staffId)
         )
         expect(fakejob).to have_received(:deliver_later)
       end

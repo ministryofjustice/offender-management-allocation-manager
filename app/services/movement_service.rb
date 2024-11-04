@@ -80,7 +80,7 @@ private
     # When an offender is released, we can no longer rely on their
     # case information (in case they come back one day), and we
     # should de-activate any current allocations.
-    alloc.dealloate_offender_after_transfer if alloc&.active?
+    alloc.deallocate_offender_after_transfer if alloc&.active?
     true
   end
 

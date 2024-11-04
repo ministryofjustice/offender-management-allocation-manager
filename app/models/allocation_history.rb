@@ -57,6 +57,13 @@ class AllocationHistory < ApplicationRecord
       .or(where(secondary_pom_nomis_id: nomis_staff_id))
   }
 
+  validates :allocated_at_tier,
+            :event,
+            :event_trigger,
+            :prison, presence: true
+
+  validates :nomis_offender_id, presence: true, uniqueness: true
+
   validate do |av|
     if av.primary_pom_nomis_id.present? &&
       av.primary_pom_nomis_id == av.secondary_pom_nomis_id
@@ -116,19 +123,18 @@ class AllocationHistory < ApplicationRecord
     end
   end
 
-  validates :allocated_at_tier,
-            :event,
-            :event_trigger,
-            :prison, presence: true
-
-  validates :nomis_offender_id, presence: true, uniqueness: true
-
   def deallocate_offender_after_release
-    deallocate_offender event: AllocationHistory::DEALLOCATE_RELEASED_OFFENDER, event_trigger: AllocationHistory::OFFENDER_RELEASED if active?
+    deallocate_offender(
+      event: AllocationHistory::DEALLOCATE_RELEASED_OFFENDER,
+      event_trigger: AllocationHistory::OFFENDER_RELEASED
+    )
   end
 
-  def dealloate_offender_after_transfer
-    deallocate_offender event: AllocationHistory::DEALLOCATE_PRIMARY_POM, event_trigger: AllocationHistory::OFFENDER_TRANSFERRED if active?
+  def deallocate_offender_after_transfer
+    deallocate_offender(
+      event: AllocationHistory::DEALLOCATE_PRIMARY_POM,
+      event_trigger: AllocationHistory::OFFENDER_TRANSFERRED
+    )
   end
 
   # check for changes in the last week where the target value
@@ -145,6 +151,8 @@ class AllocationHistory < ApplicationRecord
 private
 
   def deallocate_offender(event:, event_trigger:)
+    return unless active?
+
     primary_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(primary_pom_nomis_id)
 
     # If the offender has been released from prison, OffenderService.get_offender will return nil (due to "OUT" being an unrecognised Prison)
@@ -159,9 +167,9 @@ private
       offender_name: offender.full_name,
       nomis_offender_id: nomis_offender_id,
       prison_name: Prison.find(prison).name,
-      url: Rails.application.routes.default_url_options[:host] +
-            Rails.application.routes.url_helpers.prison_staff_caseload_path(prison, primary_pom_nomis_id)
+      url: Rails.application.routes.url_helpers.prison_staff_caseload_url(prison, primary_pom_nomis_id)
     }
+
     update!(
       event: event,
       event_trigger: event_trigger,

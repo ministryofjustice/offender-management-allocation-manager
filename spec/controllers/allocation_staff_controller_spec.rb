@@ -135,7 +135,7 @@ RSpec.describe AllocationStaffController, type: :controller do
         context 'when they were automatically deallocated from the last prison (expected behaviour)' do
           before do
             # Deallocate the POM in the previous prison (i.e. offender has been transferred to this prison)
-            allocation.dealloate_offender_after_transfer
+            allocation.deallocate_offender_after_transfer
           end
 
           it 'sets @allocation so that last_event can be displayed' do

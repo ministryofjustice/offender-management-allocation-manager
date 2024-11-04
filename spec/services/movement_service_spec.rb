@@ -78,7 +78,7 @@ describe MovementService, type: :feature do
        vcr: { cassette_name: 'prison_api/movement_service_transfer_to_open_spec' }  do
       open_prison_transfer = build(:movement, offenderNo: 'G7266VD', toAgency: 'HDI')
 
-      existing_allocation.dealloate_offender_after_transfer
+      existing_allocation.deallocate_offender_after_transfer
       processed = described_class.process_movement(open_prison_transfer)
       expect(processed).to be true
     end

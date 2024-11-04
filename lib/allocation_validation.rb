@@ -48,7 +48,7 @@ class AllocationValidation
 
       # The offender is at a different prison so deallocate as a transfer
       puts "#{offender.offender_no} (allocated) appears to have been transferred to #{offender.prison_id} - deallocating"
-      allocation.dealloate_offender_after_transfer
+      allocation.deallocate_offender_after_transfer
     end
   end
 end
