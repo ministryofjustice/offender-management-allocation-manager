@@ -10,7 +10,7 @@ class PomsController < PrisonStaffApplicationController
   before_action :set_referrer
 
   def index
-    @poms = @prison.get_list_of_poms.sort_by(&:last_name)
+    @poms = @prison.poms.sort_by(&:last_name)
   end
 
   def show
