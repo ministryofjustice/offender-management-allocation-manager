@@ -8,7 +8,7 @@ class Prison < ApplicationRecord
 
   enum prison_type: { womens: 'womens', mens_open: 'mens_open', mens_closed: 'mens_closed' }
 
-  scope :active, -> { where(code: AllocationHistory.distinct.pluck(:prison)) }
+  scope :active, -> { where(code: AllocationHistory.pluck('distinct(prison)')) }
 
   def poms
     # This API call doesn't do what it says on the tin. It can return duplicate
