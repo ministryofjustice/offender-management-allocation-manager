@@ -43,7 +43,7 @@ class Prison < ApplicationRecord
     allocated + unallocated
   end
 
-  def all_policy_offenders
+  def policy_offenders
     unfiltered_offenders.select(&:inside_omic_policy?)
   end
 
@@ -69,7 +69,7 @@ class Prison < ApplicationRecord
 private
 
   def summary
-    @summary ||= AllocationsSummary.new(allocations:, offenders: all_policy_offenders)
+    @summary ||= AllocationsSummary.new(allocations:, offenders: policy_offenders)
   end
 
   def unfiltered_offenders

@@ -23,7 +23,7 @@ class PrisonersController < PrisonsApplicationController
 
   def search
     @q = search_term
-    offenders = SearchService.search_for_offenders(@q, @prison.all_policy_offenders)
+    offenders = SearchService.search_for_offenders(@q, @prison.policy_offenders)
     @offenders, @user_allocations = get_slice_for_page(offenders, @current_user.staff_id)
     MetricsService.instance.increment_search_count
 
