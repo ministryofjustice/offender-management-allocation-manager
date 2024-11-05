@@ -9,10 +9,13 @@ class StaffMember
   delegate :position, :position_description, :probation_officer?, :prison_officer?, to: :pom, allow_nil: true
   delegate :working_pattern, :status, to: :@pom_detail
 
-  def initialize(prison, staff_id, pom_detail = default_pom_detail(prison, staff_id))
+  def initialize(prison, staff_id, pom_detail = nil)
     @prison = prison
     @staff_id = staff_id.to_i
-    @pom_detail = pom_detail
+    @pom_detail = pom_detail || PomDetail.find_or_create_new_active_by!(
+      prison:,
+      nomis_staff_id: staff_id
+    )
   end
 
   def full_name
@@ -46,11 +49,7 @@ class StaffMember
   end
 
   def position
-    if pom.present?
-      pom.position
-    else
-      'STAFF'
-    end
+    pom&.position || 'STAFF'
   end
 
   def pom_tasks
@@ -102,17 +101,10 @@ private
   end
 
   def pom
-    @pom ||= fetch_pom
-  end
-
-  def fetch_pom
-    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(@prison.code)
-    poms.detect { |pom| pom.staff_id == @staff_id }
-  end
-
-  # Attempt to forward-populate the PomDetail table for new records
-  def default_pom_detail(prison, staff_id)
-    prison.pom_details.find_by(nomis_staff_id: staff_id) || prison.pom_details.create!(working_pattern: 0.0, status: 'active', nomis_staff_id: staff_id)
+    @pom ||= begin
+      poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(@prison.code)
+      poms.find { |pom| pom.staff_id == @staff_id }
+    end
   end
 
   def staff_detail
