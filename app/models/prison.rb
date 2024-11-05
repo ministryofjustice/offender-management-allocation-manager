@@ -57,38 +57,24 @@ class Prison < ApplicationRecord
     @allocations ||= AllocationHistory.active_allocations_for_prison(code)
   end
 
-  def allocation_for_offender(offender_no)
-    @allocations_by_offender_nomis_id ||= allocations.index_by(&:nomis_offender_id)
-    @allocations_by_offender_nomis_id[offender_no]
-  end
-
   delegate :for_pom, to: :allocations, prefix: true
 
   def primary_allocated_offenders
-    offender_allocations = allocations.index_by(&:nomis_offender_id)
-
     allocated.reject(&:released?).map do |offender|
-      allocation = allocation_for_offender(offender.offender_no)
+      allocation = allocation_for(offender)
 
       AllocatedOffender.new(allocation.primary_pom_nomis_id, allocation, offender)
     end
   end
 
-  def offender_allocatable?(offender)
-    offender.case_information.present? && (womens? ? offender.complexity_level.present? : true)
-  end
-
-  def offender_allocated?(offender)
-    allocation_for_offender(offender.nomis_offender_id).present?
-  end
-
   delegate :allocated, to: :summary
   delegate :unallocated, to: :summary
   delegate :missing_info, to: :summary
+  delegate :allocation_for, to: :summary
 
 private
 
   def summary
-    @summary ||= AllocationsSummary.new(self)
+    @summary ||= AllocationsSummary.new(allocations:, offenders: unfiltered_offenders)
   end
 end

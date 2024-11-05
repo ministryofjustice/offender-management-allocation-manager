@@ -147,7 +147,8 @@ RSpec.describe Prison do
                                                                           nomis_offender_id:,
                                                                           inside_omic_policy?: true,
                                                                           case_information: double,
-                                                                          released?: false
+                                                                          released?: false,
+                                                                          allocatable?: true
       end
     end
     let(:allocated_offenders) do
