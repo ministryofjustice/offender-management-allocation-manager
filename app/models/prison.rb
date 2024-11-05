@@ -3,6 +3,7 @@ class Prison < ApplicationRecord
 
   validates :prison_type, presence: true
   validates :code, :name, presence: true, uniqueness: true
+
   has_many :pom_details, dependent: :destroy, foreign_key: :prison_code, inverse_of: :prison
 
   enum prison_type: { womens: 'womens', mens_open: 'mens_open', mens_closed: 'mens_closed' }
@@ -54,17 +55,22 @@ class Prison < ApplicationRecord
 
   def allocations
     @allocations ||= AllocationHistory.active_allocations_for_prison(code)
-      .where(nomis_offender_id: all_policy_offenders.map(&:offender_no))
+  end
+
+  def allocation_for_offender(offender_no)
+    @allocations_by_offender_nomis_id ||= allocations.index_by(&:nomis_offender_id)
+    @allocations_by_offender_nomis_id[offender_no]
   end
 
   delegate :for_pom, to: :allocations, prefix: true
 
   def primary_allocated_offenders
-    alloc_hash = allocations.index_by(&:nomis_offender_id)
+    offender_allocations = allocations.index_by(&:nomis_offender_id)
 
-    allocated.select { |offender| alloc_hash.key?(offender.offender_no) && !offender.released? }.map do |offender|
-      AllocatedOffender.new(alloc_hash[offender.offender_no].primary_pom_nomis_id,
-                            alloc_hash.fetch(offender.offender_no), offender)
+    allocated.reject(&:released?).map do |offender|
+      allocation = allocation_for_offender(offender.offender_no)
+
+      AllocatedOffender.new(allocation.primary_pom_nomis_id, allocation, offender)
     end
   end
 
@@ -73,8 +79,7 @@ class Prison < ApplicationRecord
   end
 
   def offender_allocated?(offender)
-    @allocations_by_offender_nomis_id ||= allocations.index_by(&:nomis_offender_id)
-    @allocations_by_offender_nomis_id.key?(offender.nomis_offender_id)
+    allocation_for_offender(offender.nomis_offender_id).present?
   end
 
   delegate :allocated, to: :summary
