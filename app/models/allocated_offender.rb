@@ -54,7 +54,7 @@ class AllocatedOffender
   end
 
   def staff_member
-    StaffMember.new(Prison.find(prison_id), @staff_id)
+    StaffMember.new(prison, @staff_id)
   end
 
   def latest_oasys_date
