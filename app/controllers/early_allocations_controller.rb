@@ -119,7 +119,7 @@ private
 
   def pdf_as_string
     allocation = AllocationHistory.find_by!(offender_id_from_url)
-    pom = @prison.get_single_pom(allocation.primary_pom_nomis_id)
+    pom = @prison.pom_with_id(allocation.primary_pom_nomis_id)
 
     view_context.render_early_alloc_pdf(early_allocation: @early_allocation,
                                         offender: @prisoner,

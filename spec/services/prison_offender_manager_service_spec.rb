@@ -27,17 +27,17 @@ describe PrisonOffenderManagerService do
       end
     end
 
-    describe '#get_single_pom' do
+    describe '#pom_with_id' do
       it "can fetch a single POM for a prison",
          vcr: { cassette_name: 'prison_api/pom_service_get_pom_ok' } do
-        pom = prison.get_single_pom(staff_id)
+        pom = prison.pom_with_id(staff_id)
         expect(pom).not_to be nil
       end
 
       it "raises an exception when fetching a pom if they are not a POM",
          vcr: { cassette_name: 'prison_api/pom_service_get_pom_none' } do
         expect {
-          prison.get_single_pom(1234)
+          prison.pom_with_id(1234)
         }.to raise_exception(StandardError, /^Failed to find POM/)
       end
     end
@@ -111,7 +111,7 @@ describe PrisonOffenderManagerService do
       end
     end
 
-    describe '#get_single_pom' do
+    describe '#pom_with_id' do
       context 'when pom not existing at a prison' do
         before do
           stub_auth_token
@@ -160,7 +160,7 @@ describe PrisonOffenderManagerService do
 
         it "raises" do
           expect {
-            described_class.get_single_pom(1234)
+            described_class.pom_with_id(1234)
           }.to raise_exception(StandardError)
         end
       end

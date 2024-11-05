@@ -26,8 +26,8 @@ class Prison < ApplicationRecord
     end
   end
 
-  def get_single_pom(nomis_staff_id)
-    raise ArgumentError, 'Prison#get_single_pom(nil)' if nomis_staff_id.nil?
+  def pom_with_id(nomis_staff_id)
+    raise ArgumentError, 'Prison#pom_with_id(nil)' if nomis_staff_id.nil?
 
     pom = poms.find { |p| p.staff_id == nomis_staff_id.to_i }
 
