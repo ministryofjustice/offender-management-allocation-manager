@@ -50,8 +50,6 @@ class AllocationHistory < ApplicationRecord
     active.for_pom(nomis_staff_id).at_prison(prison)
   }
 
-  scope :active_allocations_for_prison, ->(prison) { active.at_prison(prison) }
-
   scope :for_pom, lambda { |nomis_staff_id|
     where(primary_pom_nomis_id: nomis_staff_id)
       .or(where(secondary_pom_nomis_id: nomis_staff_id))

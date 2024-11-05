@@ -402,15 +402,7 @@ class MpcOffender
   end
 
   def active_allocation
-    @active_allocation ||= AllocationHistory.active_allocations_for_prison(prison.code).find_by(nomis_offender_id: offender_no)
-  end
-
-  def to_allocated_offender
-    if active_allocation
-      AllocatedOffender.new(active_allocation.primary_pom_nomis_id, active_allocation, self)
-    else
-      nil
-    end
+    @active_allocation ||= prison.allocations.find_by(nomis_offender_id:)
   end
 
   def policy_case?
