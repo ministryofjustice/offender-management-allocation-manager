@@ -103,7 +103,7 @@ private
     @missing_info = @prison.missing_info
     @unallocated = @prison.unallocated
     @allocated = @prison.allocated.map do |offender|
-      OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
+      OffenderWithAllocationPresenter.new(offender, @prison.allocation_for(offender))
     end
   end
 
@@ -123,7 +123,7 @@ private
     offenders = []
     user_allocations = []
     offender_list.map do |offender|
-      allocation = @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no }
+      allocation = @prison.allocation_for(offender)
       if !allocation.nil? && allocation.primary_pom_nomis_id == user_id
         user_allocations.push OffenderWithAllocationPresenter.new(offender, allocation)
       else
