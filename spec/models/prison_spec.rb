@@ -34,55 +34,55 @@ RSpec.describe Prison do
     end
   end
 
-    describe 'Validations' do
-      subject do
-        described_class.new(prison_type: 'mens_open',
-                            code: 'ACI',
-                            name: 'HMP Altcourse')
-      end
-
-      it "is not valid without a prison_type" do
-        subject.prison_type = nil
-        expect(subject).to be_invalid
-      end
-
-      it "is not valid without a code" do
-        subject.code = nil
-        expect(subject).to be_invalid
-      end
-
-      it 's code must be unique' do
-        described_class.create!(prison_type: 'mens_open',
-                                code: 'ACI',
-                                name: 'HMP Altcourse')
-
-        expect(subject).to be_invalid
-      end
-
-      it 's name must be unique' do
-        described_class.create!(prison_type: 'mens_open',
-                                code: 'AGI',
-                                name: 'HMP Altcourse')
-
-        expect(subject).to be_invalid
-      end
-
-      it "is valid when all values are present" do
-        expect(subject).to be_valid
-      end
+  describe 'Validations' do
+    subject do
+      described_class.new(prison_type: 'mens_open',
+                          code: 'ACI',
+                          name: 'HMP Altcourse')
     end
 
-    describe 'Associations with PomDetail' do
-      let!(:prison) { create(:prison) }
-
-      before do
-        create_list(:pom_detail, 5, prison: prison)
-      end
-
-      it 'has many pom details' do
-        expect(described_class.find(prison.code).pom_details.size).to be(5)
-      end
+    it "is not valid without a prison_type" do
+      subject.prison_type = nil
+      expect(subject).to be_invalid
     end
+
+    it "is not valid without a code" do
+      subject.code = nil
+      expect(subject).to be_invalid
+    end
+
+    it 's code must be unique' do
+      described_class.create!(prison_type: 'mens_open',
+                              code: 'ACI',
+                              name: 'HMP Altcourse')
+
+      expect(subject).to be_invalid
+    end
+
+    it 's name must be unique' do
+      described_class.create!(prison_type: 'mens_open',
+                              code: 'AGI',
+                              name: 'HMP Altcourse')
+
+      expect(subject).to be_invalid
+    end
+
+    it "is valid when all values are present" do
+      expect(subject).to be_valid
+    end
+  end
+
+  describe 'Associations with PomDetail' do
+    let!(:prison) { create(:prison) }
+
+    before do
+      create_list(:pom_detail, 5, prison: prison)
+    end
+
+    it 'has many pom details' do
+      expect(described_class.find(prison.code).pom_details.size).to be(5)
+    end
+  end
 
   describe '#allocations_for_pom' do
     it 'returns all AllocatedOffenders in this prison for the POM with the given nomis_staff_id' do

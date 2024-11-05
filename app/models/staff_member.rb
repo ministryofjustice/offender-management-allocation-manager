@@ -97,7 +97,7 @@ private
   def allocations_summary
     @allocations_summary ||= Prison::AllocationsSummary.new(
       allocations: @prison.allocations_for_pom(@staff_id),
-      offenders:   @prison.allocated
+      offenders: @prison.allocated
     )
   end
 

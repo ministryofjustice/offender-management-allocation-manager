@@ -19,9 +19,9 @@ class Prison < ApplicationRecord
 
     poms.map do |pom|
       PomWrapper.new(pom, PomDetail.find_or_create_new_active_by!(
-        prison: self,
-        nomis_staff_id: pom.staff_id
-      ))
+                            prison: self,
+                            nomis_staff_id: pom.staff_id
+                          ))
     end
   end
 
