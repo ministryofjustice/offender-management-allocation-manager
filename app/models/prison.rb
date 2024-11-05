@@ -17,12 +17,10 @@ class Prison < ApplicationRecord
       .uniq(&:staff_id)
 
     poms.map do |pom|
-      pom_detail = PomDetail.find_or_create_by!(prison_code: code, nomis_staff_id: pom.staff_id.to_i) do |pom|
-        pom.working_pattern = 0.0
-        pom.status = 'active'
-      end
-
-      PomWrapper.new(pom, pom_detail)
+      PomWrapper.new(pom, PomDetail.find_or_create_new_active_by!(
+        prison: self,
+        nomis_staff_id: pom.staff_id
+      ))
     end
   end
 
