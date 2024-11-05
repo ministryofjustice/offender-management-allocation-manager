@@ -63,10 +63,10 @@
         <%= sort_arrow('tier') %>
       </th>
       <th class="govuk-table__header" scope="col">
-        <a href="<%= sort_link('allocated_pom_name') %>">
+        <a href="<%= sort_link('formatted_pom_name') %>">
           POM
         </a>
-        <%= sort_arrow('allocated_pom_name') %>
+        <%= sort_arrow('formatted_pom_name') %>
       </th>
       <th class="govuk-table__header sorter-false" scope="col">
         <a href="<%= sort_link('allocation_date') %>">
@@ -101,7 +101,7 @@
           <%= offender.tier %>
         </td>
         <td aria-label="POM" class="govuk-table__cell">
-          <%= link_to offender.allocated_pom_name, prison_pom_path(offender.prison.code, offender.allocated_pom_nomis_id), class: "govuk-link" %>
+          <%= link_to offender.formatted_pom_name, prison_pom_path(offender.prison.code, offender.allocated_pom_nomis_id), class: "govuk-link" %>
         </td>
         <td aria-label="Allocation date" class="govuk-table__cell"><%= format_date(offender.allocation_date) %></td>
       </tr>

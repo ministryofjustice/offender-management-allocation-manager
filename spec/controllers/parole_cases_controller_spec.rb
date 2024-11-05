@@ -109,28 +109,28 @@ RSpec.describe ParoleCasesController, type: :controller do
       # includes the default search on offender last name
       it 'returns the relevant offenders' do
         get :index, params: { prison_id: prison }
-        expect(assigns(:offenders).map(&:offender_no)).to eq(['G1234VV', 'G7514GW'])
+        expect(assigns(:offenders).map(&:offender_no)).to eq(%w[G1234VV G7514GW])
       end
 
       describe 'with sorting' do
-        context 'when sorting by offender' do
+        context 'when sorting by offender last name' do
           it 'sorts' do
             get :index, params: { prison_id: prison, sort: 'last_name asc' }
-            expect(assigns(:offenders).map(&:offender_no)).to eq(['G1234VV', 'G7514GW'])
+            expect(assigns(:offenders).map(&:offender_no)).to eq(%w[G1234VV G7514GW])
           end
         end
 
         context 'when sorting by pom role' do
           it 'sorts' do
-            get :index, params: { prison_id: prison, sort: 'pom_responsible? asc' }
-            expect(assigns(:offenders).map(&:offender_no)).to eq(["G1234VV", "G7514GW"])
+            get :index, params: { prison_id: prison, sort: 'allocated_pom_role asc' }
+            expect(assigns(:offenders).map(&:offender_no)).to eq(%w[G7514GW G1234VV])
           end
         end
 
         context 'when sorting by next parole date' do
           it 'sorts' do
             get :index, params: { prison_id: prison, sort: 'next_parole_date desc' }
-            expect(assigns(:offenders).map(&:offender_no)).to eq(["G7514GW", "G1234VV"])
+            expect(assigns(:offenders).map(&:offender_no)).to eq(%w[G7514GW G1234VV])
           end
         end
       end

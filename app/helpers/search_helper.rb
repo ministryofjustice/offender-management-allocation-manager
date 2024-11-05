@@ -4,7 +4,7 @@ module SearchHelper
   def cta_for_offender(prison, offender)
     offender_id = offender.offender_no
 
-    if offender.allocated_pom_name.blank?
+    if offender.formatted_pom_name.blank?
       link_to(
         'Allocate',
         prison_prisoner_staff_index_path(prison, prisoner_id: offender_id)
