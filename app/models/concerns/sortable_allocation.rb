@@ -15,6 +15,10 @@ module SortableAllocation
     allocation.primary_pom_name.split(',').reverse.map(&:strip).join(' ').titleize
   end
 
+  def allocated_pom_role
+    offender.pom_responsible? ? 'Responsible' : 'Supporting'
+  end
+
   def complexity_level_number
     ComplexityLevelHelper::COMPLEXITIES.fetch(complexity_level)
   end

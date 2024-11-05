@@ -8,7 +8,7 @@ class OffenderWithAllocationPresenter
   delegate :offender_no, :full_name, :last_name, :earliest_release_date, :earliest_release, :latest_temp_movement_date, :allocated_com_name,
            :enhanced_handover?, :date_of_birth, :tier, :probation_record, :handover_start_date, :restricted_patient?,
            :location, :responsibility_handover_date, :pom_responsible?, :pom_supporting?, :coworking?, :prison, :active_allocation,
-           :next_parole_date, :next_parole_date_type, :allocated_pom_role, to: :@offender
+           :next_parole_date, :next_parole_date_type, to: :@offender
 
   def initialize(offender, allocation)
     @offender = offender
