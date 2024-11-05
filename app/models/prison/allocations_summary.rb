@@ -8,10 +8,11 @@ class Prison::AllocationsSummary
   def unallocated = summary.fetch(:unallocated, [])
   def missing_info = summary.fetch(:missing_info, [])
 
-  def allocation_for(offender_or_nomis_offender_id)
-    nomis_offender_id = offender_or_nomis_offender_id
-      .try(:nomis_offender_id) || offender_or_nomis_offender_id
-    allocations_by_id[nomis_offender_id]
+  def allocation_for(offender_or_id)
+    id = offender_or_id.try(:nomis_offender_id) || offender_or_id
+
+    @allocations_by_id ||= @allocations.index_by(&:nomis_offender_id)
+    @allocations_by_id[id]
   end
 
 private
@@ -24,9 +25,5 @@ private
         :missing_info
       end
     end
-  end
-
-  def allocations_by_id
-    @allocations_by_id ||= @allocations.index_by(&:nomis_offender_id)
   end
 end

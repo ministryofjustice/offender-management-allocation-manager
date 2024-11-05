@@ -69,7 +69,7 @@ class Prison < ApplicationRecord
 private
 
   def summary
-    @summary ||= AllocationsSummary.new(allocations:, offenders: unfiltered_offenders)
+    @summary ||= AllocationsSummary.new(allocations:, offenders: all_policy_offenders)
   end
 
   def unfiltered_offenders
