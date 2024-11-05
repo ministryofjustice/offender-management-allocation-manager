@@ -13,6 +13,10 @@ FactoryBot.define do
       review_status { 'Active' }
     end
 
+    trait :current do
+      hearing_outcome_received_on { 1.day.ago }
+    end
+
     trait :completed do
       target_hearing_date { 1.year.from_now }
       hearing_outcome { 'Release [*]' }

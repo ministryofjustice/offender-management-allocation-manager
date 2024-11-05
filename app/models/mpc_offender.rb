@@ -13,29 +13,25 @@ class MpcOffender
            :first_name, :last_name, :full_name_ordered, :full_name,
            :inside_omic_policy?, :offender_no, :prison_id, :restricted_patient?, :age, :booking_id, to: :@api_offender
 
-  delegate :crn, :manual_entry?, :tier, :mappa_level, to: :@case_information
+  delegate :crn, :manual_entry?, :tier, :mappa_level, to: :case_information
   # These fields make sense to be nil when the case information is nil - the others dont
-  delegate :ldu_email_address, :team_name, :ldu_name, :active_vlo?, :welsh_offender, to: :@case_information, allow_nil: true
+  delegate :ldu_email_address, :team_name, :ldu_name, :active_vlo?, :welsh_offender, to: :case_information, allow_nil: true
 
-  delegate :victim_liaison_officers, :handover_progress_task_completion_data, :handover_progress_complete?,
-           :handover_type, :current_parole_review, :previous_parole_reviews, :build_parole_review_sections,
-           :most_recent_parole_review, :parole_reviews, to: :@offender
+  delegate :victim_liaison_officers,
+           :handover_progress_task_completion_data, :handover_progress_complete?, :handover_type,
+           :current_parole_review, :previous_parole_reviews, :most_recent_parole_review, :parole_reviews,
+           :case_information, to: :offender
 
-  attr_reader :case_information, :prison
+  attr_reader :prison, :offender
 
   alias_method :nomis_offender_id, :offender_no
+  alias_method :probation_record, :case_information
+  alias_method :model, :offender
 
   def initialize(prison:, offender:, prison_record:)
     @prison = prison
     @offender = offender
     @api_offender = prison_record # @type HmppsApi::Offender
-    @case_information = offender.case_information
-  end
-
-  # @deprecated Deprecated old name - I don't know why probation record is sometimes used but the database table and the
-  # model are called case information so let's standardize on that
-  def probation_record
-    case_information
   end
 
   # TODO: - view method in model needs to be removed
@@ -199,10 +195,6 @@ class MpcOffender
     tariff_date.present? || parole_eligibility_date.present? || current_parole_review.present?
   end
 
-  def due_for_release?
-    most_recent_parole_review&.current_record_hearing_outcome == 'Release'
-  end
-
   def sentences
     @sentences ||= Offenders::Sentences.new(booking_id:)
   end
@@ -322,10 +314,6 @@ class MpcOffender
     all_alerts = HmppsApi::PrisonApi::OffenderApi.get_offender_alerts(offender_no)
     sorted_active_alerts = all_alerts.select { |a| a['active'] && !a['expired'] }.sort_by { |a| a['dateCreated'] }.reverse
     sorted_active_alerts.map { |a| a['alertCodeDescription'] }.uniq
-  end
-
-  def model
-    @offender
   end
 
   def recommended_pom_type
