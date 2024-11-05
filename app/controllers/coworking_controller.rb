@@ -6,7 +6,7 @@ class CoworkingController < PrisonsApplicationController
   def new
     @prisoner = offender(nomis_offender_id_from_url)
     current_pom_id = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id_from_url).primary_pom_nomis_id
-    poms = @prison.get_list_of_poms
+    poms = @prison.poms
     @current_pom = poms.detect { |pom| pom.staff_id == current_pom_id }
 
     @active_poms, @unavailable_poms = poms.reject { |p| p.staff_id == current_pom_id }.partition do |pom|

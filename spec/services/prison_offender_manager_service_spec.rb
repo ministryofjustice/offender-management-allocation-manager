@@ -13,9 +13,9 @@ describe PrisonOffenderManagerService do
   context 'when using T3 and VCR' do
     let(:prison)  { Prison.find('LEI') }
 
-    describe '#get_list_of_poms' do
+    describe '#poms' do
       subject do
-        prison.get_list_of_poms
+        prison.poms
       end
 
       let(:moic_integration_tests) { subject.detect { |x| x.first_name == 'MOIC' } }
@@ -54,7 +54,7 @@ describe PrisonOffenderManagerService do
       stub_auth_token
     end
 
-    describe '#get_list_of_poms' do
+    describe '#poms' do
       let!(:prison)  { create(:prison) }
 
       let(:alice) do
@@ -107,7 +107,7 @@ describe PrisonOffenderManagerService do
       end
 
       it 'removes duplicate staff ids, keeping the valid position' do
-        expect(prison.get_list_of_poms.map(&:first_name)).to eq([alice, billy].map(&:firstName))
+        expect(prison.poms.map(&:first_name)).to eq([alice, billy].map(&:firstName))
       end
     end
 
