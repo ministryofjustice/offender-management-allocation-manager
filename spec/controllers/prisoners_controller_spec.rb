@@ -226,7 +226,7 @@ RSpec.describe PrisonersController, type: :controller do
 
         it 'contains POM name' do
           get :allocated, params: { prison_id: prison.code } # Default direction is asc.
-          expect(assigns(:offenders).map(&:allocated_pom_name)).to match_array(["Mann, Olivia", "Borchard, Rachel", "Farmer, Anna", "Northey, Sam"])
+          expect(assigns(:offenders).map(&:formatted_pom_name)).to match_array(["Anna Farmer", "Olivia Mann", "Rachel Borchard", "Sam Northey"])
         end
 
         it 'sorts name by ascending order' do
@@ -507,7 +507,7 @@ RSpec.describe PrisonersController, type: :controller do
             create(:allocation_history,
                    prison: prison,
                    nomis_offender_id: first_offender_no,
-                   primary_pom_name: 'Ward, Alice',
+                   primary_pom_name: 'Alice Ward',
                    primary_pom_allocated_at: allocated_date,
                    primary_pom_nomis_id: nomis_staff_id)
           end
@@ -519,7 +519,7 @@ RSpec.describe PrisonersController, type: :controller do
               get :search, params: { prison_id: prison, q: 'Blog' }
 
               expect(updated_offenders.count).to eq(3)
-              expect(alloc_offender.allocated_pom_name).to eq('Ward, Alice')
+              expect(alloc_offender.formatted_pom_name).to eq('Alice Ward')
               expect(alloc_offender.allocation_date).to be_kind_of(Date)
             end
 
@@ -536,7 +536,7 @@ RSpec.describe PrisonersController, type: :controller do
             it "uses 'updated_at' date when 'primary_pom_allocated_at' date is nil" do
               get :search, params: { prison_id: prison, q: 'Blog' }
 
-              expect(alloc_offender.allocated_pom_name).to eq('Ward, Alice')
+              expect(alloc_offender.formatted_pom_name).to eq('Alice Ward')
               expect(alloc_offender.allocation_date).to be_kind_of(Date)
             end
           end

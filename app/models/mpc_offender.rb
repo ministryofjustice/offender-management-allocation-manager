@@ -47,10 +47,6 @@ class MpcOffender
     case_information.present? && (com_responsible? || com_supporting?) && allocated_com_name.blank?
   end
 
-  def allocated_pom_role
-    pom_responsible? ? 'Responsible' : 'Supporting'
-  end
-
   def pom_responsible?
     responsibility.try(:pom_responsible?)
   end

@@ -16,9 +16,9 @@ private
     allocations = AllocationHistory.active_allocations_for_prison(@prison.code)
     offenders   = @prison.offenders.select(&:approaching_parole?)
 
-    offenders.map { |offender|
+    offenders.filter_map do |offender|
       allocation = allocations.find_by(nomis_offender_id: offender.nomis_offender_id)
       OffenderWithAllocationPresenter.new(offender, allocation) if allocation
-    }.compact
+    end
   end
 end
