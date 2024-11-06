@@ -28,14 +28,13 @@ class AllocationsController < PrisonsApplicationController
   end
 
   def history
-    @prisoner = offender(nomis_offender_id_from_url)
-    @timeline = HmppsApi::PrisonApi::MovementApi.movements_for nomis_offender_id_from_url
+    @timeline = HmppsApi::PrisonApi::MovementApi.movements_for @prisoner.offender_no
 
-    allocation = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id_from_url)
+    allocation = AllocationHistory.find_by!(nomis_offender_id: @prisoner.offender_no)
     vlo_history = PaperTrail::Version
-        .where(item_type: 'VictimLiaisonOfficer', nomis_offender_id: nomis_offender_id_from_url).map { |vlo_version| VloHistory.new(vlo_version) }
+        .where(item_type: 'VictimLiaisonOfficer', nomis_offender_id: @prisoner.offender_no).map { |vlo_version| VloHistory.new(vlo_version) }
     complexity_history = if @prison.womens?
-                           hists = HmppsApi::ComplexityApi.get_history(nomis_offender_id_from_url)
+                           hists = HmppsApi::ComplexityApi.get_history(@prisoner.offender_no)
                            if hists.any?
                              [ComplexityNewHistory.new(hists.first)] +
                                hists.each_cons(2).map do |hpair|
@@ -44,8 +43,8 @@ class AllocationsController < PrisonsApplicationController
                            end
                          end
     complexity_history = [] if complexity_history.nil?
-    email_history = EmailHistory.where(nomis_offender_id: nomis_offender_id_from_url)
-    early_allocations = Offender.includes(:early_allocations).find_by!(nomis_offender_id: nomis_offender_id_from_url).early_allocations
+    email_history = EmailHistory.where(nomis_offender_id: @prisoner.offender_no)
+    early_allocations = Offender.includes(:early_allocations).find_by!(nomis_offender_id: @prisoner.offender_no).early_allocations
 
     ea_history = early_allocations.map { |ea|
       if ea.updated_by_firstname.present?
@@ -60,15 +59,7 @@ class AllocationsController < PrisonsApplicationController
 
 private
 
-  def offender(nomis_offender_id)
-    OffenderService.get_offender(nomis_offender_id)
-  end
-
-  def nomis_offender_id_from_url
-    params.require(:prisoner_id)
-  end
-
   def load_prisoner
-    @prisoner = OffenderService.get_offender(nomis_offender_id_from_url)
+    @prisoner = OffenderService.get_offender(params.require(:prisoner_id))
   end
 end
