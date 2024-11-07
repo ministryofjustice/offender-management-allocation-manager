@@ -101,7 +101,7 @@
           <%= offender.tier %>
         </td>
         <td aria-label="POM" class="govuk-table__cell">
-          <%= link_to offender.formatted_pom_name, prison_pom_path(offender.prison.code, offender.allocated_pom_nomis_id), class: "govuk-link" %>
+          <%= link_to offender.formatted_pom_name, prison_pom_path(@prison.code, offender.allocated_pom_nomis_id), class: "govuk-link" %>
         </td>
         <td aria-label="Allocation date" class="govuk-table__cell"><%= format_date(offender.allocation_date) %></td>
       </tr>

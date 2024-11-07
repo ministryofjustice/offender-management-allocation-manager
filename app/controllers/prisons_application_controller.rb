@@ -66,10 +66,6 @@ private
     @service_notifications = ServiceNotificationsService.notifications(roles)
   end
 
-  def page
-    params.fetch('page', 1).to_i
-  end
-
   def set_referrer
     @referrer = referrer
   end
@@ -80,11 +76,6 @@ private
 
   def store_referrer_in_session
     session[:referrer] = request.referer
-  end
-
-  def sort_and_paginate(cases)
-    sorted_cases = sort_collection cases, default_sort: :handover_date, default_direction: :asc
-    Kaminari.paginate_array(sorted_cases).page(page)
   end
 
   def check_active_caseload

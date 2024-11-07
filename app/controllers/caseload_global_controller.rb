@@ -1,23 +1,16 @@
 # frozen_string_literal: true
 
-class CaseloadGlobalController < CaseloadController
+class CaseloadGlobalController < PrisonStaffApplicationController
+  before_action :ensure_signed_in_pom_is_this_pom, :load_pom
+
   def index
     @allocated = @prison.allocated.map do |offender|
       OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
     end
 
-    @total_cases = @allocated.count
-
-    @recent_allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@allocated).filter do |a|
-      a.allocation_date >= 7.days.ago
-    end)).page(page)
-
-    @upcoming_releases = Kaminari.paginate_array(sort_allocations(filter_allocations(@allocated)).filter do |a|
-      a.earliest_release_date.present? &&
-        a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
-    end).page(page)
-
-    @all_other_allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@allocated))).page(page)
+    @recent_allocations = paginate_array(sort_allocations(recent_allocations))
+    @upcoming_releases = paginate_array(sort_allocations(upcoming_releases))
+    @all_other_allocations = paginate_array(sort_allocations(filtered_allocations))
 
     @summary = {
       all_prison_cases: @allocated.count,
@@ -40,5 +33,15 @@ private
       end
     end
     allocations
+  end
+
+  def filtered_allocations
+    @filtered_allocations ||= filter_allocations(@allocated)
+  end
+
+  def recent_allocations
+    filtered_allocations.filter do |a|
+      a.allocation_date >= 7.days.ago
+    end
   end
 end

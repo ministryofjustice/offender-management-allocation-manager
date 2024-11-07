@@ -20,7 +20,7 @@
 <%= handover_list_table(table_class: %w[com-allocation-overdue],
                         headers: [
                           { sort: 'offender_last_name', body: 'Prisoner details' },
-                          @pom_view ? nil : { sort: 'staff_member_last_name', body: 'POM' },
+                          @pom_view ? nil : { sort: 'staff_member_full_name_ordered', body: 'POM' },
                           { sort: 'handover_date', body: 'COM responsible' },
                           { sort: 'earliest_release_date', body: 'Earliest release date' },
                           { sort: 'tier', body: 'Tier' },

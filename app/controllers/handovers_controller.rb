@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class HandoversController < PrisonsApplicationController
-  include Sorting
-
   layout 'handovers'
 
   before_action :check_prerequisites_and_prepare_variables

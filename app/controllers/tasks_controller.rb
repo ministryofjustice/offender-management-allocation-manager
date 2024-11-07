@@ -7,7 +7,7 @@ class TasksController < PrisonsApplicationController
   def index
     offenders = @current_user.allocations
     sorted_tasks = sort_tasks(offenders.map(&:pom_tasks).flatten)
-    @pomtasks = Kaminari.paginate_array(sorted_tasks).page(page)
+    @pomtasks = paginate_array(sorted_tasks)
   end
 
 private
@@ -32,9 +32,5 @@ private
     poms_list = @prison.get_list_of_poms
 
     @pom = poms_list.find { |p| p.staff_id.to_i == user.staff_id.to_i }
-  end
-
-  def page
-    params.fetch('page', 1).to_i
   end
 end

@@ -18,7 +18,7 @@ class Handover::HandoverCase
   delegate :last_name, to: :offender, prefix: true
   delegate :staff_member, :allocated_com_name, :tier, :handover_progress_complete?,
            :earliest_release_for_handover, to: :offender
-  delegate :last_name, to: :staff_member, prefix: true
+  delegate :full_name_ordered, to: :staff_member, prefix: true
   delegate :handover_date, to: :calculated_handover_date
 
   def com_allocation_days_overdue(relative_to_date: Time.zone.now.to_date)

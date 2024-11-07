@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class PrisonersController < PrisonsApplicationController
-  include Sorting
-
   before_action :ensure_spo_user, except: [:show, :image, :search]
 
   before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :search]
@@ -90,11 +88,10 @@ class PrisonersController < PrisonsApplicationController
   end
 
   def image
-    @prisoner = OffenderService.get_offender(params[:prisoner_id])
-    image_data = @prisoner.get_image
+    prisoner = OffenderService.get_offender(params[:prisoner_id])
 
     response.headers['Expires'] = 6.months.from_now.httpdate
-    send_data image_data, type: 'image/jpg', disposition: 'inline'
+    send_data prisoner.get_image, type: 'image/jpg', disposition: 'inline'
   end
 
 private
@@ -108,20 +105,19 @@ private
   end
 
   def load_summary(summary_type)
-    bucket = {
+    items = {
       unallocated: @unallocated,
       missing_information: @missing_info,
       allocated: @allocated
     }.fetch(summary_type)
 
-    offenders = sort_collection(bucket, default_sort: :last_name)
-
-    @offenders = Kaminari.paginate_array(offenders).page(page)
+    @offenders = sort_and_paginate(items, default_sort: :last_name)
   end
 
   def get_slice_for_page(offender_list, user_id)
     offenders = []
     user_allocations = []
+
     offender_list.map do |offender|
       allocation = @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no }
       if !allocation.nil? && allocation.primary_pom_nomis_id == user_id
@@ -130,11 +126,8 @@ private
         offenders.push OffenderWithAllocationPresenter.new(offender, allocation)
       end
     end
-    [Kaminari.paginate_array(offenders).page(page), Kaminari.paginate_array(user_allocations).page(page)]
-  end
 
-  def page
-    params.fetch('page', 1).to_i
+    [paginate_array(offenders), paginate_array(user_allocations)]
   end
 
   def search_term
