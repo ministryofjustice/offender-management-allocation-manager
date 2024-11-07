@@ -14,7 +14,7 @@ private
 
   def offenders_with_allocs
     allocations = @prison.allocations
-    offenders   = @prison.offenders.select(&:approaching_parole?)
+    offenders   = @prison.allocatable_offenders.select(&:approaching_parole?)
 
     offenders.filter_map do |offender|
       allocation = allocations.find_by(nomis_offender_id: offender.nomis_offender_id)

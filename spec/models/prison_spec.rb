@@ -120,7 +120,7 @@ RSpec.describe Prison do
     let(:unrelated_allocation_history) { FactoryBot.create_list :allocation_history, 3, :primary }
 
     before do
-      allow(prison).to receive(:unfiltered_offenders).and_return(mpc_offenders)
+      allow(prison).to receive(:offenders).and_return(mpc_offenders)
       mpc_offenders.each { |o| Offender.create! nomis_offender_id: o.offender_no }
 
       allocation_history.each_with_index do |ah, idx|

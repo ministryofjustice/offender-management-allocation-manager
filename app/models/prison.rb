@@ -44,12 +44,12 @@ class Prison < ApplicationRecord
     self.class.active.pluck(:code).include?(code)
   end
 
-  def offenders
+  def allocatable_offenders
     allocated + unallocated
   end
 
   def policy_offenders
-    unfiltered_offenders.select(&:inside_omic_policy?)
+    offenders.select(&:inside_omic_policy?)
   end
 
   delegate :for_pom, to: :allocations, prefix: true
@@ -73,9 +73,9 @@ private
     @summary ||= AllocationsSummary.new(allocations:, offenders: policy_offenders)
   end
 
-  def unfiltered_offenders
+  def offenders
     # Returns all offenders at the provided prison, and does not
     # filter out under 18s or non-sentenced offenders
-    @unfiltered_offenders ||= OffenderService.get_offenders_in_prison(self)
+    @offenders ||= OffenderService.get_offenders_in_prison(self)
   end
 end
