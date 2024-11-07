@@ -13,12 +13,9 @@ class ParoleCasesController < PrisonsApplicationController
 private
 
   def offenders_with_allocs
-    allocations = @prison.allocations
-    offenders   = @prison.allocatable_offenders.select(&:approaching_parole?)
-
-    offenders.filter_map do |offender|
-      allocation = allocations.find_by(nomis_offender_id: offender.nomis_offender_id)
-      OffenderWithAllocationPresenter.new(offender, allocation) if allocation
+    offenders = @prison.allocated.select(&:approaching_parole?)
+    offenders.map do |offender|
+      OffenderWithAllocationPresenter.new(offender, @prison.allocation_for(offender))
     end
   end
 end

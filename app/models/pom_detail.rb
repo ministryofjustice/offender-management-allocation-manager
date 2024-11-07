@@ -19,9 +19,9 @@ class PomDetail < ApplicationRecord
   end
 
   def allocations
-    @allocations ||= begin
-      allocations = AllocationHistory.active_pom_allocations(nomis_staff_id, prison_code).pluck(:nomis_offender_id)
-      prison.allocatable_offenders.select { |o| allocations.include? o.offender_no }
-    end
+    @allocations ||= Prison::AllocationsSummary.new(
+      allocations: AllocationHistory.active_pom_allocations(nomis_staff_id, prison_code),
+      offenders: prison.allocatable_offenders
+    ).allocated
   end
 end
