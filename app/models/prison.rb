@@ -4,7 +4,7 @@ class Prison < ApplicationRecord
   validates :prison_type, presence: true
   validates :code, :name, presence: true, uniqueness: true
 
-  has_many :allocations, -> { active }, class_name: "AllocationHistory", foreign_key: :prison
+  has_many :allocations, -> { active }, class_name: 'AllocationHistory', foreign_key: :prison
   has_many :pom_details, dependent: :destroy, foreign_key: :prison_code, inverse_of: :prison
 
   enum prison_type: { womens: 'womens', mens_open: 'mens_open', mens_closed: 'mens_closed' }
