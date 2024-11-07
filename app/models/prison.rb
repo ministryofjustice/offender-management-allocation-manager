@@ -12,19 +12,21 @@ class Prison < ApplicationRecord
   scope :active, -> { where(code: AllocationHistory.pluck('distinct(prison)')) }
 
   def poms
-    # This API call doesn't do what it says on the tin. It can return duplicate
-    # staff_ids in the situation where someone has more than one role.
-    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(code)
-      .select { |pom| pom.prison_officer? || pom.probation_officer? }
-      .uniq(&:staff_id)
+    @poms ||= begin
+      # This API call doesn't do what it says on the tin. It can return duplicate
+      # staff_ids in the situation where someone has more than one role.
+      poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(code)
+        .select { |pom| pom.prison_officer? || pom.probation_officer? }
+        .uniq(&:staff_id)
 
-    poms.map do |pom|
-      pom_detail = PomDetail.find_or_create_new_active_by!(
-        prison: self,
-        nomis_staff_id: pom.staff_id
-      )
+      poms.map do |pom|
+        pom_detail = PomDetail.find_or_create_new_active_by!(
+          prison: self,
+          nomis_staff_id: pom.staff_id
+        )
 
-      PomWrapper.new(pom, pom_detail)
+        PomWrapper.new(pom, pom_detail)
+      end
     end
   end
 
