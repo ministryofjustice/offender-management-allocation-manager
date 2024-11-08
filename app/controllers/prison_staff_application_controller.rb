@@ -57,17 +57,10 @@ private
   end
 
   def pom_allocations_summary
-    @recent_allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations).filter do |a|
-      a.primary_pom_allocated_at.to_date >= 7.days.ago
-    end)).page(page)
-
-    @upcoming_releases = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations).filter do |a|
-      a.earliest_release_date.present? &&
-        a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
-    end)).page(page)
-
-    @allocations = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations))).page(page)
-    @parole_cases = Kaminari.paginate_array(sort_allocations(filter_allocations(@pom.allocations.select(&:approaching_parole?)))).page(page)
+    @recent_allocations = paginate_array(sort_allocations(recent_allocations))
+    @upcoming_releases = paginate_array(sort_allocations(upcoming_releases))
+    @parole_cases = paginate_array(sort_allocations(parole_allocations))
+    @allocations = paginate_array(sort_allocations(filtered_allocations))
 
     @handover_cases = Handover::CategorisedHandoverCasesForPom.new(@pom)
 
@@ -104,5 +97,26 @@ private
       end
     end
     allocations
+  end
+
+  def filtered_allocations
+    @filtered_allocations ||= filter_allocations(@pom.allocations)
+  end
+
+  def recent_allocations
+    filtered_allocations.filter do |a|
+      a.primary_pom_allocated_at.to_date >= 7.days.ago
+    end
+  end
+
+  def upcoming_releases
+    filtered_allocations.filter do |a|
+      a.earliest_release_date.present? &&
+        a.earliest_release_date.to_date <= 4.weeks.from_now && Date.current.beginning_of_day < a.earliest_release_date.to_date
+    end
+  end
+
+  def parole_allocations
+    filtered_allocations.select(&:approaching_parole?)
   end
 end

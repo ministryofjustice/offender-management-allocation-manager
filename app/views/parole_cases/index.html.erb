@@ -51,11 +51,7 @@
               </span>
             </td>
             <td aria-label="POM" class="govuk-table__cell">
-              <% if offender.formatted_pom_name %>
-                <%= link_to offender.formatted_pom_name, prison_pom_path(@prison.code, nomis_staff_id: offender.allocated_pom_nomis_id) %>
-              <% else %>
-                'Not allocated'
-              <% end %>
+              <%= link_to offender.formatted_pom_name, prison_pom_path(@prison.code, nomis_staff_id: offender.allocated_pom_nomis_id) %>
             </td>
             <td aria-label="POM Role" class="govuk-table__cell">
               <%= offender.allocated_pom_role %>

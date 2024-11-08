@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class PomsController < PrisonStaffApplicationController
-  include Sorting
-
   before_action :ensure_spo_user
 
   before_action :load_pom_staff_member, only: [:show, :edit, :update]

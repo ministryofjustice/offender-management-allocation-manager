@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
 class ParoleCasesController < PrisonsApplicationController
-  include Sorting
-
   before_action :ensure_spo_user
 
   def index
-    sorted_offenders_with_allocs = sort_collection offenders_with_allocs, default_sort: :last_name
-    @offenders = Kaminari.paginate_array(sorted_offenders_with_allocs).page(page)
+    @offenders = sort_and_paginate(offenders_with_allocs, default_sort: :last_name)
   end
 
 private

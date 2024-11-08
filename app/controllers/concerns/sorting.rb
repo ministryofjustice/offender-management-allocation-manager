@@ -14,6 +14,15 @@ module Sorting
     end
   end
 
+  def sort_and_paginate(collection, default_sort: :handover_date, default_direction: :asc)
+    sorted_collection = sort_collection(collection, default_sort:, default_direction:)
+    paginate_array(sorted_collection)
+  end
+
+  def paginate_array(collection)
+    Kaminari.paginate_array(collection).page(page)
+  end
+
 private
 
   def sort_with_public_send(items, field, direction)
@@ -40,5 +49,9 @@ private
     else
       1
     end
+  end
+
+  def page
+    params.fetch('page', 1).to_i
   end
 end
