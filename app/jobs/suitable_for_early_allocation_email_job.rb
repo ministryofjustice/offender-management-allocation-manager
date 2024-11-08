@@ -17,7 +17,7 @@ class SuitableForEarlyAllocationEmailJob < ApplicationJob
 
       if already_emailed.empty?
         prison = Prison.find(prisoner.prison_id)
-        pom = prison.pom_with_id(allocation.primary_pom_nomis_id)
+        pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
         EarlyAllocationMailer.with(
           email: pom.email_address,
           prisoner_name: prisoner.full_name,

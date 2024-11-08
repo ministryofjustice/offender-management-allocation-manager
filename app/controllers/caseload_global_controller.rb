@@ -3,7 +3,7 @@
 class CaseloadGlobalController < CaseloadController
   def index
     @allocated = @prison.allocated.map do |offender|
-      OffenderWithAllocationPresenter.new(offender, @prison.allocation_for(offender))
+      OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
     end
 
     @total_cases = @allocated.count
