@@ -6,7 +6,7 @@ class CoworkingController < PrisonsApplicationController
   def new
     @prisoner = offender(nomis_offender_id_from_url)
     current_pom_id = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id_from_url).primary_pom_nomis_id
-    poms = @prison.get_list_of_poms
+    poms = @prison.poms
     @current_pom = poms.detect { |pom| pom.staff_id == current_pom_id }
 
     @active_poms, @unavailable_poms = poms.reject { |p| p.staff_id == current_pom_id }.partition do |pom|
@@ -19,8 +19,8 @@ class CoworkingController < PrisonsApplicationController
 
   def confirm
     @prisoner = offender(nomis_offender_id_from_url)
-    @primary_pom = @prison.get_single_pom(primary_pom_id_from_url)
-    @secondary_pom = @prison.get_single_pom(secondary_pom_id_from_url)
+    @primary_pom = @prison.pom_with_id(primary_pom_id_from_url)
+    @secondary_pom = @prison.pom_with_id(secondary_pom_id_from_url)
     @latest_allocation_details = session[:latest_allocation_details] = format_allocation(
       offender: @prisoner, pom: @primary_pom, view_context: view_context, co_working_pom: @secondary_pom)
   end
@@ -42,7 +42,7 @@ class CoworkingController < PrisonsApplicationController
       nomis_offender_id: coworking_nomis_offender_id_from_url
     )
     @prisoner = offender(@allocation.nomis_offender_id)
-    @primary_pom = @prison.get_single_pom(@allocation.primary_pom_nomis_id)
+    @primary_pom = @prison.pom_with_id(@allocation.primary_pom_nomis_id)
   end
 
   def destroy

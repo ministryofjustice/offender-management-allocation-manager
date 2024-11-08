@@ -80,7 +80,7 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
 
       context 'when offender has 18 months or less of sentence remaining' do
         before do
-          allow_any_instance_of(Prison).to receive(:get_single_pom).and_return(pom)
+          allow_any_instance_of(Prison).to receive(:pom_with_id).and_return(pom)
         end
 
         context 'when no previous Early Allocation reminder email sent for this offender' do
