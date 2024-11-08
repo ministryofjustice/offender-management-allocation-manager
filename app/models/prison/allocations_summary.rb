@@ -10,9 +10,7 @@ class Prison::AllocationsSummary
 
   def allocation_for(offender_or_id)
     id = offender_or_id.try(:nomis_offender_id) || offender_or_id
-
-    @allocations_by_id ||= @allocations.index_by(&:nomis_offender_id)
-    @allocations_by_id[id]
+    @allocations.find { |allocation| allocation.nomis_offender_id == id }
   end
 
 private
