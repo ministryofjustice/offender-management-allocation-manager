@@ -5,6 +5,8 @@ class PrisonersController < PrisonsApplicationController
 
   before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :search]
 
+  after_action -> { MetricsService.instance.increment_search_count }, only: :search
+
   def allocated
     retrieve_latest_allocation_details
     load_summary :allocated
@@ -21,11 +23,16 @@ class PrisonersController < PrisonsApplicationController
 
   def search
     @q = search_term
-    offenders = SearchService.search_for_offenders(@q, @prison.policy_offenders)
-    @offenders, @user_allocations = get_slice_for_page(offenders, @current_user.staff_id)
-    MetricsService.instance.increment_search_count
 
-    render @current_user.allocations.empty? ? 'search' : 'search_global'
+    allocations = @prison.allocations.index_by(&:nomis_offender_id)
+    search_results = SearchService.search_for_offenders(@q, @prison.policy_offenders)
+
+    @user_allocations, @offenders = search_results
+      .map       { |offender| OffenderWithAllocationPresenter.new(offender, allocations[offender.nomis_offender_id]) }
+      .partition { |offender| offender.allocated_pom_nomis_id == @current_user.staff_id }
+      .map(&method(:paginate_array))
+
+    render @user_allocations.empty? ? 'search' : 'search_global'
   end
 
   def review_case_details
@@ -112,22 +119,6 @@ private
     }.fetch(summary_type)
 
     @offenders = sort_and_paginate(items, default_sort: :last_name)
-  end
-
-  def get_slice_for_page(offender_list, user_id)
-    offenders = []
-    user_allocations = []
-
-    offender_list.map do |offender|
-      allocation = @prison.allocation_for(offender)
-      if !allocation.nil? && allocation.primary_pom_nomis_id == user_id
-        user_allocations.push OffenderWithAllocationPresenter.new(offender, allocation)
-      else
-        offenders.push OffenderWithAllocationPresenter.new(offender, allocation)
-      end
-    end
-
-    [paginate_array(offenders), paginate_array(user_allocations)]
   end
 
   def search_term
