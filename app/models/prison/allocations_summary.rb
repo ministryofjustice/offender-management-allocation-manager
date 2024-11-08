@@ -1,29 +1,28 @@
 class Prison::AllocationsSummary
-  def initialize(allocations:, offenders:)
-    @allocations = allocations
-    @offenders = offenders
+  def initialize(prison)
+    @prison = prison
+    build_summary
   end
 
-  def allocated = summary.fetch(:allocated, [])
-  def unallocated = summary.fetch(:unallocated, [])
-  def missing_info = summary.fetch(:missing_info, [])
-
-  def allocation_for(offender_or_id)
-    id = offender_or_id.try(:nomis_offender_id) || offender_or_id
-
-    @allocations_by_id ||= @allocations.index_by(&:nomis_offender_id)
-    @allocations_by_id[id]
-  end
+  def allocated = @summary[:allocated]
+  def unallocated = @summary[:unallocated]
+  def missing_info = @summary[:missing_info]
+  def outside_omic_policy = @summary[:outside_omic_policy]
 
 private
 
-  def summary
-    @summary ||= @offenders.group_by do |offender|
-      if offender.allocatable?
-        allocation_for(offender).present? ? :allocated : :unallocated
+  def build_summary
+    @summary = @prison.unfiltered_offenders.group_by do |offender|
+      if !offender.inside_omic_policy?
+        :outside_omic_policy
+      elsif @prison.offender_allocatable?(offender) && @prison.offender_allocated?(offender)
+        :allocated
+      elsif @prison.offender_allocatable?(offender)
+        :unallocated
       else
         :missing_info
       end
     end
+    @summary.default = []
   end
 end
