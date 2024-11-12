@@ -97,7 +97,7 @@ RSpec.describe HandoversController, type: :controller do
 
   describe 'when user is not authorised' do
     before do
-      allow(controller.helpers).to receive_messages(handover_cases_view: nil)
+      allow(controller).to receive_messages(current_user_is_pom?: false, current_user_is_spo?: false)
     end
 
     describe 'upcoming handovers page' do
