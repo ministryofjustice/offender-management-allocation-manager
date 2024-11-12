@@ -121,6 +121,22 @@ private
     @offenders = sort_and_paginate(items, default_sort: :last_name)
   end
 
+  def get_slice_for_page(offender_list, user_id)
+    offenders = []
+    user_allocations = []
+
+    offender_list.map do |offender|
+      allocation = @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no }
+      if !allocation.nil? && allocation.primary_pom_nomis_id == user_id
+        user_allocations.push OffenderWithAllocationPresenter.new(offender, allocation)
+      else
+        offenders.push OffenderWithAllocationPresenter.new(offender, allocation)
+      end
+    end
+
+    [paginate_array(offenders), paginate_array(user_allocations)]
+  end
+
   def search_term
     # defaults to an empty string if the key 'q' can't be found
     params.fetch('q', '').strip
