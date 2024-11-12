@@ -31,6 +31,9 @@ cronjobs:
 generic-prometheus-alerts:
   rdsAlertsDatabases:
     cloud-platform-0fe5d72ea3e106e5: production
+  elastiCacheAlertsClusterIds:
+    cp-8174bd3acc2d2327-001: production cluster node 1
+    cp-8174bd3acc2d2327-002: production cluster node 2
   sqsOldestAlertQueueNames:
     - offender-management-production-domain-events
   sqsNumberAlertQueueNames:

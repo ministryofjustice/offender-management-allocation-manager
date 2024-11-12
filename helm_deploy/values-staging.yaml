@@ -17,6 +17,9 @@ generic-prometheus-alerts:
   businessHoursOnly: true
   rdsAlertsDatabases:
     cloud-platform-75ec3c1f26a64520: staging
+  elastiCacheAlertsClusterIds:
+    cp-5a7bff7c5fe871ef-001: staging cluster node 1
+    cp-5a7bff7c5fe871ef-002: staging cluster node 2
   sqsOldestAlertQueueNames:
     - offender-management-staging-domain-events
   sqsNumberAlertQueueNames:
