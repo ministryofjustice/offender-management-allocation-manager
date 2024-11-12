@@ -50,7 +50,9 @@ class Prison < ApplicationRecord
   end
 
   def allocations
-    @allocations ||= AllocationHistory.active_allocations_for_prison(code)
+    @allocations ||= AllocationHistory
+      .active_allocations_for_prison(code)
+      .where(nomis_offender_id: policy_offenders.map(&:offender_no))
   end
 
   delegate :for_pom, to: :allocations, prefix: true
