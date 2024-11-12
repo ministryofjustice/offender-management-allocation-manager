@@ -44,8 +44,8 @@ version: 2.1
 
 orbs:
   browser-tools: circleci/browser-tools@1.4.8
-  ruby: circleci/ruby@2.1.4
-  hmpps: ministryofjustice/hmpps@10.0.0
+  ruby: circleci/ruby@2.3.0
+  hmpps: ministryofjustice/hmpps@10.1.1
 
 commands:
   install_firefox:
