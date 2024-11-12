@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 describe SearchService do
-  let(:offenders) { Prison.new(code: 'LEI').unfiltered_offenders }
-  let(:oakwood_offenders) { Prison.new(code: 'OWI').unfiltered_offenders }
+  let(:offenders) { OffenderService.get_offenders_in_prison(Prison.new(code: 'LEI')) }
+  let(:oakwood_offenders) { OffenderService.get_offenders_in_prison(Prison.new(code: 'OWI')) }
 
   it "will return all of the records if no search", vcr: { cassette_name: 'prison_api/search_service_all' } do
     expect(described_class.search_for_offenders('', offenders).count).to be > 800
