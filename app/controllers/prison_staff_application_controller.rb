@@ -65,7 +65,7 @@ private
     @handover_cases = Handover::CategorisedHandoverCasesForPom.new(@pom)
 
     @summary = {
-      all_prison_cases: @prison.allocations.count,
+      all_prison_cases: @prison.allocations.all.count,
       new_cases_count: @pom.allocations.count(&:new_case?),
       total_cases: @pom.allocations.count,
       last_seven_days: @pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago },

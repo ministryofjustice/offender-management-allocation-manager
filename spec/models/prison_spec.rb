@@ -34,53 +34,90 @@ RSpec.describe Prison do
     end
   end
 
-  describe 'Validations' do
-    subject do
-      described_class.new(prison_type: 'mens_open',
-                          code: 'ACI',
-                          name: 'HMP Altcourse')
+  describe '#unfiltered_offenders' do
+    subject { described_class.new(code: 'LEI').unfiltered_offenders }
+
+    it "get first page of offenders for a specific prison",
+       vcr: { cassette_name: 'prison_api/offender_service_offenders_by_prison_first_page_spec' } do
+      offender_array = subject.first(9)
+      expect(offender_array).to be_kind_of(Array)
+      expect(offender_array.length).to eq(9)
     end
 
-    it "is not valid without a prison_type" do
-      subject.prison_type = nil
-      expect(subject).to be_invalid
+    it "get last page of offenders for a specific prison", vcr: { cassette_name: 'prison_api/offender_service_offenders_by_prison_last_page_spec' } do
+      offender_array = subject.to_a
+      expect(offender_array).to be_kind_of(Array)
+      expect(offender_array.length).to be > 800
     end
 
-    it "is not valid without a code" do
-      subject.code = nil
-      expect(subject).to be_invalid
+    context 'when recall flag set' do
+      let(:offenders) { build_list(:nomis_offender, 2, sentence: attributes_for(:sentence_detail, recall: true)) }
+
+      before do
+        stub_auth_token
+        stub_offenders_for_prison('LEI', offenders)
+        create(:offender, nomis_offender_id: offenders.first.fetch(:prisonerNumber))
+      end
+
+      it 'populates the recall flag' do
+        expect(subject.map(&:recalled?)).to eq [true, true]
+      end
+
+      it 'creates the missing offender object' do
+        expect(Offender.count).to eq(1)
+        expect(subject.count).to eq(2)
+        expect(Offender.count).to eq(2)
+      end
     end
 
-    it 's code must be unique' do
-      described_class.create!(prison_type: 'mens_open',
-                              code: 'ACI',
-                              name: 'HMP Altcourse')
+    describe 'Validations' do
+      subject do
+        described_class.new(prison_type: 'mens_open',
+                            code: 'ACI',
+                            name: 'HMP Altcourse')
+      end
 
-      expect(subject).to be_invalid
+      it "is not valid without a prison_type" do
+        subject.prison_type = nil
+        expect(subject).to be_invalid
+      end
+
+      it "is not valid without a code" do
+        subject.code = nil
+        expect(subject).to be_invalid
+      end
+
+      it 's code must be unique' do
+        described_class.create!(prison_type: 'mens_open',
+                                code: 'ACI',
+                                name: 'HMP Altcourse')
+
+        expect(subject).to be_invalid
+      end
+
+      it 's name must be unique' do
+        described_class.create!(prison_type: 'mens_open',
+                                code: 'AGI',
+                                name: 'HMP Altcourse')
+
+        expect(subject).to be_invalid
+      end
+
+      it "is valid when all values are present" do
+        expect(subject).to be_valid
+      end
     end
 
-    it 's name must be unique' do
-      described_class.create!(prison_type: 'mens_open',
-                              code: 'AGI',
-                              name: 'HMP Altcourse')
+    describe 'Associations with PomDetail' do
+      let!(:prison) { create(:prison) }
 
-      expect(subject).to be_invalid
-    end
+      before do
+        create_list(:pom_detail, 5, prison: prison)
+      end
 
-    it "is valid when all values are present" do
-      expect(subject).to be_valid
-    end
-  end
-
-  describe 'Associations with PomDetail' do
-    let!(:prison) { create(:prison) }
-
-    before do
-      create_list(:pom_detail, 5, prison: prison)
-    end
-
-    it 'has many pom details' do
-      expect(described_class.find(prison.code).pom_details.size).to be(5)
+      it 'has many pom details' do
+        expect(described_class.find(prison.code).pom_details.size).to be(5)
+      end
     end
   end
 
@@ -110,8 +147,7 @@ RSpec.describe Prison do
                                                                           nomis_offender_id:,
                                                                           inside_omic_policy?: true,
                                                                           case_information: double,
-                                                                          released?: false,
-                                                                          allocatable?: true
+                                                                          released?: false
       end
     end
     let(:allocated_offenders) do

@@ -13,9 +13,9 @@ describe PrisonOffenderManagerService do
   context 'when using T3 and VCR' do
     let(:prison)  { Prison.find('LEI') }
 
-    describe '#poms' do
+    describe '#get_list_of_poms' do
       subject do
-        prison.poms
+        prison.get_list_of_poms
       end
 
       let(:moic_integration_tests) { subject.detect { |x| x.first_name == 'MOIC' } }
@@ -27,17 +27,17 @@ describe PrisonOffenderManagerService do
       end
     end
 
-    describe '#pom_with_id' do
+    describe '#get_single_pom' do
       it "can fetch a single POM for a prison",
          vcr: { cassette_name: 'prison_api/pom_service_get_pom_ok' } do
-        pom = prison.pom_with_id(staff_id)
+        pom = prison.get_single_pom(staff_id)
         expect(pom).not_to be nil
       end
 
       it "raises an exception when fetching a pom if they are not a POM",
          vcr: { cassette_name: 'prison_api/pom_service_get_pom_none' } do
         expect {
-          prison.pom_with_id(1234)
+          prison.get_single_pom(1234)
         }.to raise_exception(StandardError, /^Failed to find POM/)
       end
     end
@@ -54,7 +54,7 @@ describe PrisonOffenderManagerService do
       stub_auth_token
     end
 
-    describe '#poms' do
+    describe '#get_list_of_poms' do
       let!(:prison)  { create(:prison) }
 
       let(:alice) do
@@ -107,11 +107,11 @@ describe PrisonOffenderManagerService do
       end
 
       it 'removes duplicate staff ids, keeping the valid position' do
-        expect(prison.poms.map(&:first_name)).to eq([alice, billy].map(&:firstName))
+        expect(prison.get_list_of_poms.map(&:first_name)).to eq([alice, billy].map(&:firstName))
       end
     end
 
-    describe '#pom_with_id' do
+    describe '#get_single_pom' do
       context 'when pom not existing at a prison' do
         before do
           stub_auth_token
@@ -160,7 +160,7 @@ describe PrisonOffenderManagerService do
 
         it "raises" do
           expect {
-            described_class.pom_with_id(1234)
+            described_class.get_single_pom(1234)
           }.to raise_exception(StandardError)
         end
       end

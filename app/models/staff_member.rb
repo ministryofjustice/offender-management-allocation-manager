@@ -32,9 +32,7 @@ class StaffMember
   end
 
   def email_address
-    @email_address ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi
-      .fetch_email_addresses(@staff_id)
-      .first
+    @email_address ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@staff_id).first
   end
 
   def has_pom_role?
@@ -58,17 +56,23 @@ class StaffMember
   end
 
   def allocations
-    @allocations ||= allocations_summary.allocated.map do |offender|
-      AllocatedOffender.new(@staff_id, allocations_summary.allocation_for(offender), offender)
+    @allocations ||= begin
+      alloc_hash = @prison.allocations_for_pom(@staff_id).index_by(&:nomis_offender_id)
+
+      @prison.allocated.select { |a| alloc_hash.key?(a.offender_no) }.map do |offender|
+        AllocatedOffender.new(@staff_id, alloc_hash.fetch(offender.offender_no), offender)
+      end
     end
   end
 
   def unreleased_allocations
-    allocations.reject(&:released?)
+    allocations.select do |offender|
+      offender.earliest_release_date.nil? || offender.earliest_release_date > Time.zone.now.to_date
+    end
   end
 
   def has_allocation?(nomis_offender_id)
-    allocations_summary.allocation_for(nomis_offender_id).present?
+    @prison.allocations_for_pom(@staff_id).detect { |a| a.nomis_offender_id == nomis_offender_id }.present?
   end
 
   # Counts for ordering
@@ -93,13 +97,6 @@ class StaffMember
   end
 
 private
-
-  def allocations_summary
-    @allocations_summary ||= Prison::AllocationsSummary.new(
-      allocations: @prison.allocations_for_pom(@staff_id),
-      offenders: @prison.allocated
-    )
-  end
 
   def pom
     @pom ||= fetch_pom

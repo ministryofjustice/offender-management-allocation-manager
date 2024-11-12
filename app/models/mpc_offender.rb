@@ -75,10 +75,6 @@ class MpcOffender
     @offender.responsibility.present?
   end
 
-  def allocatable?
-    case_information.present? && (prison.womens? ? complexity_level.present? : true)
-  end
-
   # Early allocation methods
   def early_allocation?
     latest_early_allocation.present? && !licence_expiry_date&.before?(Time.zone.today)
@@ -379,7 +375,9 @@ class MpcOffender
   end
 
   def released?(relative_to_date: Time.zone.now.utc.to_date)
-    earliest_release_date.present? && earliest_release_date <= relative_to_date
+    return false if earliest_release_date.nil?
+
+    earliest_release_date <= relative_to_date
   end
 
   def has_com?
