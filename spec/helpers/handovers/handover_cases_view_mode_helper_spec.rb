@@ -18,7 +18,7 @@ RSpec.describe Handovers::HandoverCasesViewModeHelper do
                                             prison: prison,
                                             current_user_is_pom: true,
                                             current_user_is_spo: false)
-        expect(result).to eq [true, pom_handover_cases]
+        expect(result).to eq pom_handover_cases
       end
     end
 
@@ -29,7 +29,7 @@ RSpec.describe Handovers::HandoverCasesViewModeHelper do
                                               prison: prison,
                                               current_user_is_pom: false,
                                               current_user_is_spo: true)
-          expect(result).to eq [false, homd_handover_cases]
+          expect(result).to eq homd_handover_cases
         end
       end
 
@@ -40,7 +40,7 @@ RSpec.describe Handovers::HandoverCasesViewModeHelper do
                                               current_user_is_pom: false,
                                               current_user_is_spo: true,
                                               for_pom: other_pom)
-          expect(result).to eq [true, pom_handover_cases]
+          expect(result).to eq pom_handover_cases
         end
       end
     end
@@ -52,7 +52,7 @@ RSpec.describe Handovers::HandoverCasesViewModeHelper do
                                               prison: prison,
                                               current_user_is_pom: true,
                                               current_user_is_spo: true)
-          expect(result).to eq [false, homd_handover_cases]
+          expect(result).to eq homd_handover_cases
         end
       end
 
@@ -63,7 +63,7 @@ RSpec.describe Handovers::HandoverCasesViewModeHelper do
                                               current_user_is_pom: true,
                                               current_user_is_spo: true,
                                               for_pom: 'user')
-          expect(result).to eq [true, pom_handover_cases]
+          expect(result).to eq pom_handover_cases
         end
       end
 
@@ -74,7 +74,7 @@ RSpec.describe Handovers::HandoverCasesViewModeHelper do
                                               current_user_is_pom: true,
                                               current_user_is_spo: true,
                                               for_pom: other_pom)
-          expect(result).to eq [true, pom_handover_cases]
+          expect(result).to eq pom_handover_cases
         end
       end
     end

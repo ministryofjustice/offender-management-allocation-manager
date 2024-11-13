@@ -8,6 +8,7 @@ class HandoversController < PrisonsApplicationController
   before_action :set_prison_id
   before_action :set_current_handovers_url
   before_action :set_handover_cases
+  before_action :set_pom_view
 
   def upcoming
     @filtered_handover_cases = sort_and_paginate(@handover_cases.upcoming)
@@ -32,7 +33,7 @@ private
   end
 
   def set_handover_cases
-    @pom_view, @handover_cases = helpers.handover_cases_view(
+    @handover_cases = helpers.handover_cases_view(
       current_user: @current_user,
       prison: @prison,
       current_user_is_pom: current_user_is_pom?,
@@ -47,6 +48,10 @@ private
 
   def set_current_handovers_url
     flash[:current_handovers_url] = request.original_url
+  end
+
+  def set_pom_view
+    @pom_view = !(current_user_is_spo? && params[:pom].blank?)
   end
 
   def ensure_sort_specified
