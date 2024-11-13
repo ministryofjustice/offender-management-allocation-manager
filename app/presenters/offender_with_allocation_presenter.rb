@@ -29,4 +29,8 @@ class OffenderWithAllocationPresenter
       (@allocation.primary_pom_allocated_at || @allocation.updated_at)&.to_date
     end
   end
+
+  def primary_pom_allocated_at
+    @allocation.primary_pom_allocated_at
+  end
 end

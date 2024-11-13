@@ -71,7 +71,10 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'parallel_tests'
   gem 'rubocop-govuk', '~> 4.12'
-  gem 'rspec-rails'
+  # Temporary lock rspec versions to fix a rackup regression
+  # https://github.com/puma/puma/issues/3531
+  gem 'rspec-rails', '7.0.1'
+  gem 'rspec-core', '3.13.1'
   gem 'rswag-specs'
   gem 'spring'
   gem 'undercover'

@@ -11,6 +11,9 @@ generic-prometheus-alerts:
   businessHoursOnly: true
   rdsAlertsDatabases:
     cloud-platform-aaaaa93fa5e829b2: preprod
+  elastiCacheAlertsClusterIds:
+    cp-7e1ba1dc760b499f-001: preprod cluster node 1
+    cp-7e1ba1dc760b499f-002: preprod cluster node 2
   sqsOldestAlertQueueNames:
     - offender-management-preprod-domain-events
   sqsNumberAlertQueueNames:
