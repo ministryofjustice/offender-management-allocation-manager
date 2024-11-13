@@ -55,7 +55,7 @@ private
   end
 
   def ensure_sort_specified
-    unless params[:sort].present?
+    if params[:sort].blank?
       redirect_to permitted_params.merge(sort: 'handover_date asc')
     end
   end

@@ -44,6 +44,7 @@ RSpec.describe HandoversController, type: :controller do
     describe '@pom_view' do
       context 'when the user is an spo but for_pom params is empty' do
         let(:for_pom) { nil }
+
         before { allow(controller).to receive(:current_user_is_spo?).and_return(true) }
 
         it 'is false' do
