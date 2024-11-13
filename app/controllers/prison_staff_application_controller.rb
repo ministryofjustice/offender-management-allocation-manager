@@ -62,7 +62,7 @@ private
     @parole_cases = paginate_array(sort_allocations(parole_allocations))
     @allocations = paginate_array(sort_allocations(filtered_allocations))
 
-    @handover_cases = Handover::CategorisedHandoverCasesForPom.new(@pom)
+    @handover_cases = helpers.handover_cases_view_for_pom(@pom)
 
     @summary = {
       all_prison_cases: @prison.allocations.all.count,

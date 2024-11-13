@@ -61,7 +61,7 @@
   <% end %>
 
   <%= render layout: 'grid_compare_row', locals: {poms: @poms, current_pom_id: @current_pom_id} do |pom| %>
-    <% handover_count = Handover::CategorisedHandoverCasesForPom.new(pom).upcoming.count %>
+    <% handover_count = handover_cases_view_for_pom(pom).upcoming.count %>
     <div class="card--caseload card-total">
       <span class="card__heading--large"><%= handover_count %></span>
       <p><%= t('.upcoming_handovers', count: handover_count) %></p>
