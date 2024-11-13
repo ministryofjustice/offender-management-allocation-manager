@@ -32,17 +32,6 @@ RSpec.describe Handovers::HandoverCasesViewModeHelper do
           expect(result).to eq homd_handover_cases
         end
       end
-
-      context 'and wants cases for a specific POM' do
-        it 'fetches POM handover cases' do
-          result = helper.handover_cases_view(current_user: current_user,
-                                              prison: prison,
-                                              current_user_is_pom: false,
-                                              current_user_is_spo: true,
-                                              for_pom: other_pom)
-          expect(result).to eq pom_handover_cases
-        end
-      end
     end
 
     describe 'when user is a POM and a HOMD' do
@@ -63,17 +52,6 @@ RSpec.describe Handovers::HandoverCasesViewModeHelper do
                                               current_user_is_pom: true,
                                               current_user_is_spo: true,
                                               for_pom: 'user')
-          expect(result).to eq pom_handover_cases
-        end
-      end
-
-      context 'and wants cases for a specific POM' do
-        it 'fetches POM handover cases' do
-          result = helper.handover_cases_view(current_user: current_user,
-                                              prison: prison,
-                                              current_user_is_pom: true,
-                                              current_user_is_spo: true,
-                                              for_pom: other_pom)
           expect(result).to eq pom_handover_cases
         end
       end

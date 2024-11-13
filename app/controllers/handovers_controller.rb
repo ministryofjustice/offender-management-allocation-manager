@@ -37,8 +37,7 @@ private
       current_user: @current_user,
       prison: @prison,
       current_user_is_pom: current_user_is_pom?,
-      current_user_is_spo: current_user_is_spo?,
-      for_pom: params[:pom]
+      current_user_is_spo: current_user_is_spo?
     )
   end
 

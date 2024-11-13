@@ -11,8 +11,8 @@ module Handovers
     def handover_cases_view_for_spo(current_user:, prison:, for_pom: '')
       if for_pom.blank?
         Handover::CategorisedHandoverCasesForHomd.new(prison)
-      else
-        Handover::CategorisedHandoverCasesForPom.new(for_pom == 'user' ? current_user : for_pom)
+      elsif for_pom == 'user'
+        handover_cases_view_for_pom(current_user)
       end
     end
 

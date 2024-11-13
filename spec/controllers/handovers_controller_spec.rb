@@ -66,8 +66,7 @@ RSpec.describe HandoversController, type: :controller do
         current_user: staff_member,
         prison: prison,
         current_user_is_pom: current_user_is_pom_stub,
-        current_user_is_spo: current_user_is_spo_stub,
-        for_pom: for_pom,
+        current_user_is_spo: current_user_is_spo_stub
       )
     end
   end
