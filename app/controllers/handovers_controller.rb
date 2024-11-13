@@ -3,7 +3,12 @@
 class HandoversController < PrisonsApplicationController
   layout 'handovers'
 
-  before_action :check_prerequisites_and_prepare_variables
+  before_action :ensure_spo_or_pom_user
+  before_action :ensure_sort_specified
+  before_action :set_prison_id
+  before_action :set_current_handovers_url
+  before_action :set_handover_cases
+  before_action :set_pom_view
 
   def upcoming
     @filtered_handover_cases = sort_and_paginate(@handover_cases.upcoming)
@@ -27,24 +32,37 @@ private
     params.permit(:prison_id, :pom, :sort)
   end
 
-  def check_prerequisites_and_prepare_variables
+  def set_handover_cases
+    @handover_cases = helpers.handover_cases_view(
+      current_user: @current_user,
+      prison: @prison,
+      current_user_is_pom: current_user_is_pom?,
+      current_user_is_spo: current_user_is_spo?,
+      for_pom: params[:pom]
+    )
+  end
+
+  def set_prison_id
+    @prison_id = active_prison_id
+  end
+
+  def set_current_handovers_url
+    flash[:current_handovers_url] = request.original_url
+  end
+
+  def set_pom_view
+    @pom_view = !(current_user_is_spo? && params[:pom].blank?)
+  end
+
+  def ensure_sort_specified
     if params[:sort].blank?
       redirect_to permitted_params.merge(sort: 'handover_date asc')
-      return
     end
+  end
 
-    @pom_view, @handover_cases = helpers.handover_cases_view(current_user: @current_user,
-                                                             prison: @prison,
-                                                             current_user_is_pom: current_user_is_pom?,
-                                                             current_user_is_spo: current_user_is_spo?,
-                                                             for_pom: params[:pom])
-
-    if @handover_cases.nil?
+  def ensure_spo_or_pom_user
+    unless current_user_is_pom? || current_user_is_spo?
       redirect_to '/401'
-      return
     end
-
-    @prison_id = active_prison_id
-    flash[:current_handovers_url] = request.original_url
   end
 end

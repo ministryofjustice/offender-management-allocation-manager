@@ -1,20 +1,23 @@
 module Handovers
   module HandoverCasesViewModeHelper
-    # @return [pom_view: Boolean, handover_cases: Handover::CategorisedHandoverCases]
     def handover_cases_view(current_user:, prison:, current_user_is_pom:, current_user_is_spo:, for_pom: '')
       if current_user_is_spo
-        if for_pom.blank?
-          [false, Handover::CategorisedHandoverCasesForHomd.new(prison)]
-        elsif for_pom == 'user'
-          [true, Handover::CategorisedHandoverCasesForPom.new(current_user)]
-        else # for_pom == <pom_user_to_view>
-          [true, Handover::CategorisedHandoverCasesForPom.new(for_pom)]
-        end
+        handover_cases_view_for_spo(current_user:, prison:, for_pom:)
       elsif current_user_is_pom
-        [true, Handover::CategorisedHandoverCasesForPom.new(current_user)]
-      else
-        nil
+        handover_cases_view_for_pom(current_user)
       end
+    end
+
+    def handover_cases_view_for_spo(current_user:, prison:, for_pom: '')
+      if for_pom.blank?
+        Handover::CategorisedHandoverCasesForHomd.new(prison)
+      else
+        Handover::CategorisedHandoverCasesForPom.new(for_pom == 'user' ? current_user : for_pom)
+      end
+    end
+
+    def handover_cases_view_for_pom(current_user)
+      Handover::CategorisedHandoverCasesForPom.new(current_user)
     end
   end
 end

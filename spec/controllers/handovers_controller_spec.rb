@@ -11,14 +11,13 @@ RSpec.describe HandoversController, type: :controller do
                             com_allocation_overdue: double(:com_allocation_overdue)
   end
   let(:for_pom) { 'for_pom' }
-  let(:pom_view_flag) { double :pom_view_flag }
   let(:current_user_is_pom_stub) { double :current_user_is_pom_stub }
   let(:current_user_is_spo_stub) { double :current_user_is_spo_stub }
   let(:page) { double :page }
 
   before do
     stub_high_level_staff_member_auth(prison: prison, staff_member: staff_member)
-    allow(controller.helpers).to receive_messages(handover_cases_view: [pom_view_flag, handover_cases])
+    allow(controller.helpers).to receive_messages(handover_cases_view: handover_cases)
     allow(controller).to receive_messages(current_user_is_pom?: current_user_is_pom_stub,
                                           current_user_is_spo?: current_user_is_spo_stub,
                                           page: page)
@@ -42,8 +41,20 @@ RSpec.describe HandoversController, type: :controller do
       expect(assigns(:handover_cases)).to eq handover_cases
     end
 
-    it 'has correct POM view flag' do
-      expect(assigns[:pom_view]).to eq pom_view_flag
+    describe '@pom_view' do
+      context 'when the user is an spo but for_pom params is empty' do
+        let(:for_pom) { nil }
+
+        before { allow(controller).to receive(:current_user_is_spo?).and_return(true) }
+
+        it 'is false' do
+          expect(assigns[:pom_view]).to be(false)
+        end
+      end
+
+      it 'is true' do
+        expect(assigns[:pom_view]).to be(true)
+      end
     end
 
     it 'has correct paginated cases' do
@@ -97,7 +108,7 @@ RSpec.describe HandoversController, type: :controller do
 
   describe 'when user is not authorised' do
     before do
-      allow(controller.helpers).to receive_messages(handover_cases_view: nil)
+      allow(controller).to receive_messages(current_user_is_pom?: false, current_user_is_spo?: false)
     end
 
     describe 'upcoming handovers page' do
