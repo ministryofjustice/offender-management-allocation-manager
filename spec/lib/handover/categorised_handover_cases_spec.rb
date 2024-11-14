@@ -41,15 +41,15 @@ RSpec.describe Handover::CategorisedHandoverCases do
   before do
     allow(CalculatedHandoverDate).to receive(:by_upcoming_handover)
                                        .with(offender_ids: offender_numbers)
-                                       .and_return(double(to_a: upcoming_calculated_handover_dates))
+                                       .and_return(Array(upcoming_calculated_handover_dates))
     allow(CalculatedHandoverDate).to(
       receive(:by_handover_in_progress)
         .with(offender_ids: offender_numbers)
-        .and_return(double(to_a: in_progress_calculated_handover_dates + overdue_tasks_calculated_handover_dates))
+        .and_return(Array(in_progress_calculated_handover_dates + overdue_tasks_calculated_handover_dates))
     )
     allow(CalculatedHandoverDate).to receive(:by_com_allocation_overdue)
                                        .with(offender_ids: offender_numbers)
-                                       .and_return(double(to_a: com_allocation_overdue_calculated_handover_dates))
+                                       .and_return(Array(com_allocation_overdue_calculated_handover_dates))
 
     allow(offenders['G']).to receive(:handover_progress_complete?).and_return(false)
     allow(offenders['H']).to receive(:handover_progress_complete?).and_return(false)
