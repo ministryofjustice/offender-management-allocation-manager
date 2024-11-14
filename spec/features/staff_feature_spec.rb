@@ -14,13 +14,6 @@ feature "staff pages" do
                  sentence: attributes_for(:sentence_detail))
     end
 
-    let(:handover_cases) do
-      sneaky_instance_double(Handover::CategorisedHandoverCasesForPom, upcoming: [],
-                                                                       in_progress: [],
-                                                                       overdue_tasks: [],
-                                                                       com_allocation_overdue: [])
-    end
-
     let(:offender_attrs) do
       {
         full_name: 'Surname1, Firstname1',
