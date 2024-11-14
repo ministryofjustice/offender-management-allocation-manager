@@ -1,7 +1,6 @@
 RSpec.describe 'handovers/cells/_handover_dates' do
   let(:handover_case) do
-    instance_double(Handover::HandoverCase,
-                    handover_date: Date.new(2020, 12, 15)) # must be well in the past to trigger 'due soon' highlight
+    double(handover_date: Date.new(2020, 12, 15)) # must be well in the past to trigger 'due soon' highlight
   end
   let(:handover_cases) { double(overdue_tasks: [handover_case]) }
 
