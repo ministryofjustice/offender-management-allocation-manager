@@ -42,6 +42,12 @@ class MpcOffender
       'Community'
     end
   end
+  
+  def com_allocation_days_overdue(relative_to_date: Time.zone.now.to_date)
+    raise ArgumentError, 'Handover date not set' unless handover_date
+
+    (relative_to_date - handover_date).to_i
+  end
 
   def needs_a_com?
     case_information.present? && (com_responsible? || com_supporting?) && allocated_com_name.blank?

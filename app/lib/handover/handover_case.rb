@@ -17,15 +17,8 @@ class Handover::HandoverCase
 
   delegate :last_name, to: :offender, prefix: true
   delegate :staff_member, :allocated_com_name, :tier, :handover_progress_complete?,
-           :earliest_release_for_handover, to: :offender
+           :earliest_release_for_handover, :com_allocation_days_overdue, :handover_date, to: :offender
   delegate :full_name_ordered, to: :staff_member, prefix: true
-  delegate :handover_date, to: :calculated_handover_date
-
-  def com_allocation_days_overdue(relative_to_date: Time.zone.now.to_date)
-    raise ArgumentError, 'Handover date not set' unless handover_date
-
-    (relative_to_date - handover_date).to_i
-  end
 
   def earliest_release_date
     earliest_release_for_handover&.date
