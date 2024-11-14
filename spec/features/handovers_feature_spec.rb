@@ -22,9 +22,9 @@ RSpec.feature 'Handovers feature:' do
   let(:offender) { sneaky_instance_double AllocatedOffender, **offender_attrs }
   let(:handover_cases) do
     sneaky_instance_double(Handover::Summary, upcoming: [],
-                                                               in_progress: [],
-                                                               overdue_tasks: [],
-                                                               com_allocation_overdue: [])
+                                              in_progress: [],
+                                              overdue_tasks: [],
+                                              com_allocation_overdue: [])
   end
   let(:handover_case) do
     instance_double AllocatedOffender,

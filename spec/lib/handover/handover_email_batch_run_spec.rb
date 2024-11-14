@@ -38,8 +38,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
       before do
         allocated_to_process.map do |offender|
           o = FactoryBot.create :offender, id: offender.offender_no
-          FactoryBot.create :calculated_handover_date,
-                                  offender: o, handover_date: today + DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION
+          FactoryBot.create :calculated_handover_date, offender: o, handover_date: today + DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION
         end
         ignored = []
 
