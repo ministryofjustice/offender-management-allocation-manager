@@ -1,5 +1,5 @@
 module Handover
-  class CategorisedHandoverCases
+  class Summary
     def initialize(offenders)
       @offenders_by_id = offenders.index_by(&:offender_no)
       @offender_ids = @offenders_by_id.keys

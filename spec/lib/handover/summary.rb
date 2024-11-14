@@ -1,4 +1,4 @@
-RSpec.describe Handover::CategorisedHandoverCases do
+RSpec.describe Handover::Summary do
   subject(:handover_cases) { described_class.new(offenders.values) }
 
   let(:offender_numbers) { ('A'..'Z').to_a }
