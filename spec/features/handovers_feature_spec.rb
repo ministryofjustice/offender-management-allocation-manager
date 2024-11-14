@@ -27,7 +27,7 @@ RSpec.feature 'Handovers feature:' do
                                                                com_allocation_overdue: [])
   end
   let(:handover_case) do
-    instance_double Handover::HandoverCase,
+    instance_double AllocatedOffender,
                     earliest_release_for_handover: NamedDate[nil, nil],
                     offender: offender,
                     handover_date: Faker::Date.forward,
