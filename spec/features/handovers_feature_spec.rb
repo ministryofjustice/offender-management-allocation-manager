@@ -21,10 +21,10 @@ RSpec.feature 'Handovers feature:' do
   end
   let(:offender) { sneaky_instance_double AllocatedOffender, **offender_attrs }
   let(:handover_cases) do
-    sneaky_instance_double(Handover::CategorisedHandoverCasesForPom, upcoming: [],
-                                                                     in_progress: [],
-                                                                     overdue_tasks: [],
-                                                                     com_allocation_overdue: [])
+    sneaky_instance_double(Handover::CategorisedHandoverCases, upcoming: [],
+                                                               in_progress: [],
+                                                               overdue_tasks: [],
+                                                               com_allocation_overdue: [])
   end
   let(:handover_case) do
     instance_double Handover::HandoverCase,
@@ -40,7 +40,10 @@ RSpec.feature 'Handovers feature:' do
     signin_pom_user([prison_code])
     stub_poms(prison_code, [user])
 
-    allow(Handover::CategorisedHandoverCasesForPom).to receive(:new).and_return(handover_cases)
+    allow(StaffMember).to receive(:new)
+      .with(prison, user.staffId)
+      .and_return(instance_double(StaffMember, unreleased_allocations: []).as_null_object)
+    allow(Handover::CategorisedHandoverCases).to receive(:new).and_return(handover_cases)
   end
 
   describe 'upcoming handovers' do
