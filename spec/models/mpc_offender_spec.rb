@@ -665,7 +665,7 @@ RSpec.describe MpcOffender, type: :model do
       expect(mpc_offender.most_recent_completed_parole_review_for_sentence).not_to eq(incomplete_in_date)
     end
   end
-  
+
   describe '#com_allocation_days_overdue' do
     let(:handover_date) { nil }
     let(:result) do
@@ -683,7 +683,7 @@ RSpec.describe MpcOffender, type: :model do
 
     describe 'when handover date is the current date' do
       let(:handover_date) { Date.new(2022, 1, 1) }
-      
+
       it 'returns 0' do
         expect(result).to eq 0
       end
@@ -691,7 +691,7 @@ RSpec.describe MpcOffender, type: :model do
 
     describe 'when COM responsible date is in the past' do
       let(:handover_date) { Date.new(2021, 12, 30) }
-      
+
       it 'returns the days overdue' do
         expect(result).to eq 2
       end
@@ -699,7 +699,7 @@ RSpec.describe MpcOffender, type: :model do
 
     describe 'when COM responsible date is in the future' do
       let(:handover_date) { Date.new(2022, 1, 2) }
-      
+
       it 'returns days overdue as negative number' do
         expect(result).to eq(-1)
       end

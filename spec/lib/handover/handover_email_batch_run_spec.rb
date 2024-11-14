@@ -38,7 +38,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
       before do
         allocated_to_process.map do |offender|
           o = FactoryBot.create :offender, id: offender.offender_no
-          chd = FactoryBot.create :calculated_handover_date,
+          FactoryBot.create :calculated_handover_date,
                                   offender: o, handover_date: today + DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION
         end
         ignored = []
@@ -85,7 +85,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
         allocated_to_process.map do |offender|
           allow(offender).to receive_messages(has_com?: true)
           o = FactoryBot.create :offender, id: offender.offender_no
-          chd = FactoryBot.create :calculated_handover_date, offender: o, handover_date: today
+          FactoryBot.create :calculated_handover_date, offender: o, handover_date: today
         end
         ignored = []
 
@@ -139,7 +139,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
         allocated_to_process.map do |offender|
           allow(offender).to receive_messages(has_com?: false)
           o = FactoryBot.create :offender, id: offender.offender_no
-          chd = FactoryBot.create :calculated_handover_date, offender: o, handover_date: today - 14.days
+          FactoryBot.create :calculated_handover_date, offender: o, handover_date: today - 14.days
         end
         ignored = []
 

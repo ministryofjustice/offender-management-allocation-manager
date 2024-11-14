@@ -9,7 +9,7 @@ module Handover
       past_handover = build_cases CalculatedHandoverDate.by_handover_in_progress(offender_ids: all_offender_ids).to_a
 
       @in_progress = past_handover + upcoming_with_com
-      @overdue_tasks = past_handover.reject { |hc| hc.handover_progress_complete? }
+      @overdue_tasks = past_handover.reject(&:handover_progress_complete?)
       @com_allocation_overdue = build_cases(
         CalculatedHandoverDate.by_com_allocation_overdue(offender_ids: all_offender_ids).to_a)
     end

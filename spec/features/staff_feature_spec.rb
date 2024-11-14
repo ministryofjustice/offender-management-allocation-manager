@@ -48,7 +48,7 @@ feature "staff pages" do
 
       offenders_in_prison.each do |offender|
         nomis_offender_id = offender[:prisonerNumber]
-        
+
         offender = create(:offender, nomis_offender_id:)
 
         create(
@@ -59,9 +59,9 @@ feature "staff pages" do
           primary_pom_nomis_id: pom.staff_id,
           recommended_pom_type: 'prison'
         )
-        
+
         create(:case_information, offender:)
-        
+
         create(:calculated_handover_date, offender:, handover_date: Time.zone.today + 5)
       end
 
