@@ -15,10 +15,8 @@ class Handover::HandoverCase
     [@offender, @calculated_handover_date] == [other.offender, other.calculated_handover_date]
   end
 
-  delegate :last_name, to: :offender, prefix: true
-  delegate :staff_member, :allocated_com_name, :tier, :handover_progress_complete?,
-           :earliest_release_for_handover, :com_allocation_days_overdue, :handover_date, to: :offender
-  delegate :full_name_ordered, to: :staff_member, prefix: true
+  delegate :staff_member, :staff_member_full_name_ordered, :allocated_com_name, :tier, :handover_progress_complete?,
+           :earliest_release_for_handover, :com_allocation_days_overdue, :handover_date, :offender_last_name, to: :offender
 
   def earliest_release_date
     earliest_release_for_handover&.date
