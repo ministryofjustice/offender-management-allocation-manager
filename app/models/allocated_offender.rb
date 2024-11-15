@@ -24,6 +24,8 @@ class AllocatedOffender
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison, :primary_pom_nomis_id, :primary_pom_name,
            to: :@allocation
   delegate :full_name_ordered, to: :staff_member, prefix: true
+  
+  attr_reader :offender
 
   COMPLEXITIES = { 'high' => 3, 'medium' => 2, 'low' => 1 }.freeze
 
@@ -73,8 +75,4 @@ class AllocatedOffender
       end
     end
   end
-
-private
-
-  attr_reader :offender # only to allow #offender_last_name delegation to work, better fix to come...
 end
