@@ -4,7 +4,6 @@ class Handover::HandoverEmailBatchRun
       chd = CalculatedHandoverDate.find_by(nomis_offender_id: offender.offender_no)
       return unless chd&.handover_date && chd.handover_date == for_date + DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION
 
-      handover_case = Handover::HandoverCase.new(offender, chd)
       Handover::HandoverEmail.deliver_if_deliverable(
         :upcoming_handover_window,
         offender.offender_no,
@@ -14,7 +13,7 @@ class Handover::HandoverEmailBatchRun
         first_name: offender.first_name.titleize,
         handover_date: format_date(chd.handover_date),
         enhanced_handover: offender.enhanced_handover?,
-        release_date: format_date(handover_case.earliest_release_for_handover&.date),
+        release_date: format_date(offender.earliest_release_for_handover&.date),
         deliver_now: deliver_now,
       )
       Rails.logger.info("event=handover_email_delivered,nomis_offender_id=#{offender.offender_no},email=upcoming_handover_window,for_date=#{for_date.iso8601}")
@@ -24,7 +23,6 @@ class Handover::HandoverEmailBatchRun
       chd = CalculatedHandoverDate.find_by(nomis_offender_id: offender.offender_no)
       return unless chd&.handover_date && chd.handover_date == for_date && offender.has_com?
 
-      handover_case = Handover::HandoverCase.new(offender, chd)
       Handover::HandoverEmail.deliver_if_deliverable(
         :handover_date,
         offender.offender_no,
@@ -32,7 +30,7 @@ class Handover::HandoverEmailBatchRun
         email: offender.staff_member.email_address,
         full_name_ordered: offender.full_name_ordered,
         first_name: offender.first_name.titleize,
-        release_date: format_date(handover_case.earliest_release_for_handover&.date),
+        release_date: format_date(offender.earliest_release_for_handover&.date),
         com_name: offender.allocated_com_name,
         com_email: offender.allocated_com_email,
         enhanced_handover: offender.enhanced_handover?,
@@ -45,7 +43,6 @@ class Handover::HandoverEmailBatchRun
       chd = CalculatedHandoverDate.find_by(nomis_offender_id: offender.offender_no)
       return unless chd&.handover_date && chd.handover_date == for_date - 14.days && !offender.has_com?
 
-      handover_case = Handover::HandoverCase.new(offender, chd)
       Handover::HandoverEmail.deliver_if_deliverable(
         :com_allocation_overdue,
         offender.offender_no,
@@ -53,7 +50,7 @@ class Handover::HandoverEmailBatchRun
         email: offender.staff_member.email_address,
         full_name_ordered: offender.full_name_ordered,
         handover_date: format_date(chd.handover_date),
-        release_date: format_date(handover_case.earliest_release_for_handover&.date),
+        release_date: format_date(offender.earliest_release_for_handover&.date),
         ldu_name: offender.ldu_name,
         ldu_email: offender.ldu_email_address,
         enhanced_handover: offender.enhanced_handover?,

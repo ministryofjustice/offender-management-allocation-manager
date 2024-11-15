@@ -21,13 +21,13 @@ RSpec.feature 'Handovers feature:' do
   end
   let(:offender) { sneaky_instance_double AllocatedOffender, **offender_attrs }
   let(:handover_cases) do
-    sneaky_instance_double(Handover::CategorisedHandoverCases, upcoming: [],
-                                                               in_progress: [],
-                                                               overdue_tasks: [],
-                                                               com_allocation_overdue: [])
+    sneaky_instance_double(Handover::Summary, upcoming: [],
+                                              in_progress: [],
+                                              overdue_tasks: [],
+                                              com_allocation_overdue: [])
   end
   let(:handover_case) do
-    instance_double Handover::HandoverCase,
+    instance_double AllocatedOffender,
                     earliest_release_for_handover: NamedDate[nil, nil],
                     offender: offender,
                     handover_date: Faker::Date.forward,
@@ -43,7 +43,7 @@ RSpec.feature 'Handovers feature:' do
     allow(StaffMember).to receive(:new)
       .with(prison, user.staffId)
       .and_return(instance_double(StaffMember, unreleased_allocations: []).as_null_object)
-    allow(Handover::CategorisedHandoverCases).to receive(:new).and_return(handover_cases)
+    allow(Handover::Summary).to receive(:new).and_return(handover_cases)
   end
 
   describe 'upcoming handovers' do

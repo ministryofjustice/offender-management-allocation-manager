@@ -14,13 +14,6 @@ feature "staff pages" do
                  sentence: attributes_for(:sentence_detail))
     end
 
-    let(:handover_cases) do
-      sneaky_instance_double(Handover::CategorisedHandoverCasesForPom, upcoming: [],
-                                                                       in_progress: [],
-                                                                       overdue_tasks: [],
-                                                                       com_allocation_overdue: [])
-    end
-
     let(:offender_attrs) do
       {
         full_name: 'Surname1, Firstname1',
@@ -49,6 +42,8 @@ feature "staff pages" do
       offenders_in_prison.each do |offender|
         nomis_offender_id = offender[:prisonerNumber]
 
+        offender = create(:offender, nomis_offender_id:)
+
         create(
           :allocation_history,
           :primary,
@@ -58,22 +53,10 @@ feature "staff pages" do
           recommended_pom_type: 'prison'
         )
 
-        create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
-      end
+        create(:case_information, offender:)
 
-      # We need couple of handovers to fully test these pages (handover count is shown)
-      allow_any_instance_of(Handover::CategorisedHandoverCases).to receive(:in_progress).and_return(
-        [
-          Handover::HandoverCase.new(
-            offender,
-            CalculatedHandoverDate.new(nomis_offender_id: 'X1111XX', handover_date: Time.zone.today + 5)
-          ),
-          Handover::HandoverCase.new(
-            offender,
-            CalculatedHandoverDate.new(nomis_offender_id: 'X1111XX', handover_date: Time.zone.today + 5)
-          )
-        ]
-      )
+        create(:calculated_handover_date, offender:, handover_date: Time.zone.today + 5)
+      end
 
       visit prison_pom_path(prison.code, pom.staff_id)
     end

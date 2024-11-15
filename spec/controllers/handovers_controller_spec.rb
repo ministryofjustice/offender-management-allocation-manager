@@ -52,8 +52,22 @@ RSpec.describe HandoversController, type: :controller do
         end
       end
 
-      it 'is true' do
-        expect(assigns[:pom_view]).to be(true)
+      context 'when the user is an spo but for_pom params is user' do
+        let(:for_pom) { 'user' }
+
+        before { allow(controller).to receive(:current_user_is_spo?).and_return(true) }
+
+        it 'is true' do
+          expect(assigns[:pom_view]).to be(true)
+        end
+      end
+
+      context 'when the user is a pom' do
+        before { allow(controller).to receive(:current_user_is_pom?).and_return(true) }
+
+        it 'is true' do
+          expect(assigns[:pom_view]).to be(true)
+        end
       end
     end
 

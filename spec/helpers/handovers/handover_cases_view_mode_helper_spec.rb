@@ -2,15 +2,15 @@ RSpec.describe Handovers::HandoverCasesViewModeHelper do
   describe '#handover_cases_view' do
     let(:current_user) { double :current_user, unreleased_allocations: double(:current_user_unreleased) }
     let(:prison) { double :prison, primary_allocated_offenders: double(:prison_primary_allocs) }
-    let(:pom_handover_cases) { instance_double Handover::CategorisedHandoverCases, :pom_handover_cases }
-    let(:pom_or_homd_as_pom_handover_cases) { instance_double Handover::CategorisedHandoverCases, :pom_or_homd_as_pom_handover_cases }
-    let(:homd_handover_cases) { instance_double Handover::CategorisedHandoverCases, :homd_handover_cases }
+    let(:pom_handover_cases) { instance_double Handover::Summary, :pom_handover_cases }
+    let(:pom_or_homd_as_pom_handover_cases) { instance_double Handover::Summary, :pom_or_homd_as_pom_handover_cases }
+    let(:homd_handover_cases) { instance_double Handover::Summary, :homd_handover_cases }
 
     before do
-      allow(Handover::CategorisedHandoverCases).to receive(:new)
+      allow(Handover::Summary).to receive(:new)
         .with(current_user.unreleased_allocations)
         .and_return(pom_or_homd_as_pom_handover_cases)
-      allow(Handover::CategorisedHandoverCases).to receive(:new)
+      allow(Handover::Summary).to receive(:new)
         .with(prison.primary_allocated_offenders)
         .and_return(homd_handover_cases)
     end

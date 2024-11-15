@@ -19,9 +19,11 @@ class AllocatedOffender
            :conditional_release_date, :automatic_release_date,
            :earliest_release_for_handover, :handover_type,
            :early_allocation?, :licence_expiry_date, :approaching_parole?, :next_parole_date, :next_parole_date_type,
-           :pom_tasks, to: :@offender
+           :pom_tasks, :com_allocation_days_overdue, :handover_date, to: :@offender
+  delegate :last_name, to: :offender, prefix: true
   delegate :updated_at, :nomis_offender_id, :primary_pom_allocated_at, :prison, :primary_pom_nomis_id, :primary_pom_name,
            to: :@allocation
+  delegate :full_name_ordered, to: :staff_member, prefix: true
 
   COMPLEXITIES = { 'high' => 3, 'medium' => 2, 'low' => 1 }.freeze
 

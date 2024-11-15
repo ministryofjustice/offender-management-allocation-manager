@@ -10,14 +10,14 @@ module Handovers
 
     def handover_cases_view_for_spo(current_user:, prison:, for_pom: '')
       if for_pom.blank?
-        Handover::CategorisedHandoverCases.new(prison.primary_allocated_offenders)
+        Handover::Summary.new(prison.primary_allocated_offenders)
       elsif for_pom == 'user'
         handover_cases_view_for_pom(current_user)
       end
     end
 
     def handover_cases_view_for_pom(current_user)
-      Handover::CategorisedHandoverCases.new(current_user.unreleased_allocations)
+      Handover::Summary.new(current_user.unreleased_allocations)
     end
   end
 end
