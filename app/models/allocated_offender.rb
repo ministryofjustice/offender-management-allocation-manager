@@ -73,8 +73,8 @@ class AllocatedOffender
       end
     end
   end
-  
+
 private
-  
+
   attr_reader :offender # only to allow #offender_last_name delegation to work, better fix to come...
 end
