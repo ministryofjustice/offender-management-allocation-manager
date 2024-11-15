@@ -32,7 +32,7 @@
     <tr class="govuk-table__row allocated-offender">
       <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: handover_case.offender %>
 
-      <%= render 'handovers/cells/staff_member', staff_member: handover_case.offender.staff_member unless @pom_view %>
+      <%= render 'handovers/cells/staff_member', staff_member: handover_case.staff_member unless @pom_view %>
 
       <%= render 'handovers/cells/handover_dates',
                  handover_case: handover_case, show_highlight: nil %>
