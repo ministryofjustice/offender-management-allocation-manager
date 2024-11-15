@@ -19,7 +19,7 @@
   <% (local_assigns[:handover_data] || @filtered_handover_cases).each do |handover_case| %>
     <tr class="govuk-table__row allocated-offender">
       <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: handover_case.offender, anchor: local_assigns[:anchor] %>
-      <%= render 'handovers/cells/staff_member', staff_member: handover_case.offender.staff_member unless @pom_view %>
+      <%= render 'handovers/cells/staff_member', staff_member: handover_case.staff_member unless @pom_view %>
 
       <%= render 'handovers/cells/com_details', offender: handover_case.offender,
                  handover_date: handover_case.handover_date unless local_assigns[:hide_com_details] %>
