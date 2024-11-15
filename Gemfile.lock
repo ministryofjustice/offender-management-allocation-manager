@@ -206,7 +206,6 @@ GEM
     ffi (1.17.0-arm64-darwin)
     ffi (1.17.0-x86_64-darwin)
     ffi (1.17.0-x86_64-linux-gnu)
-    flamegraph (0.9.5)
     formatador (1.1.0)
     formtastic (5.0.0)
       actionpack (>= 6.0.0)
@@ -321,8 +320,6 @@ GEM
     multipart-post (2.4.1)
     mutex_m (0.2.0)
     nenv (0.3.0)
-    net-http (0.4.1)
-      uri
     net-imap (0.5.1)
       date
       net-protocol
@@ -593,7 +590,6 @@ GEM
       actionpack (>= 6.1)
       activesupport (>= 6.1)
       sprockets (>= 3.0.0)
-    stackprof (0.2.26)
     stringio (3.1.2)
     terser (1.2.4)
       execjs (>= 0.3.0, < 3)
@@ -625,7 +621,6 @@ GEM
     unicode-emoji (3.7.0)
       unicode-version (~> 1.0)
     unicode-version (1.4.0)
-    uri (0.13.1)
     valid_email2 (6.0.0)
       activemodel (>= 6.0)
       mail (~> 2.5)
@@ -672,12 +667,10 @@ DEPENDENCIES
   database_cleaner-active_record
   date_validator
   dotenv-rails
-  drb
   factory_bot_rails
   faker
   faraday (~> 1.10.3)
   fast_underscore
-  flamegraph
   govuk_design_system_formbuilder (~> 5.4.1)
   govuk_notify_rails (~> 3.0.0)
   guard-rspec
@@ -691,10 +684,7 @@ DEPENDENCIES
   lograge
   logstash-event
   logstash-logger
-  matrix
   memory_profiler
-  mutex_m
-  net-http
   omniauth (~> 1.9.2)
   omniauth-oauth2
   paper_trail (~> 15.1.0)
@@ -729,7 +719,6 @@ DEPENDENCIES
   simplecov-lcov (< 0.9)
   spring
   spring-watcher-listen (~> 2.1.0)
-  stackprof
   terser
   test-prof
   timecop
