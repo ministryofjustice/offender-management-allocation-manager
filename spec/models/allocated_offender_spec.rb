@@ -35,4 +35,10 @@ RSpec.describe AllocatedOffender do
       end
     end
   end
+  
+  describe '#offender_last_name' do
+    it 'returns the last_name of the offender' do
+      expect(described_class.new(nil, nil, double(last_name: "Atreides")).offender_last_name).to eq("Atreides")
+    end
+  end
 end
