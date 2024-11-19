@@ -52,6 +52,10 @@ FactoryBot.define do
 
   factory :offender do
     nomis_offender_id
+    
+    trait :allocatable do
+      case_information { create(:case_information) }
+    end
 
     trait :enhanced_handover do
       case_information { create(:case_information, enhanced_resourcing: true) }

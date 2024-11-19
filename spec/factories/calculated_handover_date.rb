@@ -19,17 +19,23 @@ FactoryBot.define do
         CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
       ].sample
     }
+    
+    trait :upcoming_handover do
+      before_handover
+    end
 
     trait :before_handover do
       responsibility { CalculatedHandoverDate::CUSTODY_ONLY }
-      start_date { Faker::Date.forward }
-      handover_date { Faker::Date.forward }
+      handover_date { rand(1.week.from_now..((DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION-1).days.from_now)) }
+    end
+    
+    trait :handover_in_progress do
+      after_handover
     end
 
     trait :after_handover do
-      start_date { Faker::Date.backward }
-      handover_date { Faker::Date.backward }
       responsibility { CalculatedHandoverDate::COMMUNITY_RESPONSIBLE }
+      handover_date { Faker::Date.backward }
     end
   end
 end
