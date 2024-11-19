@@ -4,6 +4,8 @@ module SortHelper
   DEFAULT_SORT = 'last_name'
 
   def sort_link(field_name, anchor: nil)
+    raise ArgumentError, "`#{field_name}` is not an allowed sortable field" unless sortable_field?(field_name)
+
     if anchor.nil?
       link_for_field(field_name, URI.parse(request.original_url))
     else
@@ -12,6 +14,8 @@ module SortHelper
   end
 
   def sort_arrow(field_name)
+    raise ArgumentError, "`#{field_name}` is not an allowed sortable field" unless sortable_field?(field_name)
+
     arrow_for_field(field_name, URI.parse(request.original_url))
   end
 
@@ -69,5 +73,9 @@ private
     return 'desc' if param.end_with?('asc')
 
     'asc'
+  end
+
+  def sortable_field?(field_name)
+    Sorting::SORTABLE_FIELDS.include?(field_name.to_sym)
   end
 end

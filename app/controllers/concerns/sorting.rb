@@ -1,17 +1,40 @@
 # frozen_string_literal: true
 
 module Sorting
+  SORTABLE_FIELDS = %i[
+    action_label
+    additional_information
+    allocated_com_name
+    allocated_pom_role
+    allocation_date
+    awaiting_allocation_for
+    case_owner
+    com_allocation_days_overdue
+    complexity_level_number
+    coworking_allocations_count
+    earliest_release_date
+    formatted_pom_name
+    handover_date
+    last_name
+    location
+    new_allocations_count
+    next_parole_date
+    offender_last_name
+    offender_name
+    pom_responsibility
+    position
+    primary_pom_allocated_at
+    responsible_allocations_count
+    staff_member_full_name_ordered
+    supporting_allocations_count
+    tier
+    total_allocations_count
+    working_pattern
+  ].freeze
+
   def sort_collection(items, default_sort:, default_direction: :asc)
     field, direction = sort_params(default_sort: default_sort, default_direction: default_direction)
     sort_with_public_send items, field, direction
-  end
-
-  def sort_params(default_sort:, default_direction: :asc)
-    if params['sort']
-      params['sort'].split.map { |s| s.downcase.to_sym }
-    else
-      [default_sort, default_direction]
-    end
   end
 
   def sort_and_paginate(collection, default_sort: :handover_date, default_direction: :asc)
@@ -26,7 +49,7 @@ module Sorting
 private
 
   def sort_with_public_send(items, field, direction)
-    return items if field.nil?
+    return items if SORTABLE_FIELDS.exclude?(field)
 
     items.sort do |x, y|
       compare_via_public_send field, direction, x, y
@@ -48,6 +71,14 @@ private
       -1
     else
       1
+    end
+  end
+
+  def sort_params(default_sort:, default_direction: :asc)
+    if params['sort']
+      params['sort'].split.map { |s| s.downcase.to_sym }
+    else
+      [default_sort, default_direction]
     end
   end
 
