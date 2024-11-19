@@ -11,7 +11,6 @@ gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 5.0'
 gem 'date_validator'
 gem 'faraday', '~> 1.10.3'
-gem 'net-http' # needed to undo a conflict with system libs
 gem 'govuk_notify_rails', '~> 3.0.0'
 gem 'govuk_design_system_formbuilder', '~> 5.4.1'
 gem 'json-schema', '~> 4.0'
@@ -51,16 +50,11 @@ gem 'valid_email2'
 gem 'wicked'
 gem 'rails-i18n'
 gem 'business_time'
-gem 'matrix' # App does not use it directly but it has to be explicitly declared otherwise build breaks
 gem 'shoryuken', '~> 6.0'
 gem 'aws-sdk-sqs', '~> 1.55'
 
 # Microsoft Application Insights
 gem 'application_insights'
-
-# these default gems will be removed in ruby 3.4
-gem 'drb'
-gem 'mutex_m'
 
 gem 'activeadmin'
 
@@ -103,7 +97,6 @@ end
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
-  gem 'flamegraph'
   gem 'guard-rspec'
   gem 'guard-rubocop'
   gem 'listen'
@@ -111,7 +104,6 @@ group :development do
   gem 'parser', '~> 3.2'
   gem 'rack-mini-profiler'
   gem 'spring-watcher-listen', '~> 2.1.0'
-  gem 'stackprof'
 end
 
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]

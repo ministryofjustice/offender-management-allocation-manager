@@ -53,10 +53,6 @@ class AllocatedOffender
     @allocation.secondary_pom_nomis_id == @staff_id
   end
 
-  def primary_pom_allocated_at
-    @allocation.primary_pom_allocated_at
-  end
-
   def staff_member
     StaffMember.new(Prison.find(prison_id), @staff_id)
   end

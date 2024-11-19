@@ -8,13 +8,12 @@
   <ul class="govuk-tabs__list">
     <li class="govuk-tabs__list-item">
       <a class="govuk-tabs__tab" href="#caseload-results">
-        <%= @user_allocations.length %> result<%= 's' if @user_allocations.length != 1 %> from your caseload
+        <%= pluralize(@user_allocations.length, 'result') %> from your caseload
       </a>
     </li>
     <li class="govuk-tabs__list-item">
       <a class="govuk-tabs__tab" href="#global-results">
-        <%= @offenders.length %> <%= 'more' if @user_allocations.length > 0 %>
-        result<%= 's' if @offenders.length != 1 %> from this prison
+        <%= @offenders.length %> <%= 'more' if @user_allocations.length > 0 %> <%= 'result'.pluralize(@offenders.length) %> from this prison
       </a>
     </li>
   </ul>
@@ -24,8 +23,9 @@
         Search again
       </p>
     <% else %>
-      <h2 class="govuk-heading-l"><%= @user_allocations.length %> result<%= 's' if @user_allocations.length != 1 %> from
-        your caseload</h2>
+      <h2 class="govuk-heading-l">
+        <%= pluralize(@user_allocations.length, 'result') %> from your caseload
+      </h2>
       <%= render(
             :partial => 'shared/pagination',
             :locals => {
@@ -81,8 +81,9 @@
         Search again
       </p>
     <% else %>
-      <h2 class="govuk-heading-l"><%= @offenders.length %> <%= 'more' if @user_allocations.length > 0 %>
-        result<%= 's' if @offenders.length != 1 %> from this prison</h2>
+      <h2 class="govuk-heading-l">
+        <%= @offenders.length %> <%= 'more' if @user_allocations.length > 0 %> <%= 'result'.pluralize(@offenders.length) %> from this prison
+      </h2>
       <%= render(
             :partial => 'shared/pagination',
             :locals => {

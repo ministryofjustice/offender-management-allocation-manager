@@ -193,41 +193,6 @@ ALTER SEQUENCE public.case_information_id_seq OWNED BY public.case_information.i
 
 
 --
--- Name: contact_submissions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.contact_submissions (
-    id bigint NOT NULL,
-    message text NOT NULL,
-    email_address character varying,
-    referrer character varying,
-    user_agent character varying,
-    prison character varying,
-    name character varying,
-    job_type character varying
-);
-
-
---
--- Name: contact_submissions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.contact_submissions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: contact_submissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.contact_submissions_id_seq OWNED BY public.contact_submissions.id;
-
-
---
 -- Name: delius_import_errors; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -800,13 +765,6 @@ ALTER TABLE ONLY public.case_information ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- Name: contact_submissions id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.contact_submissions ALTER COLUMN id SET DEFAULT nextval('public.contact_submissions_id_seq'::regclass);
-
-
---
 -- Name: delius_import_errors id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -950,14 +908,6 @@ ALTER TABLE ONLY public.calculated_handover_dates
 
 ALTER TABLE ONLY public.case_information
     ADD CONSTRAINT case_information_pkey PRIMARY KEY (id);
-
-
---
--- Name: contact_submissions contact_submissions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.contact_submissions
-    ADD CONSTRAINT contact_submissions_pkey PRIMARY KEY (id);
 
 
 --
@@ -1259,6 +1209,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20241115094637'),
 ('20241008145210'),
 ('20240924134717'),
 ('20240724134026'),
