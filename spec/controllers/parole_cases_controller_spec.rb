@@ -114,23 +114,53 @@ RSpec.describe ParoleCasesController, type: :controller do
 
       describe 'with sorting' do
         context 'when sorting by offender last name' do
-          it 'sorts' do
+          it 'sorts ascending' do
             get :index, params: { prison_id: prison, sort: 'last_name asc' }
             expect(assigns(:offenders).map(&:offender_no)).to eq(%w[G1234VV G7514GW])
+          end
+
+          it 'sorts descending' do
+            get :index, params: { prison_id: prison, sort: 'last_name desc' }
+            expect(assigns(:offenders).map(&:offender_no)).to eq(%w[G7514GW G1234VV])
+          end
+        end
+
+        # Names come from Faker so are unpredictable, but we can compare they are in alphabetical order
+        context 'when sorting by pom name' do
+          it 'sorts ascending' do
+            get :index, params: { prison_id: prison, sort: 'formatted_pom_name asc' }
+            pom_names = assigns(:offenders).map(&:formatted_pom_name)
+            expect(pom_names).to eq(pom_names.sort)
+          end
+
+          it 'sorts descending' do
+            get :index, params: { prison_id: prison, sort: 'formatted_pom_name desc' }
+            pom_names = assigns(:offenders).map(&:formatted_pom_name)
+            expect(pom_names).to eq(pom_names.sort.reverse)
           end
         end
 
         context 'when sorting by pom role' do
-          it 'sorts' do
+          it 'sorts ascending' do
             get :index, params: { prison_id: prison, sort: 'allocated_pom_role asc' }
             expect(assigns(:offenders).map(&:offender_no)).to eq(%w[G7514GW G1234VV])
+          end
+
+          it 'sorts descending' do
+            get :index, params: { prison_id: prison, sort: 'allocated_pom_role desc' }
+            expect(assigns(:offenders).map(&:offender_no)).to eq(%w[G1234VV G7514GW])
           end
         end
 
         context 'when sorting by next parole date' do
-          it 'sorts' do
+          it 'sorts ascending' do
             get :index, params: { prison_id: prison, sort: 'next_parole_date desc' }
             expect(assigns(:offenders).map(&:offender_no)).to eq(%w[G7514GW G1234VV])
+          end
+
+          it 'sorts descending' do
+            get :index, params: { prison_id: prison, sort: 'next_parole_date asc' }
+            expect(assigns(:offenders).map(&:offender_no)).to eq(%w[G1234VV G7514GW])
           end
         end
       end
