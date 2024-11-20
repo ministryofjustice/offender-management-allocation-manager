@@ -12,9 +12,16 @@ shared_examples 'handover cases table' do |data|
     render
   end
 
-  specify 'the rendered table has the correct column headings' do
-    rendered_columns = page.all(".#{data[:table_class]} thead th").map(&:text)
-    expect(rendered_columns).to eq(data[:has_columns])
+  specify 'the rendered table has the correct sortable column headings' do
+    rendered_columns = page.all(".#{data[:table_class]} thead th")
+
+    data[:has_sortable_columns].each_with_index do |(column_name, sortable_field), i|
+      if sortable_field
+        expect(rendered_columns[i]).to have_link(column_name, href: /\?sort=#{sortable_field}\+(asc|desc)/)
+      else
+        expect(rendered_columns[i].text).to eq(column_name)
+      end
+    end
   end
 
   specify 'the header is correct' do
@@ -26,28 +33,59 @@ describe 'handovers/upcoming.html.erb' do
   it_behaves_like 'handover cases table',
                   heading: 'Upcoming handovers',
                   table_class: 'upcoming-handovers',
-                  has_columns: ['Prisoner details', 'POM', 'COM responsible', 'Earliest release date', 'Tier', 'Handover progress']
+                  has_sortable_columns: {
+                    'Prisoner details' => 'offender_last_name',
+                    'POM' => 'staff_member_full_name_ordered',
+                    'COM responsible' => 'handover_date',
+                    'Earliest release date' => 'earliest_release_date',
+                    'Tier' => 'tier',
+                    'Handover progress' => nil
+                  }
 end
 
 describe 'handovers/in_progress.html.erb' do
   it_behaves_like 'handover cases table',
                   heading: 'Handovers in progress',
                   table_class: 'in-progress-handovers',
-                  has_columns: ["Prisoner details", "POM", "COM details", "COM responsible", "Earliest release date", "Tier", "Handover progress"]
+                  has_sortable_columns: {
+                    'Prisoner details' => 'offender_last_name',
+                    'POM' => 'staff_member_full_name_ordered',
+                    'COM details' => 'allocated_com_name',
+                    'COM responsible' => 'handover_date',
+                    'Earliest release date' => 'earliest_release_date',
+                    'Tier' => 'tier',
+                    'Handover progress' => nil
+                  }
 end
 
 describe 'handovers/com_allocation_overdue.html.erb' do
   it_behaves_like 'handover cases table',
                   heading: 'COM allocation overdue',
                   table_class: 'com-allocation-overdue',
-                  has_columns: ["Prisoner details", "POM", "COM responsible", "Earliest release date", "Tier", "Days overdue", "LDU details"]
+                  has_sortable_columns: {
+                    'Prisoner details' => 'offender_last_name',
+                    'POM' => 'staff_member_full_name_ordered',
+                    'COM responsible' => 'handover_date',
+                    'Earliest release date' => 'earliest_release_date',
+                    'Tier' => 'tier',
+                    'Days overdue' => 'com_allocation_days_overdue',
+                    'LDU details' => nil
+                  }
 end
 
 describe 'handovers/overdue_tasks.html.erb' do
   it_behaves_like 'handover cases table',
                   heading: 'Overdue tasks',
                   table_class: 'overdue-tasks-handovers',
-                  has_columns: ["Prisoner details", "POM", "COM details", "COM responsible", "Earliest release date", "Tier", "Handover progress"]
+                  has_sortable_columns: {
+                    'Prisoner details' => 'offender_last_name',
+                    'POM' => 'staff_member_full_name_ordered',
+                    'COM details' => 'allocated_com_name',
+                    'COM responsible' => 'handover_date',
+                    'Earliest release date' => 'earliest_release_date',
+                    'Tier' => 'tier',
+                    'Handover progress' => nil
+                  }
 end
 
 describe 'poms/_handover_tab.html.erb' do
@@ -64,23 +102,50 @@ describe 'poms/_handover_tab.html.erb' do
                   heading: 'Upcoming handovers',
                   id: 'upcoming-handovers',
                   table_class: 'upcoming-handovers',
-                  has_columns: ['Prisoner details', 'COM responsible', 'Earliest release date', 'Tier', 'Handover progress']
+                  has_sortable_columns: {
+                    'Prisoner details' => 'offender_last_name',
+                    'COM responsible' => 'handover_date',
+                    'Earliest release date' => 'earliest_release_date',
+                    'Tier' => 'tier',
+                    'Handover progress' => nil
+                  }
 
   it_behaves_like 'handover cases table',
                   heading: 'Handovers in progress',
                   id: 'in-progress-handovers',
                   table_class: 'in-progress-handovers',
-                  has_columns: ["Prisoner details", "COM details", "COM responsible", "Earliest release date", "Tier", "Handover progress"]
+                  has_sortable_columns: {
+                    'Prisoner details' => 'offender_last_name',
+                    'COM details' => 'allocated_com_name',
+                    'COM responsible' => 'handover_date',
+                    'Earliest release date' => 'earliest_release_date',
+                    'Tier' => 'tier',
+                    'Handover progress' => nil
+                  }
 
   it_behaves_like 'handover cases table',
                   heading: 'Overdue tasks',
                   id: 'overdue-tasks',
                   table_class: 'overdue-tasks',
-                  has_columns: ["Prisoner details", "COM details", "COM responsible", "Earliest release date", "Tier", "Handover progress"]
+                  has_sortable_columns: {
+                    'Prisoner details' => 'offender_last_name',
+                    'COM details' => 'allocated_com_name',
+                    'COM responsible' => 'handover_date',
+                    'Earliest release date' => 'earliest_release_date',
+                    'Tier' => 'tier',
+                    'Handover progress' => nil
+                  }
 
   it_behaves_like 'handover cases table',
                   heading: 'COM allocation overdue',
                   id: 'overdue-com-allocations',
                   table_class: 'overdue-com-allocation',
-                  has_columns: ["Prisoner details", "COM responsible", "Earliest release date", "Tier", "Days overdue", "LDU details"]
+                  has_sortable_columns: {
+                    'Prisoner details' => 'offender_last_name',
+                    'COM responsible' => 'handover_date',
+                    'Earliest release date' => 'earliest_release_date',
+                    'Tier' => 'tier',
+                    'Days overdue' => 'com_allocation_days_overdue',
+                    'LDU details' => nil
+                  }
 end
