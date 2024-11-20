@@ -141,6 +141,11 @@ Lint/IneffectiveAccessModifier:
 RSpec/Capybara:
   Enabled: false
 
+# In a view spec, the top level describe must be the view that is rendered
+RSpec/MultipleDescribes:
+  Exclude:
+    - 'spec/views/handovers/columns_spec.rb'
+
 RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
