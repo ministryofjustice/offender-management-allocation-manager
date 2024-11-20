@@ -25,8 +25,6 @@ class AllocatedOffender
            to: :@allocation
   delegate :full_name_ordered, to: :staff_member, prefix: true
 
-  attr_reader :offender
-
   COMPLEXITIES = { 'high' => 3, 'medium' => 2, 'low' => 1 }.freeze
 
   def initialize(staff_id, allocation, offender)

@@ -36,4 +36,16 @@ RSpec.describe SortHelper do
     result = sort_link('last_name', anchor: 'anchortag')
     expect(result).to eq('/unallocated?sort=last_name+asc#anchortag')
   end
+
+  it "raises an error when generating the link if the field is not sortable" do
+    expect {
+      sort_link('invalid_field')
+    }.to raise_error(ArgumentError, "`invalid_field` is not an allowed sortable field")
+  end
+
+  it "raises an error when generating the arrow if the field is not sortable" do
+    expect {
+      sort_arrow('invalid_field')
+    }.to raise_error(ArgumentError, "`invalid_field` is not an allowed sortable field")
+  end
 end

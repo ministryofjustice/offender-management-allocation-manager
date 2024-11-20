@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe StaffMember, type: :model do
   let(:prison) { create(:prison) }
   let(:staff_id) { 123 }
+  let(:other_staff_id) { 485_637 }
   let(:user) { described_class.new(prison, staff_id) }
   let(:offenders) do
     [
@@ -130,8 +131,6 @@ RSpec.describe StaffMember, type: :model do
       [old_primary_alloc, old_secondary_alloc, primary_alloc, secondary_alloc]
     end
 
-    let(:other_staff_id) { 485_637 }
-
     before do
       old_primary_alloc.update!(secondary_pom_nomis_id: other_staff_id)
     end
@@ -160,6 +159,86 @@ RSpec.describe StaffMember, type: :model do
 
     it 'returns false if the given nomis_offender_id is not allocated to this staff member' do
       expect(user.has_allocation?(FactoryBot.generate(:nomis_offender_id))).to eq false
+    end
+  end
+
+  describe '#position' do
+    before do
+      allow(user).to receive(:pom).and_return(pom)
+    end
+
+    context 'when POM is present' do
+      let(:pom) { double(:pom, position: 'Senior POM') }
+
+      it 'returns the position of the POM' do
+        expect(user.position).to eq('Senior POM')
+      end
+    end
+
+    context 'when POM is nil' do
+      let(:pom) { nil }
+
+      it 'defaults to `STAFF`' do
+        expect(user.position).to eq('STAFF')
+      end
+    end
+  end
+
+  describe '#new_allocations_count' do
+    let(:new_allocations) do
+      [
+        create(:allocation_history, primary_pom_nomis_id: staff_id, nomis_offender_id: 'G1234AB', prison: prison.code),
+        create(:allocation_history, primary_pom_nomis_id: staff_id, nomis_offender_id: 'G1234GG', prison: prison.code)
+      ]
+    end
+
+    let(:old_allocation) do
+      Timecop.travel(8.days.ago) do
+        create(:allocation_history, primary_pom_nomis_id: staff_id, nomis_offender_id: 'G7514GW', prison: prison.code)
+      end
+    end
+
+    before do
+      new_allocations
+      old_allocation
+    end
+
+    it 'returns the count of new allocations made within the last 7 days' do
+      expect(user.new_allocations_count).to eq(2)
+    end
+  end
+
+  describe '#coworking_allocations_count' do
+    let(:coworking_allocations) do
+      [
+        create(:allocation_history, primary_pom_nomis_id: other_staff_id, nomis_offender_id: 'G1234AB', prison: prison.code, secondary_pom_nomis_id: staff_id),
+        create(:allocation_history, primary_pom_nomis_id: other_staff_id, nomis_offender_id: 'G1234GG', prison: prison.code, secondary_pom_nomis_id: staff_id)
+      ]
+    end
+
+    before do
+      coworking_allocations
+    end
+
+    it 'returns the count of coworking allocations' do
+      expect(user.coworking_allocations_count).to eq(2)
+    end
+  end
+
+  describe '#total_allocations_count' do
+    let(:allocations) do
+      [
+        create(:allocation_history, primary_pom_nomis_id: staff_id, nomis_offender_id: 'G1234AB', prison: prison.code),
+        create(:allocation_history, primary_pom_nomis_id: staff_id, nomis_offender_id: 'G1234GG', prison: prison.code)
+      ]
+    end
+
+    before do
+      allocations
+    end
+
+    it 'returns the count of all allocations' do
+      expect(user.total_allocations_count).to eq(2)
     end
   end
 end
