@@ -1,58 +1,28 @@
-<h2 class="govuk-heading-l">
-  COM allocation overdue
-</h2>
-
-<% if @pom_view %>
-  <p>
-    These cases have passed their handover date and are missing COM details on NDelius. You could:
-  </p>
-
-  <ul class="govuk-list govuk-list--bullet">
-    <li>notify the local divisional unit (LDU) that COM allocation is overdue</li>
-    <li>if there's no response, discuss the allocation with your manager</li>
-  </ul>
-<% else %>
-  <p>
-    These cases have passed their handover date and are missing COM details on NDelius.
-  </p>
-<% end %>
-
-<%= handover_list_table(table_class: %w[com-allocation-overdue],
-                        headers: [
-                          { sort: 'offender_last_name', body: 'Prisoner details' },
-                          @pom_view ? nil : { sort: 'staff_member_full_name_ordered', body: 'POM' },
-                          { sort: 'handover_date', body: 'COM responsible' },
-                          { sort: 'earliest_release_date', body: 'Earliest release date' },
-                          { sort: 'tier', body: 'Tier' },
-                          { sort: 'com_allocation_days_overdue', body: 'Days overdue', class: %w[days-overdue] },
-                          { body: 'LDU details', class: %w[ldu-details govuk-!-width-one-quarter] },
-                        ].compact) do %>
-
-  <% @filtered_handover_cases.each do |handover_case| %>
-    <tr class="govuk-table__row allocated-offender">
-      <%= render 'handovers/cells/prisoner_details', prison_id: @prison_id, offender: handover_case.offender %>
-
-      <%= render 'handovers/cells/staff_member', staff_member: handover_case.staff_member unless @pom_view %>
-
-      <%= render 'handovers/cells/handover_dates',
-                 handover_case: handover_case, show_highlight: nil %>
-
-      <%= render 'handovers/cells/earliest_release_date', handover_case: handover_case %>
-
-      <%= render 'handovers/cells/tier', offender: handover_case.offender %>
-
-      <%= render 'handovers/cells/days_overdue', days_overdue: handover_case.com_allocation_days_overdue %>
-
-      <%= render 'handovers/cells/ldu_details', offender: handover_case.offender %>
-    </tr>
+<% description = capture do %>
+  <% if @pom_view %>
+    <p>
+      These cases have passed their handover date and are missing COM details on NDelius. You could:
+    </p>
+  
+    <ul class="govuk-list govuk-list--bullet">
+      <li>notify the local divisional unit (LDU) that COM allocation is overdue</li>
+      <li>if there's no response, discuss the allocation with your manager</li>
+    </ul>
+  <% else %>
+    <p>
+      These cases have passed their handover date and are missing COM details on NDelius.
+    </p>
   <% end %>
 <% end %>
 
-<% if @filtered_handover_cases.size == 0 %>
-  <p>No handover cases missing COM details</p>
-<% else %>
-  <%= render partial: 'shared/pagination', locals: { data: @filtered_handover_cases } %>
-<% end %>
-
-<div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
-<div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
+<%=
+  render 'case_list',
+    heading: 'COM allocation overdue',
+    description_html: description,
+    handover_data: @filtered_handover_cases,
+    table_class: 'com-allocation-overdue',
+    no_cases_message: 'No handover cases missing COM details',
+    hide_com_details: true,
+    show_handover_date_highlight: nil,
+    com_allocation_view: true
+%>
