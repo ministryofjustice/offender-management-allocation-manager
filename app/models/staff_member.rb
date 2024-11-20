@@ -15,13 +15,10 @@ class StaffMember
     @pom_detail = pom_detail
   end
 
-  def full_name
-    "#{last_name}, #{first_name}"
-  end
-
   def full_name_ordered
-    "#{first_name} #{last_name}"
+    [first_name, last_name].compact_blank.join(' ')
   end
+  alias_method :full_name, :full_name_ordered
 
   def first_name
     staff_detail.first_name&.titleize

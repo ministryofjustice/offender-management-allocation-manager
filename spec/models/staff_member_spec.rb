@@ -22,6 +22,22 @@ RSpec.describe StaffMember, type: :model do
     end
   end
 
+  describe 'staff name' do
+    let(:staff_detail) { instance_double(described_class, first_name: 'john', last_name: 'doe') }
+
+    before do
+      allow(user).to receive(:staff_detail).and_return(staff_detail)
+    end
+
+    it 'returns the full name titleized and in the correct order' do
+      expect(user.full_name_ordered).to eq('John Doe')
+    end
+
+    it 'returns the full name using alias method' do
+      expect(user.full_name).to eq('John Doe')
+    end
+  end
+
   context 'when checking allocations' do
     before do
       # # Allocate all of the offenders to this POM
