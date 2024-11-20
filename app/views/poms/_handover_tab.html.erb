@@ -29,7 +29,7 @@
       </ul>
 
       <div class="govuk-tabs__panel" id="upcoming-handovers">
-        <%= render 'handovers/shared_in_progress',
+        <%= render 'handovers/case_list',
               anchor: 'upcoming-handovers',
               heading: 'Upcoming handovers',
               heading_tag: :h3,
@@ -44,7 +44,7 @@
       </div>
 
       <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="in-progress-handovers">
-        <%= render 'handovers/shared_in_progress',
+        <%= render 'handovers/case_list',
               anchor: 'in-progress-handovers',
               heading: 'Handovers in progress',
               heading_tag: :h3,
@@ -59,7 +59,7 @@
       </div>
 
       <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overdue-tasks">
-        <%= render 'handovers/shared_in_progress',
+        <%= render 'handovers/case_list',
               anchor: 'overdue-tasks',
               heading: 'Overdue tasks',
               heading_tag: :h3,
@@ -74,7 +74,7 @@
       </div>
 
       <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="overdue-com-allocations">
-        <%= render 'handovers/shared_in_progress',
+        <%= render 'handovers/case_list',
               anchor: 'overdue-com-allocations',
               heading: 'COM allocation overdue',
               heading_tag: :h3,

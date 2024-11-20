@@ -54,7 +54,7 @@
   <% if handover_cases.size == 0 %>
   <p><%= no_cases_message %></p>
 <% else %>
-  <%= render partial: 'shared/pagination', locals: { data: handover_data } %>
+  <%= render partial: 'shared/pagination', locals: { data: handover_cases } %>
 <% end %>
 
 <div aria-live="polite" role="status" aria-atomic="true" class="govuk-visually-hidden"></div>
