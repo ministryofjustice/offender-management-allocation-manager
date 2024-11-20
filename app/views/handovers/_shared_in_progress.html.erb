@@ -1,6 +1,10 @@
 <%= content_tag(local_assigns[:heading_tag] || :h2, heading, class: local_assigns[:heading_class] || 'govuk-heading-l') %>
 
-<p><%= description %></p>
+<% if local_assigns[:description_html] %>
+  <%= description_html %>
+<% else %>
+  <p><%= description %></p>
+<% end %>
 
 <%= handover_list_table(table_class: [table_class],
                         anchor: local_assigns[:anchor],
