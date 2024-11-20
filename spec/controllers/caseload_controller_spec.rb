@@ -55,8 +55,9 @@ RSpec.describe CaseloadController, type: :controller do
       stub_offenders_for_prison(prison.code, offenders, movements)
 
       # Need to create history records because AllocatedOffender#new_case? doesn't cope otherwise
-      offenders.each do |offender|
-        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
+      tiers = %w[A B C]
+      offenders.each.with_index do |offender, index|
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)), tier: tiers[index])
         alloc = create(:allocation_history, primary_pom_allocated_at: offender.fetch(:created), nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: pom.staffId, prison: prison.code)
         alloc.update!(primary_pom_nomis_id: pom.staffId,
                       event: AllocationHistory::REALLOCATE_PRIMARY_POM,
@@ -137,6 +138,12 @@ RSpec.describe CaseloadController, type: :controller do
           it 'returns ROTL information' do
             get :cases, params: { prison_id: prison.code, staff_id: staff_id }
             expect(offenders.map { |o| allocations.fetch(o.fetch(:prisonerNumber)).latest_temp_movement_date }).to eq [today, nil, nil]
+          end
+
+          it 'can sort by tier desc' do
+            get :cases, params: { prison_id: prison.code, staff_id: staff_id, sort: 'tier desc' }
+            expect(response).to be_successful
+            expect(assigns(:allocations).map(&:tier)).to eq %w[C B A]
           end
         end
       end
