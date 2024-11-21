@@ -83,6 +83,7 @@ RSpec.configure do |config|
   config.include FeaturesHelper
   config.include AuthHelper
   config.include ApiHelper
+  config.include ScenarioSetupHelper
 
   config.before(:each, type: :view) do
     # This is needed for any view test that uses the sort_link and sort_arrow helpers

@@ -17,6 +17,8 @@ module FeaturesHelper
     stub_request(:get, "#{ApiHelper::T3}/staff/#{pom.staff_id}/emails")
         .to_return(body: pom.emails.to_json)
   end
+  
+  def stub_pom_user(pom) = stub_spo_user(pom)
 
   def signin_spo_pom_user(prisons = %w[LEI RSI], name = 'MOIC_POM')
     mock_sso_response(name, [SsoIdentity::SPO_ROLE, SsoIdentity::POM_ROLE], prisons)
