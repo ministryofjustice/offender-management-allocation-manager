@@ -28,19 +28,25 @@ describe "HOMD views handover summary for a Prison" do
   end
 
   specify 'HOMD can view upcoming handovers' do
-    offender_with_upcoming_handover = offender_records.first
-    create(:allocation_history, primary_pom_nomis_id: poms_at_prison['emily'].staffId, prison: prison.code, offender: offender_with_upcoming_handover)
-    create(:calculated_handover_date, :upcoming_handover, offender: offender_with_upcoming_handover)
+    offender_with_upcoming_handover = offender_with_upcoming_handover(offender_records.first, allocated_to: poms_at_prison['emily'], at_prison: prison)
 
     visit upcoming_prison_handovers_path(prison_id: prison.code)
     expect(page).to have_content("Upcoming handovers (1)")
     expect(page).to have_content(offender_with_upcoming_handover.nomis_offender_id)
   end
 
+  specify 'HOMD can view upcoming handovers for a POM' do
+    offender_with_upcoming_handover = offender_with_upcoming_handover(offender_records.first, allocated_to: poms_at_prison['emily'], at_prison: prison)
+    another_offender_with_upcoming_handover_but_different_pom = offender_with_upcoming_handover(offender_records.second, allocated_to: poms_at_prison['frank'], at_prison: prison)
+
+    visit prison_show_pom_tab_path(prison_id: prison.code, nomis_staff_id: poms_at_prison['emily'].staffId, tab: 'handover')
+    expect(page).to have_content("Upcoming handovers (1)")
+    expect(page).to have_content(offender_with_upcoming_handover.nomis_offender_id)
+    expect(page).not_to have_content(another_offender_with_upcoming_handover_but_different_pom.nomis_offender_id)
+  end
+
   specify 'HOMD can view in progress handovers' do
-    offender_with_in_progress_handover = offender_records.second
-    create(:allocation_history, primary_pom_nomis_id: poms_at_prison['frank'].staffId, prison: prison.code, offender: offender_with_in_progress_handover)
-    create(:calculated_handover_date, :handover_in_progress, offender: offender_with_in_progress_handover)
+    offender_with_in_progress_handover = offender_with_handover_in_progress(offender_records.second, allocated_to: poms_at_prison['frank'], at_prison: prison)
 
     visit in_progress_prison_handovers_path(prison_id: prison.code)
     expect(page).to have_content("Handovers in progress (1)")
@@ -48,12 +54,7 @@ describe "HOMD views handover summary for a Prison" do
   end
 
   specify 'HOMD can handovers with overdue tasks' do
-    offender_with_overdue_handover_tasks = offender_records.second
-    create(:allocation_history, primary_pom_nomis_id: poms_at_prison['frank'].staffId, prison: prison.code, offender: offender_with_overdue_handover_tasks)
-    create(:calculated_handover_date, :handover_in_progress, offender: offender_with_overdue_handover_tasks)
-    # ensure offender has standard handover - contacted_com is a required task for standard handover
-    offender_with_overdue_handover_tasks.case_information.update!(enhanced_resourcing: false)
-    create(:handover_progress_checklist, contacted_com: false, offender: offender_with_overdue_handover_tasks)
+    offender_with_overdue_handover_tasks = offender_with_overdue_handover_tasks(offender_records.second, allocated_to: poms_at_prison['frank'], at_prison: prison)
 
     visit overdue_tasks_prison_handovers_path(prison_id: prison.code)
     expect(page).to have_content("Handovers in progress (1)")
@@ -64,10 +65,7 @@ describe "HOMD views handover summary for a Prison" do
   end
 
   specify 'HOMD can view handovers with com allocation overdue' do
-    offender_with_com_allocation_overdue = offender_records.first
-    create(:allocation_history, primary_pom_nomis_id: poms_at_prison['emily'].staffId, prison: prison.code, offender: offender_with_com_allocation_overdue)
-    create(:calculated_handover_date, :handover_in_progress, offender: offender_with_com_allocation_overdue)
-    offender_with_com_allocation_overdue.case_information.update!(com_email: nil, com_name: nil)
+    offender_with_com_allocation_overdue = offender_in_handover_with_com_allocation_overdue(offender_records.first, allocated_to: poms_at_prison['emily'], at_prison: prison)
 
     visit com_allocation_overdue_prison_handovers_path(prison_id: prison.code)
     expect(page).to have_content("Handovers in progress (1)")
