@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
-  helper_method :current_user
-  helper_method :caseloads
-  helper_method :dps_header_footer
-
   before_action :set_paper_trail_whodunnit
+
+  delegate :default_prison_code, :caseloads, :current_user_is_spo?, to: :sso_identity
+  delegate :current_user, to: :sso_identity, allow_nil: true
+
+  helper_method :current_user,
+                :current_user_is_spo?,
+                :dps_header_footer
 
   def authenticate_user
     if sso_identity.absent? || sso_identity.session_expired?
@@ -15,11 +18,6 @@ class ApplicationController < ActionController::Base
       redirect_to '/401' unless sso_identity.allowed?
     end
   end
-
-  delegate :current_user, to: :sso_identity, allow_nil: true
-
-  delegate :current_user_is_spo?, to: :sso_identity
-  helper_method :current_user_is_spo?
 
   def ensure_spo_user
     unless current_user_is_spo?
@@ -32,10 +30,6 @@ class ApplicationController < ActionController::Base
       redirect_to '/401'
     end
   end
-
-  delegate :default_prison_code, to: :sso_identity
-
-  delegate :caseloads, to: :sso_identity
 
   # called by active admin
   def access_denied(_active_admin_context)

@@ -121,7 +121,7 @@ feature 'Co-working' do
       visit prison_prisoner_allocation_path(prison.code, nomis_offender_id)
       within '#co-working-pom' do
         expect(page).to have_content 'Remove'
-        expect(page).to have_content 'Integration-Tests, Moic'
+        expect(page).to have_content 'Moic Integration-Tests'
       end
     end
   end

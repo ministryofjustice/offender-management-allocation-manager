@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe VictimLiaisonOfficer, type: :model do
+  let(:vlo) { build(:victim_liaison_officer, first_name: 'John', last_name: 'Doe') }
+
   it 'validates presence of first, last and email' do
     expect(subject).to validate_presence_of :first_name
     expect(subject).to validate_presence_of :last_name
@@ -9,7 +11,7 @@ RSpec.describe VictimLiaisonOfficer, type: :model do
 
   context 'with an offender record' do
     before do
-      create(:offender, victim_liaison_officers: [build(:victim_liaison_officer)])
+      create(:offender, victim_liaison_officers: [vlo])
     end
 
     let(:offender) { Offender.last }
@@ -24,6 +26,16 @@ RSpec.describe VictimLiaisonOfficer, type: :model do
       expect {
         offender.destroy
       }.to change(described_class, :count).by(-1)
+    end
+  end
+
+  describe 'VLO name' do
+    it 'returns the full name in the correct order' do
+      expect(vlo.full_name_ordered).to eq('John Doe')
+    end
+
+    it 'returns the full name using alias method' do
+      expect(vlo.full_name).to eq('John Doe')
     end
   end
 end
