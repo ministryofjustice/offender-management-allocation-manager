@@ -38,6 +38,16 @@ RSpec.describe ParoleReview, type: :model do
       allow(subject).to receive(:hearing_outcome).and_return('No Parole Board Decision - ABC [*]')
       expect(subject.formatted_hearing_outcome).to eq('No Parole Board decision – ABC')
     end
+
+    it 'returns nil if the hearing outcome is nil' do
+      allow(subject).to receive(:hearing_outcome).and_return(nil)
+      expect(subject.formatted_hearing_outcome).to be_nil
+    end
+
+    it 'returns nil if the hearing outcome is empty' do
+      allow(subject).to receive(:hearing_outcome).and_return('')
+      expect(subject.formatted_hearing_outcome).to be_nil
+    end
   end
 
   describe '.for_sentences_starting' do
@@ -89,6 +99,24 @@ RSpec.describe ParoleReview, type: :model do
 
         expect(described_class.previous).to match_array([parole_review_3])
       end
+    end
+  end
+
+  describe 'validations on manual update' do
+    it 'validates that the hearing_outcome_received_on is in the past' do
+      subject.hearing_outcome_received_on = 1.week.from_now
+      subject.valid?(:manual_update)
+      expect(subject.errors[:hearing_outcome_received_on]).to include(
+        'The date the hearing outcome was confirmed must be in the past'
+      )
+    end
+
+    it 'validates that the hearing_outcome_received_on is present' do
+      subject.hearing_outcome_received_on = nil
+      subject.valid?(:manual_update)
+      expect(subject.errors[:hearing_outcome_received_on]).to include(
+        'The date the hearing outcome was confirmed must be entered and a valid date'
+      )
     end
   end
 end
