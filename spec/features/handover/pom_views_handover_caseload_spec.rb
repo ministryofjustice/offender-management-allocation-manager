@@ -20,7 +20,7 @@ describe "POM views their handover caseload" do
     stub_pom_user(pom)
     signin_pom_user([prison.code])
   end
-  
+
   specify 'POM can view upcoming handovers' do
     offender_with_upcoming_handover = offender_with_upcoming_handover(offender_records.first, allocated_to: pom, at_prison: prison)
 

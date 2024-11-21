@@ -34,7 +34,7 @@ describe "HOMD views handover summary for a Prison" do
     expect(page).to have_content("Upcoming handovers (1)")
     expect(page).to have_content(offender_with_upcoming_handover.nomis_offender_id)
   end
-  
+
   specify 'HOMD can view upcoming handovers for a POM' do
     offender_with_upcoming_handover = offender_with_upcoming_handover(offender_records.first, allocated_to: poms_at_prison['emily'], at_prison: prison)
     another_offender_with_upcoming_handover_but_different_pom = offender_with_upcoming_handover(offender_records.second, allocated_to: poms_at_prison['frank'], at_prison: prison)
