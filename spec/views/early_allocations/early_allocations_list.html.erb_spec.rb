@@ -85,7 +85,7 @@ RSpec.describe "early_allocations/early_allocations_list", type: :view do
 
         it 'shows the name of the POM who created the record' do
           pom_names = early_allocations.map do |record|
-            "#{record.created_by_lastname}, #{record.created_by_firstname}"
+            "#{record.created_by_firstname} #{record.created_by_lastname}"
           end
           expect(rendered_values).to eq(pom_names)
         end

@@ -42,7 +42,7 @@ RSpec.describe "allocations/history", type: :view do
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Early allocation assessment form completed"]
         expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
-        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
+        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_firstname} #{ea.created_by_lastname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome: not eligible.')
       end
@@ -57,7 +57,7 @@ RSpec.describe "allocations/history", type: :view do
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Early allocation assessment form completed"]
         expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
-        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
+        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_firstname} #{ea.created_by_lastname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome: eligible.')
         expect(page.css('.moj-timeline__description')).to have_content('The assessment has not been sent to the community probation team.')
@@ -74,7 +74,7 @@ RSpec.describe "allocations/history", type: :view do
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Early allocation assessment form completed"]
         expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
-        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
+        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_firstname} #{ea.created_by_lastname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome: not eligible.')
       end
@@ -89,7 +89,7 @@ RSpec.describe "allocations/history", type: :view do
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Early allocation assessment form completed"]
         expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
-        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
+        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_firstname} #{ea.created_by_lastname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome: discretionary.')
         expect(page.css('.moj-timeline__description')).to have_content('The assessment has not been sent to the community probation team.')
@@ -106,7 +106,7 @@ RSpec.describe "allocations/history", type: :view do
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Early allocation assessment form completed"]
         expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
-        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
+        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_firstname} #{ea.created_by_lastname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome: eligible.')
         expect(page.css('.moj-timeline__description')).to have_content('The case handover date has been updated. The community probation team will allocate a COM to take responsibility for this case early.')
@@ -122,7 +122,7 @@ RSpec.describe "allocations/history", type: :view do
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ["Early allocation assessment form completed"]
         expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
-        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
+        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_firstname} #{ea.created_by_lastname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome is discretionary.')
         expect(page.css('.moj-timeline__description')).to have_content('The community probation team will need to make a decision.')
@@ -140,8 +140,8 @@ RSpec.describe "allocations/history", type: :view do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ['Early allocation decision recorded', "Early allocation assessment form completed"]
         expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
         expect(page.css('.moj-timeline__date')).to have_text("21st November 2060 (11:35)")
-        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
-        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.updated_by_lastname}, #{ea.updated_by_firstname}")
+        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_firstname} #{ea.created_by_lastname}")
+        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.updated_by_firstname} #{ea.updated_by_lastname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome is discretionary.')
         expect(page.css('.moj-timeline__description')).to have_content('The community probation team will need to make a decision.')
@@ -161,8 +161,8 @@ RSpec.describe "allocations/history", type: :view do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ['Early allocation decision recorded', "Early allocation assessment form completed",]
         expect(page.css('.moj-timeline__date')).to have_text("19th November 2060 (11:28)")
         expect(page.css('.moj-timeline__date')).to have_text("21st November 2060 (11:35)")
-        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_lastname}, #{ea.created_by_firstname}")
-        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.updated_by_lastname}, #{ea.updated_by_firstname}")
+        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.created_by_firstname} #{ea.created_by_lastname}")
+        expect(page.css('.moj-timeline__date')).to have_text("by #{ea.updated_by_firstname} #{ea.updated_by_lastname}")
 
         expect(page.css('.moj-timeline__description')).to have_content('Assessment outcome is discretionary.')
         expect(page.css('.moj-timeline__description')).to have_content('The community probation team will need to make a decision.')
