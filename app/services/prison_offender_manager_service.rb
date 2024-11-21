@@ -2,9 +2,14 @@
 
 class PrisonOffenderManagerService
   class << self
-    def fetch_pom_name(staff_id)
+    def fetch_pom_name(staff_id, ordered: true)
       staff = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(staff_id)
-      "#{staff.last_name}, #{staff.first_name}"
+
+      if ordered
+        [staff.first_name, staff.last_name].compact_blank.join(' ').titleize
+      else
+        [staff.last_name, staff.first_name].compact_blank.join(', ')
+      end
     end
 
     def fetch_pom_email(staff_id)
