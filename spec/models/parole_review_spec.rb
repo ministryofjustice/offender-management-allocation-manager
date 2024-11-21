@@ -101,4 +101,22 @@ RSpec.describe ParoleReview, type: :model do
       end
     end
   end
+
+  describe 'validations on manual update' do
+    it 'validates that the hearing_outcome_received_on is in the past' do
+      subject.hearing_outcome_received_on = 1.week.from_now
+      subject.valid?(:manual_update)
+      expect(subject.errors[:hearing_outcome_received_on]).to include(
+        'The date the hearing outcome was confirmed must be in the past'
+      )
+    end
+
+    it 'validates that the hearing_outcome_received_on is present' do
+      subject.hearing_outcome_received_on = nil
+      subject.valid?(:manual_update)
+      expect(subject.errors[:hearing_outcome_received_on]).to include(
+        'The date the hearing outcome was confirmed must be entered and a valid date'
+      )
+    end
+  end
 end
