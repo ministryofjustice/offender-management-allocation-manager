@@ -38,6 +38,16 @@ RSpec.describe ParoleReview, type: :model do
       allow(subject).to receive(:hearing_outcome).and_return('No Parole Board Decision - ABC [*]')
       expect(subject.formatted_hearing_outcome).to eq('No Parole Board decision – ABC')
     end
+
+    it 'returns nil if the hearing outcome is nil' do
+      allow(subject).to receive(:hearing_outcome).and_return(nil)
+      expect(subject.formatted_hearing_outcome).to be_nil
+    end
+
+    it 'returns nil if the hearing outcome is empty' do
+      allow(subject).to receive(:hearing_outcome).and_return('')
+      expect(subject.formatted_hearing_outcome).to be_nil
+    end
   end
 
   describe '.for_sentences_starting' do
