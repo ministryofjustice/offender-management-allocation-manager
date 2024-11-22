@@ -2,7 +2,8 @@ module Handover::HandoverCalculation
   POM_RESPONSIBLE = CalculatedHandoverDate::CUSTODY_ONLY
   POM_RESPONSIBLE_COM_SUPPORTING = CalculatedHandoverDate::CUSTODY_WITH_COM
   COM_RESPONSIBLE = CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
-
+  
+  
   class << self
     def calculate_handover_date(sentence_start_date:,
                                 earliest_release_date:,
@@ -10,17 +11,38 @@ module Handover::HandoverCalculation
                                 is_early_allocation:,
                                 is_indeterminate:,
                                 in_open_conditions:)
-      if is_early_allocation
-        [earliest_release_date - 15.months, :early_allocation]
-      elsif is_indeterminate
-        [(earliest_release_date - 12.months if earliest_release_date), in_open_conditions ? :indeterminate_open : :indeterminate]
-      elsif sentence_start_date + 10.months >= earliest_release_date
-        [nil, :determinate_short]
-      elsif is_determinate_parole
-        [earliest_release_date - 12.months, :determinate_parole]
-      else
-        [earliest_release_date - 8.months - 14.days, :determinate]
-      end
+      period = 
+        if is_early_allocation
+          Handover::HandoverPeriod.new(
+            duration_of: 15.months, 
+            earliest_release_date:,
+            reason: :early_allocation
+          )
+        elsif is_indeterminate
+          Handover::HandoverPeriod.new(
+            duration_of: 12.months, 
+            earliest_release_date:,
+            reason: in_open_conditions ? :indeterminate_open : :indeterminate
+          )
+        elsif sentence_start_date + 10.months >= earliest_release_date
+          Handover::NoHandover.new(
+            earliest_release_date:,
+            reason: :determinate_short
+          )
+        elsif is_determinate_parole
+          Handover::HandoverPeriod.new(
+            duration_of: 12.months, 
+            earliest_release_date:,
+            reason: :determinate_parole
+          )
+        else
+          Handover::HandoverPeriod.new(
+            duration_of: 8.months + 14.days, 
+            earliest_release_date:,
+            reason: :determinate
+          )
+        end
+      [period.handover_date, period.reason]
     end
 
     def calculate_handover_start_date(handover_date:,
