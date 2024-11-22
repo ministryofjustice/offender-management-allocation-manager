@@ -82,7 +82,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
         describe "format: #{format}" do
           it 'shows the record specified in :id param' do
             early_allocations.each do |record|
-              get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id, id: record.id }, format: :html
+              get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id, id: record.id }, format: format
               expect(assigns(:early_allocation)).to eq(record)
             end
           end
@@ -91,7 +91,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
             it 'raises a "Not Found" error' do
               somebody_else = create(:early_allocation)
               expect {
-                get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id, id: somebody_else.id }, format: :html
+                get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id, id: somebody_else.id }, format: format
               }.to raise_error(ActiveRecord::RecordNotFound)
             end
           end
@@ -100,7 +100,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
             it 'raises a "Not Found" error' do
               id = 48_753
               expect {
-                get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id, id: id }, format: :html
+                get :show, params: { prison_id: prison, prisoner_id: nomis_offender_id, id: id }, format: format
               }.to raise_error(ActiveRecord::RecordNotFound)
             end
           end
@@ -217,6 +217,40 @@ RSpec.describe EarlyAllocationsController, type: :controller do
         }
 
         assert_template 'landing_ineligible'
+      end
+    end
+  end
+
+  describe '#edit' do
+    let(:release_date) { Time.zone.today + 17.months }
+    let(:early_allocation) { create(:early_allocation, nomis_offender_id: nomis_offender_id) }
+
+    it 'renders the edit page' do
+      get :edit, params: { prison_id: prison, prisoner_id: nomis_offender_id, id: early_allocation.id }
+      assert_template 'edit'
+    end
+  end
+
+  describe '#oasys_date' do
+    let(:release_date) { Time.zone.today + 17.months }
+
+    context 'when form is valid' do
+      it 'renders the eligible page' do
+        post :oasys_date, params: { prison_id: prison,
+                                    prisoner_id: nomis_offender_id,
+                                    early_allocation: { oasys_risk_assessment_date: valid_date } }
+
+        assert_template 'eligible'
+      end
+    end
+
+    context 'when form is invalid' do
+      it 'renders the new page' do
+        post :oasys_date, params: { prison_id: prison,
+                                    prisoner_id: nomis_offender_id,
+                                    early_allocation: { oasys_risk_assessment_date: nil } }
+
+        assert_template 'new'
       end
     end
   end
