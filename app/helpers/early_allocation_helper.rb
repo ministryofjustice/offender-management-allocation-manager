@@ -66,7 +66,7 @@ module EarlyAllocationHelper
   }.freeze
 
   def pom_full_name(early_allocation)
-    "#{early_allocation.created_by_lastname}, #{early_allocation.created_by_firstname}"
+    "#{early_allocation.created_by_firstname} #{early_allocation.created_by_lastname}"
   end
 
   EARLY_ALLOCATION_STATUSES = {

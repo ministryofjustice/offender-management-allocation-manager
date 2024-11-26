@@ -10,7 +10,7 @@ class EarlyAllocationDecision
   end
 
   def created_by_name
-    "#{@early_allocation.updated_by_lastname}, #{@early_allocation.updated_by_firstname}"
+    "#{@early_allocation.updated_by_firstname} #{@early_allocation.updated_by_lastname}"
   end
 
   def to_partial_path

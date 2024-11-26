@@ -47,7 +47,7 @@ class PrisonersController < PrisonsApplicationController
       end
 
       if @allocation.secondary_pom_name.present?
-        @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
+        @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id)
         @secondary_pom_email = PrisonOffenderManagerService.fetch_pom_email(@allocation.secondary_pom_nomis_id)
       end
     end
@@ -73,11 +73,10 @@ class PrisonersController < PrisonsApplicationController
 
     if @allocation.present?
       @primary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.primary_pom_nomis_id)
-          .titleize
     end
 
     if @allocation.present? && @allocation.secondary_pom_name.present?
-      @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id).titleize
+      @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id)
     end
 
     @keyworker = HmppsApi::KeyworkerApi.get_keyworker(

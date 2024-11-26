@@ -8,7 +8,7 @@ class EarlyAllocationHistory
   end
 
   def created_by_name
-    "#{@early_allocation.created_by_lastname}, #{@early_allocation.created_by_firstname}"
+    "#{@early_allocation.created_by_firstname} #{@early_allocation.created_by_lastname}"
   end
 
   def to_partial_path

@@ -43,8 +43,12 @@ describe PrisonOffenderManagerService do
     end
 
     describe 'fetch_pom_name', vcr: { cassette_name: 'prison_api/pom_helper_fetch_pom_name' } do
-      it 'fetches the POM name from NOMIS' do
-        expect(described_class.fetch_pom_name(485_926)).to eq('POM, MOIC')
+      it 'fetches the ordered POM name from NOMIS' do
+        expect(described_class.fetch_pom_name(485_926)).to eq('Moic Pom')
+      end
+
+      it 'fetches the unordered POM name from NOMIS' do
+        expect(described_class.fetch_pom_name(485_926, ordered: false)).to eq('POM, MOIC')
       end
     end
   end

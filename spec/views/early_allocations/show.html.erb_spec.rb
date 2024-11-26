@@ -14,7 +14,7 @@ RSpec.describe "early_allocations/show", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
   let(:referrer) { nil }
 
-  context 'when reviewing an elibigle early assessment' do
+  context 'when reviewing an eligible early assessment' do
     let(:early_allocation) {  create(:early_allocation, :eligible, created_at: '05/11/2021', created_by_firstname: 'Olivia', created_by_lastname: 'Mann') }
 
     it 'shows the previous assessment date' do
@@ -24,7 +24,7 @@ RSpec.describe "early_allocations/show", type: :view do
 
     it 'shows the previous POM who made the assessment' do
       expect(page.css('#pom-name-label')).to have_text('POM name')
-      expect(page.css('#pom-name')).to have_text('Mann, Olivia')
+      expect(page.css('#pom-name')).to have_text('Olivia Mann')
     end
 
     describe 'outcome' do
