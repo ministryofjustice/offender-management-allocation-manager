@@ -28,9 +28,9 @@ class MpcOffender
   alias_method :probation_record, :case_information
   alias_method :model, :offender
 
-  def initialize(prison:, offender:, prison_record:)
+  def initialize(prison:, offender: nil, prison_record:)
     @prison = prison
-    @offender = offender
+    @offender = offender || Offender.find_or_create_by(nomis_offender_id: prison_record.offender_no)
     @api_offender = prison_record # @type HmppsApi::Offender
   end
 

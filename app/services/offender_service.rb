@@ -8,23 +8,12 @@ class OffenderService
     prison = Prison.find_by(code: prison_record.prison_id)
     return unless prison
 
-    offender = Offender.find_or_create_by(nomis_offender_id: offender_no)
-    MpcOffender.new(prison:, offender:, prison_record:)
+    MpcOffender.new(prison:, prison_record:)
   end
 
   def self.get_offenders_in_prison(prison, ignore_legal_status: false)
-    prison_records = HmppsApi::PrisonApi::OffenderApi
-      .get_offenders_in_prison(prison.code, ignore_legal_status:)
-      .index_by(&:offender_no)
-
-    offenders = find_or_create_offenders(prison_records.keys)
-    offenders.map do |offender|
-      MpcOffender.new(
-        prison:,
-        offender:,
-        prison_record: prison_records.fetch(offender.nomis_offender_id)
-      )
-    end
+    prison_records = HmppsApi::PrisonApi::OffenderApi.get_offenders_in_prison(prison.code, ignore_legal_status:)
+    prison_records.map { |prison_record| MpcOffender.new(prison:, prison_record:) }
   end
 
   class << self
