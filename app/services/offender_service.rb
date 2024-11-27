@@ -126,21 +126,5 @@ class OffenderService
     rescue Faraday::ResourceNotFound
       nil
     end
-
-  private
-
-    def find_or_create_offenders(nomis_ids)
-      Offender.upsert_all(
-        nomis_ids.map { |id| { nomis_offender_id: id } },
-        unique_by: :nomis_offender_id
-      )
-
-      Offender.includes(
-        :early_allocations,
-        :responsibility,
-        :parole_reviews,
-        case_information: [:local_delivery_unit]
-      ).where(nomis_offender_id: nomis_ids)
-    end
   end
 end
