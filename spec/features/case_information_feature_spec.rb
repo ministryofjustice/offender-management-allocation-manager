@@ -46,6 +46,17 @@ feature 'case information feature', flaky: true do
         expect(page).to have_no_button('Save and allocate')
       end
     end
+
+    context 'when trying to edit a non manual entry' do
+      before do
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)), manual_entry: false)
+      end
+
+      it 'does not allow the user to edit the case information', :js do
+        visit edit_prison_case_information_path(prison.code, offender.fetch(:prisonerNumber))
+        expect(page).to have_current_path('/404')
+      end
+    end
   end
 
   context 'with vcr' do
