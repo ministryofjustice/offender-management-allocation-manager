@@ -1,34 +1,27 @@
 # frozen_string_literal: true
 
 class AllocationStaffController < PrisonsApplicationController
+  MAX_RECENT_POM_HISTORY = 3
+  MAX_COMPARISON_SIZE = 4
+
   before_action :ensure_spo_user
   before_action :load_pom_types
   before_action :load_prisoner_via_prisoner_id
   before_action :store_referrer_in_session, only: [:index]
   before_action :set_referrer
 
-  MAX_RECENT_POM_HISTORY = 3
-
   def index
-    @case_info = Offender.find_by!(nomis_offender_id: prisoner_id_from_url).case_information
-    @allocation = AllocationHistory.find_by nomis_offender_id: prisoner_id_from_url
-    previous_pom_ids = @allocation ? @allocation.previously_allocated_poms : []
+    previous_pom_ids = allocation ? allocation.previously_allocated_poms : []
     poms = @prison.get_list_of_poms.index_by(&:staff_id)
+
     @previous_poms = previous_pom_ids.map { |staff_id| poms[staff_id] }.compact
-    @current_pom = poms[@allocation.primary_pom_nomis_id] if @allocation&.primary_pom_nomis_id
-    @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@prisoner.offender_no)
-    @recent_pom_history = AllocationService.pom_terms(@allocation).select { |t| t[:ended_at].present? }.reverse.first(MAX_RECENT_POM_HISTORY)
+    @current_pom = poms[allocation&.primary_pom_nomis_id]
+    @recent_pom_history = AllocationService.pom_terms(allocation).select { |t| t[:ended_at].present? }.reverse.first(MAX_RECENT_POM_HISTORY)
+    @coworking = coworking?
 
     sort_dir = @prisoner.recommended_pom_type == RecommendationService::PRISON_POM ? :desc : :asc
-    @available_poms = sort_collection(
-      @prison_poms.select(&:active?) + @probation_poms.select(&:active?),
-      default_sort: :position,
-      default_direction: sort_dir)
-
-    @coworking = coworking?
+    @available_poms = sort_collection(active_poms, default_sort: :position, default_direction: sort_dir)
   end
-
-  MAX_COMPARISON_SIZE = 4
 
   def check_compare_list
     if params[:pom_ids].nil?
@@ -46,7 +39,6 @@ class AllocationStaffController < PrisonsApplicationController
 
   def compare_poms
     @coworking = coworking?
-    allocation = AllocationHistory.find_by nomis_offender_id: prisoner_id_from_url
 
     if allocation
       @current_pom_id = allocation.primary_pom_nomis_id
@@ -73,8 +65,16 @@ private
     params.require(:prisoner_id)
   end
 
+  def allocation
+    @allocation ||= AllocationHistory.find_by(nomis_offender_id: prisoner_id_from_url)
+  end
+
+  def active_poms
+    @prison_poms.select(&:active?) + @probation_poms.select(&:active?)
+  end
+
   def load_pom_types
-    poms = @prison.get_list_of_poms.map { |pom| StaffMember.new(@prison, pom.staff_id) }.sort_by(&:last_name)
+    poms = @prison.get_list_of_poms.map { |pom| StaffMember.new(@prison, pom.staff_id) }.sort_by(&:full_name_ordered)
     @probation_poms, @prison_poms = poms.partition(&:probation_officer?)
   end
 
