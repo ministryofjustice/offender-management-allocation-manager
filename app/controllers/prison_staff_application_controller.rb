@@ -69,10 +69,7 @@ private
       new_cases_count: @pom.allocations.count(&:new_case?),
       total_cases: @pom.allocations.count,
       last_seven_days: @pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago },
-      release_next_four_weeks: @pom.allocations.count do |a|
-        a.earliest_release_date.present? &&
-          a.earliest_release_date.to_date <= 4.weeks.after && Date.current.beginning_of_day < a.earliest_release_date.to_date
-      end,
+      release_next_four_weeks: @pom.allocations.count { |a| release_next_four_weeks?(a) },
       last_allocated_date: @allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date,
       pending_handover_count: @handover_cases.upcoming.count,
       in_progress_handover_count: @handover_cases.in_progress.count,
@@ -110,10 +107,11 @@ private
   end
 
   def upcoming_releases
-    filtered_allocations.filter do |a|
-      a.earliest_release_date.present? &&
-        a.earliest_release_date.to_date <= 4.weeks.from_now && Date.current.beginning_of_day < a.earliest_release_date.to_date
-    end
+    filtered_allocations.filter { |a| release_next_four_weeks?(a) }
+  end
+
+  def release_next_four_weeks?(allocation)
+    allocation.earliest_release_date&.to_date&.between?(Date.current.beginning_of_day, 4.weeks.from_now)
   end
 
   def parole_allocations

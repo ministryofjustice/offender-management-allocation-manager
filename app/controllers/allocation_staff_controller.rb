@@ -74,7 +74,7 @@ private
   end
 
   def load_pom_types
-    poms = @prison.get_list_of_poms.map { |pom| StaffMember.new(@prison, pom.staff_id) }.sort_by(&:last_name)
+    poms = @prison.get_list_of_poms.map { |pom| StaffMember.new(@prison, pom.staff_id) }.sort_by(&:full_name_ordered)
     @probation_poms, @prison_poms = poms.partition(&:probation_officer?)
   end
 
