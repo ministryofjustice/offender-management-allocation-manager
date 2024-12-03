@@ -14,7 +14,12 @@ class CaseInformationController < PrisonsApplicationController
     @case_info = offender.build_case_information
   end
 
-  def edit; end
+  def edit
+    unless @prisoner.manual_entry?
+      Rails.logger.warn("[#{self.class}] Prisoner #{@prisoner.nomis_offender_id} is not marked as manual entry, refusing edit")
+      redirect_to('/404')
+    end
+  end
 
   def create
     prisoner = Offender.find_by! nomis_offender_id: case_information_params[:nomis_offender_id]

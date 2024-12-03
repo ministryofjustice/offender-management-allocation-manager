@@ -68,7 +68,9 @@
             <tr class="govuk-table__row" id="tier">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Tier</th>
               <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.tier.presence || 'No tier found' %></td>
-              <td class="govuk-table__cell govuk-!-width-one-third"><%= link_to('Change', edit_prison_case_information_path(@prison, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state') %></td>
+              <td class="govuk-table__cell govuk-!-width-one-third">
+                <%= link_to('Change', edit_prison_case_information_path(@prison, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state') if @prisoner.manual_entry? %>
+              </td>
             </tr>
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header govuk-!-width-one-third">Category</th>
