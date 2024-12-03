@@ -15,10 +15,10 @@ class CaseInformationController < PrisonsApplicationController
   end
 
   def edit
-    return if @prisoner.manual_entry?
-
-    Rails.logger.warn("[#{self.class}] Prisoner #{@prisoner.nomis_offender_id} is not marked as manual entry, refusing edit")
-    redirect_to('/404')
+    unless @prisoner.manual_entry?
+      Rails.logger.warn("[#{self.class}] Prisoner #{@prisoner.nomis_offender_id} is not marked as manual entry, refusing edit")
+      redirect_to('/404')
+    end
   end
 
   def create
