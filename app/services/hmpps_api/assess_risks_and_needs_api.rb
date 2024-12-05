@@ -19,9 +19,8 @@ module HmppsApi
       response = client.get(route)
 
       assessment = response['timeline'].select { |a|
-        VALID_ASSESSMENT_TYPES.include?(a.fetch('assessmentType')) &&
-          a.fetch('status') == 'COMPLETE'
-      }.max { |a, b| a.fetch('completedDate') <=> b.fetch('completedDate') }
+        VALID_ASSESSMENT_TYPES.include?(a.fetch('assessmentType')) && a.fetch('status') == 'COMPLETE'
+      }.max_by { |a| a.fetch('completedDate') }
 
       return nil if assessment.nil?
 
