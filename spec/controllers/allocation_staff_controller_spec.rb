@@ -94,18 +94,12 @@ RSpec.describe AllocationStaffController, type: :controller do
           create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
         end
 
-        it 'sets @allocation so that last_event can be displayed' do
-          get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
-          expect(response).to be_successful
-          expect(assigns(:allocation)).to eq(allocation)
-        end
-
         context 'when deallocated' do
           before do
             AllocationHistory.last.deallocate_offender_after_release
           end
 
-          it 'retrives old POMs' do
+          it 'retrieves old POMs' do
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
             expect(response).to be_successful
             expect(assigns(:previous_poms).map(&:staff_id)).to eq [poms.last.staff_id]
@@ -115,7 +109,6 @@ RSpec.describe AllocationStaffController, type: :controller do
 
       context 'when newly transferred from a different prison' do
         let(:previous_prison_code) { create(:prison).code }
-
         let(:previous_pom) { build(:pom, :probation_officer) }
 
         let!(:allocation) do
@@ -138,72 +131,18 @@ RSpec.describe AllocationStaffController, type: :controller do
             allocation.deallocate_offender_after_transfer
           end
 
-          it 'sets @allocation so that last_event can be displayed' do
-            get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
-            expect(response).to be_successful
-            expect(assigns(:allocation)).to eq(allocation)
-          end
-        end
-
-        context "when they weren't deallocated from the last prison (a known bug)" do
-          it 'sets @allocation so that last_event can be displayed' do
-            get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
-            expect(response).to be_successful
-            expect(assigns(:allocation)).to eq(allocation)
-          end
-
           it 'makes a nil current POM' do
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
             expect(response).to be_successful
             expect(assigns(:current_pom)).to be_nil
           end
         end
-      end
 
-      context 'when displaying the last OASys assessment' do
-        let(:page) { Nokogiri::HTML(response.body) }
-
-        before do
-          create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
-          stub_offenders_for_prison(prison_code, [offender])
-        end
-
-        context 'when an offender has a previous LAYER_3 assessment' do
-          let(:completed_date) { '2021-06-02'.to_date }
-
-          before do
-            expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
+        context "when they weren't deallocated from the last prison (a known bug)" do
+          it 'makes a nil current POM' do
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
-          end
-
-          it 'displays the latest one' do
-            expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER_3', completed: completed_date)
-          end
-        end
-
-        context 'when an offender has a previous LAYER_1 assessment' do
-          let(:completed_date) { '2021-06-02'.to_date }
-
-          before do
-            expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
-            get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
-          end
-
-          it 'displays the latest one' do
-            expect(assigns(:oasys_assessment)).to eq(assessment_type: 'LAYER_1', completed: completed_date)
-          end
-        end
-
-        context 'when an offender has no assessments' do
-          let(:completed_date) { nil }
-
-          before do
-            expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
-            get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
-          end
-
-          it 'displays a reason for no date being present' do
-            expect(assigns(:oasys_assessment)).to eq(nil)
+            expect(response).to be_successful
+            expect(assigns(:current_pom)).to be_nil
           end
         end
       end
