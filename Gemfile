@@ -24,7 +24,7 @@ gem 'omniauth-oauth2'
 gem 'omniauth', '~> 1.9.2', require: nil
 gem 'paper_trail', '~> 15.1.0'
 gem 'pg'
-gem 'puma', '~> 6.4.2'
+gem 'puma', '~> 6.5.0'
 gem 'prometheus_exporter'
 gem 'sidekiq', '~> 7.2.4'
 gem 'sentry-ruby'
@@ -65,10 +65,8 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'parallel_tests'
   gem 'rubocop-govuk', '~> 4.12'
-  # Temporary lock rspec versions to fix a rackup regression
-  # https://github.com/puma/puma/issues/3531
-  gem 'rspec-rails', '7.0.1'
-  gem 'rspec-core', '3.13.1'
+  gem 'rspec-rails'
+  gem 'rspec-core'
   gem 'rswag-specs'
   gem 'spring'
   gem 'undercover'
