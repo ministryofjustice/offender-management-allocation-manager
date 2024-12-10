@@ -133,6 +133,20 @@ RSpec.describe CaseloadGlobalController, type: :controller do
           end
         end
 
+        describe 'sorting' do
+          it 'can sort by last_name asc' do
+            get :index, params: { prison_id: prison.code, staff_id: staff_id, sort: 'last_name asc' }
+            expect(response).to be_successful
+            expect(assigns(:all_other_allocations).map(&:last_name)).to match_array(offenders.map { |o| o.fetch(:lastName) }.sort)
+          end
+
+          it 'can sort by last_name desc' do
+            get :index, params: { prison_id: prison.code, staff_id: staff_id, sort: 'last_name desc' }
+            expect(response).to be_successful
+            expect(assigns(:all_other_allocations).map(&:last_name)).to match_array(offenders.map { |o| o.fetch(:lastName) }.sort.reverse)
+          end
+        end
+
         context 'when user is a different POM to the one signed in' do
           before do
             stub_signed_in_pom(prison.code, staff_id, 'alice')

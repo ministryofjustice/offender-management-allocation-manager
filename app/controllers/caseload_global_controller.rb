@@ -19,7 +19,7 @@ class CaseloadGlobalController < PrisonStaffApplicationController
       last_seven_days: @recent_allocations.count,
       release_next_four_weeks: @upcoming_releases.length,
       pending_task_count: @pom.pom_tasks.count,
-      parole_cases_count: @pom.allocations.select(&:approaching_parole?).size
+      parole_cases_count: @pom.allocations.count(&:approaching_parole?)
     }
   end
 
