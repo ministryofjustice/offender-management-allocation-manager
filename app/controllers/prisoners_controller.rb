@@ -71,11 +71,11 @@ class PrisonersController < PrisonsApplicationController
     @allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no)
     @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@prisoner.offender_no)
 
-    if @allocation.present?
+    if @allocation.present? && @allocation.primary_pom_nomis_id.present?
       @primary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.primary_pom_nomis_id)
     end
 
-    if @allocation.present? && @allocation.secondary_pom_name.present?
+    if @allocation.present? && @allocation.secondary_pom_nomis_id.present?
       @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id)
     end
 
