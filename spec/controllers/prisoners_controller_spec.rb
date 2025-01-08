@@ -610,4 +610,27 @@ RSpec.describe PrisonersController, type: :controller do
       end
     end
   end
+
+  describe 'when an allocation exists but is not active (no primary pom allocated)' do
+    it 'can still render the page' do
+      prison = create(:prison)
+      offender = build(:nomis_offender, prisonId: prison.code)
+      offender_id = offender[:prisonerNumber]
+
+      stub_offender(offender)
+      stub_keyworker prison.code, offender_id, build(:keyworker)
+      stub_sso_data(prison.code)
+
+      allow(PrisonOffenderManagerService).to receive(:fetch_pom_name).with(nil).and_raise(Faraday::ResourceNotFound, "the server responded with status 404")
+      allow(PrisonOffenderManagerService).to receive(:fetch_pom_name).with(222_888).and_return('Secondary Pom')
+
+      create(:allocation_history, nomis_offender_id: offender_id, secondary_pom_name: 'Secondary Pom', secondary_pom_nomis_id: 222_888, prison: prison.code, primary_pom_nomis_id: nil, primary_pom_name: nil)
+
+      get :show, params: { prison_id: prison.code, id: offender_id }
+
+      expect(response.status).to be(200)
+      expect(assigns(:primary_pom_name)).to be(nil)
+      expect(assigns(:secondary_pom_name)).to eq('Secondary Pom')
+    end
+  end
 end
