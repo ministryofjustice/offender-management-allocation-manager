@@ -354,6 +354,7 @@ GEM
     omniauth-oauth2 (1.7.3)
       oauth2 (>= 1.4, < 3)
       omniauth (>= 1.9, < 3)
+    ostruct (0.6.1)
     paper_trail (15.1.0)
       activerecord (>= 6.1)
       request_store (~> 1.4)
@@ -642,11 +643,10 @@ GEM
     zeitwerk (2.7.1)
 
 PLATFORMS
-  arm64-darwin-21
   arm64-darwin-23
   arm64-darwin-24
-  x86_64-darwin-21
   x86_64-darwin-23
+  x86_64-darwin-24
   x86_64-linux
 
 DEPENDENCIES
@@ -686,6 +686,7 @@ DEPENDENCIES
   memory_profiler
   omniauth (~> 1.9.2)
   omniauth-oauth2
+  ostruct
   paper_trail (~> 15.1.0)
   parallel_tests
   parser (~> 3.2)
