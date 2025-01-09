@@ -38,6 +38,7 @@ gem 'fast_underscore', require: false
 gem 'rubyzip', '< 3'
 gem 'turnout'
 gem 'kaminari' # pagination
+gem 'ostruct'
 gem 'prawn-rails'
 gem 'rswag-api' # api-documentation
 gem 'rswag-ui'  # api-documentation interface
