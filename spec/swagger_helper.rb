@@ -89,8 +89,6 @@ RSpec.configure do |config|
                         primaryPomName
                         secondaryPomName
                         createdByName
-                        primaryPomNomisId
-                        secondaryPomNomisId
                         event
                         eventTrigger
                         primaryPomAllocatedAt
@@ -104,12 +102,10 @@ RSpec.configure do |config|
                         overrideReasons: { type: :string, nullable: true },
                         overrideDetail: { type: :string, nullable: true },
                         message: { type: :string, nullable: true },
-                        suitabiltyDetail: { type: :string, nullable: true },
+                        suitabilityDetail: { type: :string, nullable: true },
                         primaryPomName: { type: :string, nullable: true },
                         secondaryPomName: { type: :string, nullable: true },
                         createdByName: { type: :string, nullable: true },
-                        primaryPomNomisId: { type: :integer, nullable: true },
-                        secondaryPomNomisId: { type: :integer, nullable: true },
                         event: { type: :string, nullable: true },
                         eventTrigger: { type: :string, nullable: true },
                         primaryPomAllocatedAt: { type: :string, nullable: true },
@@ -188,14 +184,12 @@ RSpec.configure do |config|
                     type: :object,
                     nullable: true,
                     required: %w[tier
-                                 crn
                                  mappaLevel
                                  manualEntry
                                  probationService
                                  comName
                                  teamName
-                                 localDeliveryUnitId
-                                 lduCode
+                                 localDeliveryUnit
                                  comEmail
                                  activeVlo
                                  enhancedResourcing
@@ -203,14 +197,12 @@ RSpec.configure do |config|
                                  updatedAt],
                     properties: {
                       tier: { type: :string, nullable: true },
-                      crn: { type: :string, nullable: true },
                       mappaLevel: { type: :integer, nullable: true },
                       manualEntry: { type: :boolean },
                       probationService: { type: :string, nullable: true },
                       comName: { type: :string, nullable: true },
                       teamName: { type: :string, nullable: true },
-                      localDeliveryUnitId: { type: :integer, nullable: true },
-                      lduCode: { type: :string, nullable: true },
+                      localDeliveryUnit: { type: :string, nullable: true },
                       comEmail: { type: :string, nullable: true },
                       activeVlo: { type: :boolean },
                       enhancedResourcing: { type: :boolean, nullable: true },

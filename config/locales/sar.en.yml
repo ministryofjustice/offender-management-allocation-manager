@@ -1,0 +1,21 @@
+---
+en:
+  sar:
+    allocation_history:
+      event:
+        allocate_primary_pom: Allocate primary POM
+        reallocate_primary_pom: Reallocate primary POM
+        allocate_secondary_pom: Allocate secondary POM
+        reallocate_secondary_pom: Reallocate secondary POM
+        deallocate_primary_pom: Deallocate primary POM
+        deallocate_secondary_pom: Deallocate secondary POM
+        deallocate_released_offender: Deallocate released offender
+      event_trigger:
+        user: User
+        offender_transferred: Offender transferred
+        offender_released: Offender released
+      override_reasons:
+        suitability: Suitability
+        no_staff: No staff
+        continuity: Continuity
+        other: Other reason

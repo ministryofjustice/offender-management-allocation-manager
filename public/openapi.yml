@@ -81,8 +81,6 @@ components:
                 - primaryPomName
                 - secondaryPomName
                 - createdByName
-                - primaryPomNomisId
-                - secondaryPomNomisId
                 - event
                 - eventTrigger
                 - primaryPomAllocatedAt
@@ -105,7 +103,7 @@ components:
                   message:
                     type: string
                     nullable: true
-                  suitabiltyDetail:
+                  suitabilityDetail:
                     type: string
                     nullable: true
                   primaryPomName:
@@ -116,12 +114,6 @@ components:
                     nullable: true
                   createdByName:
                     type: string
-                    nullable: true
-                  primaryPomNomisId:
-                    type: integer
-                    nullable: true
-                  secondaryPomNomisId:
-                    type: integer
                     nullable: true
                   event:
                     type: string
@@ -222,14 +214,12 @@ components:
               nullable: true
               required:
               - tier
-              - crn
               - mappaLevel
               - manualEntry
               - probationService
               - comName
               - teamName
-              - localDeliveryUnitId
-              - lduCode
+              - localDeliveryUnit
               - comEmail
               - activeVlo
               - enhancedResourcing
@@ -237,9 +227,6 @@ components:
               - updatedAt
               properties:
                 tier:
-                  type: string
-                  nullable: true
-                crn:
                   type: string
                   nullable: true
                 mappaLevel:
@@ -256,10 +243,7 @@ components:
                 teamName:
                   type: string
                   nullable: true
-                localDeliveryUnitId:
-                  type: integer
-                  nullable: true
-                lduCode:
+                localDeliveryUnit:
                   type: string
                   nullable: true
                 comEmail:
