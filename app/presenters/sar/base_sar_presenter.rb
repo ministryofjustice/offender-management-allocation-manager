@@ -14,11 +14,6 @@ module Sar
       end
     end
 
-    # Used by `serializable_hash`
-    def attributes
-      __getobj__ ? super : {}
-    end
-
     def serializable_hash(_options = nil)
       super(
         except: self.class.omitted_attributes + generic_omitted_attributes,

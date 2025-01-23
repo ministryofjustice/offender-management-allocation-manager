@@ -35,7 +35,10 @@ RSpec.describe SarOffenderDataService do
       end
 
       let!(:allocation) do
-        create(:allocation_history, :override, prison: 'LEI', nomis_offender_id: nomis_offender_id, primary_pom_name: 'OLD_NAME, MOIC')
+        create(
+          :allocation_history, :override, prison: 'LEI', nomis_offender_id: nomis_offender_id,
+                                          primary_pom_name: 'OLD_NAME, MOIC', secondary_pom_name: 'SEC_SURNAME, POM'
+        )
       end
 
       let(:fake_allocation_history) do
@@ -191,7 +194,17 @@ RSpec.describe SarOffenderDataService do
             expect(presented_allocation.keys).not_to include('id')
             expect(presented_allocation.keys).not_to include('nomisOffenderId')
             expect(presented_allocation.keys).not_to include('primaryPomNomisId')
+            expect(presented_allocation.keys).not_to include('primaryPomName')
             expect(presented_allocation.keys).not_to include('secondaryPomNomisId')
+            expect(presented_allocation.keys).not_to include('secondaryPomName')
+          end
+
+          it 'returns the primary POM last name' do
+            expect(presented_allocation['primaryPomLastName']).to eq('OLD_NAME')
+          end
+
+          it 'returns the secondary POM last name' do
+            expect(presented_allocation['secondaryPomLastName']).to eq('SEC_SURNAME')
           end
 
           it 'localizes event and event_trigger' do

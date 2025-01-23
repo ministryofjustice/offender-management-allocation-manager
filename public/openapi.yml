@@ -78,8 +78,8 @@ components:
                 - overrideDetail
                 - message
                 - suitabilityDetail
-                - primaryPomName
-                - secondaryPomName
+                - primaryPomLastName
+                - secondaryPomLastName
                 - createdByName
                 - event
                 - eventTrigger
@@ -106,10 +106,10 @@ components:
                   suitabilityDetail:
                     type: string
                     nullable: true
-                  primaryPomName:
+                  primaryPomLastName:
                     type: string
                     nullable: true
-                  secondaryPomName:
+                  secondaryPomLastName:
                     type: string
                     nullable: true
                   createdByName:
