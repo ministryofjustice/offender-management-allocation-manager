@@ -22,8 +22,8 @@ RSpec.describe SarOffenderDataService do
         create_historic(:offender, nomis_offender_id, offset: 7.days)
         create_historic_list(:audit_event, nomis_offender_id)
         create_historic(:calculated_early_allocation_status, nomis_offender_id)
-        create_historic(:calculated_handover_date, nomis_offender_id)
-        create_historic(:case_information, nomis_offender_id)
+        create_historic(:calculated_handover_date, nomis_offender_id, reason: 'immigration_case', responsibility: 'CustodyWithCom')
+        create_historic(:case_information, nomis_offender_id, local_delivery_unit: build(:local_delivery_unit, name: 'Leeds'))
         create_historic_list(:early_allocation, nomis_offender_id)
         create_historic_list(:email_history, nomis_offender_id, trait: :auto_early_allocation)
         create_historic(:handover_progress_checklist, nomis_offender_id)
@@ -35,7 +35,10 @@ RSpec.describe SarOffenderDataService do
       end
 
       let!(:allocation) do
-        create(:allocation_history, prison: 'LEI', nomis_offender_id: nomis_offender_id, primary_pom_name: 'OLD_NAME, MOIC')
+        create(
+          :allocation_history, :override, prison: 'LEI', nomis_offender_id: nomis_offender_id,
+                                          primary_pom_name: 'OLD_NAME, MOIC', secondary_pom_name: 'SEC_SURNAME, POM'
+        )
       end
 
       let(:fake_allocation_history) do
@@ -182,12 +185,86 @@ RSpec.describe SarOffenderDataService do
           end
         end
       end
+
+      context 'when returned data require transformations' do
+        context 'with allocation history' do
+          let(:presented_allocation) { result[:allocationHistory].last }
+
+          it 'omits some attributes' do
+            expect(presented_allocation.keys).not_to include('id')
+            expect(presented_allocation.keys).not_to include('nomisOffenderId')
+            expect(presented_allocation.keys).not_to include('primaryPomNomisId')
+            expect(presented_allocation.keys).not_to include('primaryPomName')
+            expect(presented_allocation.keys).not_to include('secondaryPomNomisId')
+            expect(presented_allocation.keys).not_to include('secondaryPomName')
+          end
+
+          it 'returns the primary POM last name' do
+            expect(presented_allocation['primaryPomLastName']).to eq('OLD_NAME')
+          end
+
+          it 'returns the secondary POM last name' do
+            expect(presented_allocation['secondaryPomLastName']).to eq('SEC_SURNAME')
+          end
+
+          it 'localizes event and event_trigger' do
+            expect(presented_allocation['event']).to eq('Allocate primary POM')
+            expect(presented_allocation['eventTrigger']).to eq('User')
+          end
+
+          it 'localizes override reasons' do
+            expect(presented_allocation['overrideReasons']).to eq('Suitability')
+          end
+
+          it 'returns nil attributes' do
+            expect(presented_allocation['message']).to be_nil
+          end
+        end
+
+        context 'with case information' do
+          let(:case_information) { result[:caseInformation] }
+
+          it 'omits some attributes' do
+            expect(case_information.keys).not_to include('id')
+            expect(case_information.keys).not_to include('nomisOffenderId')
+            expect(case_information.keys).not_to include('crn')
+            expect(case_information.keys).not_to include('localDeliveryUnitId')
+            expect(case_information.keys).not_to include('lduCode')
+          end
+
+          it 'returns booleans' do
+            expect(case_information['manualEntry']).to eq(true)
+            expect(case_information['enhancedResourcing']).to eq(false)
+          end
+
+          it 'returns the LDU name' do
+            expect(case_information['localDeliveryUnit']).to eq('Leeds')
+          end
+        end
+
+        context 'with calculated handover date' do
+          let(:calculated_handover_date) { result[:calculatedHandoverDate] }
+
+          it 'omits some attributes' do
+            expect(calculated_handover_date.keys).not_to include('id')
+            expect(calculated_handover_date.keys).not_to include('nomisOffenderId')
+          end
+
+          it 'returns the reason string' do
+            expect(calculated_handover_date['reason']).to eq('Immigration Case')
+          end
+
+          it 'returns the responsibility string' do
+            expect(calculated_handover_date['responsibility']).to eq('POM')
+          end
+        end
+      end
     end
   end
 
-  def create_historic(name, nomis_offender_id, offset: 0)
+  def create_historic(name, nomis_offender_id, offset: 0, **factory_opts)
     Timecop.travel REFERENCE_TIME - offset do
-      create(name, nomis_offender_id: nomis_offender_id)
+      create(name, nomis_offender_id: nomis_offender_id, **factory_opts)
     end
   end
 

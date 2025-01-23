@@ -34,15 +34,15 @@ private
   end
 
   def allocation_with_history
-    allocation = AllocationHistory.find_by(nomis_offender_id: nomis_offender_id)
+    allocation = AllocationHistory.find_by(nomis_offender_id:)
     return [] if allocation.nil?
 
-    jsonify_keys(by_date([allocation] + allocation.get_old_versions, :state))
+    transform_data(by_date([allocation] + allocation.get_old_versions, :state))
   end
 
   def by_offender_id(klass, algorithm)
-    collection = klass.where(nomis_offender_id: nomis_offender_id)
-    jsonify_keys(by_date(collection, algorithm))
+    collection = klass.where(nomis_offender_id:)
+    transform_data(by_date(collection, algorithm))
   end
 
   # @param items [Array, ActiveRecord_Relation]
@@ -63,15 +63,18 @@ private
     (last_before_range + within_range).compact
   end
 
-  def jsonify_keys(collection)
-    return [] if collection.none?
+  def transform_data(collection)
+    return [] if collection.empty?
 
-    exclude_attributes = %w[id nomis_offender_id nomis_id]
+    presenter = presenter_for(collection)
 
     collection.map do |item|
-      item.attributes
-          .reject { |key, _val| exclude_attributes.include?(key) }
-          .deep_transform_keys { |key| key.camelcase(:lower) }
+      presenter.new(item).as_json
     end
+  end
+
+  def presenter_for(collection)
+    presenter_klass = "Sar::#{collection.first.class.name.demodulize}"
+    Object.const_defined?(presenter_klass) ? presenter_klass.constantize : Sar::GenericPresenter
   end
 end
