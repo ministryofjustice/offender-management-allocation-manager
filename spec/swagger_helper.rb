@@ -125,7 +125,6 @@ RSpec.configure do |config|
                         systemEvent
                         username
                         userHumanName
-                        data
                         createdAt
                         updatedAt
                       ],
@@ -138,7 +137,6 @@ RSpec.configure do |config|
                         systemEvent: { type: :boolean, nullable: true },
                         username: { type: :string, nullable: true },
                         userHumanName: { type: :string, nullable: true },
-                        data: { type: :json },
                         createdAt: { type: :string },
                         updatedAt: { type: :string },
                       }
