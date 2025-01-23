@@ -141,7 +141,6 @@ components:
                 - systemEvent
                 - username
                 - userHumanName
-                - data
                 - createdAt
                 - updatedAt
                 properties:
@@ -160,8 +159,6 @@ components:
                   userHumanName:
                     type: string
                     nullable: true
-                  data:
-                    type: json
                   createdAt:
                     type: string
                   updatedAt:

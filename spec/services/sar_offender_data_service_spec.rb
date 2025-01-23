@@ -27,7 +27,7 @@ RSpec.describe SarOffenderDataService do
         create_historic_list(:early_allocation, nomis_offender_id)
         create_historic_list(:email_history, nomis_offender_id, trait: :auto_early_allocation)
         create_historic(:handover_progress_checklist, nomis_offender_id)
-        create_historic_list(:offender_email_sent, nomis_offender_id)
+        create_historic_list(:offender_email_sent, nomis_offender_id, offender_email_type: 'handover_date')
         create_historic(:responsibility, nomis_offender_id)
         create_historic_list(:victim_liaison_officer, nomis_offender_id)
 
@@ -207,12 +207,12 @@ RSpec.describe SarOffenderDataService do
             expect(presented_allocation['secondaryPomLastName']).to eq('SEC_SURNAME')
           end
 
-          it 'localizes event and event_trigger' do
+          it 'humanizes event and event_trigger' do
             expect(presented_allocation['event']).to eq('Allocate primary POM')
             expect(presented_allocation['eventTrigger']).to eq('User')
           end
 
-          it 'localizes override reasons' do
+          it 'humanizes override reasons' do
             expect(presented_allocation['overrideReasons']).to eq('Suitability')
           end
 
@@ -258,6 +258,46 @@ RSpec.describe SarOffenderDataService do
             expect(calculated_handover_date['responsibility']).to eq('POM')
           end
         end
+
+        context 'with audit event' do
+          let(:audit_event) { result[:auditEvents].last }
+
+          it 'omits some attributes' do
+            expect(audit_event.keys).not_to include('data')
+          end
+        end
+
+        context 'with early allocation' do
+          let(:early_allocation) { result[:earlyAllocations].last }
+
+          it 'humanizes outcome' do
+            expect(early_allocation['outcome']).to eq('Eligible')
+          end
+        end
+
+        context 'with email history' do
+          let(:email_history) { result[:emailHistories].last }
+
+          it 'humanizes event' do
+            expect(email_history['event']).to eq('Auto early allocation')
+          end
+        end
+
+        context 'with offender email sent' do
+          let(:offender_email_sent) { result[:offenderEmailSent].last }
+
+          it 'humanizes offender email type' do
+            expect(offender_email_sent['offenderEmailType']).to eq('Handover date')
+          end
+        end
+
+        context 'with responsibility' do
+          let(:responsibility) { result[:responsibility] }
+
+          it 'humanizes reason' do
+            expect(responsibility['reason']).to eq('Less than 10 months to serve')
+          end
+        end
       end
     end
   end
@@ -268,12 +308,12 @@ RSpec.describe SarOffenderDataService do
     end
   end
 
-  def create_historic_list(name, nomis_offender_id, trait: nil)
+  def create_historic_list(name, nomis_offender_id, trait: nil, **factory_opts)
     args_array = [name, trait].compact
 
     (0..(HISTORY_SIZE - 1)).to_a.map do |i|
       Timecop.travel REFERENCE_TIME - i.days do
-        create(*args_array, nomis_offender_id: nomis_offender_id)
+        create(*args_array, nomis_offender_id: nomis_offender_id, **factory_opts)
       end
     end
   end
