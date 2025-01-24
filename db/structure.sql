@@ -1187,11 +1187,43 @@ CREATE INDEX index_victim_liaison_officers_on_nomis_offender_id ON public.victim
 
 
 --
+-- Name: case_information fk_rails_0a31de3c39; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.case_information
+    ADD CONSTRAINT fk_rails_0a31de3c39 FOREIGN KEY (local_delivery_unit_id) REFERENCES public.local_delivery_units(id);
+
+
+--
 -- Name: handover_progress_checklists fk_rails_0f7d3e1f9a; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.handover_progress_checklists
     ADD CONSTRAINT fk_rails_0f7d3e1f9a FOREIGN KEY (nomis_offender_id) REFERENCES public.offenders(nomis_offender_id);
+
+
+--
+-- Name: victim_liaison_officers fk_rails_19e2979b5e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.victim_liaison_officers
+    ADD CONSTRAINT fk_rails_19e2979b5e FOREIGN KEY (nomis_offender_id) REFERENCES public.offenders(nomis_offender_id);
+
+
+--
+-- Name: responsibilities fk_rails_2990911eec; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.responsibilities
+    ADD CONSTRAINT fk_rails_2990911eec FOREIGN KEY (nomis_offender_id) REFERENCES public.offenders(nomis_offender_id);
+
+
+--
+-- Name: calculated_early_allocation_statuses fk_rails_4a67a995e3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.calculated_early_allocation_statuses
+    ADD CONSTRAINT fk_rails_4a67a995e3 FOREIGN KEY (nomis_offender_id) REFERENCES public.offenders(nomis_offender_id);
 
 
 --
@@ -1203,12 +1235,45 @@ ALTER TABLE ONLY public.offender_email_sent
 
 
 --
+-- Name: early_allocations fk_rails_9456c6acaa; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.early_allocations
+    ADD CONSTRAINT fk_rails_9456c6acaa FOREIGN KEY (nomis_offender_id) REFERENCES public.offenders(nomis_offender_id);
+
+
+--
+-- Name: pom_details fk_rails_b84f73475f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pom_details
+    ADD CONSTRAINT fk_rails_b84f73475f FOREIGN KEY (prison_code) REFERENCES public.prisons(code);
+
+
+--
+-- Name: delius_import_errors fk_rails_d7a7067ace; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.delius_import_errors
+    ADD CONSTRAINT fk_rails_d7a7067ace FOREIGN KEY (nomis_offender_id) REFERENCES public.offenders(nomis_offender_id);
+
+
+--
+-- Name: email_histories fk_rails_f8c57edac2; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_histories
+    ADD CONSTRAINT fk_rails_f8c57edac2 FOREIGN KEY (nomis_offender_id) REFERENCES public.offenders(nomis_offender_id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250124103109'),
 ('20241115094637'),
 ('20241008145210'),
 ('20240924134717'),
