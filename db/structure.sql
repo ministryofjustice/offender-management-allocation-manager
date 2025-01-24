@@ -313,38 +313,6 @@ ALTER SEQUENCE public.email_histories_id_seq OWNED BY public.email_histories.id;
 
 
 --
--- Name: flipflop_features; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.flipflop_features (
-    id bigint NOT NULL,
-    key character varying NOT NULL,
-    enabled boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: flipflop_features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.flipflop_features_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: flipflop_features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.flipflop_features_id_seq OWNED BY public.flipflop_features.id;
-
-
---
 -- Name: handover_progress_checklists; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -786,13 +754,6 @@ ALTER TABLE ONLY public.email_histories ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- Name: flipflop_features id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.flipflop_features ALTER COLUMN id SET DEFAULT nextval('public.flipflop_features_id_seq'::regclass);
-
-
---
 -- Name: handover_progress_checklists id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -932,14 +893,6 @@ ALTER TABLE ONLY public.early_allocations
 
 ALTER TABLE ONLY public.email_histories
     ADD CONSTRAINT email_histories_pkey PRIMARY KEY (id);
-
-
---
--- Name: flipflop_features flipflop_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.flipflop_features
-    ADD CONSTRAINT flipflop_features_pkey PRIMARY KEY (id);
 
 
 --
@@ -1209,6 +1162,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250127094859'),
 ('20241115094637'),
 ('20241008145210'),
 ('20240924134717'),
