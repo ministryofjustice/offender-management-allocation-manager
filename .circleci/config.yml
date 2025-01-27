@@ -162,6 +162,7 @@ workflows:
           env: staging
       - hmpps/database_schema_report:
           filters: { branches: { only: [ schemaspy ] } } # TODO: change to `main`
+          name: database_schema_report
           jdk_tag: << pipeline.parameters.java-version >>
           postgres_tag: << pipeline.parameters.postgres-version >>
           database_name: mpc_schemaspy
