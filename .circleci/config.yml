@@ -15,12 +15,6 @@ references:
     publish: false
     <<: *docker_image_name
 
-  deploy_container_config: &deploy_container_config
-    working_directory: ~/app
-    resource_class: small
-    docker:
-      - image: ministryofjustice/cloud-platform-tools
-
   test_container_config: &test_container_config
     working_directory: ~/app
     resource_class: large
@@ -59,9 +53,6 @@ commands:
             firefox --version
 
 parameters:
-  workflow_to_trigger:
-    type: string
-    default: ""
   java-version:
     type: string
     default: "21.0"
@@ -161,8 +152,8 @@ workflows:
           name: helm_lint
           env: staging
       - hmpps/database_schema_report:
-          filters: { branches: { only: [ schemaspy ] } } # TODO: change to `main`
-          name: database_schema_report
+          filters: { branches: { only: [ main ] } }
+          name: schemaspy_report
           jdk_tag: << pipeline.parameters.java-version >>
           postgres_tag: << pipeline.parameters.postgres-version >>
           database_name: mpc_schemaspy
