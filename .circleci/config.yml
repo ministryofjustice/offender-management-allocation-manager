@@ -15,12 +15,6 @@ references:
     publish: false
     <<: *docker_image_name
 
-  deploy_container_config: &deploy_container_config
-    working_directory: ~/app
-    resource_class: small
-    docker:
-      - image: ministryofjustice/cloud-platform-tools
-
   test_container_config: &test_container_config
     working_directory: ~/app
     resource_class: large
@@ -45,7 +39,7 @@ version: 2.1
 orbs:
   browser-tools: circleci/browser-tools@1.4.9
   ruby: circleci/ruby@2.3.1
-  hmpps: ministryofjustice/hmpps@10.1.1
+  hmpps: ministryofjustice/hmpps@10.2.0
 
 commands:
   install_firefox:
@@ -58,14 +52,15 @@ commands:
           command: |
             firefox --version
 
-jobs:
-  noop:
-    <<: *deploy_container_config
-    steps:
-      - run:
-          name: Truthy no-op
-          command: "true"
+parameters:
+  java-version:
+    type: string
+    default: "21.0"
+  postgres-version:
+    type: string
+    default: "16.3"
 
+jobs:
   install_dependencies:
     <<: *test_container_config
     steps:
@@ -156,6 +151,19 @@ workflows:
       - hmpps/helm_lint:
           name: helm_lint
           env: staging
+      - hmpps/database_schema_report:
+          filters: { branches: { only: [ main ] } }
+          name: schemaspy_report
+          jdk_tag: << pipeline.parameters.java-version >>
+          postgres_tag: << pipeline.parameters.postgres-version >>
+          database_name: mpc_schemaspy
+          user: schemaspy
+          password: schemaspy
+          initialise_database: |
+            export PGPASSWORD=schemaspy && \
+              dropdb -U schemaspy -h localhost --if-exists mpc_schemaspy && \
+              createdb -U schemaspy -h localhost mpc_schemaspy && \
+              psql -U schemaspy -h localhost -d mpc_schemaspy < db/structure.sql
       - hmpps/build_docker:
           <<: *ignore_deployable_branches
           <<: *verify_docker_image_config

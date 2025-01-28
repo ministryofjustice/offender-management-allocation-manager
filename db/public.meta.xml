@@ -1,0 +1,85 @@
+<schemaMeta xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://schemaspy.org/xsd/6/schemameta.xsd">
+  <tables>
+    <table name="allocation_history">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="audit_events">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="calculated_early_allocation_statuses">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="calculated_handover_dates">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="case_information">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="delius_import_errors">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="early_allocations">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="email_histories">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="parole_reviews">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="parole_review_imports">
+      <column name="nomis_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="responsibilities">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="versions">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="victim_liaison_officers">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="case_information">
+      <column name="local_delivery_unit_id">
+        <foreignKey table="local_delivery_units" column="id"/>
+      </column>
+    </table>
+    <table name="case_information">
+      <column name="ldu_code">
+        <foreignKey table="local_delivery_units" column="code"/>
+      </column>
+    </table>
+    <table name="pom_details">
+      <column name="prison_code">
+        <foreignKey table="prisons" column="code"/>
+      </column>
+    </table>
+  </tables>
+</schemaMeta>
