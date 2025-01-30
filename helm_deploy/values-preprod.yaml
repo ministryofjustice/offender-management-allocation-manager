@@ -8,6 +8,7 @@ cronjobs:
     enabled: true
 
 generic-prometheus-alerts:
+  alertSeverity: mpc-alerts-nonprod-preprod
   businessHoursOnly: true
   rdsAlertsDatabases:
     cloud-platform-aaaaa93fa5e829b2: preprod

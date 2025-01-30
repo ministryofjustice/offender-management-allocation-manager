@@ -60,7 +60,6 @@ cronjob_resources:
 
 generic-prometheus-alerts:
   targetApplication: offender-management
-  alertSeverity: moic
   hpaTargetOverride: ".*"
   podTargetOverride: ".*"
   deploymentTargetOverride: ".*"

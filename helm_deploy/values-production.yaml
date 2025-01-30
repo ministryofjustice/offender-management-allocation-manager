@@ -29,6 +29,7 @@ cronjobs:
     schedule: 0 6 * * *
 
 generic-prometheus-alerts:
+  alertSeverity: mpc-alerts-prod
   rdsAlertsDatabases:
     cloud-platform-0fe5d72ea3e106e5: production
   elastiCacheAlertsClusterIds:
