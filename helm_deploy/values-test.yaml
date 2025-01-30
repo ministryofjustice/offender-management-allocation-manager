@@ -8,6 +8,7 @@ custom_templates_config:
     enabled: false
 
 generic-prometheus-alerts:
+  alertSeverity: mpc-alerts-nonprod-dev
   businessHoursOnly: true
 
 generic-service:
