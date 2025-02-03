@@ -21,6 +21,11 @@ class ParoleDataImportJob < ApplicationJob
       return
     end
 
+    if ENV['PPUD_EMAIL_FROM'].blank?
+      Rails.logger.error("#{log_prefix},snapshot_date=#{date}|PPUD_EMAIL_FROM not set")
+      return
+    end
+
     Rails.logger.info("#{log_prefix},snapshot_date=#{date}|Starting")
 
     purge_count = ParoleDataImportService.purge

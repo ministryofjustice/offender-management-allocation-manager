@@ -5,7 +5,7 @@ require 'csv'
 class ParoleDataImportService
   IMAP_HOST = 'imap.gmail.com'.freeze
   IMAP_PORT = 993
-  EMAIL_FROM = 'moic-data@digital.justice.gov.uk'.freeze
+  EMAIL_FROM = ENV['PPUD_EMAIL_FROM'].freeze
   EMAIL_SUBJECT = 'POM Cases list'.freeze
 
   CSV_HEADINGS = {

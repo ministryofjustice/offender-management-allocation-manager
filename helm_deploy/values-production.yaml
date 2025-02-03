@@ -69,3 +69,4 @@ generic-service:
     parole-data-import:
       GMAIL_USERNAME: email_username
       GMAIL_PASSWORD: email_password
+      PPUD_EMAIL_FROM: email_from
