@@ -184,6 +184,7 @@ Extra variables not required locally
 | SENTRY_DSN | The URL of a sentry installation. If no installation is available, then this should be present but an empty string ( "" )|
 | GMAIL_USERNAME | Email of Gmail user for Parole import |
 | GMAIL_PASSWORD | Application password of Gmail user for Parole import |
+| PPUD_EMAIL_FROM | Email address from which the PPUD report is being sent |
 
 ## Git Hooks
 

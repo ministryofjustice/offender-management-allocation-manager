@@ -12,6 +12,8 @@ cronjobs:
     enabled: true
   community_api_import:
     enabled: true
+  parole_data_import:
+    enabled: true
 
 generic-prometheus-alerts:
   alertSeverity: mpc-alerts-nonprod-dev
@@ -49,3 +51,9 @@ generic-service:
     TIERING_API_HOST: https://hmpps-tier-dev.hmpps.service.justice.gov.uk
     DPS_FRONTEND_COMPONENTS_API_HOST: https://frontend-components-dev.hmpps.service.justice.gov.uk
     DIGITAL_PRISON_SERVICE_HOST: https://digital-dev.prison.service.justice.gov.uk
+
+  namespace_secrets:
+    parole-data-import:
+      GMAIL_USERNAME: email_username
+      GMAIL_PASSWORD: email_password
+      PPUD_EMAIL_FROM: email_from
