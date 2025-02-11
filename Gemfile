@@ -24,7 +24,7 @@ gem 'omniauth-oauth2'
 gem 'omniauth', '~> 1.9.2', require: nil
 gem 'paper_trail', '~> 15.1.0'
 gem 'pg'
-gem 'puma', '~> 6.5.0'
+gem 'puma', '~> 6.6.0'
 gem 'prometheus_exporter'
 gem 'sidekiq', '~> 7.2.4'
 gem 'sentry-ruby'
