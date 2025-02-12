@@ -61,10 +61,6 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
   end
 
   shared_examples 'audit event' do
-    before do
-      allow(RecalculateHandoverDateJob).to receive(:perform_later).and_return(nil)
-    end
-
     let(:audit_event) { AuditEvent.last }
 
     it 'creates an audit event' do
@@ -308,42 +304,6 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
 
       it 'logs an error' do
         expect(Rails.logger).to have_received(:error).once
-      end
-    end
-  end
-
-  describe 'pushing handover dates into nDelius' do
-    let(:offender) { build(:nomis_offender, prisonId: prison.code) }
-    let(:offender_no) { offender.fetch(:prisonerNumber) }
-    let(:nomis_offender_id) { offender_no }
-    let(:crn) { 'X89264GC' }
-
-    before do
-      stub_offender(offender)
-    end
-
-    shared_examples 'recalculate handover dates' do
-      it "recalculates the offender's handover dates, using the new Case Information data" do
-        expect(RecalculateHandoverDateJob).to receive(:perform_later).with(offender_no)
-        described_class.perform_now offender_no
-      end
-    end
-
-    context 'when creating a new Case Information record' do
-      include_examples 'recalculate handover dates'
-    end
-
-    context 'when updating an existing Case Information record' do
-      let!(:case_info) do
-        create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: offender_no), crn: crn)
-      end
-
-      include_examples 'recalculate handover dates'
-
-      it 'does not re-calculate if CaseInformation is unchanged' do
-        described_class.perform_now offender_no
-        expect(RecalculateHandoverDateJob).not_to receive(:perform_later)
-        described_class.perform_now offender_no
       end
     end
   end

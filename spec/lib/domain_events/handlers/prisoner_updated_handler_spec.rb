@@ -3,12 +3,12 @@ RSpec.describe DomainEvents::Handlers::PrisonerUpdatedHandler do
 
   before do
     allow(RecalculateHandoverDateJob).to receive(:perform_now)
-    expect(RecalculateHandoverDateJob).not_to receive(:perform_later)
+    allow(RecalculateHandoverDateJob).to receive(:perform_later)
 
     allow(CaseInformation).to receive(:find_by_nomis_offender_id).and_return(double(:case_information))
   end
 
-  it 'recalculates handover for cases whose categoriesChanged includes SENTENCE' do
+  it 'does not recalculate handover for cases whose categoriesChanged includes SENTENCE' do
     event = DomainEvents::Event.new(
       event_type: 'prisoner-offender-search.prisoner.updated',
       version: 1,
@@ -21,8 +21,9 @@ RSpec.describe DomainEvents::Handlers::PrisonerUpdatedHandler do
       external_event: true,
     )
     handler.handle(event)
-
-    expect(RecalculateHandoverDateJob).to have_received(:perform_now).with('T1111XX')
+    
+    expect(RecalculateHandoverDateJob).not_to have_received(:perform_now)
+    expect(RecalculateHandoverDateJob).not_to have_received(:perform_later)
   end
 
   it 'does not recalculate handover for cases whose categoriesChanged does not SENTENCE' do
@@ -39,7 +40,8 @@ RSpec.describe DomainEvents::Handlers::PrisonerUpdatedHandler do
     )
     handler.handle(event)
 
-    expect(RecalculateHandoverDateJob).not_to have_received(:perform_now).with('T1111XX')
+    expect(RecalculateHandoverDateJob).not_to have_received(:perform_now)
+    expect(RecalculateHandoverDateJob).not_to have_received(:perform_later)
   end
 
   it 'does NOT proceed for cases that have no Delius probation case information' do
@@ -59,5 +61,6 @@ RSpec.describe DomainEvents::Handlers::PrisonerUpdatedHandler do
     handler.handle(event)
 
     expect(RecalculateHandoverDateJob).not_to have_received(:perform_now)
+    expect(RecalculateHandoverDateJob).not_to have_received(:perform_later)
   end
 end

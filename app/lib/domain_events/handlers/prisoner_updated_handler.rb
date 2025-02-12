@@ -8,9 +8,7 @@ class DomainEvents::Handlers::PrisonerUpdatedHandler
       return
     end
 
-    Shoryuken::Logging.logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type},nomis_offender_id=#{nomis_offender_id}"
-    categories = event.additional_information.fetch('categoriesChanged')
-    RecalculateHandoverDateJob.perform_now(nomis_offender_id) if categories.include?('SENTENCE')
+    Shoryuken::Logging.logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type},nomis_offender_id=#{nomis_offender_id},noop"
     Shoryuken::Logging.logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type},nomis_offender_id=#{nomis_offender_id}"
   end
 end
