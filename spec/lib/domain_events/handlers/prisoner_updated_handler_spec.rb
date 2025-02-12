@@ -21,7 +21,7 @@ RSpec.describe DomainEvents::Handlers::PrisonerUpdatedHandler do
       external_event: true,
     )
     handler.handle(event)
-    
+
     expect(RecalculateHandoverDateJob).not_to have_received(:perform_now)
     expect(RecalculateHandoverDateJob).not_to have_received(:perform_later)
   end
