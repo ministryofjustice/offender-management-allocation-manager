@@ -76,9 +76,6 @@ private
       case_info_attrs_before = case_info.changed_attributes
 
       if case_info.save
-        # Recalculate the offender's handover dates
-        RecalculateHandoverDateJob.perform_later(nomis_offender_id)
-
         tags = %w[job process_delius_data_job case_information changed]
         tags << trigger_method.to_s
         tags << event_type.downcase if event_type.present?
