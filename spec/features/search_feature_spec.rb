@@ -79,11 +79,11 @@ feature 'Search for offenders' do
       visit allocated_prison_prisoners_path(prison_code)
 
       expect(page).to have_text('See allocations')
-      fill_in 'q', with: 'Fra'
+      fill_in 'q', with: 'Fran'
       click_on('search-button')
 
       expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
-      expect(page).to have_css('tbody tr', count: 9)
+      expect(page).to have_css('tbody tr', count: 10)
     end
 
     it 'Can search from the Awaiting Allocation summary page', vcr: { cassette_name: 'prison_api/waiting_allocation_search_feature' } do

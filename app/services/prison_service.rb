@@ -79,6 +79,7 @@ class PrisonService
     PrisonInfo.new('LYI', 'Leyhill (HMP)', :england, :male),
     PrisonInfo.new('MDI', 'Moorland (HMP/YOI)', :england, :male),
     PrisonInfo.new('MHI', 'Morton Hall (HMP)', :england, :male),
+    PrisonInfo.new('MKI', 'Millsike (HMP)', :england, :male),
     PrisonInfo.new('MRI', 'Manchester (HMP)', :england, :male),
     PrisonInfo.new('MSI', 'Maidstone (HMP)', :england, :male),
     PrisonInfo.new('MTI', 'The Mount (HMP)', :england, :male),
