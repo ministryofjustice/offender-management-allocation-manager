@@ -162,13 +162,6 @@ en:
       previous: "&lsaquo; Previous"
       next: "Next &rsaquo;"
       truncate: "&hellip;"
-    notifications:
-      offender_needs_a_com:
-        maybe_contact_ldu: "You may need to contact the community probation office"
-        must_contact_ldu: "You must contact the community probation office"
-        com_needed: "A Community Offender Manager (COM) must be allocated to this case."
-        ldu_emailed: "We automatically emailed the LDU asking them to allocate a COM on %{date}."
-        ldu_uncontactable: "We can’t automatically contact the LDU because their details are missing. You need to find an alternative way of contacting them."
   helpers:
     fieldset:
       early_allocation:

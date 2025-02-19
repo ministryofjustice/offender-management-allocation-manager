@@ -1,29 +1,22 @@
 <div class="govuk-error-summary" aria-labelledby="com-error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
   <h2 class="govuk-error-summary__title" id="com-error-summary-title">
-    <%=
-      if email_history.present?
-        I18n.t('views.notifications.offender_needs_a_com.maybe_contact_ldu')
-      else
-        I18n.t('views.notifications.offender_needs_a_com.must_contact_ldu')
-      end
-    %>
+    COM allocation overdue
   </h2>
   <div class="govuk-error-summary__body">
-    <ul class="govuk-list govuk-error-summary__list">
-      <li id="com_warning"><%= link_to I18n.t('views.notifications.offender_needs_a_com.com_needed'), "#com-name", data: { turbolinks: false } %></li>
-
-      <% if email_history.present? %>
-        <li id="ldu_warning">
-          <%=
-            date_sent = email_history.map(&:created_at).max.to_date
-            link_to I18n.t('views.notifications.offender_needs_a_com.ldu_emailed', date: format_date(date_sent)), "#com-name", data: { turbolinks: false }
-          %>
-        </li>
-      <% elsif offender.ldu_email_address.blank? %>
-        <li id="ldu_warning">
-          <%= link_to I18n.t('views.notifications.offender_needs_a_com.ldu_uncontactable'), "#com-name", data: { turbolinks: false } %>
-        </li>
-      <% end %>
-    </ul>
+    <% if offender.ldu_email_address.present? %>
+      <p class="govuk-body">
+        Contact <%= offender.ldu_name %>
+        on <%= mail_to offender.ldu_email_address, offender.ldu_email_address, class: %w[govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold] %>
+        to see if a COM can be allocated.
+      </p>
+    <% else %>
+      <p class="govuk-body">
+        We do not know which LDU will be responsible for this person.
+      </p>
+      <p class="govuk-body govuk-!-margin-top-2">
+        Check their <%= link_to 'full Digital Prison Services profile', digital_prison_service_profile_path(offender.offender_no), class: %w[govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold], target: '_blank' %>
+        to see where they were sentenced and then try contacting the LDU for that area.
+      </p>
+    <% end %>
   </div>
 </div>
