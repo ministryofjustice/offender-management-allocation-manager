@@ -313,9 +313,10 @@ class MpcOffender
   end
 
   def active_alert_labels
-    all_alerts = HmppsApi::PrisonApi::OffenderApi.get_offender_alerts(offender_no)
-    sorted_active_alerts = all_alerts.select { |a| a['active'] && !a['expired'] }.sort_by { |a| a['dateCreated'] }.reverse
-    sorted_active_alerts.map { |a| a['alertCodeDescription'] }.uniq
+    active_alerts = HmppsApi::PrisonAlertsApi.alerts_for(offender_no)
+      .select { |alert| alert['isActive'] }
+      .sort_by { |alert| alert['createdAt'] }
+    active_alerts.map { |alert| alert.dig('alertCode', 'description') }
   end
 
   def recommended_pom_type

@@ -9,8 +9,8 @@ module HmppsApi
     def self.alerts_for(nomis_offender_id)
       safe_offender_no = URI.encode_www_form_component(nomis_offender_id)
       route = "/prisoners/#{safe_offender_no}/alerts"
-      response = client.get(route)
-      response.fetch('content', [])
+      data, = client.get(route)
+      data.fetch('content', [])
     end
   end
 end
