@@ -41,11 +41,13 @@ namespace :reports do
             results[:prison_all_cases] += total_allocations_count
           end
 
+          # rubocop:disable Style/Next
           if pom.probation_officer?
             offender_nos = allocations.map(&:nomis_offender_id).uniq
             probation_isp_cases_count = OffenderService.get_offenders(offender_nos).count(&:indeterminate_sentence?)
             results[:probation_isp_cases] += probation_isp_cases_count
           end
+          # rubocop:enable Style/Next
         end
 
         csv << [
