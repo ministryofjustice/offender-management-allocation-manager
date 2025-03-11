@@ -28,9 +28,10 @@ namespace :reports do
           pom_detail = PomDetail.find_by(nomis_staff_id: pom.staff_id, prison_code: prison.code, status: 'active')
           next if pom_detail.nil?
 
-          allocations = AllocationHistory.active_pom_allocations(pom.staff_id, prison.code)
+          staff_member = StaffMember.new(prison, pom.staff_id, pom_detail)
+          allocations = staff_member.allocations
 
-          pom_responsible_allocations_count = allocations.count { |a| a.primary_pom_nomis_id == pom.staff_id }
+          pom_responsible_allocations_count = allocations.count(&:pom_responsible?)
           total_allocations_count = allocations.count
 
           if pom.probation_officer?
