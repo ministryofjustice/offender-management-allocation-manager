@@ -9,12 +9,12 @@ describe HmppsApi::PrisonAlertsApi do
           { "alertCode" => { code: "DEF", description: "DEF Desc" } },
           { "alertCode" => { code: "GHI", description: "GHI Desc" } },
         ]
-      }
+      }.deep_stringify_keys
 
       stub_request(:get, "#{Rails.configuration.prison_alerts_api_host}/prisoners/ABC123/alerts")
         .to_return(body: response.to_json)
 
-      expect(described_class.alerts_for("ABC123")).to eq(response.deep_stringify_keys)
+      expect(described_class.alerts_for("ABC123")).to eq(response["content"])
     end
   end
 end
