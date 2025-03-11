@@ -42,7 +42,8 @@ module ApiHelper
       .to_return(body: {}.to_json)
 
     # Alerts
-    stub_request(:get, "#{T3}/offenders/#{offender_no}/alerts/v2").to_return(body: [].to_json)
+    stub_request(:get, "#{Rails.configuration.prison_alerts_api_host}/prisoners/#{offender_no}/alerts")
+      .to_return(body: { content: [] }.to_json)
 
     stub_sentence_terms(offender)
 
