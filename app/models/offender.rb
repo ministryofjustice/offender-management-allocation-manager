@@ -77,6 +77,8 @@ class Offender < ApplicationRecord
     end
   end
 
+  def enhanced_handover? = handover_type == 'enhanced'
+
   def responsible_pom_name = allocations.latest&.primary_pom_name
   def responsible_pom_nomis_id = allocations.latest&.primary_pom_nomis_id
   def responsible_com_name = case_information&.com_name
