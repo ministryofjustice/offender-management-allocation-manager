@@ -62,6 +62,7 @@ generic-service:
     TIERING_API_HOST: https://hmpps-tier.hmpps.service.justice.gov.uk
     DPS_FRONTEND_COMPONENTS_API_HOST: https://frontend-components.hmpps.service.justice.gov.uk
     DIGITAL_PRISON_SERVICE_HOST: https://digital.prison.service.justice.gov.uk
+    PRISON_ALERTS_API_HOST: https://alerts-api.hmpps.service.justice.gov.uk
 
   namespace_secrets:
     allocation-manager-secrets:

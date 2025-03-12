@@ -57,6 +57,7 @@ module OffenderManagementAllocationClient
     config.tiering_api_host = ENV['TIERING_API_HOST']&.strip
     config.dps_frontend_components_api_host = ENV['DPS_FRONTEND_COMPONENTS_API_HOST']&.strip
     config.community_api_host = ENV['COMMUNITY_API_HOST']&.strip
+    config.prison_alerts_api_host = ENV['PRISON_ALERTS_API_HOST']&.strip
 
     config.hmpps_oauth_client_id = ENV['HMPPS_OAUTH_CLIENT_ID']&.strip
     config.hmpps_oauth_client_secret = ENV['HMPPS_OAUTH_CLIENT_SECRET']&.strip

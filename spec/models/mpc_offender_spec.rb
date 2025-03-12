@@ -288,22 +288,17 @@ RSpec.describe MpcOffender, type: :model do
   end
 
   describe '#active_alert_labels' do
-    let(:api_result) do
-      [
-        { "alertCodeDescription" => "Apples", "active" => true, "dateCreated" => "2022-01-01" },
-        { "alertCodeDescription" => "Pears", "active" => true, "dateCreated" => "2022-01-02" },
-        { "alertCodeDescription" => "Bananas", "active" => false, "dateCreated" => "2021-06-04" },
-        { "alertCodeDescription" => "Artichokes", "active" => false, "dateCreated" => "2021-01-01" },
-        { "alertCodeDescription" => "Carrots", "active" => false, "dateCreated" => "2021-01-01" }
-      ]
-    end
+    it "returns the labels of active alerts in reverse order from when they were created" do
+      response = [
+        { isActive: false, created_at: 2.months.ago, alertCode: { description: "Alert A" } },
+        { isActive: true, created_at: 3.months.ago, alertCode: { description: "Alert B" } },
+        { isActive: false, created_at: 4.months.ago, alertCode: { description: "Alert C" } },
+        { isActive: true, created_at: 5.months.ago, alertCode: { description: "Alert D" } },
+      ].map(&:deep_stringify_keys)
 
-    before do
-      allow(HmppsApi::PrisonApi::OffenderApi).to receive(:get_offender_alerts).and_return(api_result)
-    end
+      allow(HmppsApi::PrisonAlertsApi).to receive(:alerts_for).and_return(response)
 
-    it 'returns correct filtered and sorted list' do
-      expect(subject.active_alert_labels).to eq(["Pears", "Apples"])
+      expect(subject.active_alert_labels).to eq(["Alert B", "Alert D"])
     end
   end
 
