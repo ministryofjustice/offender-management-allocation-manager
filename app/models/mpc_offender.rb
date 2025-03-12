@@ -18,7 +18,7 @@ class MpcOffender
   delegate :ldu_email_address, :team_name, :ldu_name, :active_vlo?, :welsh_offender, to: :case_information, allow_nil: true
 
   delegate :victim_liaison_officers,
-           :handover_progress_task_completion_data, :handover_progress_complete?, :handover_type,
+           :handover_progress_task_completion_data, :handover_progress_complete?, :handover_type, :enhanced_handover?,
            :current_parole_review, :previous_parole_reviews, :most_recent_parole_review, :parole_reviews,
            :case_information, to: :offender
 

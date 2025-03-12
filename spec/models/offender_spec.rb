@@ -100,7 +100,7 @@ RSpec.describe Offender, type: :model do
     end
   end
 
-  describe '#handover_type' do
+  describe 'handover type' do
     before do
       offender.build_case_information
       offender.build_calculated_handover_date
@@ -109,16 +109,19 @@ RSpec.describe Offender, type: :model do
     it 'is "missing" if there is no case information/probation record' do
       offender.case_information = nil
       expect(offender.handover_type).to eq 'missing'
+      expect(offender.enhanced_handover?).to eq false
     end
 
     it 'is "missing" if no handover has been calculated yet' do
       offender.calculated_handover_date = nil
       expect(offender.handover_type).to eq 'missing'
+      expect(offender.enhanced_handover?).to eq false
     end
 
     it 'is "enhanced" if enhanced resourcing field from case information is missing' do
       offender.case_information.enhanced_resourcing = nil
       expect(offender.handover_type).to eq 'enhanced'
+      expect(offender.enhanced_handover?).to eq true
     end
 
     describe 'when sentence is short enough to be community responsible immediately' do
@@ -126,12 +129,14 @@ RSpec.describe Offender, type: :model do
         offender.case_information.enhanced_resourcing = true
         offender.calculated_handover_date.reason = 'determinate_short'
         expect(offender.handover_type).to eq 'none'
+        expect(offender.enhanced_handover?).to eq false
       end
 
       it 'is "none" even if enhanced resourcing field from case information is missing' do
         offender.case_information.enhanced_resourcing = nil
         offender.calculated_handover_date.reason = 'determinate_short'
         expect(offender.handover_type).to eq 'none'
+        expect(offender.enhanced_handover?).to eq false
       end
     end
 
@@ -139,11 +144,13 @@ RSpec.describe Offender, type: :model do
       it 'is "standard" if standard resourcing' do
         offender.case_information.enhanced_resourcing = false
         expect(offender.handover_type).to eq 'standard'
+        expect(offender.enhanced_handover?).to eq false
       end
 
       it 'is "enhanced" if enhanced resourcing' do
         offender.case_information.enhanced_resourcing = true
         expect(offender.handover_type).to eq 'enhanced'
+        expect(offender.enhanced_handover?).to eq true
       end
     end
   end
