@@ -107,11 +107,6 @@ module HmppsApi
         default_image
       end
 
-      def self.get_offender_alerts(offender_no)
-        path = "/offenders/#{offender_no}/alerts/v2"
-        client.get(path)
-      end
-
       def self.get_offender_sentences_and_offences(booking_id)
         path = "/offender-sentences/booking/#{booking_id}/sentenceTerms"
         client.get(path)
