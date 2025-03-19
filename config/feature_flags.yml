@@ -1,0 +1,5 @@
+feature_flags:
+  example_feature:
+    staging: true
+    preprod: false
+    production: false
