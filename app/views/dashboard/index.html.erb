@@ -50,7 +50,7 @@
 
     <%= render 'dashboard_partition',
                title: "Parole cases",
-               link: UrlMigrator.prison_parole_cases_path(@prison.code),
+               link: prison_parole_cases_path(@prison.code),
                content: t('parole.upcoming.spo')
     %>
 
