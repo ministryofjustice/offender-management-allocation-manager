@@ -1,5 +1,6 @@
+# Any environment not explicitly listed will default to false,
+# except local and test, where the default will be true
+#
 feature_flags:
-  example_feature:
+  new_mpc_links:
     staging: true
-    preprod: false
-    production: false

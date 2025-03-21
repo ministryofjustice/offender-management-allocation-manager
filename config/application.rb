@@ -39,6 +39,12 @@ module OffenderManagementAllocationClient
         'http://localhost:3000'
       )
 
+    config.new_mpc_host =
+      ENV.fetch(
+        'NEW_MPC_HOST',
+        'http://localhost:3001'
+      )
+
     Rails.application.default_url_options[:host] = config.allocation_manager_host
 
     # Sentry environment set with SENTRY_CURRENT_ENV
