@@ -3,20 +3,21 @@
 ActiveAdmin.register LocalDeliveryUnit do
   menu label: 'Local Delivery Units'
 
-  permit_params :code, :name, :email_address, :country, :enabled
+  actions :index
+  config.sort_order = 'name_asc'
 
-  form do |_form|
-    inputs do
-      input :code
-      input :name
-      input :email_address
-      input :country, as: :select, collection: LocalDeliveryUnit::VALID_COUNTRIES
-      input :enabled
-    end
-    actions
+  index do
+    column :id
+    column :code
+    column :name
+    column :email_address
+    column :country
+    column :created_at
+    column :updated_at
+    column :mailbox_register_id
   end
 
   # Filter fields
   preserve_default_filters!
-  remove_filter :case_information
+  remove_filter :case_information, :enabled
 end

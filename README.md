@@ -56,7 +56,7 @@ $  bundle install
 yarn install
 ```
 
-4. Create a .env file in the root of the folder and add any necessary [environment variables](#environment-variables) (or copy from .env.example). Load your environment variables into your current session ...
+4. Create a .env file in the root of the folder and add any necessary [environment variables](#environment-variables) (or copy from .env.example). If you need to further configure the environment, you can add a `.env.local` file that will take precedence over the default values declared in `.env.development`.
 
 5. Create and seed database
 

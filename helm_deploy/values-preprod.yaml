@@ -41,3 +41,4 @@ generic-service:
     DPS_FRONTEND_COMPONENTS_API_HOST: https://frontend-components-preprod.hmpps.service.justice.gov.uk
     DIGITAL_PRISON_SERVICE_HOST: https://digital-preprod.prison.service.justice.gov.uk
     PRISON_ALERTS_API_HOST: https://alerts-api-preprod.hmpps.service.justice.gov.uk
+    MAILBOX_REGISTER_API_HOST: https://manage-custody-mailbox-register-api-preprod.hmpps.service.justice.gov.uk
