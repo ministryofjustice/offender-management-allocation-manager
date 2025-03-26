@@ -99,15 +99,8 @@ feature 'admin urls' do
         visit('/admin/local_delivery_units')
       end
 
-      it 'can create one' do
-        expect {
-          click_link 'New Localdeliveryunit'
-          fill_in 'Code', with: Faker::Alphanumeric.alphanumeric(number: 4)
-          fill_in 'Name', with: Faker::Lorem.sentence
-          fill_in 'Email address', with: Faker::Internet.email
-          select 'England'
-          click_button 'Create Local delivery unit'
-        }.to change(LocalDeliveryUnit, :count).by(1)
+      it 'cannot create one' do
+        expect(page).not_to have_content('New Localdeliveryunit')
       end
     end
   end

@@ -359,7 +359,8 @@ CREATE TABLE public.local_delivery_units (
     country character varying NOT NULL,
     enabled boolean NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    mailbox_register_id uuid
 );
 
 
@@ -1162,6 +1163,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250325141546'),
 ('20250127094859'),
 ('20241115094637'),
 ('20241008145210'),
