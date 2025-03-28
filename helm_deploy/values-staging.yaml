@@ -12,6 +12,8 @@ cronjobs:
     enabled: true
   community_api_import:
     enabled: true
+  mailbox_register_import:
+    enabled: true
   parole_data_import:
     enabled: true
 
