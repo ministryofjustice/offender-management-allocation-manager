@@ -168,5 +168,7 @@ generic-service:
       REDIS_URL: url
     hmpps-domain-events-topic:
       DOMAIN_EVENTS_TOPIC_ARN: topic_arn
+    s3-bucket-output:
+      S3_BUCKET_NAME: bucket_name
     offender-management-allocation-manager:
       APPINSIGHTS_INSTRUMENTATIONKEY: APPINSIGHTS_INSTRUMENTATIONKEY

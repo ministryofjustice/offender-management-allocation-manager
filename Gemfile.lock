@@ -105,6 +105,13 @@ GEM
       aws-sigv4 (~> 1.9)
       base64
       jmespath (~> 1, >= 1.6.1)
+    aws-sdk-kms (1.99.0)
+      aws-sdk-core (~> 3, >= 3.216.0)
+      aws-sigv4 (~> 1.5)
+    aws-sdk-s3 (1.183.0)
+      aws-sdk-core (~> 3, >= 3.216.0)
+      aws-sdk-kms (~> 1)
+      aws-sigv4 (~> 1.5)
     aws-sdk-sns (1.97.0)
       aws-sdk-core (~> 3, >= 3.216.0)
       aws-sigv4 (~> 1.5)
@@ -664,6 +671,7 @@ DEPENDENCIES
   activeadmin
   application_insights
   auto_strip_attributes
+  aws-sdk-s3
   aws-sdk-sns
   aws-sdk-sqs (~> 1.55)
   better_errors
