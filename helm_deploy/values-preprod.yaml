@@ -6,6 +6,8 @@ cronjobs:
     enabled: true
   community_api_import:
     enabled: true
+  mailbox_register_import:
+    enabled: true
 
 generic-prometheus-alerts:
   alertSeverity: mpc-alerts-nonprod-preprod
