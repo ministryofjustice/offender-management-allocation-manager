@@ -7,6 +7,8 @@ gem 'rails', '~> 7.1.3'
 gem 'auto_strip_attributes'
 # Need AWS SNS SDK for publishing events to HMPPS_DOMAIN_EVENTS
 gem 'aws-sdk-sns'
+# Need AWS S3 SDK for processing PPUD exports
+gem 'aws-sdk-s3'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 5.0'
 gem 'date_validator'
