@@ -1,5 +1,8 @@
 ---
 cronjobs:
+  mailbox_register_import:
+    enabled: true
+    schedule: 0 1 * * *
   process_movements:
     enabled: true
     schedule: 0 2 * * *
