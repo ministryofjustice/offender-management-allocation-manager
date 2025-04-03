@@ -3,6 +3,6 @@
 namespace :parole do
   desc 'fetch updates to active parole reviews'
   task import: :environment do |_task|
-    ParoleDataImportJob.perform_later(Time.zone.today - 1)
+    ParoleDataImportJob.perform_later(Time.zone.yesterday)
   end
 end

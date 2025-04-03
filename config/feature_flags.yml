@@ -4,3 +4,5 @@
 feature_flags:
   new_mpc_links:
     staging: true
+  ppud_s3_bucket:
+    staging: true

@@ -7,6 +7,7 @@ class ParoleDataImportService
   IMAP_PORT = 993
   EMAIL_FROM = ENV['PPUD_EMAIL_FROM'].freeze
   EMAIL_SUBJECT = 'POM Cases list'.freeze
+  S3_OBJECT_PREFIX = 'PPUD_MPC'.freeze
 
   CSV_HEADINGS = {
     title: 'TITLE',
@@ -30,15 +31,22 @@ class ParoleDataImportService
     @log_prefix = log_prefix
     @single_day_snapshot = single_day_snapshot
     @import_id = SecureRandom.uuid
+    @csv_row_import_count = 0
+    @csv_row_count = 0
   end
 
-  def import_from_email_with_catchup(date)
+  def import_with_catchup(date, s3_import)
     latest_imported_date = ParoleReviewImport.maximum(:snapshot_date)
 
-    if latest_imported_date.nil?
-      import_from_email(date)
-    elsif latest_imported_date < date
-      (latest_imported_date + 1..date).to_a.each { |dt| import_from_email(dt) }
+    dates_to_import = if latest_imported_date.nil?
+                        date
+                      elsif latest_imported_date < date
+                        (latest_imported_date + 1..date)
+                      end
+
+    dates_to_import.to_a.each do |dt|
+      Rails.logger.info(format_log("Importing date #{dt}. S3 enabled? #{s3_import}", dt))
+      s3_import ? import_from_s3_bucket(dt) : import_from_email(dt)
     end
 
     [@csv_row_import_count, @csv_row_count]
@@ -57,8 +65,26 @@ class ParoleDataImportService
 
     imap.logout
     imap.disconnect
+  end
 
-    [@csv_row_import_count, @csv_row_count]
+  def import_from_s3_bucket(date)
+    prefix = [S3_OBJECT_PREFIX, date.strftime('%Y%m%d')].join('_')
+    csv_files = S3::List.new(prefix:).call
+
+    if csv_files.empty?
+      Rails.logger.warn(format_log("No files found with prefix #{prefix}", date))
+    else
+      # In the scenario multiple files for the same prefix (date)
+      # are found, we only need to process the most recent one
+      object_key = csv_files.last[:object_key]
+
+      Rails.logger.info(
+        format_log("Found #{csv_files.size} files with prefix #{prefix}. Importing #{object_key}", date)
+      )
+
+      csv_content = S3::Read.new(object_key:).call
+      import_from_rows(CSV.new(csv_content, headers: true), date)
+    end
   end
 
   def import_from_rows(csv_rows, date)
@@ -71,8 +97,6 @@ class ParoleDataImportService
         import_row(csv_row, date)
       end
     end
-
-    [@csv_row_import_count, @csv_row_count]
   end
 
   def self.purge

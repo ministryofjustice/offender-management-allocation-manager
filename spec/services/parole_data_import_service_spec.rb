@@ -13,6 +13,7 @@ RSpec.describe ParoleDataImportService do
   let(:attachment_mock_1) { double(filename: 'attachment_mock_1.csv', body: attachment_1_body) }
   let(:attachment_mock_2) { double(filename: 'attachment_mock_2.txt') }
 
+  let(:mail_mock) { nil }
   let(:imap_mock) do
     double(login: true,
            select: true,
@@ -63,7 +64,7 @@ RSpec.describe ParoleDataImportService do
     end
   end
 
-  context 'when import throws an error' do
+  context 'when email import throws an error' do
     let(:mail_mock) { double(attachments: [attachment_mock_1]) }
 
     it 'logs the error message' do
@@ -73,6 +74,44 @@ RSpec.describe ParoleDataImportService do
       # Error logged for each row in the CSV that raised an error
       expect { subject.import_from_email(Time.zone.today) }.not_to raise_error
       expect(Rails.logger).to have_received(:error).twice
+    end
+  end
+
+  describe 'S3 bucket import' do
+    let(:date) { Date.new(2025, 3, 25) }
+    let(:s3_list_mock) { instance_double(S3::List, call: s3_files) }
+    let(:s3_read_mock) { instance_double(S3::Read, call: attachment_1_body.decoded) }
+
+    before do
+      allow(S3::List).to receive(:new).and_return(s3_list_mock)
+      allow(S3::Read).to receive(:new).and_return(s3_read_mock)
+    end
+
+    context 'when there are files in the S3 bucket' do
+      let(:s3_files) { [{ object_key: 'PPUD_MPC_20250325060324.csv' }, { object_key: 'PPUD_MPC_20250325160328.csv' }] }
+
+      it 'imports the CSV file from the S3 bucket' do
+        allow(Rails.logger).to receive(:info).and_call_original
+        subject.import_from_s3_bucket(date)
+
+        expect(Rails.logger).to have_received(:info).with(
+          /Found 2 files with prefix PPUD_MPC_20250325\. Importing PPUD_MPC_20250325160328\.csv/
+        )
+        expect(ParoleReviewImport.count).to eq(2)
+      end
+    end
+
+    context 'when no files are found in the S3 bucket' do
+      let(:s3_files) { [] }
+
+      it 'logs a warning message' do
+        allow(Rails.logger).to receive(:warn).and_call_original
+        subject.import_from_s3_bucket(date)
+
+        expect(Rails.logger).to have_received(:warn).with(
+          /No files found with prefix PPUD_MPC_20250325/
+        )
+      end
     end
   end
 end
