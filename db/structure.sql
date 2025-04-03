@@ -486,7 +486,8 @@ CREATE TABLE public.parole_review_imports (
     single_day_snapshot boolean,
     processed_on date,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    s3_object_key character varying
 );
 
 
@@ -1163,6 +1164,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250403141647'),
 ('20250325141546'),
 ('20250127094859'),
 ('20241115094637'),

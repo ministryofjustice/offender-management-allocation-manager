@@ -33,6 +33,7 @@ class ParoleDataImportService
     @import_id = SecureRandom.uuid
     @csv_row_import_count = 0
     @csv_row_count = 0
+    @s3_object_key = nil
   end
 
   def import_with_catchup(date, s3_import)
@@ -76,13 +77,13 @@ class ParoleDataImportService
     else
       # In the scenario multiple files for the same prefix (date)
       # are found, we only need to process the most recent one
-      object_key = csv_files.last[:object_key]
+      @s3_object_key = csv_files.last[:object_key]
 
       Rails.logger.info(
-        format_log("Found #{csv_files.size} files with prefix #{prefix}. Importing #{object_key}", date)
+        format_log("Found #{csv_files.size} files with prefix #{prefix}. Importing #{@s3_object_key}", date)
       )
 
-      csv_content = S3::Read.new(object_key:).call
+      csv_content = S3::Read.new(object_key: @s3_object_key).call
       import_from_rows(CSV.new(csv_content, headers: true), date)
     end
   end
@@ -138,6 +139,7 @@ private
     imported_row.snapshot_date = date
     imported_row.row_number = @csv_row_count
     imported_row.import_id = @import_id
+    imported_row.s3_object_key = @s3_object_key
     imported_row.single_day_snapshot = @single_day_snapshot
     imported_row.save!
     @csv_row_import_count += 1
