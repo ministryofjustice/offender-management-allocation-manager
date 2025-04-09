@@ -8,6 +8,8 @@ cronjobs:
     enabled: true
   mailbox_register_import:
     enabled: true
+  parole_data_import:
+    enabled: true
 
 generic-prometheus-alerts:
   alertSeverity: mpc-alerts-nonprod-preprod
