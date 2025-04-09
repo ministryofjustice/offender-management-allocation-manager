@@ -71,7 +71,7 @@ module Handover::HandoverCalculation
                                    automatic_release_date:)
       if is_indeterminate
         ted = NamedDate[tariff_date, 'TED']
-        thd = NamedDate[target_hearing_date, 'THD']
+        thd = NamedDate[target_hearing_date&.past? ? nil : target_hearing_date, 'THD']
         [ted, thd].compact.min
       else
         ped = NamedDate[parole_eligibility_date, 'PED']
