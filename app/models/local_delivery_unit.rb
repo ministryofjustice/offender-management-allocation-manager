@@ -14,7 +14,6 @@ class LocalDeliveryUnit < ApplicationRecord
   validates :email_address,  presence: true, 'valid_email_2/email': true
 
   scope :enabled, -> { where(enabled: true) }
-  scope :by_code_or_mailbox_register_id, ->(code, mailbox_register_id) { where(code:).or(where(mailbox_register_id:)) }
 
   has_many :case_information, dependent: :restrict_with_exception
 

@@ -35,7 +35,7 @@ class ImportLocalDeliveryUnits
       uuid = mailbox['id']
 
       ldu = LocalDeliveryUnit
-              .by_code_or_mailbox_register_id(code, uuid)
+              .where(mailbox_register_id: uuid)
               .first_or_initialize.tap do |record|
         record.code = code
         record.mailbox_register_id = uuid
