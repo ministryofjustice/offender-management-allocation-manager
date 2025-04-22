@@ -10,19 +10,19 @@
   <table class="govuk-table responsive tablesorter">
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
-        <th class="govuk-table__header" scope="col">
+        <th class="govuk-table__header" scope="col" <%= sort_aria('last_name') %>>
           <a href="<%= sort_link('last_name') %>">
             Case
           </a>
           <%= sort_arrow('last_name') %>
         </th>
-        <th class="govuk-table__header sorter-false" xscope="col">
+        <th class="govuk-table__header sorter-false" scope="col" <%= sort_aria('allocated_pom_role') %>>
           <a href="<%= sort_link('allocated_pom_role') %>">
             Role
           </a>
           <%= sort_arrow('allocated_pom_role') %>
         </th>
-        <th class="govuk-table__header sorter-false" xscope="col">
+        <th class="govuk-table__header sorter-false" scope="col" <%= sort_aria('next_parole_date') %>>
           <a href="<%= sort_link('next_parole_date') %>">
             Next parole date
           </a>
