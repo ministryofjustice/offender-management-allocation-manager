@@ -92,49 +92,49 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
   <table id="available-poms" class="govuk-table">
     <thead class="govuk-table__head">
       <tr>
-        <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;">
+        <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;" <%= sort_aria('last_name') %>>
           <a href="<%= sort_link('last_name') %>">
             POM
           </a>
           <%= sort_arrow('last_name') %>
         </th>
-        <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;">
+        <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;" <%= sort_aria('position') %>>
           <a href="<%= sort_link('position') %>">
             POM type
           </a>
           <%= sort_arrow('position') %>
         </th>
-        <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 140px;">
+        <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 140px;" <%= sort_aria('working_pattern') %>>
           <a href="<%= sort_link('working_pattern') %>">
             Working pattern
           </a>
           <%= sort_arrow('working_pattern') %>
         </th>
-        <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">
+        <th class="govuk-table__header govuk-table__header--numeric" scope="col" <%= sort_aria('new_allocations_count') %>>
           <a href="<%= sort_link('new_allocations_count') %>">
             Allocations in last 7 days
           </a>
           <%= sort_arrow('new_allocations_count') %>
         </th>
-        <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">
+        <th class="govuk-table__header govuk-table__header--numeric" scope="col" <%= sort_aria('supporting_allocations_count') %>>
           <a href="<%= sort_link('supporting_allocations_count') %>">
             Supporting cases
           </a>
           <%= sort_arrow('supporting_allocations_count') %>
         </th>
-        <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">
+        <th class="govuk-table__header govuk-table__header--numeric" scope="col" <%= sort_aria('responsible_allocations_count') %>>
           <a href="<%= sort_link('responsible_allocations_count') %>">
             Responsible cases
           </a>
           <%= sort_arrow('responsible_allocations_count') %>
         </th>
-        <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">
+        <th class="govuk-table__header govuk-table__header--numeric" scope="col" <%= sort_aria('coworking_allocations_count') %>>
           <a href="<%= sort_link('coworking_allocations_count') %>">
             Co-working cases
           </a>
           <%= sort_arrow('coworking_allocations_count') %>
         </th>
-        <th scope="col" class="govuk-table__header govuk-table__header--numeric" aria-sort="none">
+        <th scope="col" class="govuk-table__header govuk-table__header--numeric" <%= sort_aria('total_allocations_count') %>>
           <a href="<%= sort_link('total_allocations_count') %>">
             Total cases
           </a>

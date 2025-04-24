@@ -41,43 +41,43 @@
   <table class="govuk-table responsive tablesorter">
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-      <th class="govuk-table__header" scope="col">
+      <th class="govuk-table__header" scope="col" <%= sort_aria('last_name') %>>
         <a href="<%= sort_link('last_name') %>">
           Case
         </a>
         <%= sort_arrow('last_name') %>
       </th>
-      <th class="govuk-table__header sorter-false" scope="col">
+      <th class="govuk-table__header sorter-false" scope="col" <%= sort_aria('location') %>>
         <a href="<%= sort_link('location') %>">
           Location
         </a>
         <%= sort_arrow('location') %>
       </th>
-      <th class="govuk-table__header sorter-false" scope="col">
+      <th class="govuk-table__header sorter-false" scope="col" <%= sort_aria('earliest_release_date') %>>
         <a href="<%= sort_link('earliest_release_date') %>">
           Earliest release<br/>date
         </a>
         <%= sort_arrow('earliest_release_date') %>
       </th>
-      <th class="govuk-table__header sorter-false" scope="col">
+      <th class="govuk-table__header sorter-false" scope="col" <%= sort_aria('tier') %>>
         <a href="<%= sort_link('tier') %>">
           Tier
         </a>
         <%= sort_arrow('tier') %>
       </th>
-      <th class="govuk-table__header sorter-false" scope="col">
+      <th class="govuk-table__header sorter-false" scope="col" <%= sort_aria('case_owner') %>>
         <a href="<%= sort_link('case_owner') %>">
           POM role needed
         </a>
         <%= sort_arrow('case_owner') %>
       </th>
-      <th class="govuk-table__header sorter-false" scope="col">
+      <th class="govuk-table__header sorter-false" scope="col" <%= sort_aria('additional_information') %>>
         <a href="<%= sort_link('additional_information') %>">
           Additional information
         </a>
         <%= sort_arrow('additional_information') %>
       </th>
-      <th class="govuk-table__header sorter-false" scope="col">
+      <th class="govuk-table__header sorter-false" scope="col" <%= sort_aria('awaiting_allocation_for') %>>
         <a href="<%= sort_link('awaiting_allocation_for') %>">
           Working days since<br />entering this prison
         </a>

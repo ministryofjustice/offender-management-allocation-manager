@@ -14,13 +14,13 @@
  <table class="govuk-table responsive tablesorter">
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-      <th class="govuk-table__header" scope="col">
+      <th class="govuk-table__header" scope="col" <%= sort_aria('offender_name') %>>
         <a href="<%= sort_link('offender_name') %>">
           Prisoner name
         </a>
         <%= sort_arrow('offender_name') %>
       </th>
-      <th class="govuk-table__header" scope="col">
+      <th class="govuk-table__header" scope="col" <%= sort_aria('action_label') %>>
         <a href="<%= sort_link('action_label') %>">
         Update needed
         </a>

@@ -16,7 +16,17 @@ module SortHelper
   def sort_arrow(field_name)
     raise ArgumentError, "`#{field_name}` is not an allowed sortable field" unless sortable_field?(field_name)
 
-    arrow_for_field(field_name, URI.parse(request.original_url))
+    uri = URI.parse(request.original_url)
+    query = Rack::Utils.parse_query(uri.query)
+    direction = sort_direction_for(field_name, query['sort'])
+    direction ? send("#{direction}_tag") : ''
+  end
+
+  def sort_aria(field_name)
+    raise ArgumentError, "`#{field_name}` is not an allowed sortable field" unless sortable_field?(field_name)
+
+    value = sort_aria_value(field_name)
+    value == '' ? '' : "aria-sort=\"#{value}\"".html_safe
   end
 
 private
@@ -37,22 +47,24 @@ private
     uri.to_s
   end
 
-  def arrow_for_field(field_name, uri)
-    query = Rack::Utils.parse_query(uri.query)
-    current_sort_field = query['sort']
-
+  def sort_direction_for(field_name, current_sort_field = '')
     if field_name == DEFAULT_SORT && current_sort_field.blank?
-      return asc_tag
+      return :asc
     end
 
-    return '' if current_sort_field.blank?
-    return '' unless current_sort_field.start_with?(field_name)
+    return nil if current_sort_field.blank?
+    return nil unless current_sort_field.start_with?(field_name)
 
     if current_sort_field.end_with?('asc')
-      asc_tag
+      :asc
     else
-      desc_tag
+      :desc
     end
+  end
+
+  def sort_aria_value(field_name)
+    direction = sort_direction_for(field_name, params['sort'])
+    direction ? { asc: 'ascending', desc: 'descending' }[direction] : nil
   end
 
   def default_direction(field_name, current_sort_field)
