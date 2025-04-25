@@ -325,11 +325,10 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
       before { args[:is_indeterminate] = true }
 
       [
-        [2.months.from_now,     nil,                    'TED', 'TED exists and is in the future'],
-        [2.months.from_now - 1, 2.months.from_now,      'TED', 'TED and THD both exist as future dates but TED is earlier'],
-        [2.months.from_now,     2.months.from_now - 1,  'THD', 'TED and THD both exist as future dates but THD is earlier'],
-        [2.months.from_now,     1.day.ago,              'TED', 'TED and THD both exist as dates, TED in the future, THD is earlier but it is in the past'],
-        [nil,                   2.months.from_now,      'THD', 'TED does not exist but a future THD does'],
+        [Time.zone.today, nil,                  'TED', 'TED alone exists'],
+        [Time.zone.today - 1, Time.zone.today,  'TED', 'TED and THD both exist but TED is earlier'],
+        [Time.zone.today, Time.zone.today - 1,  'THD', 'TED and TED both exist but THD is earlier'],
+        [nil, Time.zone.today,                  'THD', 'TED does not exist but THD does'],
       ].each do |ted, thd, expected_date, situation|
         example "earliest date is #{expected_date} when #{situation}" do
           args[:tariff_date] = ted
@@ -345,7 +344,7 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
         args[:is_indeterminate] = false
       end
 
-      example 'there is no earliest release if PED, ARD, and CRD are all nil' do
+      example 'there is no earliest release if PED, ARD, and CRD are nil' do
         args[:parole_eligibility_date] = nil
         args[:automatic_release_date] = nil
         args[:conditional_release_date] = nil
