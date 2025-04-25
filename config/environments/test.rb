@@ -45,7 +45,6 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
 
   config.allocation_manager_host = 'http://localhost:3000'
-  config.new_mpc_host = 'http://localhost:3001'
   Rails.application.default_url_options[:host] = config.allocation_manager_host
 
   # It seems that the default cookie store behaves very subtly different to the cache store
