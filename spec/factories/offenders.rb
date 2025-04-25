@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# TODO: At some point the dates in this file will stop working for the scenarios and will make tests fail, 
-# we need to replace literal dates with relative ones...
-
 FactoryBot.define do
   factory :nomis_offender, class: Hash do
     initialize_with {
@@ -184,7 +181,7 @@ FactoryBot.define do
           { hearing_outcome_received_on: Date.parse("15th May 2023"),
             hearing_outcome: "Not Applicable" },
           { hearing_outcome_received_on: Date.parse("15th May 2024"),
-            hearing_outcome: "Release [*]", target_hearing_date: 1.week.from_now  },
+            hearing_outcome: "Release [*]", target_hearing_date: Date.parse("15th May 2023")  },
         ]
         hearing_outcomes.each do |hearing_outcome|
           create(:parole_review,
