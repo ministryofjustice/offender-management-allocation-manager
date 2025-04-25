@@ -25,7 +25,6 @@ generic-service:
     SENTRY_CURRENT_ENV: test
     CACHE_TIMEOUT: "3"
     ALLOCATION_MANAGER_HOST: https://test.moic.service.justice.gov.uk
-    NEW_MPC_HOST: https://manage-pom-cases-dev.prison.service.justice.gov.uk
     PRISON_API_HOST: https://prison-api-dev.prison.service.justice.gov.uk
     PRISONER_SEARCH_HOST: https://prisoner-search-dev.prison.service.justice.gov.uk
     COMMUNITY_API_HOST: https://community-api-secure.test.delius.probation.hmpps.dsd.io
