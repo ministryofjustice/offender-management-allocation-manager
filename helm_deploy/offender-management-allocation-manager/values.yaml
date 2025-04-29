@@ -22,7 +22,6 @@ custom_templates_config:
 # IMPORTANT: `staging` and `preprod` turn off RDS instance for cost savings
 # between 10:00 PM - 6:00 AM, so any cronjobs running on those environments
 # that require DB access must be scheduled outside this downtime window.
-# Additionally, none of these cronjobs should run in `test` environment.
 cronjobs:
   integration_tests_cleanup:
     enabled: false # should only be enabled in `staging`

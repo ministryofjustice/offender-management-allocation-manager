@@ -131,29 +131,21 @@ kubectl -n offender-management-production get secrets allocation-manager-secrets
 
 These are all managed manually using kubectl. [See here for more info](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/secrets.html#secrets-overview)
 
-## Deploying to staging, preprod and test
+## Deploying to staging and preprod
 
-staging, preprod and test are deployed environments that can be used as part of the development process. Their
+staging and preprod are deployed environments that can be used as part of the development process. Their
 purposes are:
 
 * staging - Deployed to first before deploying to production to make sure deployment works. Can also be deployed to
   separately by force-pushing to the `staging` branch.
 * preprod - Contains a copy of live data, updated via a script. Only security-cleared personnel can look at it. Deploy
   here when you need to check WIP code against real data.
-* test - Points to the same database as the staging environment, but does not need code to be mainlined to be
-  deployed to. Just like staging, contains synthetic data so does not require SC to access.
-  Deploy here when you need to check WIP code that requires valid NOMIS data. However, job workers always run in staging
-  so if you are testing background tasks, set the `RUN_JOBS_INLINE=1` environment variable so the jobs run when
-  they are invoked.
 
 The method to deploy to these envs is the same. Commit any code to be deployed locally, and run:
 
 ```
 # Staging environment
 git push --force origin HEAD:staging
-
-# Test environment
-git push --force origin HEAD:test
 
 # Preprod environment
 git push --force origin HEAD:preprod
