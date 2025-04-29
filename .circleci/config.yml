@@ -1,6 +1,6 @@
 references:
   ignore_deployable_branches: &ignore_deployable_branches
-    filters: { branches: { ignore: [main, staging, preprod, test] } }
+    filters: { branches: { ignore: [main, staging, preprod] } }
 
   docker_image_name: &docker_image_name
     image_name: quay.io/hmpps/offender-management
@@ -171,18 +171,9 @@ workflows:
             - helm_lint
       - hmpps/build_docker:
           <<: *build_and_push_docker_image_config
-          filters: { branches: { only: [ main, test, staging, preprod ] } }
+          filters: { branches: { only: [ main, staging, preprod ] } }
           requires:
             - helm_lint
-      - hmpps/deploy_env:
-          name: deploy_test
-          env: test
-          filters: { branches: { only: [ test ] } }
-          context:
-            - hmpps-common-vars # needed to fetch the ip-allowlist-groups
-            - offender-management-test
-          requires:
-            - build_and_push_docker_image
       - hmpps/deploy_env:
           name: deploy_staging
           env: staging
