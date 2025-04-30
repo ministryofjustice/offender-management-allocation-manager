@@ -33,8 +33,10 @@ config.health_checks = Health.new(timeout_in_seconds_per_check: 2, num_retries_p
     name: 'tieringApi',
     get_response: -> { HmppsApi::Client.new(config.tiering_api_host).get('/health/ping', cache: false) })
   .add_check(
+    # TODO: we nil the `Authorization` header because of a bug with this service, returning a different
+    # response body when passing the Bearer token. A nil authorization will make it behave like the other services.
     name: 'assessRisksAndNeedsApi',
-    get_response: -> { HmppsApi::Client.new(config.assess_risks_and_needs_api_host).get('/health/ping', cache: false) })
+    get_response: -> { HmppsApi::Client.new(config.assess_risks_and_needs_api_host).get('/health/ping', extra_headers: { 'Authorization' => nil }, cache: false) })
   .add_check(
     name: 'prisonAlertsApi',
     get_response: -> { HmppsApi::Client.new(config.prison_alerts_api_host).get('/health/ping', cache: false) })
