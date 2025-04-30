@@ -3,6 +3,7 @@
     <h2 class="govuk-summary-card__title">Offender details</h2>
   </div>
   <div class="govuk-summary-card__content">
+    <% if @offender %>
     <dl class="govuk-summary-list">
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Full name</dt>
@@ -77,6 +78,9 @@
           <% end %>
         </dd>
       </div>
+      <% else %>
+        <p class="govuk-body">Unable to retrieve offender details from prisoner search</p>
+      <% end %>
     </dl>
   </div>
 </div>

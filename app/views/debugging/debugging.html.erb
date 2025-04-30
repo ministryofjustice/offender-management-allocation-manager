@@ -14,37 +14,37 @@
   <% end %>
 </div>
 
-<% if @offender %>
+<% if @nomis_id %>
 
   <%= render partial: "offender_details",
     locals: { oasys_assessment: @oasys_assessment } %>
-
-  <%= render partial: @offender.responsibility_override? ? "responsibility_overridden" : "responsibility",
-    locals: { responsibility: @offender.send(:responsibility) } %>
-
+  
+  <%= render partial: @overidden_responsibility.present? ? "responsibility_overridden" : "responsibility", 
+    locals: { responsibility: @persisted_handover, override: @overidden_responsibility } %>
   <%= render partial: "responsibility_history",
     locals: { history: @persisted_handover.try(:history) } %>
 
+  <% if @offender %>
   <%= render partial: "sentence" %>
-
   <%= render partial: "sentence_history",
     locals: { sentences: @sentences.reverse } %>
-
   <%= render partial: "parole" %>
-
+  <% end %>
+  
   <%= render partial: "parole_history",
     locals: { parole_reviews: @parole_reviews } %>
 
   <%= render partial: "allocation",
     locals: { allocation: @allocation } %>
 
-  <%= render partial: "community" %>
+  <%= render partial: "community", 
+    locals: { case_information: @case_information }  %>
 
   <%= render partial: "movements",
     locals: { movements: @movements } %>
 
 <% else %>
 
-  <p class="govuk-body">Could not find offender with NOMIS ID <code><%= @nomis_id %></code></p>
+  <p class="govuk-body">Please enter a NOMIS Id for the offender</p>
 
 <% end %>

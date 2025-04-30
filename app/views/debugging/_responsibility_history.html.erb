@@ -3,7 +3,7 @@
     <h2 class="govuk-summary-card__title">Calculated responsibility & handover history</h2>
   </div>
   <div class="govuk-summary-card__content">
-    <% if history %>
+    <% if history&.any? %>
       <table class="govuk-table">
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
