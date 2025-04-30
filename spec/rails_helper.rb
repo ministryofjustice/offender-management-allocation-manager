@@ -117,13 +117,6 @@ RSpec.configure do |config|
     WebMock.disable_net_connect!(allow_localhost: true, allow: Rails.configuration.nomis_oauth_host)
   end
 
-  # This is to prevent most tests from having to mock this callback due
-  # to an after_save call back in AllocationHistory.Enable by setting
-  # the push_pom_to_delius tag in your tests
-  config.before(:each, type: lambda { |_v, m| m[:push_pom_to_delius] != true } ) do
-    allow(PushPomToDeliusJob).to receive(:perform_later)
-  end
-
   config.before(:each) do
     stub_request(:get, %r{#{Rails.configuration.prison_api_host}/api/offender-sentences/booking/\d+/sentenceTerms}).to_return(body: [].to_json)
   end
