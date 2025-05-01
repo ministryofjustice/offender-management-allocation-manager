@@ -18,6 +18,7 @@ class AllocationHistory < ApplicationRecord
   USER = 0
   OFFENDER_TRANSFERRED = 1
   OFFENDER_RELEASED = 2
+  POM_BECAME_INACTIVE = 3
 
   after_commit :publish_allocation_changed_event
 
@@ -39,7 +40,8 @@ class AllocationHistory < ApplicationRecord
   enum event_trigger: {
     user: USER,
     offender_transferred: OFFENDER_TRANSFERRED,
-    offender_released: OFFENDER_RELEASED
+    offender_released: OFFENDER_RELEASED,
+    pom_became_inactive: POM_BECAME_INACTIVE
   }
 
   scope :active, -> { where.not(primary_pom_nomis_id: nil) }
@@ -99,25 +101,25 @@ class AllocationHistory < ApplicationRecord
   # one is not. It should still show up in the 'waiting to allocate' bucket.
   # This appears to be safe as allocations only show up for viewing if they have
   # a non-nil primary_pom_nomis_id
-  def self.deallocate_primary_pom(nomis_staff_id, prison)
+  def self.deallocate_primary_pom(nomis_staff_id, prison, event_trigger: USER)
     active_pom_allocations(nomis_staff_id, prison).each do |alloc|
       alloc.primary_pom_nomis_id = nil
       alloc.primary_pom_name = nil
       alloc.recommended_pom_type = nil
       alloc.primary_pom_allocated_at = nil
       alloc.event = DEALLOCATE_PRIMARY_POM
-      alloc.event_trigger = USER
+      alloc.event_trigger = event_trigger
 
       alloc.save!
     end
   end
 
-  def self.deallocate_secondary_pom(nomis_staff_id, prison)
+  def self.deallocate_secondary_pom(nomis_staff_id, prison, event_trigger: USER)
     active_pom_allocations(nomis_staff_id, prison).each do |alloc|
       alloc.secondary_pom_nomis_id = nil
       alloc.secondary_pom_name = nil
       alloc.event = DEALLOCATE_SECONDARY_POM
-      alloc.event_trigger = USER
+      alloc.event_trigger = event_trigger
 
       alloc.save!
     end

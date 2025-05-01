@@ -124,6 +124,15 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
         expect(deallocation.primary_pom_name).to be_nil
         expect(deallocation.primary_pom_allocated_at).to be_nil
         expect(deallocation.recommended_pom_type).to be_nil
+        expect(deallocation.event_trigger).to eq('user')
+      end
+
+      it 'can specify an event trigger when removing the primary pom from the allocations' do
+        described_class.deallocate_primary_pom(nomis_staff_id, allocation.prison, event_trigger: AllocationHistory::POM_BECAME_INACTIVE)
+
+        deallocation = described_class.find_by!(nomis_offender_id: nomis_offender_id)
+
+        expect(deallocation.event_trigger).to eq('pom_became_inactive')
       end
 
       it 'removes them as the secondary pom from all allocations' do
@@ -133,6 +142,14 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
 
         expect(deallocation.secondary_pom_nomis_id).to be_nil
         expect(deallocation.secondary_pom_name).to be_nil
+      end
+
+      it 'can specify an event trigger when removing the secondary pom from the allocations' do
+        described_class.deallocate_secondary_pom(nomis_staff_id, allocation.prison, event_trigger: AllocationHistory::POM_BECAME_INACTIVE)
+
+        deallocation = described_class.find_by!(nomis_offender_id: another_nomis_offender_id)
+
+        expect(deallocation.event_trigger).to eq('pom_became_inactive')
       end
     end
 
