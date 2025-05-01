@@ -34,60 +34,6 @@ class OffenderService
         .compact
     end
 
-    def get_community_data(nomis_offender_id)
-      community_info = HmppsApi::CommunityApi.get_offender(nomis_offender_id).deep_symbolize_keys
-      registrations = HmppsApi::CommunityApi.get_offender_registrations(nomis_offender_id).deep_symbolize_keys.fetch(:registrations, [])
-
-      mappa_registrations = registrations.select do |r|
-        r.fetch(:active) && r.key?(:registerLevel) && r.dig(:registerLevel, :code).starts_with?('M')
-      end
-
-      enhanced_resourcing = begin
-        HmppsApi::CommunityApi.get_latest_resourcing(nomis_offender_id).fetch('enhancedResourcing', true)
-      rescue Faraday::ResourceNotFound
-        true
-      end
-
-      com = community_info.fetch(:offenderManagers).detect { |om| om.fetch(:active) }
-
-      {
-        noms_no: nomis_offender_id,
-        tier: community_info.fetch(:currentTier),
-        crn: community_info.dig(:otherIds, :crn),
-        enhanced_resourcing: enhanced_resourcing,
-        offender_manager: com.dig(:staff, :unallocated) ? nil : "#{com.dig(:staff, :surname)}, #{com.dig(:staff, :forenames)}",
-        team_name: com.dig(:team, :description),
-        ldu_code: com.dig(:team, :localDeliveryUnit, :code),
-        mappa_levels: mappa_registrations.map { |r| r.dig(:registerLevel, :code).last.to_i },
-        active_vlo: registrations.any? { |r| r.fetch(:active) && %w[INVI DASO].include?(r.dig(:type, :code)) }
-      }.with_indifferent_access
-    end
-
-    def get_com(nomis_offender_id)
-      oms = HmppsApi::CommunityApi.get_all_offender_managers(nomis_offender_id)
-      com = oms.detect { |om| om['isPrisonOffenderManager'] == false }
-
-      personal_details = if com['isUnallocated']
-                           {
-                             name: nil,
-                             email: nil,
-                             is_unallocated: true,
-                           }
-                         else
-                           staff = com.fetch('staff')
-                           {
-                             name: [staff.fetch('surname'), staff.fetch('forenames')].join(', '),
-                             email: staff['email'],
-                             is_unallocated: false,
-                           }
-                         end
-      personal_details.merge({
-        is_responsible: com.fetch('isResponsibleOfficer'),
-        team_name: com.fetch('team').fetch('description'),
-        ldu_code: com.fetch('team').fetch('localDeliveryUnit').fetch('code'),
-      }).with_indifferent_access
-    end
-
     def get_mappa_details(crn)
       nil_details = { category: nil, level: nil, short_description: nil, review_date: nil, start_date: nil }
 

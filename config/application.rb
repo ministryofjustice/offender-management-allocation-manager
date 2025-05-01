@@ -56,7 +56,6 @@ module OffenderManagementAllocationClient
     config.manage_pom_cases_and_delius_host = ENV['MANAGE_POM_CASES_AND_DELIUS_HOST']&.strip
     config.tiering_api_host = ENV['TIERING_API_HOST']&.strip
     config.dps_frontend_components_api_host = ENV['DPS_FRONTEND_COMPONENTS_API_HOST']&.strip
-    config.community_api_host = ENV['COMMUNITY_API_HOST']&.strip
     config.prison_alerts_api_host = ENV['PRISON_ALERTS_API_HOST']&.strip
     config.mailbox_register_api_host = ENV['MAILBOX_REGISTER_API_HOST']&.strip
 

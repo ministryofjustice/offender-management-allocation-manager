@@ -41,11 +41,10 @@ generic-service:
   env:
     ENV_NAME: staging
     SENTRY_CURRENT_ENV: staging
-    CACHE_TIMEOUT: "3"
+    CACHE_TIMEOUT: "60" # seconds
     ALLOCATION_MANAGER_HOST: https://dev.moic.service.justice.gov.uk
     PRISON_API_HOST: https://prison-api-dev.prison.service.justice.gov.uk
     PRISONER_SEARCH_HOST: https://prisoner-search-dev.prison.service.justice.gov.uk
-    COMMUNITY_API_HOST: https://community-api-secure.test.delius.probation.hmpps.dsd.io
     COMPLEXITY_API_HOST: https://complexity-of-need-staging.hmpps.service.justice.gov.uk
     NOMIS_OAUTH_HOST: https://sign-in-dev.hmpps.service.justice.gov.uk
     ASSESS_RISKS_AND_NEEDS_API_HOST: https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk

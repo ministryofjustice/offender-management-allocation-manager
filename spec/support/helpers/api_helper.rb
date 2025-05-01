@@ -7,7 +7,6 @@ module ApiHelper
   ASSESS_RISKS_AND_NEEDS_API_HOST = Rails.configuration.assess_risks_and_needs_api_host
   MANAGE_POM_CASES_AND_DELIUS_HOST = Rails.configuration.manage_pom_cases_and_delius_host
   KEYWORKER_API_HOST = ENV.fetch('KEYWORKER_API_HOST')
-  COMMUNITY_HOST = "#{Rails.configuration.community_api_host}/secure".freeze
   T3_LATEST_MOVE_URL = "#{T3}/movements/offenders?latestOnly=true&movementTypes=TAP".freeze
   T3_BOOKINGS_URL = "#{T3}/offender-sentences/bookings".freeze
 
@@ -187,20 +186,9 @@ module ApiHelper
       .to_return(body: keyworker.to_json)
   end
 
-  def stub_community_offender(nomis_offender_id, community_data, registrations = [])
-    stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/all")
-        .to_return(body: community_data.to_json)
-    stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/registrations")
-        .to_return(body: { registrations: registrations }.to_json)
-    stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/risk/resourcing/latest")
-        .to_return(body: community_data.slice(:enhancedResourcing).to_json)
+  def stub_community_offender(_nomis_offender_id, _community_data)
     stub_request(:get, Addressable::Template.new("#{MANAGE_POM_CASES_AND_DELIUS_HOST}/case-records/{crn}/risks/mappa"))
         .to_return(body: { "category" => 3, "level" => 1, "reviewDate" => "2021-04-27", "startDate" => "2021-01-27" }.to_json)
-  end
-
-  def stub_get_all_offender_managers(nomis_offender_id, stubbed_data)
-    stub_request(:get, "#{COMMUNITY_HOST}/offenders/nomsNumber/#{nomis_offender_id}/allOffenderManagers")
-      .to_return(body: stubbed_data.to_json)
   end
 
   def stub_agencies(type)
