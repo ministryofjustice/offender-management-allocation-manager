@@ -3,33 +3,38 @@
     <h2 class="govuk-summary-card__title">Prison allocation</h2>
   </div>
   <div class="govuk-summary-card__content">
-    <% if allocation.try(:active?) %>
+    <% if allocation %>
       <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">POM role</dt>
+          <dt class="govuk-summary-list__key">Active?</dt>
           <dd class="govuk-summary-list__value">
-            <% if @offender.inside_omic_policy? %>
-              <%= pom_responsibility_label(@offender) if @offender.probation_record.present? %>
-            <% else %>
-              Information unavailable as this case is outside OMIC policy
-            <% end %>
+            <%= allocation.active? ? 'Yes' : 'No' %>
           </dd>
         </div>
+        
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">POM</dt>
-          <dd class="govuk-summary-list__value"><%= allocation.primary_pom_name.titleize %></dd>
+          <dd class="govuk-summary-list__value">
+            <%= allocation.primary_pom_name&.titleize %>
+          </dd>
         </div>
+        
+        <% if @offender %>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">POM Role</dt>
+            <dd class="govuk-summary-list__value">
+              <%= pom_responsibility_label(@offender) %>
+            </dd>
+          </div>
+        <% end %>
+          
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">Last allocation event</dt>
           <dd class="govuk-summary-list__value"><%= last_event(allocation) %></dd>
         </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">Early Allocation?</dt>
-          <dd class="govuk-summary-list__value"><%= humanized_bool(@offender.early_allocation?) %></dd>
-        </div>
       </dl>
     <% else %>
-      <p class="govuk-body">Not currently allocated</p>
+      <p class="govuk-body">No allocation recorded</p>
     <% end %>
   </div>
 </div>

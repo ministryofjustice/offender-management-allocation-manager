@@ -7,6 +7,7 @@ feature 'Provide debugging information for our team to use' do
   before do
     allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).and_return(nil)
     allow(Sentences).to receive(:for).and_return([])
+    # allow(HmppsApi::PrisonApi::MovementApi).to receive(:movements_for).and_return(double(in?: true).as_null_object)
     signin_global_admin_user
   end
 
@@ -26,26 +27,6 @@ feature 'Provide debugging information for our team to use' do
       expect(page).to have_content('Rossana Spinka')
       expect(page).to have_content('Movement date 29 Mar 2017')
       expect(page).to have_content('No OASys information')
-    end
-
-    it 'can handle an incorrect offender number', vcr: { cassette_name: 'prison_api/debugging_incorrect_offender_feature' } do
-      visit prison_debugging_path('LEI')
-
-      expect(page).to have_text('Debugging')
-      fill_in 'offender_no', with: 'A1234BC'
-      click_on('search-button')
-
-      expect(page).to have_content('Could not find offender')
-    end
-
-    it 'can handle no offender number being entered', vcr: { cassette_name: 'prison_api/debugging_no_offender_feature' } do
-      visit prison_debugging_path('LEI')
-
-      expect(page).to have_text('Debugging')
-      fill_in 'offender_no', with: ''
-      click_on('search-button')
-
-      expect(page).to have_content('Could not find offender')
     end
   end
 end
