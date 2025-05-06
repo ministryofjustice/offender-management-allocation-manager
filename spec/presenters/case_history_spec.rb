@@ -24,7 +24,7 @@ describe CaseHistory do
       allocation = AllocationHistory.new(created_by_name: "End User")
       version = PaperTrail::Version.new
       case_history = described_class.new(nil, allocation, version)
-      expect(case_history.created_by_name).to be(nil)
+      expect(case_history.created_by_name).to be_nil
     end
   end
 end

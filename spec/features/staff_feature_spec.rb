@@ -37,7 +37,7 @@ feature "staff pages" do
     before do
       stub_signin_spo pom, [prison.code]
       stub_offenders_for_prison(prison.code, offenders_in_prison)
-      stub_poms(prison.code, (prison_poms + [pom]))
+      stub_poms(prison.code, prison_poms + [pom])
 
       offenders_in_prison.each do |offender|
         nomis_offender_id = offender[:prisonerNumber]

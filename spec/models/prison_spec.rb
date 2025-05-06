@@ -40,13 +40,13 @@ RSpec.describe Prison do
     it "get first page of offenders for a specific prison",
        vcr: { cassette_name: 'prison_api/offender_service_offenders_by_prison_first_page_spec' } do
       offender_array = subject.first(9)
-      expect(offender_array).to be_kind_of(Array)
+      expect(offender_array).to be_a(Array)
       expect(offender_array.length).to eq(9)
     end
 
     it "get last page of offenders for a specific prison", vcr: { cassette_name: 'prison_api/offender_service_offenders_by_prison_last_page_spec' } do
       offender_array = subject.to_a
-      expect(offender_array).to be_kind_of(Array)
+      expect(offender_array).to be_a(Array)
       expect(offender_array.length).to be > 800
     end
 

@@ -323,7 +323,7 @@ describe HmppsApi::Offender do
         expect(offender.location).to eq(offender_location)
       end
 
-      it "returns correct prison code using " do
+      it "returns correct prison code using" do
         expect(offender.prison_id).to eq('LEI')
       end
     end

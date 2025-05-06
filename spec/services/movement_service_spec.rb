@@ -8,9 +8,9 @@ describe MovementService, type: :feature do
   it "can get recent movements",
      vcr: { cassette_name: 'prison_api/movement_service_recent_spec' }  do
     movements = described_class.movements_on(Date.iso8601('2019-02-20'))
-    expect(movements).to be_kind_of(Array)
+    expect(movements).to be_a(Array)
     expect(movements.length).to eq(2)
-    expect(movements.first).to be_kind_of(HmppsApi::Movement)
+    expect(movements.first).to be_a(HmppsApi::Movement)
   end
 
   it "can ignore movements OUT",

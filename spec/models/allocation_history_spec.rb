@@ -395,7 +395,7 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
         it_behaves_like 'publish count', 2
       end
 
-      context 'when re-allocating primary POM ' do
+      context 'when re-allocating primary POM' do
         before do
           allocation.update!(primary_pom_nomis_id: updated_nomis_staff_id)
         end

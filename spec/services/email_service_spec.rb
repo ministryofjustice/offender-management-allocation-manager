@@ -90,7 +90,7 @@ RSpec.describe EmailService do
 
       expect {
         described_class.send_email(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id)
-      }.to change(enqueued_jobs, :size).by(0)
+      }.not_to change(enqueued_jobs, :size)
     end
 
     it "Can send a reallocation email"  do
@@ -116,7 +116,7 @@ RSpec.describe EmailService do
         described_class.send_cowork_deallocation_email(allocation: coworking_deallocation,
                                                        pom_nomis_id: coworking_deallocation.primary_pom_nomis_id,
                                                        secondary_pom_name: coworking_allocation.secondary_pom_name)
-      }.to change(enqueued_jobs, :size).by(0)
+      }.not_to change(enqueued_jobs, :size)
     end
   end
 

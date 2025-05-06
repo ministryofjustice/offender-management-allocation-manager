@@ -21,7 +21,7 @@ describe PrisonOffenderManagerService do
       let(:moic_integration_tests) { subject.detect { |x| x.first_name == 'MOIC' } }
 
       it "can get a list of POMs", vcr: { cassette_name: 'prison_api/pom_service_get_poms_list' } do
-        expect(subject).to be_kind_of(Enumerable)
+        expect(subject).to be_a(Enumerable)
         expect(subject.count { |pom| pom.status == 'active' }).to eq(subject.count)
         expect(moic_integration_tests.probation_officer?).to eq(true)
       end
@@ -31,7 +31,7 @@ describe PrisonOffenderManagerService do
       it "can fetch a single POM for a prison",
          vcr: { cassette_name: 'prison_api/pom_service_get_pom_ok' } do
         pom = prison.get_single_pom(staff_id)
-        expect(pom).not_to be nil
+        expect(pom).not_to be_nil
       end
 
       it "raises an exception when fetching a pom if they are not a POM",

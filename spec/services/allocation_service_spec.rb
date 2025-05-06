@@ -105,7 +105,7 @@ describe AllocationService do
   end
 
   describe '#allocation_history_pom_emails' do
-    it 'can retrieve all the POMs email addresses for ', vcr: { cassette_name: 'prison_api/allocation_service_history_spec' } do
+    it 'can retrieve all the POMs email addresses for', vcr: { cassette_name: 'prison_api/allocation_service_history_spec' } do
       previous_primary_pom_nomis_id = 485_637
       updated_primary_pom_nomis_id = 485_926
       secondary_pom_nomis_id = 485_833
