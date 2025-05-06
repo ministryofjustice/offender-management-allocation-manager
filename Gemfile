@@ -67,7 +67,7 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
   gem 'parallel_tests'
-  gem 'rubocop-govuk', '~> 4.12'
+  gem 'rubocop-govuk'
   gem 'rspec-rails'
   gem 'rspec-core'
   gem 'rswag-specs'
