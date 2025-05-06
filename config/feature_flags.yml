@@ -5,3 +5,4 @@ feature_flags:
   ppud_s3_bucket:
     staging: true
     preprod: true
+    production: true
