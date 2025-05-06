@@ -1,0 +1,14 @@
+<h2 class="govuk-heading-l">
+  Confirmation of deallocations
+</h2>
+
+<p class="govuk-body">The following cases will be deallocated:</p>
+
+<%= render 'table' %>
+
+<%= form_tag(manage_deallocate_pom_path(staff_id: params[:staff_id], prison: params[:prison]), method: :patch) do %>
+  <div class="govuk-button-group">
+    <input type="submit" class="govuk-button" value="Deallocate <%= 'Case'.pluralize(@allocations.count) %>">
+    <%= link_to "Back to POM", manage_deallocate_pom_path(staff_id: params[:staff_id]), class: "govuk-link" %>
+  </div>
+<% end %>

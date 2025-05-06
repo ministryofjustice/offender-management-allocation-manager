@@ -1,0 +1,22 @@
+<table class="govuk-table">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Case ID</th>
+      <th scope="col" class="govuk-table__header">Prison</th>
+      <th scope="col" class="govuk-table__header">Primary POM</th>
+      <th scope="col" class="govuk-table__header">Secondary POM</th>
+      <th scope="col" class="govuk-table__header">Last Event</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <% @allocations.each do |allocation| %>
+      <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header"><%= link_to allocation.nomis_offender_id, prison_debugging_path(prison_id: default_prison_code, offender_no: allocation.nomis_offender_id) %></th>
+        <td class="govuk-table__cell"><%= allocation.prison %></td>
+        <td class="govuk-table__cell <%= allocation.primary_pom_nomis_id.to_s == params[:staff_id] ? 'govuk-!-font-weight-bold' : '' %>"><%= allocation.primary_pom_name %></td>
+        <td class="govuk-table__cell <%= allocation.secondary_pom_nomis_id.to_s == params[:staff_id] ? 'govuk-!-font-weight-bold' : '' %>"><%= allocation.secondary_pom_name %></td>
+        <td class="govuk-table__cell"><%= allocation.event %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
