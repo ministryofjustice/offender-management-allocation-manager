@@ -1,17 +1,7 @@
 require "rails_helper"
 
-describe HandoverFollowUpJob::FollowUpEmailDetails, vcr: { cassette_name: "prison_api/handover_follow_up_email_details" } do
-  around do |example|
-    cassettes = [
-      { name: 'prison_api/pom_api_list_spec', options: { record: :all } },
-      { name: 'prison_api/elite2_staff_api_get_email', options: { record: :all } }
-    ]
-    VCR.use_cassettes(cassettes) do
-      example.run
-    end
-  end
-
-  let(:prison) { Prison.find_by(code: "LEI") }
+describe HandoverFollowUpJob::FollowUpEmailDetails do
+  let(:prison) { create(:prison, code: "LEI") }
   let(:handover_start_date) { 1.week.from_now }
   let(:handover_date) { 2.weeks.from_now }
   let(:indeterminate_sentence) { false }
@@ -29,6 +19,11 @@ describe HandoverFollowUpJob::FollowUpEmailDetails, vcr: { cassette_name: "priso
   end
 
   describe "the details used in sending the CommunityMailer email" do
+    before do
+      stub_auth_token
+      stub_poms(prison.code, [build(:pom, staffId: 486_154, firstName: 'MOIC', lastName: 'POM', emails: ['test@example.com'])])
+    end
+
     it "includes basic details regardless of allocation or sentence type" do
       details = described_class.for(offender:)
 
@@ -53,8 +48,8 @@ describe HandoverFollowUpJob::FollowUpEmailDetails, vcr: { cassette_name: "priso
         details = described_class.for(offender:)
 
         expect(details).to include(
-          pom_email: "tom.rooker@digital.justice.gov.uk", # comes from the elite2_staff_api_get_email VCR
-          pom_name: "Rooker, Tom", # comes from the pom_api_list_spec VCR
+          pom_email: "test@example.com",
+          pom_name: "Pom, Moic",
         )
       end
     end
@@ -96,7 +91,7 @@ describe HandoverFollowUpJob::FollowUpEmailDetails, vcr: { cassette_name: "priso
     context "when the offender sentence is indeterminate" do
       let(:indeterminate_sentence) { true }
 
-      it "has 'Ineterminate' as the sentence type in the email" do
+      it "has 'Indeterminate' as the sentence type in the email" do
         details = described_class.for(offender:)
 
         expect(details).to include(sentence_type: "Indeterminate")
