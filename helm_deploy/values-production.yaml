@@ -12,9 +12,6 @@ cronjobs:
   deactivate_cnls:
     enabled: true
     schedule: 45 3 * * *
-  parole_data_import:
-    enabled: true
-    schedule: 0 4 * * *
   early_allocation_suitability_email:
     enabled: true
     schedule: 30 4 * * *
@@ -30,6 +27,9 @@ cronjobs:
   community_api_import:
     enabled: true
     schedule: 0 6 * * *
+  parole_data_import:
+    enabled: true
+    schedule: 15 7 * * *
 
 generic-prometheus-alerts:
   alertSeverity: mpc-alerts-prod
