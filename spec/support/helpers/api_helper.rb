@@ -91,9 +91,11 @@ module ApiHelper
       .to_return(body: emails.to_json)
   end
 
-  def stub_pom(pom)
+  def stub_pom(pom, emails: nil)
     stub_request(:get, "#{T3}/staff/#{pom.staffId}")
       .to_return(body: pom.to_json)
+
+    stub_pom_emails(pom.staffId, emails) if emails
   end
 
   def stub_signed_in_pom(prison, staff_id, username = 'alice')

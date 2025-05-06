@@ -2,8 +2,9 @@
 
 require 'swagger_helper'
 
-describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } do
+describe 'Allocation API' do
   let(:Authorization) { "Bearer TEST_TOKEN" }
+  let(:staff_id) { 485_926 }
 
   path '/api/allocation/{nomsNumber}' do
     get 'Retrieves the current allocation for an offender' do
@@ -53,16 +54,11 @@ describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } d
           end
 
           run_test! do |_|
-            # check primary POM name stored in allocation
-            allocation = AllocationHistory.last
-            expect(allocation.primary_pom_name).to eq('OLD_NAME, MOIC')
-
             primary_pom = JSON.parse(response.body)['primary_pom']
             secondary_pom = JSON.parse(response.body)['secondary_pom']
 
-            expect(primary_pom['staff_id']).to eq(485_926)
-            # ensure the API returns the POM name stored in NOMIS rather than the allocation
-            expect(primary_pom['name']).to eq('POM, MOIC')
+            expect(primary_pom['staff_id']).to eq(staff_id)
+            expect(primary_pom['name']).to eq('OLD_NAME, MOIC')
 
             expect(secondary_pom).to eq({})
           end
@@ -98,6 +94,12 @@ describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } d
       describe 'when authorised' do
         before do
           allow_any_instance_of(Api::AllocationApiController).to receive(:verify_token)
+
+          stub_auth_token
+          stub_pom(
+            build(:pom, staffId: staff_id, firstName: 'MOIC', lastName: 'POM'),
+            emails: ['test@example.com']
+          )
         end
 
         response '200', 'Offender is allocated' do
@@ -126,18 +128,15 @@ describe 'Allocation API', vcr: { cassette_name: 'prison_api/allocation_api' } d
           end
 
           run_test! do |_|
-            # check primary POM name stored in allocation
-            allocation = AllocationHistory.last
-            expect(allocation.primary_pom_name).to eq('OLD_NAME, MOIC')
-
             manager = JSON.parse(response.body)['manager']
             prison = JSON.parse(response.body)['prison']
 
-            expect(manager['code']).to eq(485_926)
+            expect(manager['code']).to eq(staff_id)
 
-            # ensure the API returns the POM name stored in NOMIS rather than the allocation
+            # details coming from the prison-api staff endpoint instead of the allocation DB record
             expect(manager['forename']).to eq('MOIC')
             expect(manager['surname']).to eq('POM')
+            expect(manager['email']).to eq('test@example.com')
 
             expect(prison['code']).to eq('LEI')
           end

@@ -4,17 +4,16 @@ module Api
   class AllocationApiController < Api::ApiController
     rescue_from HmppsApi::Error::Unauthorized, with: :unauthorized_error
 
-    def show
-      render_404('Not ready for allocation') && return if allocation.nil?
-      render_404('Not allocated') && return unless offender_allocated?
+    before_action :check_allocation_status
 
-      render json: both_poms
+    def show
+      render json: {
+        primary_pom: primary_pom_details,
+        secondary_pom: secondary_pom_details
+      }
     end
 
     def primary_pom
-      render_404('Not ready for allocation') && return if allocation.nil?
-      render_404('Not allocated') && return unless offender_allocated?
-
       staff = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(allocation.primary_pom_nomis_id)
 
       render json: {
@@ -32,17 +31,18 @@ module Api
 
   private
 
-    def both_poms
-      {
-        primary_pom: primary_pom_details,
-        secondary_pom: secondary_pom_details
-      }
+    def check_allocation_status
+      if allocation.nil?
+        render_404('Not ready for allocation')
+      elsif !allocation.active?
+        render_404('Not allocated')
+      end
     end
 
     def primary_pom_details
       {
         staff_id: @allocation.primary_pom_nomis_id,
-        name: PrisonOffenderManagerService.fetch_pom_name(@allocation.primary_pom_nomis_id, ordered: false)
+        name: @allocation.primary_pom_name
       }
     end
 
@@ -51,20 +51,12 @@ module Api
 
       {
         staff_id: @allocation.secondary_pom_nomis_id,
-        name: PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id, ordered: false)
+        name: @allocation.secondary_pom_name
       }
-    end
-
-    def offender_allocated?
-      offender.present? && offender.inside_omic_policy? && allocation.active?
     end
 
     def allocation
       @allocation ||= AllocationHistory.find_by(nomis_offender_id: offender_number)
-    end
-
-    def offender
-      @offender ||= OffenderService.get_offender(offender_number)
     end
 
     def offender_number
