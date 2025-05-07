@@ -53,7 +53,7 @@ generic-service:
 
   postgresDatabaseRestore:
     enabled: true
-    schedule: "15 6 * * 3" # At 06:15 on Wednesdays
+    schedule: "0 20 * * 3" # At 20:00 on Wednesdays
     jobName: "db-refresh-job"
     env:
       MIGRATIONS_VENDOR: "active_record"
