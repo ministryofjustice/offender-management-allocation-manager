@@ -1,32 +1,27 @@
 class Manage::DeallocatePomsController < ApplicationController
   before_action :authenticate_user, :ensure_admin_user
-  before_action :fetch_allocations, only: %i[show confirm update]
 
-  def index
-    redirect_to manage_deallocate_pom_path(staff_id: params[:staff_id]) if params[:staff_id].present?
+  def search
+    @allocations = if params[:staff_id].present?
+                     AllocationHistory.for_pom(params[:staff_id])
+                   elsif params[:case_id].present?
+                     AllocationHistory.where(nomis_offender_id: params[:case_id])
+                   else
+                     []
+                   end
   end
 
-  def show; end
-
-  def confirm; end
+  def confirm
+    @allocations = AllocationHistory.where(id: params[:allocation_ids])
+  end
 
   def update
-    @allocations.each do |allocation|
+    Array(params[:allocation_ids]).each do |allocation_id|
+      allocation = AllocationHistory.find(allocation_id)
       allocation.deallocate_primary_pom(event_trigger: AllocationHistory::MANUAL_CHANGE)
       allocation.deallocate_secondary_pom(event_trigger: AllocationHistory::MANUAL_CHANGE)
     end
 
-    redirect_to manage_deallocate_pom_path(staff_id: params[:staff_id])
-  end
-
-private
-
-  def fetch_allocations
-    @allocations = AllocationHistory.for_pom(params[:staff_id])
-
-    # optionally filter by prison
-    if params[:prison].present? && params[:prison].in?(PrisonService::PRISONS.keys)
-      @allocations = @allocations.at_prison(params[:prison])
-    end
+    redirect_to manage_deallocate_poms_path
   end
 end

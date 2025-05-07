@@ -4,11 +4,11 @@
 
 <p class="govuk-body">The following cases will be deallocated:</p>
 
-<%= render 'table' %>
-
-<%= form_tag(manage_deallocate_pom_path(staff_id: params[:staff_id], prison: params[:prison]), method: :patch) do %>
+<%= form_tag(manage_deallocate_poms_update_path, method: :patch) do %>
+  <%= render 'table', hide_checkboxes: true %>
+  
   <div class="govuk-button-group">
-    <input type="submit" class="govuk-button" value="Deallocate <%= 'Case'.pluralize(@allocations.count) %>">
-    <%= link_to "Back to POM", manage_deallocate_pom_path(staff_id: params[:staff_id]), class: "govuk-link" %>
+    <input type="submit" class="govuk-button" value="Deallocate <%= @allocations.count %> <%= 'Case'.pluralize(@allocations.count) %>">
+    <%= link_to "Reset Form", manage_deallocate_poms_path, class: "govuk-link" %>
   </div>
 <% end %>

@@ -1,0 +1,10 @@
+<%= render 'header' %>
+
+<%= form_tag(manage_deallocate_poms_confirm_path, method: :patch) do %>
+  <%= render 'table', hide_checkboxes: false %>
+  
+  <div class="govuk-button-group">
+    <input type="submit" class="govuk-button" value="Deallocate Selected Cases">
+    <%= link_to "Reset Form", manage_deallocate_poms_path, class: "govuk-link" %>
+  </div>
+<% end %>
