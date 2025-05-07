@@ -1,21 +1,40 @@
 <table class="govuk-table">
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
+      <% unless defined?(:hide_checkboxes) && hide_checkboxes %><th class="govuk-table__header" scope="col"></th><% end %>
       <th scope="col" class="govuk-table__header">Case ID</th>
       <th scope="col" class="govuk-table__header">Prison</th>
       <th scope="col" class="govuk-table__header">Primary POM</th>
       <th scope="col" class="govuk-table__header">Secondary POM</th>
       <th scope="col" class="govuk-table__header">Last Event</th>
+      <th scope="col" class="govuk-table__header">Allocated At</th>
     </tr>
   </thead>
   <tbody class="govuk-table__body">
     <% @allocations.each do |allocation| %>
-      <tr class="govuk-table__row">
+      <% if defined?(:hide_checkboxes) && hide_checkboxes %>
+        <input type="hidden" name="allocation_ids[]" value="<%= allocation.id %>">
+      <% else %>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">
+            <div class="govuk-checkboxes__item govuk-checkboxes--small moj-multi-select__checkbox">
+              <input type="checkbox" name="allocation_ids[]" value="<%= allocation.id %>" class="govuk-checkboxes__input" id="cases-<%= allocation.nomis_offender_id %>">
+              <label class="govuk-label govuk-checkboxes__label" for="cases-<%= allocation.nomis_offender_id %>">
+                <span class="govuk-visually-hidden">Select <%= allocation.nomis_offender_id %></span>
+              </label>
+            </div>
+          </th>
+        <% end %>
         <th scope="row" class="govuk-table__header"><%= link_to allocation.nomis_offender_id, prison_debugging_path(prison_id: default_prison_code, offender_no: allocation.nomis_offender_id) %></th>
         <td class="govuk-table__cell"><%= allocation.prison %></td>
-        <td class="govuk-table__cell <%= allocation.primary_pom_nomis_id.to_s == params[:staff_id] ? 'govuk-!-font-weight-bold' : '' %>"><%= allocation.primary_pom_name %></td>
-        <td class="govuk-table__cell <%= allocation.secondary_pom_nomis_id.to_s == params[:staff_id] ? 'govuk-!-font-weight-bold' : '' %>"><%= allocation.secondary_pom_name %></td>
+        <td class="govuk-table__cell <%= allocation.primary_pom_nomis_id.to_s == params[:staff_id] ? 'govuk-!-font-weight-bold' : '' %>">
+          <%= link_to allocation.primary_pom_name, manage_deallocate_poms_path(staff_id: allocation.primary_pom_nomis_id) if allocation.primary_pom_nomis_id.present? %>
+        </td>
+        <td class="govuk-table__cell <%= allocation.secondary_pom_nomis_id.to_s == params[:staff_id] ? 'govuk-!-font-weight-bold' : '' %>">
+          <%= link_to allocation.secondary_pom_name, manage_deallocate_poms_path(staff_id: allocation.secondary_pom_nomis_id) if allocation.secondary_pom_nomis_id.present? %>
+        </td>
         <td class="govuk-table__cell"><%= allocation.event %></td>
+        <td class="govuk-table__cell"><%= allocation.primary_pom_allocated_at&.strftime('%d/%m/%Y %H:%M') %></td>
       </tr>
     <% end %>
   </tbody>
