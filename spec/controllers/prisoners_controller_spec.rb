@@ -474,7 +474,7 @@ RSpec.describe PrisonersController, type: :controller do
         stub_signed_in_pom(prison, nomis_staff_id)
       end
 
-      context 'when user is an SPO ' do
+      context 'when user is an SPO' do
         before do
           stub_sso_data(prison)
         end
@@ -520,7 +520,7 @@ RSpec.describe PrisonersController, type: :controller do
 
               expect(updated_offenders.count).to eq(3)
               expect(alloc_offender.formatted_pom_name).to eq('Alice Ward')
-              expect(alloc_offender.allocation_date).to be_kind_of(Date)
+              expect(alloc_offender.allocation_date).to be_a(Date)
             end
 
             it 'can find all the Alices' do
@@ -537,7 +537,7 @@ RSpec.describe PrisonersController, type: :controller do
               get :search, params: { prison_id: prison, q: 'Blog' }
 
               expect(alloc_offender.formatted_pom_name).to eq('Alice Ward')
-              expect(alloc_offender.allocation_date).to be_kind_of(Date)
+              expect(alloc_offender.allocation_date).to be_a(Date)
             end
           end
         end
@@ -629,7 +629,7 @@ RSpec.describe PrisonersController, type: :controller do
       get :show, params: { prison_id: prison.code, id: offender_id }
 
       expect(response.status).to be(200)
-      expect(assigns(:primary_pom_name)).to be(nil)
+      expect(assigns(:primary_pom_name)).to be_nil
       expect(assigns(:secondary_pom_name)).to eq('Secondary Pom')
     end
   end

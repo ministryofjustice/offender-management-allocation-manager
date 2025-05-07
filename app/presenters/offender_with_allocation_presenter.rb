@@ -24,13 +24,13 @@ class OffenderWithAllocationPresenter
     @allocation.primary_pom_nomis_id if @allocation
   end
 
+  def primary_pom_allocated_at
+    @allocation.primary_pom_allocated_at if @allocation
+  end
+
   def allocation_date
     if @allocation
       (@allocation.primary_pom_allocated_at || @allocation.updated_at)&.to_date
     end
-  end
-
-  def primary_pom_allocated_at
-    @allocation.primary_pom_allocated_at
   end
 end

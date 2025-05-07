@@ -17,7 +17,7 @@ describe SignonIdentity, model: true do
   let(:signon_identity) { described_class.from_omniauth(omniauth_data) }
 
   it 'creates a SignonIdentity instance' do
-    expect(signon_identity).to be_a_kind_of(described_class)
+    expect(signon_identity).to be_a(described_class)
   end
 
   it 'does not crash if from_omniauth fails' do

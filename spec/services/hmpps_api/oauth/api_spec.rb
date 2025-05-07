@@ -11,7 +11,7 @@ describe HmppsApi::Oauth::Api do
   it 'fetches an auth token', vcr: { cassette_name: 'prison_api/nomis_oauth_api_auth_token_spec' } do
     token = described_class.fetch_new_auth_token
 
-    expect(token).to be_kind_of(HmppsApi::Oauth::Token)
+    expect(token).to be_a(HmppsApi::Oauth::Token)
   end
 
   describe 'JWKS keys' do

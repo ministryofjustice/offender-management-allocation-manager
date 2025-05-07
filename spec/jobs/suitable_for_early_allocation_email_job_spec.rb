@@ -119,7 +119,7 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
                                         created_within_referral_window: false, nomis_offender_id:  api_offender.offender_no)
 
               expect_any_instance_of(EarlyAllocationMailer).not_to receive(:review_early_allocation)
-              expect { described_class.perform_now(api_offender.offender_no) }.to change(EmailHistory, :count).by(0)
+              expect { described_class.perform_now(api_offender.offender_no) }.not_to change(EmailHistory, :count)
             end
           end
 

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-# rubocop:disable RSpec/FilePath
+# rubocop:disable RSpec/SpecFilePathFormat
 describe ActiveSupport::Inflector do
   describe '#titleize' do
     it 'capitalizes the letter of a string after an apostrophe' do
@@ -15,4 +15,4 @@ describe ActiveSupport::Inflector do
     end
   end
 end
-# rubocop:enable RSpec/FilePath
+# rubocop:enable RSpec/SpecFilePathFormat

@@ -50,7 +50,7 @@ feature "view an offender's allocation information", flaky: true do
     end
   end
 
-  context 'when an NPS, Determinate, English  offender has a key worker assigned' do
+  context 'when an NPS, Determinate, English offender has a key worker assigned' do
     context 'when the offender has over 10 months left to serve' do
       before do
         create(:case_information, :english, offender: build(:offender, nomis_offender_id: offender_no), enhanced_resourcing: true, tier: 'A')

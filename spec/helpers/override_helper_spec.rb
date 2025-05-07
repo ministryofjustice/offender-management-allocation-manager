@@ -42,7 +42,7 @@ RSpec.describe OverrideHelper do
       expect(display_override_details("suitability", allocation_one)).to include('Prisoner too high risk')
     end
 
-    it 'returns that the POM has worked with the prisoner before ' do
+    it 'returns that the POM has worked with the prisoner before' do
       expect(display_override_details("continuity", allocation_one)).to include('This POM has worked with the prisoner before')
     end
 

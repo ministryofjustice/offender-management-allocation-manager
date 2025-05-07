@@ -6,9 +6,9 @@ describe HmppsApi::PrisonApi::MovementApi do
        vcr: { cassette_name: 'prison_api/movement_api_on_date' } do
       movements = described_class.movements_on_date(Date.iso8601('2019-02-20'))
 
-      expect(movements).to be_kind_of(Array)
+      expect(movements).to be_a(Array)
       expect(movements.length).to eq(2)
-      expect(movements).to all be_kind_of(HmppsApi::Movement)
+      expect(movements).to all be_a(HmppsApi::Movement)
     end
   end
 

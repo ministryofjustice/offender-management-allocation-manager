@@ -16,9 +16,11 @@ class CaseHistory
     @version.whodunnit
   end
 
+  # rubocop:disable Rails/Delegate
   def system_admin_note
     @version.system_admin_note
   end
+  # rubocop:enable Rails/Delegate
 
   # we need to override the 'updated_at' in the history with the 'to' value (index 1)
   # so that if it is changed later w/o history (e.g. by updating the COM name)

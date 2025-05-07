@@ -49,7 +49,7 @@ RSpec.describe OffenderHelper do
     end
   end
 
-  describe 'generates labels for case owner ' do
+  describe 'generates labels for case owner' do
     context 'when Prison' do
       let(:api_offender) do
         build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail,
@@ -76,16 +76,16 @@ RSpec.describe OffenderHelper do
   describe '#recommended_pom_type_label' do
     it "returns 'Prison officer' if RecommendService is PRISON_POM" do
       allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PRISON_POM)
-      subject = OpenStruct.new(immigration_case?: true, nps_case?: false, responsibility: nil)
+      offender = OpenStruct.new(immigration_case?: true, nps_case?: false, responsibility: nil)
 
-      expect(helper.recommended_pom_type_label(subject)).to eq('Prison officer')
+      expect(helper.recommended_pom_type_label(offender)).to eq('Prison officer')
     end
 
     it "returns 'Probation officer' if RecommendService is PROBATION_POM" do
       allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PROBATION_POM)
-      subject = OpenStruct.new(immigration_case?: false, nps_case?: true, tier: 'A', responsibility: nil)
+      offender = OpenStruct.new(immigration_case?: false, nps_case?: true, tier: 'A', responsibility: nil)
 
-      expect(helper.recommended_pom_type_label(subject)).to eq('Probation officer')
+      expect(helper.recommended_pom_type_label(offender)).to eq('Probation officer')
     end
   end
 
@@ -93,10 +93,10 @@ RSpec.describe OffenderHelper do
     context 'when a prison POM' do
       # we need to set up this test to return a Prison POM recommendation; we are using an
       # Immigration case as they are always recommended to Prison POMs
-      let(:subject) { OpenStruct.new(immigration_case?: true, nps_case?: false) }
+      let(:offender) { OpenStruct.new(immigration_case?: true, nps_case?: false) }
 
       it "can get for a prison owned offender" do
-        expect(helper.complex_reason_label(subject)).to eq('Prisoner assessed as not suitable for a prison officer POM')
+        expect(helper.complex_reason_label(offender)).to eq('Prisoner assessed as not suitable for a prison officer POM')
       end
     end
 

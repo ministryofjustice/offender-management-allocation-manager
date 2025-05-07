@@ -1,8 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe ComplexityLevelHelper, type: :helper do
+  subject { helper.display_complexity_change_info(previous_complexity_level: previous, updated_complexity_level: updated.level) }
+
   let(:updated) { Complexity.new(level: updated_level, reason: 'bla bla bla') }
-  let(:subject) { helper.display_complexity_change_info(previous_complexity_level: previous, updated_complexity_level: updated.level) }
 
   context 'when complexity level has been updated from low to high' do
     let(:previous) { 'low' }

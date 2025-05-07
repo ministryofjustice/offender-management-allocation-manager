@@ -23,7 +23,7 @@ class ParoleReviewImport < ApplicationRecord
   end
 
   def no_hearing_outcome?
-    final_result == 'Not Applicable' || final_result == 'Not Specified'
+    ['Not Applicable', 'Not Specified'].include?(final_result)
   end
 
 private

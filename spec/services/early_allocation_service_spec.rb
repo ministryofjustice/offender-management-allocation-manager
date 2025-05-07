@@ -2,7 +2,7 @@ describe EarlyAllocationService do
   describe '::send_early_allocation' do
     let!(:calc_status) { create(:calculated_early_allocation_status, eligible: true) }
 
-    let(:topic) { instance_double("topic") }
+    let(:topic) { instance_double(Aws::SNS::Topic) }
 
     before do
       allow(described_class).to receive(:sns_topic).and_return(topic)
