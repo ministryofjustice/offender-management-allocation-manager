@@ -1,0 +1,18 @@
+<%= render 'header' %>
+
+<% if @allocations.any? %>
+  <%= render 'table' %>
+  
+  <div class="govuk-button-group">
+    <%= link_to "Deallocate All Cases", confirm_manage_deallocate_pom_path(staff_id: params[:staff_id], prison: 'all'), class: 'govuk-button' %>
+  
+    <% prisons = @allocations.pluck(:prison).uniq %>
+    <% if prisons.count >= 2 %>
+      <% prisons.each do |prison| %>
+        <%= link_to "Deallocate #{prison} Cases", confirm_manage_deallocate_pom_path(staff_id: params[:staff_id], prison:), class: 'govuk-button govuk-button--secondary' %>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <p class="govuk-body">No allocations found</p>
+<% end %>

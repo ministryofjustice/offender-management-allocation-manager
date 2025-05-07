@@ -180,6 +180,9 @@ Rails.application.routes.draw do
   # '/admin' is already taken by ActiveAdmin
   namespace :manage do
     resources :audit_events, only: %i[index]
+    resources :deallocate_poms, only: %i[index show update], param: :staff_id do
+      get '/confirm', to: 'confirm', on: :member
+    end
   end
 
   mount Rswag::Ui::Engine => '/api-docs'

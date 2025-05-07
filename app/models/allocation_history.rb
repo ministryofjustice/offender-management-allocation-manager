@@ -18,6 +18,7 @@ class AllocationHistory < ApplicationRecord
   USER = 0
   OFFENDER_TRANSFERRED = 1
   OFFENDER_RELEASED = 2
+  MANUAL_CHANGE = 3
 
   after_commit :publish_allocation_changed_event
 
@@ -39,7 +40,8 @@ class AllocationHistory < ApplicationRecord
   enum event_trigger: {
     user: USER,
     offender_transferred: OFFENDER_TRANSFERRED,
-    offender_released: OFFENDER_RELEASED
+    offender_released: OFFENDER_RELEASED,
+    manual_change: MANUAL_CHANGE
   }
 
   scope :active, -> { where.not(primary_pom_nomis_id: nil) }
@@ -101,26 +103,32 @@ class AllocationHistory < ApplicationRecord
   # a non-nil primary_pom_nomis_id
   def self.deallocate_primary_pom(nomis_staff_id, prison)
     active_pom_allocations(nomis_staff_id, prison).each do |alloc|
-      alloc.primary_pom_nomis_id = nil
-      alloc.primary_pom_name = nil
-      alloc.recommended_pom_type = nil
-      alloc.primary_pom_allocated_at = nil
-      alloc.event = DEALLOCATE_PRIMARY_POM
-      alloc.event_trigger = USER
-
-      alloc.save!
+      alloc.deallocate_primary_pom(event_trigger: USER)
     end
+  end
+
+  def deallocate_primary_pom(event_trigger: USER)
+    self.primary_pom_nomis_id = nil
+    self.primary_pom_name = nil
+    self.recommended_pom_type = nil
+    self.primary_pom_allocated_at = nil
+    self.event = DEALLOCATE_PRIMARY_POM
+    self.event_trigger = event_trigger
+    save!
   end
 
   def self.deallocate_secondary_pom(nomis_staff_id, prison)
     active_pom_allocations(nomis_staff_id, prison).each do |alloc|
-      alloc.secondary_pom_nomis_id = nil
-      alloc.secondary_pom_name = nil
-      alloc.event = DEALLOCATE_SECONDARY_POM
-      alloc.event_trigger = USER
-
-      alloc.save!
+      alloc.deallocate_secondary_pom(event_trigger: USER)
     end
+  end
+
+  def deallocate_secondary_pom(event_trigger: USER)
+    self.secondary_pom_nomis_id = nil
+    self.secondary_pom_name = nil
+    self.event = DEALLOCATE_SECONDARY_POM
+    self.event_trigger = event_trigger
+    save!
   end
 
   def deallocate_offender_after_release

@@ -1,0 +1,17 @@
+<% content_for :title, "Mass Deallocate POMs – #{t('global.default_page_title')}" %>
+
+<h2 class="govuk-heading-l">
+  POM mass deallocation tool
+</h2>
+
+<div class="search-box govuk-grid-row">
+  <%= form_tag(manage_deallocate_poms_path, method: :get) do %>
+    <div class="govuk-form-group" style="display: inline;">
+      <label class="govuk-label" for="staff_id">
+        Staff ID
+      </label>
+      <input class="govuk-input govuk-input--width-5" id="staff_id" name="staff_id" type="text" value="<%= params[:staff_id] %>" autofocus>
+      <input id="search-button" type="submit" class="govuk-button govuk-!-margin-left-1" value="Find Cases">
+    </div>
+  <% end %>
+</div>

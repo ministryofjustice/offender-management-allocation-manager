@@ -124,6 +124,7 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
         expect(deallocation.primary_pom_name).to be_nil
         expect(deallocation.primary_pom_allocated_at).to be_nil
         expect(deallocation.recommended_pom_type).to be_nil
+        expect(deallocation.event_trigger).to eq('user')
       end
 
       it 'removes them as the secondary pom from all allocations' do

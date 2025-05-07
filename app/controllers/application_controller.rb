@@ -8,7 +8,8 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user,
                 :current_user_is_spo?,
-                :dps_header_footer
+                :dps_header_footer,
+                :default_prison_code
 
   def authenticate_user
     if sso_identity.absent? || sso_identity.session_expired?
