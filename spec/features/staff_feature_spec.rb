@@ -199,8 +199,8 @@ feature "staff pages" do
     let(:probation_poms) do
       [
         # Need deterministic POM order by surname
-        build(:pom, :probation_officer, lastName: 'Smith'),
-        build(:pom, :probation_officer, lastName: 'Watkins')
+        build(:pom, :probation_officer, lastName: 'Smith', firstName: 'Janine'),
+        build(:pom, :probation_officer, lastName: 'Watkins', firstName: 'Janet')
       ]
     end
 
@@ -209,6 +209,8 @@ feature "staff pages" do
 
     let(:nomis_offender) do
       build(:nomis_offender,
+            firstName: 'Novel',
+            lastName: 'Offender',
             prisonId: female_prison, complexityLevel: 'high',
             category: attributes_for(:offender_category, :female_closed),
             sentence: attributes_for(:sentence_detail))
@@ -293,15 +295,17 @@ feature "staff pages" do
     it 'can view a POM' do
       # click on the first POM
       within "#active_probation_poms" do
-        first('td.govuk-table__cell > a').click
+        click_link 'Janine Smith'
       end
 
       expect(page).to have_content('Working pattern')
       expect(page).to have_content('Status')
 
       click_link 'Caseload'
-      # click on first prisoner name
-      first('.govuk-table a:nth-child(1)').click
+
+      within '#all-cases' do
+        click_link 'Offender, Novel'
+      end
     end
   end
 end
