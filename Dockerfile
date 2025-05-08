@@ -1,4 +1,4 @@
-FROM ruby:3.4.1-slim-bullseye
+FROM ruby:3.4.3-slim-bullseye
 
 # Incremenent to bust Docker layer cache
 ENV DOCKER_CACHE_BUSTER=1
@@ -37,6 +37,7 @@ RUN \
     curl \
     build-essential \
     libpq-dev \
+    libyaml-dev \
     postgresql-client \
     libjemalloc-dev \
     unzip \
