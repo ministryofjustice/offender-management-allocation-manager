@@ -37,6 +37,7 @@ RUN \
     curl \
     build-essential \
     libpq-dev \
+    libyaml-dev \
     postgresql-client \
     libjemalloc-dev \
     unzip \
