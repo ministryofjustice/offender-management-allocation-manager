@@ -27,8 +27,13 @@ class DeactivateCnls
   end
 
   def process_offender(offender_id, offender_index, offender_count)
-    nomis_offender = with_retries { HmppsApi::PrisonApi::OffenderApi.get_offender(offender_id, ignore_legal_status: true) }
+    nomis_offender = with_retries do
+      HmppsApi::PrisonApi::OffenderApi.get_offender(
+        offender_id, ignore_legal_status: true, fetch_categories: false, fetch_movements: false
+      )
+    end
 
+    return if nomis_offender.complexity_level.blank?
     return if nomis_offender.sentenced?
     return if nomis_offender.immigration_case?
 
