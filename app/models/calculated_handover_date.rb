@@ -119,7 +119,7 @@ class CalculatedHandoverDate < ApplicationRecord
       relation
         .by_offender_ids(offender_ids)
         .where(responsibility: CUSTODY_ONLY)
-        .where('"handover_date" - :days_before <= :relative_to AND :relative_to < "handover_date"',
+        .where('"handover_date" - cast(:days_before as int) <= :relative_to AND :relative_to < "handover_date"',
                { days_before: upcoming_handover_window_duration, relative_to: relative_to_date })
     end
 
