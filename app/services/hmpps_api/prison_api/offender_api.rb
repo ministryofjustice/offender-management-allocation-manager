@@ -131,10 +131,19 @@ module HmppsApi
         offender['inOutStatus'] == 'OUT' && offender['lastMovementTypeCode'] == HmppsApi::MovementType::TEMPORARY
       end
 
+      # Technically we could use the same API endpoint (POST `/complexity-of-need/multiple/offender-no`)
+      # whether it is 1 offender, or many, but to keep the amount of tests that would need to change low, this
+      # if-else will maintain backward compatibility (so 1 offender uses GET, more than 1 uses POST).
+      #
       def self.complexities_for(offender_nos, prison_id)
         return {} unless Prison.womens.exists?(prison_id)
 
-        HmppsApi::ComplexityApi.get_complexities(offender_nos)
+        if offender_nos.many?
+          HmppsApi::ComplexityApi.get_complexities(offender_nos)
+        else
+          offender_no = offender_nos.first
+          { offender_no => HmppsApi::ComplexityApi.get_complexity(offender_no) }
+        end
       end
 
     private
