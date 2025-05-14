@@ -12,7 +12,7 @@ cronjobs:
     enabled: true
   community_api_import:
     enabled: true
-  deactivate_cnls:
+  deactivate_unsentenced_cnls:
     enabled: true
   mailbox_register_import:
     enabled: true
