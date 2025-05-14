@@ -19,6 +19,15 @@ module HmppsApi
         build_offenders(offenders, prison, *args)
       end
 
+      def self.get_offenders_out_of_prison(prison)
+        offenders = get_search_api_offenders_out_in_last_prison(prison)
+
+        build_offenders(
+          offenders, prison,
+          ignore_legal_status: true, fetch_complexities: false, fetch_categories: false, fetch_movements: false
+        )
+      end
+
       # Get a single offender
       #
       # Returns nil if the offender's legal status is not in the list ALLOWED_LEGAL_STATUSES
@@ -160,6 +169,36 @@ module HmppsApi
             queryparams: { page: page_num, size: 10_000, 'include-restricted-patients': true },
             extra_headers: { 'Content-Type': 'application/json' }
           )
+          # last should always indicate the last page of results, do perform manual check just to be safe
+          last_page = r.fetch('last') || page_num > r.fetch('totalPages')
+          page_num += 1
+          results.concat r.fetch('content')
+        end
+
+        results
+      end
+
+      def self.get_search_api_offenders_out_in_last_prison(prison_code)
+        route = '/attribute-search'
+        page_num = 0
+        last_page = false
+        results = []
+
+        body = {
+          "joinType": 'AND',
+          "queries": [
+            {
+              "joinType": 'AND',
+              "matchers": [
+                { "type": 'String', "attribute": 'prisonId', "condition": 'IS', "searchTerm": 'OUT' },
+                { "type": 'String', "attribute": 'lastPrisonId', "condition": 'IS', "searchTerm": prison_code },
+              ]
+            }
+          ]
+        }.freeze
+
+        until last_page
+          r = search_client.post(route, body, queryparams: { page: page_num, size: 2_000 })
           # last should always indicate the last page of results, do perform manual check just to be safe
           last_page = r.fetch('last') || page_num > r.fetch('totalPages')
           page_num += 1

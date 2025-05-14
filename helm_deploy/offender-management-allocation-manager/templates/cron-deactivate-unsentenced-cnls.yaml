@@ -1,5 +1,5 @@
 {{- if .Values.cronjobs.deactivate_unsentenced_cnls.enabled }}
-{{- $cronjobName := "deactivate-cnls" }}
+{{- $cronjobName := "deactivate-unsentenced-cnls" }}
 ---
 apiVersion: batch/v1
 kind: CronJob
