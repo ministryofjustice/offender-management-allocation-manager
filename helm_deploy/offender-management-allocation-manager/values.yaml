@@ -35,7 +35,7 @@ cronjobs:
   community_api_import:
     enabled: false
     schedule: 0 7 * * *
-  deactivate_cnls:
+  deactivate_unsentenced_cnls:
     enabled: false
     schedule: 45 7 * * *
   parole_data_import:

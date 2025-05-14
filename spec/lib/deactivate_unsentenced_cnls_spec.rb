@@ -1,7 +1,7 @@
 require 'rails_helper'
-require 'deactivate_cnls'
+require 'deactivate_unsentenced_cnls'
 
-RSpec.describe DeactivateCnls do
+RSpec.describe DeactivateUnsentencedCnls do
   let!(:prison) { create(:womens_prison) }
   let(:offender_id) { 'A0000BC' }
   let(:nomis_offender) { build(:nomis_offender, prisonerNumber: offender_id).with_indifferent_access }

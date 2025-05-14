@@ -9,7 +9,7 @@ cronjobs:
   recalculate_handover_dates:
     enabled: true
     schedule: 0 3 * * *
-  deactivate_cnls:
+  deactivate_unsentenced_cnls:
     enabled: true
     schedule: 45 3 * * *
   early_allocation_suitability_email:

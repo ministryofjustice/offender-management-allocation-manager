@@ -1,4 +1,4 @@
-class DeactivateCnls
+class DeactivateUnsentencedCnls
   attr_reader :dry_run, :inactivated_count
 
   def initialize(dry_run: true)
@@ -6,7 +6,7 @@ class DeactivateCnls
   end
 
   def call
-    Rails.logger = Logger.new($stdout) if Rails.env.production?
+    Rails.logger = Logger.new($stdout)
 
     @inactivated_count = 0
     womens_prisons = Prison.where(code: PrisonService::WOMENS_PRISON_CODES)
