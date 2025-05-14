@@ -13,19 +13,47 @@ module HmppsApi
       # will show up as `SENTENCED` legal status, and we need to filter by their sentence type code.
       EXCLUDED_IMPRISONMENT_STATUSES = %w[A_FINE].freeze
 
-      def self.get_offenders_in_prison(prison, ignore_legal_status: false)
-        unfiltered = get_search_api_offenders_in_prison(prison)
-        offenders = ignore_legal_status ? unfiltered : filtered_offenders(unfiltered)
+      def self.get_offenders_in_prison(prison, *args)
+        offenders = get_search_api_offenders_in_prison(prison)
+
+        build_offenders(offenders, prison, *args)
+      end
+
+      # Get a single offender
+      #
+      # Returns nil if the offender's legal status is not in the list ALLOWED_LEGAL_STATUSES
+      # To ignore the ALLOWED_LEGAL_STATUSES list and return the offender anyway, set `ignore_legal_status` to true.
+      # Warning: when you ignore the offender's legal status, you could potentially receive an offender who wouldn't
+      # normally appear within the service. This should only be done under certain circumstances –
+      # e.g. when deallocating an offender who has since left the service due to a change in legal status
+      def self.get_offender(offender_no, *args)
+        offender = get_search_api_offenders(offender_no).first
+        return if offender.nil?
+
+        # Restricted Patients use supportingPrisonId, since the offender is currently in hospital
+        prison_id = offender.fetch(offender['restrictedPatient'] ? 'supportingPrisonId' : 'prisonId')
+
+        build_offenders([offender], prison_id, *args).first
+      end
+
+      def self.build_offenders(unfiltered_offenders, prison_id, *args)
+        default_options = {
+          ignore_legal_status: false, fetch_complexities: true, fetch_categories: true, fetch_movements: true
+        }.freeze
+
+        options = default_options.dup.merge(args.extract_options! || {}).assert_valid_keys(default_options.keys)
+
+        offenders = options[:ignore_legal_status] ? unfiltered_offenders : filtered_offenders(unfiltered_offenders)
         return [] if offenders.empty?
 
-        # Get additional data from other APIs
-        offender_nos = offenders.map { |o| o.fetch('prisonerNumber') }
-        offender_categories = get_offender_categories(offender_nos)
-        complexities = complexities_for(offender_nos, prison)
-        temp_movements = latest_temp_movement_for(offenders)
-        movements = HmppsApi::PrisonApi::MovementApi.admissions_for(offender_nos)
+        offender_nos = offenders.pluck('prisonerNumber')
 
-        # Create Offender objects
+        # Get additional data from other APIs
+        offender_categories = options[:fetch_categories] ? get_offender_categories(offender_nos) : {}
+        complexities = options[:fetch_complexities] ? complexities_for(offender_nos, prison_id) : {}
+        temp_movements = options[:fetch_movements] ? latest_temp_movement_for(offenders) : {}
+        movements = options[:fetch_movements] ? HmppsApi::PrisonApi::MovementApi.admissions_for(offender_nos) : {}
+
         offenders.map do |offender|
           offender_no = offender.fetch('prisonerNumber')
 
@@ -37,36 +65,6 @@ module HmppsApi
             movements: movements[offender_no]
           )
         end
-      end
-
-      # Get a single offender
-      #
-      # Returns nil if the offender's legal status is not in the list ALLOWED_LEGAL_STATUSES
-      # To ignore the ALLOWED_LEGAL_STATUSES list and return the offender anyway, set `ignore_legal_status` to true.
-      # Warning: when you ignore the offender's legal status, you could potentially receive an offender who wouldn't
-      # normally appear within the service. This should only be done under certain circumstances –
-      # e.g. when deallocating an offender who has since left the service due to a change in legal status
-      def self.get_offender(offender_no, ignore_legal_status: false)
-        unfiltered = get_search_api_offenders([offender_no])
-        offender = (ignore_legal_status ? unfiltered : filtered_offenders(unfiltered)).first
-        return nil if offender.blank?
-
-        # Restricted Patients use supportingPrisonId, since the offender is currently in hospital
-        prison_id = offender.fetch(offender['restrictedPatient'] ? 'supportingPrisonId' : 'prisonId')
-
-        # Get additional data from other APIs
-        complexity_level = complexity_for(offender_no, prison_id)
-        offender_categories = get_offender_categories([offender_no])
-        temp_movements = latest_temp_movement_for([offender])
-        movements = HmppsApi::PrisonApi::MovementApi.admissions_for([offender_no])
-
-        HmppsApi::Offender.new(
-          offender:,
-          category: offender_categories[offender_no],
-          latest_temp_movement: temp_movements[offender_no],
-          complexity_level:,
-          movements: movements[offender_no]
-        )
       end
 
       def self.get_offender_categories(offender_nos)
@@ -133,16 +131,19 @@ module HmppsApi
         offender['inOutStatus'] == 'OUT' && offender['lastMovementTypeCode'] == HmppsApi::MovementType::TEMPORARY
       end
 
+      # Technically we could use the same API endpoint (POST `/complexity-of-need/multiple/offender-no`)
+      # whether it is 1 offender, or many, but to keep the amount of tests that would need to change low, this
+      # if-else will maintain backward compatibility (so 1 offender uses GET, more than 1 uses POST).
+      #
       def self.complexities_for(offender_nos, prison_id)
         return {} unless Prison.womens.exists?(prison_id)
 
-        HmppsApi::ComplexityApi.get_complexities(offender_nos)
-      end
-
-      def self.complexity_for(offender_no, prison_id)
-        return {} unless Prison.womens.exists?(prison_id)
-
-        HmppsApi::ComplexityApi.get_complexity(offender_no)
+        if offender_nos.many?
+          HmppsApi::ComplexityApi.get_complexities(offender_nos)
+        else
+          offender_no = offender_nos.first
+          { offender_no => HmppsApi::ComplexityApi.get_complexity(offender_no) }
+        end
       end
 
     private
@@ -170,7 +171,7 @@ module HmppsApi
 
       def self.get_search_api_offenders(offender_nos)
         search_route = '/prisoner-search/prisoner-numbers'
-        search_client.post(search_route, { prisonerNumbers: offender_nos }, queryparams: { 'include-restricted-patients': true }, cache: true)
+        search_client.post(search_route, { prisonerNumbers: Array(offender_nos) }, queryparams: { 'include-restricted-patients': true }, cache: true)
       end
 
       def self.default_image

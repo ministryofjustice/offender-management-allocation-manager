@@ -14,24 +14,26 @@ class DeactivateCnls
     report_info "Processing #{womens_prisons_count} women's prisons. Dry run: #{dry_run}"
 
     womens_prisons.each_with_index do |prison, i|
-      offenders = OffenderService.get_offenders_in_prison(prison, ignore_legal_status: true)
+      offenders = HmppsApi::PrisonApi::OffenderApi.get_offenders_in_prison(
+        prison.code, ignore_legal_status: true, fetch_complexities: false, fetch_categories: false, fetch_movements: false
+      )
+
       offender_count = offenders.size
       report_info "Prison #{i + 1}/#{womens_prisons_count}: #{prison.name}: processing #{offender_count} offenders"
 
       offenders.each_with_index do |offender, j|
-        process_offender(offender.offender_no, j + 1, offender_count)
+        process_offender(offender, j + 1, offender_count)
       end
     end
 
     report_info "Done. Complexity of need level de-activated for #{inactivated_count} offenders"
   end
 
-  def process_offender(offender_id, offender_index, offender_count)
-    nomis_offender = with_retries { HmppsApi::PrisonApi::OffenderApi.get_offender(offender_id, ignore_legal_status: true) }
-
+  def process_offender(nomis_offender, offender_index, offender_count)
     return if nomis_offender.sentenced?
     return if nomis_offender.immigration_case?
 
+    offender_id = nomis_offender.offender_no
     output = ["- #{offender_index}/#{offender_count}: #{offender_id} is un-sentenced"]
 
     unless dry_run

@@ -2,25 +2,20 @@ require 'rails_helper'
 require 'deactivate_cnls'
 
 RSpec.describe DeactivateCnls do
-  let(:prison) { create(:womens_prison) }
+  let!(:prison) { create(:womens_prison) }
   let(:offender_id) { 'A0000BC' }
   let(:nomis_offender) { build(:nomis_offender, prisonerNumber: offender_id).with_indifferent_access }
 
   let(:api_offender) do
-    HmppsApi::Offender.new(offender: nomis_offender, category: nil, latest_temp_movement: nil, complexity_level: 'high', movements: [])
+    HmppsApi::Offender.new(offender: nomis_offender, category: nil, latest_temp_movement: nil, complexity_level: nil, movements: [])
   end
 
   before do
-    allow(OffenderService).to receive(:get_offenders_in_prison).and_return(
-      [
-        MpcOffender.new(prison: prison, offender: Offender.new(nomis_offender_id: offender_id), prison_record: api_offender),
-        MpcOffender.new(prison: prison, offender: Offender.new(nomis_offender_id: offender_id), prison_record: api_offender)
-      ]
-    )
+    allow(HmppsApi::PrisonApi::OffenderApi).to receive(:get_offenders_in_prison).and_return([api_offender])
 
     allow_any_instance_of(HmppsApi::Offender).to receive(:sentenced?).and_return(is_sentenced)
     allow_any_instance_of(HmppsApi::Offender).to receive(:immigration_case?).and_return(immigration_case)
-    allow(HmppsApi::PrisonApi::OffenderApi).to receive(:get_offender).and_return(api_offender)
+
     allow(HmppsApi::ComplexityApi).to receive(:inactivate).and_return(nil)
   end
 
@@ -41,7 +36,7 @@ RSpec.describe DeactivateCnls do
       let(:is_sentenced) { false }
 
       it 'sends inactivate to complexity of need microservice' do
-        expect(HmppsApi::ComplexityApi).to have_received(:inactivate).twice.with(offender_id)
+        expect(HmppsApi::ComplexityApi).to have_received(:inactivate).with(offender_id)
       end
     end
 
