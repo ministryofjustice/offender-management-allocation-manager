@@ -178,6 +178,8 @@ module HmppsApi
         results
       end
 
+      # NOTE: this API endpoint has a total hardcoded limit of 10_000 offenders returned
+      # in total, even if using a lower page size and looping. `BZI` will go over this limit.
       def self.get_search_api_offenders_out_in_last_prison(prison_code)
         route = '/attribute-search'
         page_num = 0

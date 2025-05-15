@@ -8,12 +8,16 @@ class DeactivateReleasedCnlsJob < ApplicationJob
     @inactivated_count = 0
     @errors_count = 0
 
-    offenders = HmppsApi::PrisonApi::OffenderApi.get_offenders_out_of_prison(prison.code)
-    offender_count = offenders.size
+    offender_nos = AllocationHistory.where(
+      prison: prison.code,
+      event_trigger: AllocationHistory::OFFENDER_RELEASED,
+    ).pluck(:nomis_offender_id)
+
+    offender_count = offender_nos.size
     log("Processing #{offender_count} released offenders...")
 
-    offenders.each do |offender|
-      process_offender(offender)
+    offender_nos.each do |nomis_offender_id|
+      process_offender(nomis_offender_id)
     end
 
     log("Done. Inactivated: #{inactivated_count}/#{offender_count}. Errors: #{errors_count}.")
@@ -21,11 +25,11 @@ class DeactivateReleasedCnlsJob < ApplicationJob
 
 private
 
-  def process_offender(nomis_offender)
-    with_retries { HmppsApi::ComplexityApi.inactivate(nomis_offender.offender_no) }
+  def process_offender(nomis_offender_id)
+    with_retries { HmppsApi::ComplexityApi.inactivate(nomis_offender_id) }
     @inactivated_count += 1
   rescue StandardError => e
-    log("Offender ID #{nomis_offender.offender_no} produced an error: #{e.message}")
+    log("Offender ID #{nomis_offender_id} produced an error: #{e.message}")
     @errors_count += 1
   end
 
