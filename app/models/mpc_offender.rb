@@ -145,7 +145,11 @@ class MpcOffender
   # parole methods
 
   def target_hearing_date
-    most_recent_parole_review&.target_hearing_date
+    @target_hearing_date ||= parole_reviews
+      .ordered_by_sortable_date
+      .for_sentences_starting(sentence_start_date)
+      .pluck(:target_hearing_date)
+      .last
   end
 
   def approaching_parole?
