@@ -321,25 +321,41 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
       }
     end
 
-    describe 'when case is indeterminate' do
+    describe 'for ISPS' do
       before { args[:is_indeterminate] = true }
 
-      [
-        [Time.zone.today, nil,                  'TED', 'TED alone exists'],
-        [Time.zone.today - 1, Time.zone.today,  'TED', 'TED and THD both exist but TED is earlier'],
-        [Time.zone.today, Time.zone.today - 1,  'THD', 'TED and TED both exist but THD is earlier'],
-        [nil, Time.zone.today,                  'THD', 'TED does not exist but THD does'],
-      ].each do |ted, thd, expected_date, situation|
-        example "earliest date is #{expected_date} when #{situation}" do
-          args[:tariff_date] = ted
-          args[:target_hearing_date] = thd
+      def in_the_future = 2.weeks.from_now
+      def further_in_the_future = 3.weeks.from_now
+      def in_the_past = 2.weeks.ago
+      def further_in_the_past = 1.day.ago
+      def empty = nil
 
-          expect(described_class.calculate_earliest_release(**args).name).to eq(expected_date)
+      #        TED                     THD           Expected Date
+      [
+        [:in_the_future,         :in_the_future,         'TED'],
+        [:in_the_future,         :further_in_the_future, 'TED'],
+        [:further_in_the_future, :in_the_future,         'TED'],
+        [:in_the_future,         :empty,                 'TED'],
+        [:in_the_future,         :in_the_past,           'TED'],
+        [:empty,                 :in_the_future,         'THD'],
+        [:in_the_past,           :in_the_future,         'THD'],
+        [:empty,                 :in_the_past,           'THD'],
+        [:in_the_past,           :empty,                 'TED'],
+        [:in_the_past,           :in_the_past,           'TED'],
+        [:in_the_past,           :further_in_the_past,   'THD'],
+        [:further_in_the_past,   :in_the_past,           'TED'],
+        [:empty,                 :empty,                 nil],
+      ].each do |ted, thd, expected_date|
+        example "when TED is #{ted} and THD is #{thd} then earliest date is #{expected_date}" do
+          args[:tariff_date] = send(ted)
+          args[:target_hearing_date] = send(thd)
+
+          expect(described_class.calculate_earliest_release(**args)&.name).to eq(expected_date)
         end
       end
     end
 
-    describe 'when case is determinate' do
+    describe 'for determinate cases' do
       before do
         args[:is_indeterminate] = false
       end

@@ -72,11 +72,18 @@ module Handover::HandoverCalculation
       if is_indeterminate
         ted = NamedDate[tariff_date, 'TED']
         thd = NamedDate[target_hearing_date, 'THD']
-        [ted, thd].compact.min
+
+        # get the date which is in the future, prioritising TED
+        return ted if ted&.future?
+        return thd if thd&.future?
+
+        # revert to the next closest date, or nil
+        [ted, thd].compact.min_by { |date| (date.date.to_date - Time.zone.today).abs }
       else
         ped = NamedDate[parole_eligibility_date, 'PED']
         crd = NamedDate[conditional_release_date, 'CRD']
         ard = NamedDate[automatic_release_date, 'ARD']
+
         ped || [ard, crd].compact.min
       end
     end
