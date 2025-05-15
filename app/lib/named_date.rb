@@ -15,6 +15,8 @@ class NamedDate
 
   attr_reader :name, :date
 
+  delegate :future?, :past?, to: :date
+
   def <=>(other)
     date <=> other.date
   end

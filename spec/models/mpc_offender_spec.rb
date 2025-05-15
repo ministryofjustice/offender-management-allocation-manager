@@ -511,29 +511,9 @@ RSpec.describe MpcOffender, type: :model do
 
       context 'when next_parole_date is target_hearing_date' do
         it 'returns "Target hearing date"' do
-          allow(subject).to receive(:next_parole_date).and_return(target_hearing_date)
+          allow(subject).to receive(:target_hearing_date).and_return(target_hearing_date)
 
           expect(subject.next_parole_date_type).to eq 'Target hearing date'
-        end
-      end
-    end
-
-    context 'when the offender has an upcoming parole hearing' do
-      describe '#target_hearing_date' do
-        it 'returns the target hearing date of the incomplete parole review' do
-          expect(subject.target_hearing_date).to eq(parole_review.target_hearing_date)
-        end
-      end
-    end
-
-    context 'when the offender does not have an upcoming parole hearing' do
-      before do
-        allow(offender_model).to receive(:most_recent_parole_review).and_return(completed_parole_review)
-      end
-
-      describe '#target_hearing_date' do
-        it 'returns the target hearing date of the most recent completed parole review' do
-          expect(subject.target_hearing_date).to eq(completed_parole_review.target_hearing_date)
         end
       end
     end
@@ -656,8 +636,25 @@ RSpec.describe MpcOffender, type: :model do
       expect(mpc_offender.most_recent_completed_parole_review_for_sentence).to eq(completed_in_date)
       expect(mpc_offender.most_recent_completed_parole_review_for_sentence).not_to eq(incomplete_out_of_date)
       expect(mpc_offender.most_recent_completed_parole_review_for_sentence).not_to eq(completed_out_of_date)
-      expect(mpc_offender.most_recent_completed_parole_review_for_sentence).not_to eq(target_hearing_date)
       expect(mpc_offender.most_recent_completed_parole_review_for_sentence).not_to eq(incomplete_in_date)
+    end
+  end
+
+  describe '#target_hearing_date' do
+    it 'is the latest recorded THD which is on or greater than the current sentence start date' do
+      offender = create(:offender, nomis_offender_id:)
+      mpc_offender = described_class.new(prison:, offender:, prison_record: api_offender)
+
+      incomplete_out_of_date = create(:parole_review, :active, target_hearing_date: mpc_offender.sentence_start_date - 1.year, nomis_offender_id:)
+      completed_out_of_date = create(:parole_review, :completed, target_hearing_date: mpc_offender.sentence_start_date - 1.year, nomis_offender_id:)
+      target_hearing_date = mpc_offender.sentence_start_date + 1.day # ensure dates are the same so its not just passing tests by picking the latest one
+      incomplete_in_date = create(:parole_review, :active, target_hearing_date: target_hearing_date + 2.days, nomis_offender_id:) # latest target hearing date available
+      completed_in_date = create(:parole_review, :completed, target_hearing_date:, nomis_offender_id:)
+
+      expect(mpc_offender.target_hearing_date).to eq(incomplete_in_date.target_hearing_date)
+      expect(mpc_offender.target_hearing_date).not_to eq(incomplete_out_of_date.target_hearing_date)
+      expect(mpc_offender.target_hearing_date).not_to eq(completed_out_of_date.target_hearing_date)
+      expect(mpc_offender.target_hearing_date).not_to eq(completed_in_date.target_hearing_date)
     end
   end
 
