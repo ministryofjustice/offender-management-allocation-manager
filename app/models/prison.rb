@@ -5,7 +5,7 @@ class Prison < ApplicationRecord
   validates :code, :name, presence: true, uniqueness: true
   has_many :pom_details, dependent: :destroy, foreign_key: :prison_code, inverse_of: :prison
 
-  enum prison_type: { womens: 'womens', mens_open: 'mens_open', mens_closed: 'mens_closed' }
+  enum :prison_type, { womens: 'womens', mens_open: 'mens_open', mens_closed: 'mens_closed' }
 
   scope :active, -> { where(code: AllocationHistory.distinct.pluck(:prison)) }
 

@@ -1,9 +1,5 @@
-require 'console_display_helpers'
-
 Rails.application.configure do
   console do
-    Rails::ConsoleMethods.include(ConsoleDisplayHelpers)
-    Rails::ConsoleMethods.include(ConsoleAuditHelpers)
-    Rails::ConsoleMethods.include(ConsoleDebugOffenderHelpers)
+    require_relative '../../app/lib/with_audit_notes_helper'
   end
 end

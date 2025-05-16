@@ -1,6 +1,7 @@
 sentry_dsn = Rails.configuration.sentry_dsn
 
 if sentry_dsn
+  require 'active_support/parameter_filter'
   param_filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
 
   Sentry.init do |config|
