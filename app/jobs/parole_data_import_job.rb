@@ -1,5 +1,3 @@
-require 'net/imap'
-require 'mail'
 require 'csv'
 
 class ParoleDataImportJob < ApplicationJob
@@ -14,22 +12,10 @@ class ParoleDataImportJob < ApplicationJob
 
   def import_parole(date)
     log_prefix = 'job=parole_data_import_job,service=parole_data_import_service'
-    s3_import = FeatureFlags.ppud_s3_bucket.enabled?
 
-    if s3_import
-      if ENV['S3_BUCKET_NAME'].blank?
-        Rails.logger.error("#{log_prefix},snapshot_date=#{date}|S3_BUCKET_NAME not set")
-        return
-      end
-    else
-      if ENV['GMAIL_USERNAME'].blank? || ENV['GMAIL_PASSWORD'].blank?
-        Rails.logger.error("#{log_prefix},snapshot_date=#{date}|Gmail credentials not set")
-        return
-      end
-      if ENV['PPUD_EMAIL_FROM'].blank?
-        Rails.logger.error("#{log_prefix},snapshot_date=#{date}|PPUD_EMAIL_FROM not set")
-        return
-      end
+    if ENV['S3_BUCKET_NAME'].blank?
+      Rails.logger.error("#{log_prefix},snapshot_date=#{date}|S3_BUCKET_NAME not set")
+      return
     end
 
     Rails.logger.info("#{log_prefix},snapshot_date=#{date}|Starting")
@@ -39,7 +25,7 @@ class ParoleDataImportJob < ApplicationJob
 
     import_count, row_count = ParoleDataImportService
       .new(log_prefix:)
-      .import_with_catchup(date, s3_import)
+      .import_with_catchup(date)
 
     Rails.logger.info("#{log_prefix},snapshot_date=#{date}|Complete. #{import_count}/#{row_count} imported")
   end
