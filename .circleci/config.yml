@@ -132,12 +132,6 @@ jobs:
             RAILS_ENV: test
             RACK_ENV: test
             DISABLE_COVERAGE: 1
-      - store_test_results:
-          path: coverage
-      - store_artifacts:
-          path: coverage
-      - store_artifacts:
-          path: ~/test-results
 
 workflows:
   test_build_deploy:
