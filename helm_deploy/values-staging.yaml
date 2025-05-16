@@ -56,9 +56,3 @@ generic-service:
     DIGITAL_PRISON_SERVICE_HOST: https://digital-dev.prison.service.justice.gov.uk
     PRISON_ALERTS_API_HOST: https://alerts-api-dev.hmpps.service.justice.gov.uk
     MAILBOX_REGISTER_API_HOST: https://manage-custody-mailbox-register-api-dev.hmpps.service.justice.gov.uk
-
-  namespace_secrets:
-    parole-data-import:
-      GMAIL_USERNAME: email_username
-      GMAIL_PASSWORD: email_password
-      PPUD_EMAIL_FROM: email_from

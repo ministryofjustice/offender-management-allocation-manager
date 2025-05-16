@@ -2,7 +2,5 @@
 # except local and test, where the default will be true
 #
 feature_flags:
-  ppud_s3_bucket:
+  example_feature:
     staging: true
-    preprod: true
-    production: true

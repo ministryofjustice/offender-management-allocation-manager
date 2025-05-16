@@ -1,12 +1,6 @@
-require 'net/imap'
-require 'mail'
 require 'csv'
 
 class ParoleDataImportService
-  IMAP_HOST = 'imap.gmail.com'.freeze
-  IMAP_PORT = 993
-  EMAIL_FROM = ENV['PPUD_EMAIL_FROM'].freeze
-  EMAIL_SUBJECT = 'POM Cases list'.freeze
   S3_OBJECT_PREFIX = 'PPUD_MPC'.freeze
 
   CSV_HEADINGS = {
@@ -36,7 +30,7 @@ class ParoleDataImportService
     @s3_object_key = nil
   end
 
-  def import_with_catchup(date, s3_import)
+  def import_with_catchup(date)
     latest_imported_date = ParoleReviewImport.maximum(:snapshot_date)
 
     dates_to_import = if latest_imported_date.nil?
@@ -46,26 +40,11 @@ class ParoleDataImportService
                       end
 
     dates_to_import.to_a.each do |dt|
-      Rails.logger.info(format_log("Importing date #{dt}. S3 enabled? #{s3_import}", dt))
-      s3_import ? import_from_s3_bucket(dt) : import_from_email(dt)
+      Rails.logger.info(format_log("Importing date #{dt}.", dt))
+      import_from_s3_bucket(dt)
     end
 
     [@csv_row_import_count, @csv_row_count]
-  end
-
-  def import_from_email(date)
-    imap = Net::IMAP.new(IMAP_HOST, port: IMAP_PORT, ssl: true)
-    fetched_mail = fetch_email(imap, date)
-
-    if fetched_mail.nil?
-      Rails.logger.info(format_log('No mail found', date))
-    else
-      mail = Mail.new(fetched_mail)
-      mail.attachments.empty? ? Rails.logger.info(format_log('No attachments found', date)) : process_attachments(mail, date)
-    end
-
-    imap.logout
-    imap.disconnect
   end
 
   def import_from_s3_bucket(date)
@@ -88,6 +67,12 @@ class ParoleDataImportService
     end
   end
 
+  def self.purge
+    ParoleReviewImport.to_purge.delete_all
+  end
+
+private
+
   def import_from_rows(csv_rows, date)
     @csv_row_count = 0
     @csv_row_import_count = 0
@@ -97,35 +82,6 @@ class ParoleDataImportService
         @csv_row_count += 1
         import_row(csv_row, date)
       end
-    end
-  end
-
-  def self.purge
-    ParoleReviewImport.to_purge.delete_all
-  end
-
-private
-
-  # It was confirmed by the PPUD team that in the case of duplicate emails, we should take the most recently-received one.
-  # For this reason, the email with the highest ID is taken, as the IDs appear to be sequential.
-  def fetch_email(imap, date)
-    imap.login(ENV['GMAIL_USERNAME'], ENV['GMAIL_PASSWORD'])
-    imap.select('INBOX')
-    email_id = imap.search(['FROM', EMAIL_FROM, 'SUBJECT', EMAIL_SUBJECT, 'ON', date.strftime('%d-%b-%Y').to_s]).max
-
-    return nil if email_id.nil?
-
-    imap.fetch(email_id, 'RFC822')[0].attr['RFC822']
-  end
-
-  def process_attachments(mail, date)
-    mail.attachments.each do |attachment|
-      if attachment.filename.split('.').last != 'csv'
-        Rails.logger.info(format_log("Skipping non-csv attachment '#{attachment.filename}'", date))
-        next
-      end
-
-      import_from_rows(CSV.new(attachment.body.decoded, headers: true), date)
     end
   end
 
