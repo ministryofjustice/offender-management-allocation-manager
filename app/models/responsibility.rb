@@ -30,7 +30,7 @@ class Responsibility < ApplicationRecord
   OTHER_REASON = 3
   PRISONER_MOVED_TO_OPEN_PRISON = 4
 
-  enum reason: {
+  enum :reason, {
     less_than_10_months_to_serve: LESS_THAN_10_MONTHS_TO_SERVE,
     community_team_to_work_with_offender: COMMUNITY_TEAM_TO_WORK_WITH_OFFENDER,
     prisoner_has_been_recalled: PRISONER_HAS_BEEN_RECALLED,

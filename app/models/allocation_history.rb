@@ -26,7 +26,7 @@ class AllocationHistory < ApplicationRecord
   # make sure the constant it points to
   # has a value that is sequential and does not
   # re-assign an already existing value
-  enum event: {
+  enum :event, {
     allocate_primary_pom: ALLOCATE_PRIMARY_POM,
     reallocate_primary_pom: REALLOCATE_PRIMARY_POM,
     allocate_secondary_pom: ALLOCATE_SECONDARY_POM,
@@ -37,7 +37,7 @@ class AllocationHistory < ApplicationRecord
   }
 
   # 'Event triggers' capture the subject or action that triggered the event
-  enum event_trigger: {
+  enum :event_trigger, {
     user: USER,
     offender_transferred: OFFENDER_TRANSFERRED,
     offender_released: OFFENDER_RELEASED,
