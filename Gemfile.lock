@@ -709,7 +709,6 @@ DEPENDENCIES
   ostruct
   paper_trail (~> 16.0)
   parallel_tests
-  parser (~> 3.2)
   pg
   prawn-rails
   prometheus_exporter
