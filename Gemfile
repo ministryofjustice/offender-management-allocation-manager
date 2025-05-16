@@ -3,7 +3,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby file: '.ruby-version'
 
-gem 'rails', '~> 7.1.3'
+gem 'rails', '~> 7.2'
 gem 'auto_strip_attributes'
 # Need AWS SNS SDK for publishing events to HMPPS_DOMAIN_EVENTS
 gem 'aws-sdk-sns'
@@ -24,7 +24,7 @@ gem 'logstash-event'
 gem 'logstash-logger'
 gem 'omniauth-oauth2'
 gem 'omniauth', '~> 1.9.2', require: nil
-gem 'paper_trail', '~> 15.1.0'
+gem 'paper_trail', '~> 15.2'
 gem 'pg'
 gem 'puma', '~> 6.6.0'
 gem 'prometheus_exporter'
