@@ -134,6 +134,7 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
 
         it 'nags the LDU 48 hours later' do
           allow(CommunityMailer).to receive(:with).and_call_original
+          ActiveJob::Base.queue_adapter = :test
 
           expected_params = {
             params: {
