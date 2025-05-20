@@ -21,9 +21,10 @@ module OffenderManagementAllocationClient
 
     # allow customization of full error messages on a per-model basis
     config.active_model.i18n_customize_full_message = true
-    config.load_defaults 7.1
+    config.load_defaults 8.0
     config.exceptions_app = routes
     config.generators.system_tests = nil
+    config.active_support.to_time_preserves_timezone = :zone
 
     config.autoload_lib(ignore: %w[assets tasks])
 
