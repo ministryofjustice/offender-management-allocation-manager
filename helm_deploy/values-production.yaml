@@ -75,6 +75,7 @@ generic-service:
     ALLOCATION_MANAGER_HOST: https://moic.service.justice.gov.uk
     PRISON_API_HOST: https://prison-api.prison.service.justice.gov.uk
     PRISONER_SEARCH_HOST: https://prisoner-search.prison.service.justice.gov.uk
+    KEYWORKER_API_HOST: https://keyworker-api.prison.service.justice.gov.uk
     COMPLEXITY_API_HOST: https://complexity-of-need.hmpps.service.justice.gov.uk
     NOMIS_OAUTH_HOST: https://sign-in.hmpps.service.justice.gov.uk
     ASSESS_RISKS_AND_NEEDS_API_HOST: https://assess-risks-and-needs.hmpps.service.justice.gov.uk
