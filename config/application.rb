@@ -65,7 +65,6 @@ module OffenderManagementAllocationClient
     config.hmpps_api_client_secret = ENV['HMPPS_API_CLIENT_SECRET']&.strip
 
     config.collect_prometheus_metrics = ENV['PROMETHEUS_METRICS']&.strip == 'on'
-    config.support_email = ENV['SUPPORT_EMAIL']&.strip
     config.redis_url = ENV['REDIS_URL']&.strip
 
     config.cache_expiry = (ENV['CACHE_TIMEOUT']&.strip || 60.minutes).to_i
