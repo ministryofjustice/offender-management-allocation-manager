@@ -61,16 +61,6 @@ class PomMailer < ApplicationMailer
     mail(to: params[:pom_email])
   end
 
-  def new_prison_allocation_email
-    set_template('651da525-7564-4f04-85ff-b0343fb7c47d')
-    set_personalisation(
-      email_subject: 'New Allocation',
-      prison: Prison.find(params.fetch(:prison)).name
-    )
-
-    mail(to: ENV['SUPPORT_EMAIL'])
-  end
-
   def deallocation_email
     set_template('cd628495-6e7a-448e-b4ad-4d49d4d8567d')
 

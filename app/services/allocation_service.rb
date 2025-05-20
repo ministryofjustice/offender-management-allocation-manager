@@ -47,10 +47,6 @@ class AllocationService
     )
 
     if alloc_version.nil?
-      if AllocationHistory.where(prison: params_copy[:prison]).empty?
-        PomMailer.with(prison: params_copy[:prison]).new_prison_allocation_email.deliver_later
-      end
-
       alloc_version = AllocationHistory.create!(params_copy)
     else
       alloc_version.update!(params_copy)
