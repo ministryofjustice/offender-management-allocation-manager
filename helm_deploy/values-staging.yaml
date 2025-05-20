@@ -38,6 +38,9 @@ generic-service:
       - dev.moic.service.justice.gov.uk
     tlsSecretName: allocation-manager-hostname
 
+  scheduledDowntime:
+    enabled: true
+
   env:
     ENV_NAME: staging
     SENTRY_CURRENT_ENV: staging
