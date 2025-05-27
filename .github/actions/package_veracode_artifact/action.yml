@@ -1,0 +1,25 @@
+name: Package veracode artifact
+description: This action collects app artifacts and creates a zip file which is then used by veracode SAST scan
+inputs:
+  artifact_name:
+    description: A name for the artifact
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Setup Ruby and install gems
+      uses: ruby/setup-ruby@v1
+      with:
+        bundler-cache: true
+    - name: Package application
+      shell: bash
+      run: bundle exec veracode prepare
+    - name: Rename package zip file
+      shell: bash
+      run: mv tmp/veracode*.zip ./source.zip
+    - name: Upload package artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact_name }}
+        path: source.zip
+        retention-days: 1

@@ -59,6 +59,9 @@ gem 'aws-sdk-sqs', '~> 1.55'
 # Microsoft Application Insights
 gem 'application_insights'
 
+# Veracode static code analysis
+gem 'veracode'
+
 gem 'activeadmin'
 
 group :development, :test do
