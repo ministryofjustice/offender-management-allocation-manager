@@ -1,0 +1,44 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://prison-api-dev.prison.service.justice.gov.uk/api/staff/485926/caseloads
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.3
+      Authorization:
+      - authorisation_header
+  response:
+    status:
+      code: 200
+      message:
+    headers:
+      date:
+      - Fri, 07 Jun 2024 08:36:44 GMT
+      content-type:
+      - application/json
+      vary:
+      - Origin, Access-Control-Request-Method, Access-Control-Request-Headers
+      x-content-type-options:
+      - nosniff
+      x-xss-protection:
+      - '0'
+      cache-control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      pragma:
+      - no-cache
+      expires:
+      - '0'
+      strict-transport-security:
+      - max-age=15724800; includeSubDomains
+      x-frame-options:
+      - SAMEORIGIN
+    body:
+      encoding: ASCII-8BIT
+      string: '[{"caseLoadId":"LEI","description":"Leeds (HMP)","type":"INST","caseloadFunction":"GENERAL","currentlyActive":true},{"caseLoadId":"NWEB","description":"Nomis-web
+        Application","type":"APP","caseloadFunction":"GENERAL","currentlyActive":false}]'
+  recorded_at: Fri, 07 Jun 2024 08:36:44 GMT
+recorded_with: VCR 6.2.0

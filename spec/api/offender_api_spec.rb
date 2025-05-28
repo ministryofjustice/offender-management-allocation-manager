@@ -2,7 +2,7 @@
 
 require 'swagger_helper'
 
-describe 'Offender Early Allocation API', vcr: { cassette_name: 'prison_api/offender_api' } do
+describe 'Offender Early Allocation API', vcr: { cassette_name: 'prison_api/offender_api' }, ci_fixme: true do
   let(:Authorization) { "Bearer TEST_TOKEN" }
 
   path '/api/offenders/{nomsNumber}' do

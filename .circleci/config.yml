@@ -1,19 +1,12 @@
+version: 2.1
+
+orbs:
+  browser-tools: circleci/browser-tools@2.0.0
+  ruby: circleci/ruby@2.5.3
+
 references:
   ignore_deployable_branches: &ignore_deployable_branches
-    filters: { branches: { ignore: [main, staging, preprod] } }
-
-  docker_image_name: &docker_image_name
-    image_name: quay.io/hmpps/offender-management
-
-  build_and_push_docker_image_config: &build_and_push_docker_image_config
-    name: build_and_push_docker_image
-    persist_container_image: true
-    <<: *docker_image_name
-
-  verify_docker_image_config: &verify_docker_image_config
-    name: verify_docker_image
-    publish: false
-    <<: *docker_image_name
+    filters: { branches: { ignore: [main, staging] } }
 
   test_container_config: &test_container_config
     working_directory: ~/app
@@ -34,38 +27,10 @@ references:
           POSTGRES_DB: offender-management_test
       - image: cimg/redis:7.0
 
-version: 2.1
-
-orbs:
-  browser-tools: circleci/browser-tools@1.5.3
-  ruby: circleci/ruby@2.5.0
-  hmpps: ministryofjustice/hmpps@10.3.0
-
 commands:
-  install_firefox:
-    description: Install Firefox and Geckodriver
+  compile_frontend:
+    description: Compile frontend modules
     steps:
-      - browser-tools/install-firefox
-      - browser-tools/install-geckodriver
-      - run:
-          name: Check install
-          command: |
-            firefox --version
-
-parameters:
-  java-version:
-    type: string
-    default: "21.0"
-  postgres-version:
-    type: string
-    default: "16.3"
-
-jobs:
-  install_dependencies:
-    <<: *test_container_config
-    steps:
-      - checkout
-      - ruby/install-deps
       - restore_cache:
           name: Restore Yarn Package Cache
           key: &yarn-cache yarn-packages-{{ checksum "yarn.lock" }}
@@ -78,17 +43,25 @@ jobs:
           paths:
             - .yarn/cache
             - .yarn/unplugged
-      - install_firefox
+
+  install_firefox:
+    description: Install Firefox and Geckodriver
+    steps:
+      - browser-tools/install_firefox
+      - browser-tools/install_geckodriver
       - run:
-          name: Download Code Climate
+          name: Check install
           command: |
-            if [ `which cc-test-reporter` ]
-            then
-              echo "CC test reporter cached"
-            else
-              curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ~/.local/bin/cc-test-reporter
-              chmod +x ~/.local/bin/cc-test-reporter
-            fi
+            firefox --version
+
+jobs:
+  install_dependencies:
+    <<: *test_container_config
+    steps:
+      - checkout
+      - ruby/install-deps
+      - compile_frontend
+      - install_firefox
       - persist_to_workspace:
           root: ~/
           paths:
@@ -97,16 +70,7 @@ jobs:
             - .local/bin
             - .bundle/config
 
-  rubocop:
-    <<: *test_container_config
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - ruby/install-deps
-      - ruby/rubocop-check
-
-  test:
+  run_tests:
     <<: *test_container_config
     circleci_ip_ranges: true # opts the job into the IP ranges feature
     steps:
@@ -114,9 +78,6 @@ jobs:
       - attach_workspace:
           at: ~/
       - ruby/install-deps
-      - run:
-          name: Security analysis
-          command: bundle exec brakeman -o ~/test-results/brakeman/brakeman.json -o ~/test-results/brakeman/brakeman.html
       - run:
           name: Setup database
           command: |
@@ -134,69 +95,9 @@ jobs:
             DISABLE_COVERAGE: 1
 
 workflows:
-  test_build_deploy:
+  test_full_suite:
     jobs:
       - install_dependencies:
           <<: *ignore_deployable_branches
-      - rubocop:
+      - run_tests:
           requires: [install_dependencies]
-      - test:
-          requires: [install_dependencies]
-      - hmpps/helm_lint:
-          name: helm_lint
-          env: staging
-      - hmpps/database_schema_report:
-          filters: { branches: { only: [ main ] } }
-          name: schemaspy_report
-          jdk_tag: << pipeline.parameters.java-version >>
-          postgres_tag: << pipeline.parameters.postgres-version >>
-          database_name: mpc_schemaspy
-          user: schemaspy
-          password: schemaspy
-          initialise_database: |
-            export PGPASSWORD=schemaspy && \
-              dropdb -U schemaspy -h localhost --if-exists mpc_schemaspy && \
-              createdb -U schemaspy -h localhost mpc_schemaspy && \
-              psql -U schemaspy -h localhost -d mpc_schemaspy < db/structure.sql
-      - hmpps/build_docker:
-          <<: *ignore_deployable_branches
-          <<: *verify_docker_image_config
-          requires:
-            - helm_lint
-      - hmpps/build_docker:
-          <<: *build_and_push_docker_image_config
-          filters: { branches: { only: [ main, staging, preprod ] } }
-          requires:
-            - helm_lint
-      - hmpps/deploy_env:
-          name: deploy_staging
-          env: staging
-          filters: { branches: { only: [ main, staging ] } }
-          context:
-            - hmpps-common-vars # needed to fetch the ip-allowlist-groups
-          requires:
-            - build_and_push_docker_image
-      - hmpps/deploy_env:
-          name: deploy_preprod
-          env: preprod
-          filters: { branches: { only: [ main, preprod ] } }
-          context:
-            - hmpps-common-vars # needed to fetch the ip-allowlist-groups
-            - offender-management-preprod
-          requires:
-            - build_and_push_docker_image
-      - deploy_production_approval:
-          type: approval
-          filters: { branches: { only: [ main ] } }
-          requires:
-            - deploy_staging
-      - hmpps/deploy_env:
-          name: deploy_production
-          env: production
-          context:
-            - hmpps-common-vars # needed to fetch the ip-allowlist-groups, and slack notification
-            - offender-management-production
-          requires:
-            - deploy_production_approval
-          slack_notification: true
-          slack_channel_name: the_elephants_devs

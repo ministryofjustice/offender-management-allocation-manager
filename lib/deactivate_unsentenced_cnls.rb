@@ -6,7 +6,9 @@ class DeactivateUnsentencedCnls
   end
 
   def call
-    Rails.logger = Logger.new($stdout)
+    unless Rails.env.test?
+      Rails.logger = Logger.new($stdout)
+    end
 
     @inactivated_count = 0
     womens_prisons = Prison.where(code: PrisonService::WOMENS_PRISON_CODES)
