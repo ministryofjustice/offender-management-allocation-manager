@@ -1,3 +1,4 @@
+[![Pipeline [test -> build -> deploy]](https://github.com/ministryofjustice/offender-management-allocation-manager/actions/workflows/pipeline.yml/badge.svg)](https://github.com/ministryofjustice/offender-management-allocation-manager/actions/workflows/pipeline.yml) 
 [![CircleCI](https://circleci.com/gh/ministryofjustice/offender-management-allocation-manager.svg?style=svg)](https://circleci.com/gh/ministryofjustice/offender-management-allocation-manager)
 
 # Offender Management Allocation Manager
@@ -193,9 +194,9 @@ Helm chart files in `helm_deploy/` directory. Modify these to manage deployment.
 
 ## CircleCI
 
-CircleCI is used for testing of branches and deploying.
+CircleCI is only used to run a full suite of tests. Eventually this will be moved completely to Github Actions.
 
-It runs tests in parallel and skips flaky specs.
+It runs tests in parallel and skips flaky/local specs.
 
 Mark specs as flaky by adding the `flaky: true` flag to them.
 
