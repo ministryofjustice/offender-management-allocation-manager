@@ -115,6 +115,10 @@ describe HmppsApi::Offender do
 
     let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate), prisonId: 'LEI') }
 
+    before do
+      stub_auth_token
+    end
+
     context 'when the responsibility has not been overridden' do
       let(:case_info) { build(:case_information) }
       let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
@@ -158,6 +162,10 @@ describe HmppsApi::Offender do
     subject { OffenderManagerResponsibility.new offender.com_responsible?, offender.com_supporting? }
 
     let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate), prisonId: 'LEI') }
+
+    before do
+      stub_auth_token
+    end
 
     context 'when the responsibility has not been overridden' do
       let(:case_info) { build(:case_information) }

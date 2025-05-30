@@ -1,7 +1,7 @@
 require "rails_helper"
 
 describe HandoverFollowUpJob::FollowUpEmailDetails do
-  let(:prison) { create(:prison, code: "LEI") }
+  let(:prison) { Prison.find_by(code: "LEI") || create(:prison, code: "LEI") }
   let(:handover_start_date) { 1.week.from_now }
   let(:handover_date) { 2.weeks.from_now }
   let(:indeterminate_sentence) { false }

@@ -101,6 +101,10 @@ RSpec.describe OffenderHelper do
     end
 
     context 'when a probation POM' do
+      before do
+        stub_auth_token
+      end
+
       let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate)) }
       let(:offender) do
         build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:case_information, tier: 'A').offender)

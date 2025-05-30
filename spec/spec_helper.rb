@@ -28,15 +28,7 @@ if ENV['DISABLE_COVERAGE'].blank?
     minimum_coverage 20
     # sometimes coverage drops between branches - don't fail in these cases
     maximum_coverage_drop 0.5
-
-    # set merge_timeout to 30 minutes on circle:ci
-    merge_timeout ENV['MERGE_TIMEOUT'].to_i if ENV['MERGE_TIMEOUT']
   end
-end
-
-if ENV['CIRCLE_ARTIFACTS']
-  dir = File.join(ENV['CIRCLE_ARTIFACTS'], "coverage")
-  SimpleCov.coverage_dir(dir)
 end
 
 # patch to support SAMPLE=nn to only run nn tests

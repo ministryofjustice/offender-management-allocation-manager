@@ -81,7 +81,7 @@ generic-service:
   containerCommand: ['sh', '-c', 'bundle exec puma']
 
   image:
-    repository: quay.io/hmpps/offender-management
+    repository: ghcr.io/ministryofjustice/offender-management-allocation-manager
     tag: app_version # overridden at deployment time
     port: 3000
 

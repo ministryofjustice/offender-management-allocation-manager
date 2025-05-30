@@ -1,0 +1,184 @@
+name: Pipeline [test -> build -> deploy]
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+    inputs:
+      additional_docker_tag:
+        description: Additional docker tag that can be used to specify stable or testing tags
+        required: false
+        default: ''
+        type: string
+      push:
+        description: Push docker image to registry flag
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  helm_lint:
+    strategy:
+      matrix:
+        environments: ['staging', 'preprod', 'production']
+    name: Helm lint
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/test_helm_lint.yml@v2 # WORKFLOW_VERSION
+    secrets: inherit
+    with:
+      environment: ${{ matrix.environments }}
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      RACK_ENV: test
+      REDIS_URL: redis://127.0.0.1:6379
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    services:
+      postgres:
+        image: postgres:15.2-alpine
+        env:
+          POSTGRES_DB: offender-management-allocation-manager_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Ruby and install gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+      - name: Install yarn package
+        run: yarn install --immutable
+      - name: Precompile assets
+        run: bin/rails assets:precompile
+      - name: Setup firefox
+        uses: browser-actions/setup-firefox@v1
+      - name: Setup geckodriver
+        uses: browser-actions/setup-geckodriver@latest
+      - name: Run brakeman
+        run: bundle exec brakeman
+      - name: Run rubocop
+        run: bundle exec rubocop
+      - name: Setup database
+        run: bin/rails db:prepare
+      - name: Run tests
+        env:
+          MOZ_HEADLESS: 1
+          DISABLE_COVERAGE: 1
+        run: |
+          export SPEC_STATUS_PATH=~/spec_status
+          bundle exec rspec -t ~@flaky -t ~@local_only -t ~@ci_fixme \
+            --exclude-pattern "spec/{features,services}/**/*" --format progress spec || \
+            (echo "Flaky tests detected, trying again..." && sleep 15 && bundle exec rspec -t ~@flaky -t ~@local_only -t ~@ci_fixme --only-failures spec)
+
+  verify_docker_image:
+    name: Verify docker image
+    if: ${{ ! contains(fromJSON('["refs/heads/main", "refs/heads/staging"]'), github.ref) }}
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
+    with:
+      docker_registry: 'ghcr.io'
+      registry_org: 'ministryofjustice'
+      push: false
+      docker_multiplatform: false
+
+  build:
+    name: Build docker image
+    if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/staging"]'), github.ref) }}
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
+    needs:
+      - helm_lint
+      - test
+    with:
+      docker_registry: 'ghcr.io'
+      registry_org: 'ministryofjustice'
+      additional_docker_tag: ${{ inputs.additional_docker_tag }}
+      push: ${{ inputs.push || true }}
+      docker_multiplatform: false
+
+  database_schema_report:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    name: Database schema report
+    services:
+      postgres:
+        image: postgres:15.2-alpine
+        env:
+          POSTGRES_DB: mpc_schemaspy
+          POSTGRES_USER: schemaspy
+          POSTGRES_PASSWORD: schemaspy
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Initialise database
+        run: |
+          export PGPASSWORD=schemaspy && \
+          dropdb -U schemaspy -h localhost --if-exists mpc_schemaspy && \
+          createdb -U schemaspy -h localhost mpc_schemaspy && \
+          psql -U schemaspy -h localhost -d mpc_schemaspy < db/structure.sql
+      - uses: ministryofjustice/hmpps-github-actions/.github/actions/database_schema_report@v2 # WORKFLOW_VERSION
+        with:
+          database_name: mpc_schemaspy
+          user: schemaspy
+          password: schemaspy
+
+  deploy_staging:
+    name: Deploy to staging
+    needs:
+      - build
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
+    secrets: inherit
+    with:
+      environment: 'staging'
+      app_version: '${{ needs.build.outputs.app_version }}'
+
+  deploy_preprod:
+    name: Deploy to preprod
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - build
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
+    secrets: inherit
+    with:
+      environment: 'preprod'
+      app_version: '${{ needs.build.outputs.app_version }}'
+
+  deploy_production:
+    name: Deploy to production
+    needs:
+      - build
+      - deploy_preprod
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
+    secrets: inherit
+    with:
+      environment: 'production'
+      app_version: '${{ needs.build.outputs.app_version }}'
+      slack_notification: 'true'

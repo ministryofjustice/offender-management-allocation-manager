@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe HandoverFollowUpJob, vcr: { cassette_name: "prison_api/handover_follow_up_email" } do
+describe HandoverFollowUpJob, vcr: { cassette_name: "prison_api/handover_follow_up_email" }, ci_fixme: true do
   around do |example|
     cassettes = [
       { name: 'prison_api/offender_api' },

@@ -1,6 +1,10 @@
 require "rails_helper"
 
 describe Sentences do
+  before do
+    stub_auth_token
+  end
+
   describe '.for' do
     before { stub_request(:get, "https://prison-api-dev.prison.service.justice.gov.uk/api/offender-sentences/booking/12345678/sentenceTerms").to_return(status: 200, body: results.to_json, headers: {}) }
 

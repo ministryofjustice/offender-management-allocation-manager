@@ -1,3 +1,4 @@
+[![Pipeline [test -> build -> deploy]](https://github.com/ministryofjustice/offender-management-allocation-manager/actions/workflows/pipeline.yml/badge.svg)](https://github.com/ministryofjustice/offender-management-allocation-manager/actions/workflows/pipeline.yml) 
 [![CircleCI](https://circleci.com/gh/ministryofjustice/offender-management-allocation-manager.svg?style=svg)](https://circleci.com/gh/ministryofjustice/offender-management-allocation-manager)
 
 # Offender Management Allocation Manager
@@ -136,19 +137,15 @@ These are all managed manually using kubectl. [See here for more info](https://u
 staging and preprod are deployed environments that can be used as part of the development process. Their
 purposes are:
 
-* staging - Deployed to first before deploying to production to make sure deployment works. Can also be deployed to
-  separately by force-pushing to the `staging` branch.
-* preprod - Contains a copy of live data, updated via a script. Only security-cleared personnel can look at it. Deploy
-  here when you need to check WIP code against real data.
+* staging - Deployed upon merge to `main`. Can also be deployed to separately by force-pushing to the `staging` branch.
+* preprod - Contains a copy of live data, updated via a script. Only security-cleared personnel can look at it. Deployed 
+  upon merge to `main`, just like `staging`. Can't be deployed by force-pushing.
 
-The method to deploy to these envs is the same. Commit any code to be deployed locally, and run:
+To deploy staging manually, commit any code to be deployed locally, and run:
 
 ```
 # Staging environment
 git push --force origin HEAD:staging
-
-# Preprod environment
-git push --force origin HEAD:preprod
 ```
 
 ## Environment Variables
@@ -193,9 +190,9 @@ Helm chart files in `helm_deploy/` directory. Modify these to manage deployment.
 
 ## CircleCI
 
-CircleCI is used for testing of branches and deploying.
+CircleCI is only used to run a full suite of tests. Eventually this will be moved completely to Github Actions.
 
-It runs tests in parallel and skips flaky specs.
+It runs tests in parallel and skips flaky/local specs.
 
 Mark specs as flaky by adding the `flaky: true` flag to them.
 
