@@ -137,19 +137,15 @@ These are all managed manually using kubectl. [See here for more info](https://u
 staging and preprod are deployed environments that can be used as part of the development process. Their
 purposes are:
 
-* staging - Deployed to first before deploying to production to make sure deployment works. Can also be deployed to
-  separately by force-pushing to the `staging` branch.
-* preprod - Contains a copy of live data, updated via a script. Only security-cleared personnel can look at it. Deploy
-  here when you need to check WIP code against real data.
+* staging - Deployed upon merge to `main`. Can also be deployed to separately by force-pushing to the `staging` branch.
+* preprod - Contains a copy of live data, updated via a script. Only security-cleared personnel can look at it. Deployed 
+  upon merge to `main`, just like `staging`. Can't be deployed by force-pushing.
 
-The method to deploy to these envs is the same. Commit any code to be deployed locally, and run:
+To deploy staging manually, commit any code to be deployed locally, and run:
 
 ```
 # Staging environment
 git push --force origin HEAD:staging
-
-# Preprod environment
-git push --force origin HEAD:preprod
 ```
 
 ## Environment Variables
