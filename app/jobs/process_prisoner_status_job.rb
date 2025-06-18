@@ -7,11 +7,9 @@ class ProcessPrisonerStatusJob < ApplicationJob
   discard_on Faraday::ResourceNotFound
 
   def perform(nomis_offender_id, trigger_method: :event)
-    ApplicationRecord.transaction do
-      logger.info("nomis_offender_id=#{nomis_offender_id},trigger_method=#{trigger_method},job=process_prisoner_status_job,event=started")
-      process_status_change(nomis_offender_id)
-      logger.info("nomis_offender_id=#{nomis_offender_id},trigger_method=#{trigger_method},job=process_prisoner_status_job,event=finished")
-    end
+    logger.info("nomis_offender_id=#{nomis_offender_id},trigger_method=#{trigger_method},job=process_prisoner_status_job,event=started")
+    process_status_change(nomis_offender_id)
+    logger.info("nomis_offender_id=#{nomis_offender_id},trigger_method=#{trigger_method},job=process_prisoner_status_job,event=finished")
   end
 
 private
