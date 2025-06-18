@@ -21,6 +21,9 @@ class AllocationHistory < ApplicationRecord
   MANUAL_CHANGE = 3
   LEGAL_STATUS_CHANGED = 4
 
+  # IMPORTANT:
+  # Dirty changes are reset every time the model saves, not just when a transaction is closed.
+  # When the `after_commit` callback is executed, we can only enquiry about the most recent saved attributes.
   after_commit :publish_allocation_changed_event
 
   # When adding a new 'event' or 'event trigger'
