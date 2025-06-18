@@ -6,7 +6,7 @@ class StaffMember
   # maybe this method shouldn't be here?
   attr_reader :staff_id, :prison
 
-  delegate :position, :position_description, :probation_officer?, :prison_officer?, to: :pom, allow_nil: true
+  delegate :position_description, :probation_officer?, :prison_officer?, to: :pom, allow_nil: true
   delegate :working_pattern, :status, to: :@pom_detail
 
   def initialize(prison, staff_id, pom_detail = default_pom_detail(prison, staff_id))

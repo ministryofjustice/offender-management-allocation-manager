@@ -1,7 +1,0 @@
-#!/bin/bash
-
-set -eo pipefail
-
-export DOCKER_DEFAULT_PLATFORM=linux/amd64
-
-docker run -it --rm app.local "${@}"

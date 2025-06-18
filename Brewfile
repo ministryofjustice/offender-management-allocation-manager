@@ -18,5 +18,5 @@ brew 'geckodriver'
 # required by gem 'mimemagic' v0.3.9
 brew 'shared-mime-info'
 
-# required by bin/copy-prod-db-to-preprod.sh
+# handy to have
 brew 'jq'
