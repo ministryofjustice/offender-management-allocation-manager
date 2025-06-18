@@ -13,7 +13,6 @@
 # section should replace API mocks with dependency mocks as has been described above.
 RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
   let(:nomis_offender_id) { 'G4281GV' }
-  let(:remand_nomis_offender_id) { 'G3716UD' }
   let(:crn) { 'X362207' }
   let(:ldu) {  create(:local_delivery_unit) }
   let(:prison) { create(:prison) }
