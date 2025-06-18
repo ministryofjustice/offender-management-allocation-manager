@@ -19,6 +19,7 @@ class AllocationHistory < ApplicationRecord
   OFFENDER_TRANSFERRED = 1
   OFFENDER_RELEASED = 2
   MANUAL_CHANGE = 3
+  LEGAL_STATUS_CHANGED = 4
 
   after_commit :publish_allocation_changed_event
 
@@ -41,7 +42,8 @@ class AllocationHistory < ApplicationRecord
     user: USER,
     offender_transferred: OFFENDER_TRANSFERRED,
     offender_released: OFFENDER_RELEASED,
-    manual_change: MANUAL_CHANGE
+    manual_change: MANUAL_CHANGE,
+    legal_status_changed: LEGAL_STATUS_CHANGED,
   }
 
   scope :active, -> { where.not(primary_pom_nomis_id: nil) }
