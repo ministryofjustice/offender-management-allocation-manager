@@ -14,6 +14,13 @@ class ProcessPrisonerStatusJob < ApplicationJob
 
 private
 
+  # We allow `UNKNOWN` out of precaution as we've seen brief changes of
+  # status from `SENTENCED` to `UNKNOWN` and back to `SENTENCED` and we
+  # don't want to deallocate these offenders upon getting the event.
+  def allowed_legal_statuses
+    HmppsApi::PrisonApi::OffenderApi::ALLOWED_LEGAL_STATUSES + %w[UNKNOWN]
+  end
+
   def process_status_change(nomis_offender_id)
     allocation = AllocationHistory.active.find_by(nomis_offender_id:)
     return if allocation.nil?
@@ -34,7 +41,7 @@ private
       return
     end
 
-    if HmppsApi::PrisonApi::OffenderApi::ALLOWED_LEGAL_STATUSES.exclude?(offender.legal_status)
+    if allowed_legal_statuses.exclude?(offender.legal_status)
       logger.info(
         "nomis_offender_id=#{nomis_offender_id},job=process_prisoner_status_job,event=legal_status_changed|" \
           "Legal status #{offender.legal_status} is not allowed. Deallocating."

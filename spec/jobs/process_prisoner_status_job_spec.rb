@@ -70,4 +70,15 @@ RSpec.describe ProcessPrisonerStatusJob, type: :job do
       described_class.perform_now(nomis_offender_id)
     end
   end
+
+  context 'when offender legal_status is unknown' do
+    let(:legal_status) { 'UNKNOWN' }
+
+    it 'does not deallocate POMs' do
+      expect(allocation).not_to receive(:deallocate_primary_pom)
+      expect(allocation).not_to receive(:deallocate_secondary_pom)
+
+      described_class.perform_now(nomis_offender_id)
+    end
+  end
 end

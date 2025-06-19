@@ -217,7 +217,8 @@ private
       noms_number: nomis_offender_id,
       additional_information: {
         'staffCode' => primary_pom_nomis_id,
-        'prisonId' => prison
+        'prisonId' => prison,
+        'eventTrigger' => event_trigger_before_type_cast,
       }
     ).publish
   end
