@@ -344,7 +344,8 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
           noms_number: nomis_offender_id,
           additional_information: {
             'staffCode' => anything,
-            'prisonId' => prison_code
+            'prisonId' => prison_code,
+            'eventTrigger' => described_class::USER,
           }
         )
 
