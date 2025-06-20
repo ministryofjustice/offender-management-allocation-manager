@@ -218,7 +218,7 @@ private
       additional_information: {
         'staffCode' => primary_pom_nomis_id,
         'prisonId' => prison,
-        'eventTrigger' => event_trigger_before_type_cast,
+        'eventTrigger' => event_trigger,
       }
     ).publish
   end
