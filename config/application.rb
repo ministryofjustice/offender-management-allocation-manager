@@ -96,6 +96,7 @@ module OffenderManagementAllocationClient
       # event_type               => handler class (as a string)
       'offender-management.noop' => 'DomainEvents::Handlers::NoopHandler',
       'prisoner-offender-search.prisoner.updated' => 'DomainEvents::Handlers::PrisonerUpdatedHandler',
+      'prisoner-offender-search.prisoner.released' => 'DomainEvents::Handlers::PrisonerReleasedHandler',
       'probation-case.registration.added' => 'DomainEvents::Handlers::ProbationChangeHandler',
       'probation-case.registration.deleted' => 'DomainEvents::Handlers::ProbationChangeHandler',
       'probation-case.registration.deregistered' => 'DomainEvents::Handlers::ProbationChangeHandler',

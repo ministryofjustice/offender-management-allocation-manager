@@ -23,8 +23,9 @@ module HmppsApi
         end
       end
 
-      # This is only called by allocation history and debugging (to find the last movement)
-      def self.movements_for(offender_no, movement_types = ADMISSION_TYPES)
+      # Used by allocation history and debugging (to find the last movement), as well
+      # as handling of `prisoner-offender-search.prisoner.released` events
+      def self.movements_for(offender_no, movement_types: ADMISSION_TYPES)
         route = '/movements/offenders'
 
         data = client.post(route, [offender_no],
