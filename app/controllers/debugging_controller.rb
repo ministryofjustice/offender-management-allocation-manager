@@ -20,7 +20,13 @@ class DebuggingController < PrisonsApplicationController
     @parole_reviews = ParoleReview.where(nomis_offender_id: @nomis_id).order('updated_at DESC')
     @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@nomis_id)
     @allocation = AllocationHistory.find_by(nomis_offender_id: @nomis_id)
-    @movements = HmppsApi::PrisonApi::MovementApi.movements_for(@nomis_id, %w[ADM TRN REL]).last_movement
+    @movements = HmppsApi::PrisonApi::MovementApi.movements_for(
+      @nomis_id, movement_types: [
+        HmppsApi::MovementType::ADMISSION,
+        HmppsApi::MovementType::TRANSFER,
+        HmppsApi::MovementType::RELEASE,
+      ]
+    ).last_movement
   end
 
 private

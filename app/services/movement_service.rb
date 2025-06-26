@@ -40,7 +40,7 @@ private
     # and is not going back to a prison OR
     # when the movement is from a prison to an immigration or detention centre
     if (transfer.from_immigration? && !transfer.to_prison?) ||
-       (transfer.to_immigration? && transfer.from_prison?)
+       (transfer.from_prison? && transfer.to_immigration?)
       release_offender(transfer.offender_no, transfer.from_agency)
 
       return true
@@ -66,21 +66,8 @@ private
 
     Rails.logger.info("[MOVEMENT] De-allocating #{transfer.offender_no}")
 
-    alloc = AllocationHistory.find_by(nomis_offender_id: transfer.offender_no)
-
-    # We need to check whether the from_agency is from within the prison estate
-    # to know whether it is a transfer.  If it isn't then we want to bail and
-    # not process the new admission.
-    # There are special rules for responsibility when offenders
-    # move to open prisons so we will trigger this job to send
-    # an email to the LDU
-    # Bail if this is a new admission to prison
-    # We only want to deallocate the offender if they have not already been
-    # allocated at their new prison
-    # When an offender is released, we can no longer rely on their
-    # case information (in case they come back one day), and we
-    # should de-activate any current allocations.
-    alloc.deallocate_offender_after_transfer if alloc&.active?
+    alloc = AllocationHistory.active.find_by(nomis_offender_id: transfer.offender_no)
+    alloc.deallocate_offender_after_transfer if alloc
     true
   end
 
@@ -89,15 +76,8 @@ private
   # should de-activate any current allocations.
   def self.process_release(release)
     return false unless release.to_agency == RELEASE_MOVEMENT_CODE
-
-    if release.from_agency == HmppsApi::Movement::IMMIGRATION_MOVEMENT_CODES.first ||
-       release.from_agency == HmppsApi::Movement::IMMIGRATION_MOVEMENT_CODES.last
-      release_offender(release.offender_no, release.from_agency)
-
-      return true
-    end
-
-    return false unless release.from_prison? || hospital_agencies.include?(release.from_agency)
+    return false unless release.from_prison? || release.from_immigration? ||
+                        hospital_agencies.include?(release.from_agency)
 
     release_offender(release.offender_no, release.from_agency)
     true
@@ -107,19 +87,8 @@ private
     Rails.logger.info("[MOVEMENT] Processing release for #{offender_no}")
 
     CaseInformation.where(nomis_offender_id: offender_no).destroy_all
-    alloc = AllocationHistory.find_by(nomis_offender_id: offender_no)
-    # We need to check whether the from_agency is from within the prison estate
-    # to know whether it is a transfer.  If it isn't then we want to bail and
-    # not process the new admission.
-    # There are special rules for responsibility when offenders
-    # move to open prisons so we will trigger this job to send
-    # an email to the LDU
-    # Bail if this is a new admission to prison
-    # We only want to deallocate the offender if they have not already been
-    # allocated at their new prison
-    # When an offender is released, we can no longer rely on their
-    # case information (in case they come back one day), and we
-    # should de-activate any current allocations.
+
+    alloc = AllocationHistory.active.find_by(nomis_offender_id: offender_no)
     alloc.deallocate_offender_after_release if alloc
 
     HmppsApi::ComplexityApi.inactivate(offender_no) if PrisonService.womens_prison?(from_agency)
