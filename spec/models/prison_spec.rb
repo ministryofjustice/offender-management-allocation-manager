@@ -37,26 +37,23 @@ RSpec.describe Prison do
   describe '#unfiltered_offenders' do
     subject { described_class.new(code: 'LEI').unfiltered_offenders }
 
-    it "get first page of offenders for a specific prison",
-       vcr: { cassette_name: 'prison_api/offender_service_offenders_by_prison_first_page_spec' }, ci_fixme: true do
-      offender_array = subject.first(9)
-      expect(offender_array).to be_a(Array)
-      expect(offender_array.length).to eq(9)
+    let(:offenders) { build_list(:nomis_offender, 3) }
+
+    before do
+      stub_auth_token
+      stub_offenders_for_prison('LEI', offenders)
     end
 
-    it "get last page of offenders for a specific prison",
-       vcr: { cassette_name: 'prison_api/offender_service_offenders_by_prison_last_page_spec' }, ci_fixme: true do
+    it "get offenders for a specific prison" do
       offender_array = subject.to_a
       expect(offender_array).to be_a(Array)
-      expect(offender_array.length).to be > 800
+      expect(offender_array.length).to eq(3)
     end
 
     context 'when recall flag set' do
       let(:offenders) { build_list(:nomis_offender, 2, sentence: attributes_for(:sentence_detail, recall: true)) }
 
       before do
-        stub_auth_token
-        stub_offenders_for_prison('LEI', offenders)
         create(:offender, nomis_offender_id: offenders.first.fetch(:prisonerNumber))
       end
 
