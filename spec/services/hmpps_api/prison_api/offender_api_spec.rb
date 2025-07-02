@@ -53,7 +53,6 @@ describe HmppsApi::PrisonApi::OffenderApi do
       end
 
       before do
-        stub_auth_token
         stub_offenders_for_prison(prison, offenders)
       end
 
@@ -76,7 +75,6 @@ describe HmppsApi::PrisonApi::OffenderApi do
       end
 
       before do
-        stub_auth_token
         stub_offenders_for_prison(prison, in_offenders + out_offenders, rotl_movements)
       end
 
@@ -98,10 +96,6 @@ describe HmppsApi::PrisonApi::OffenderApi do
 
       let(:offender) { build(:nomis_offender, sentence: attributes_for(:sentence_detail, recall: true)) }
       let(:offender_no) { offender.fetch(:prisonerNumber) }
-
-      before do
-        stub_auth_token
-      end
 
       context "when offender exists" do
         before do
@@ -145,7 +139,6 @@ describe HmppsApi::PrisonApi::OffenderApi do
       end
 
       before do
-        stub_auth_token
         offenders.each { |o| stub_offender(o) }
       end
 

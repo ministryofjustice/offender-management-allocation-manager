@@ -26,7 +26,6 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
 
   before do
     allow(controller).to receive(:verify_token)
-    stub_auth_token
   end
 
   describe '#show' do

@@ -10,21 +10,11 @@ context 'when NOMIS is missing information' do
     before do
       stub_poms = [{ staffId: staff_id, position: RecommendationService::PRISON_POM }]
 
-      stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token")
-        .with(query: { grant_type: 'client_credentials' })
-        .to_return(body: {}.to_json)
-
-      stub_request(:get, "#{ApiHelper::T3}/users/example_user")
-        .to_return(body: { staffId: staff_id }.to_json)
-
-      stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}/emails")
-        .to_return(body: [].to_json)
-
       stub_request(:get, "#{ApiHelper::T3}/staff/roles/#{prison_code}/role/POM")
         .to_return(body: stub_poms.to_json)
 
       signin_pom_user([prison_code])
-      stub_user(username: 'MOIC_POM', staff_id: staff_id)
+      stub_user('MOIC_POM', staff_id)
     end
 
     describe 'the caseload page' do

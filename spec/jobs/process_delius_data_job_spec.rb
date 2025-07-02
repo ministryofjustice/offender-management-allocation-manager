@@ -53,8 +53,6 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
   end
 
   before do
-    stub_auth_token
-
     allow(OffenderService).to receive(:get_probation_record).with(nomis_offender_id)
       .and_return(mock_probation_record)
   end

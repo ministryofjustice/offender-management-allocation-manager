@@ -10,10 +10,6 @@ describe OmniAuth::Strategies::HmppsSso, vcr: { cassette_name: 'prison_api/hmpps
     }.to_app
   end
 
-  before do
-    stub_auth_token
-  end
-
   context 'when methods' do
     context 'when #info' do
       it 'returns a hash with the username, active caseload, caseloads and email address' do

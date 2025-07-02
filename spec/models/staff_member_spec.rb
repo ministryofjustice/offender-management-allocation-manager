@@ -15,7 +15,6 @@ RSpec.describe StaffMember, type: :model do
   end
 
   before do
-    stub_auth_token
     stub_offenders_for_prison(prison.code, offenders)
     offenders.each do |offender|
       create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))

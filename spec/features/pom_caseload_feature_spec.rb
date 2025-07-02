@@ -87,7 +87,6 @@ feature "view POM's caseload" do
         other_pom
       ]
 
-    stub_auth_token
     stub_poms(prison.code, poms)
     signin_pom_user [prison.code]
 
@@ -115,7 +114,7 @@ feature "view POM's caseload" do
 
     allow_any_instance_of(MpcOffender).to receive(:handover_start_date).and_return(tomorrow)
 
-    stub_user staff_id: nomis_staff_id
+    stub_user 'MOIC_POM', nomis_staff_id
   end
 
   context 'when in a womens prison' do
@@ -225,7 +224,7 @@ feature "view POM's caseload" do
 
     context 'when clicking through the offender link' do
       it 'shows the new page' do
-        stub_user staff_id: nomis_staff_id
+        stub_user 'MOIC_POM', nomis_staff_id
 
         stub_offender(first_offender)
         stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/#{prison.code}/offender/#{first_offender.fetch(:prisonerNumber)}")
@@ -247,7 +246,7 @@ feature "view POM's caseload" do
     end
 
     it 'can sort all cases that have been allocated to a specific POM in the last week' do
-      stub_user staff_id: nomis_staff_id
+      stub_user 'MOIC_POM', nomis_staff_id
       expect(find('a[href="#recent-allocations"]').text).to eq('Allocated in last 7 days (21)')
 
       # The first name...

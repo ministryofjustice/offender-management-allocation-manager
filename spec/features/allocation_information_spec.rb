@@ -203,8 +203,7 @@ private
     stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token?grant_type=client_credentials")
             .to_return(body: {}.to_json)
 
-    stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM")
-      .to_return(body: { 'staffId': 1 }.to_json)
+    stub_user('MOIC_POM', 1)
     stub_pom_emails(1, [])
 
     stub_offender(build(:nomis_offender, prisonerNumber: offender_no,

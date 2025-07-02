@@ -11,7 +11,6 @@ feature 'early allocation when crossing 18 month threshold' do
     let(:offender_no) { nomis_offender.fetch(:prisonerNumber) }
 
     before do
-      stub_auth_token
       stub_offenders_for_prison(prison.code, [nomis_offender])
       stub_movements_for nomis_offender.fetch(:prisonerNumber), attributes_for_list(:movement, 1, toAgency: prison.code)
       stub_poms(prison.code, [user])

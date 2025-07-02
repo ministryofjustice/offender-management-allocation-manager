@@ -54,10 +54,6 @@ describe PrisonOffenderManagerService do
   end
 
   context 'without T3 fixtures' do
-    before do
-      stub_auth_token
-    end
-
     describe '#get_list_of_poms' do
       let!(:prison)  { create(:prison) }
 
@@ -118,7 +114,6 @@ describe PrisonOffenderManagerService do
     describe '#get_single_pom' do
       context 'when pom not existing at a prison' do
         before do
-          stub_auth_token
           stub_offenders_for_prison('LEI', [build(:nomis_offender)])
           stub_request(:get, "#{ApiHelper::T3}/staff/roles/LEI/role/POM")
             .with(

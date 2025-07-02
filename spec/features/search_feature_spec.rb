@@ -51,7 +51,6 @@ feature 'Search for offenders', flaky: true do
     let(:pom) { build(:pom) }
 
     before do
-      stub_auth_token
       stub_offenders_for_prison(prison_code, offenders)
       stub_spo_user pom
       stub_poms prison_code, [pom]

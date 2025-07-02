@@ -1,10 +1,6 @@
 describe HmppsApi::AssessRisksAndNeedsApi do
   let(:api_host) { Rails.configuration.assess_risks_and_needs_api_host }
 
-  before do
-    stub_auth_token
-  end
-
   describe '.get_latest_oasys_date' do
     let(:offender_no) { 'A9346AC' }
 

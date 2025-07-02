@@ -98,18 +98,20 @@ module ApiHelper
     stub_pom_emails(pom.staffId, emails) if emails
   end
 
-  def stub_signed_in_pom(prison, staff_id, username = 'alice')
-    stub_auth_token
-    stub_sso_data(prison, username: username, roles: [SsoIdentity::POM_ROLE])
+  def stub_user(username, staff_id, emails: [])
     stub_request(:get, "#{T3}/users/#{username}")
       .to_return(body: { 'staffId': staff_id }.to_json)
+    stub_pom_emails(staff_id, emails)
+  end
+
+  def stub_signed_in_pom(prison, staff_id, username = 'alice')
+    stub_sso_data(prison, username: username, roles: [SsoIdentity::POM_ROLE])
+    stub_user(username, staff_id)
   end
 
   def stub_signed_in_spo_pom(prison, staff_id, username = 'alice')
-    stub_auth_token
     stub_sso_data(prison, username: username, roles: [SsoIdentity::POM_ROLE, SsoIdentity::SPO_ROLE])
-    stub_request(:get, "#{T3}/users/#{username}")
-        .to_return(body: { 'staffId': staff_id }.to_json)
+    stub_user(username, staff_id)
   end
 
   def stub_offenders_for_prison(prison, offenders, movements = [])

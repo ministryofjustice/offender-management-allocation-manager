@@ -40,7 +40,6 @@ RSpec.describe Prison do
     let(:offenders) { build_list(:nomis_offender, 3) }
 
     before do
-      stub_auth_token
       stub_offenders_for_prison('LEI', offenders)
     end
 

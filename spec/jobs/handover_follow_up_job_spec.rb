@@ -6,7 +6,6 @@ describe HandoverFollowUpJob do
   let(:mailer_double) { double("CommunityMailer", deliver_later: true) }
 
   before do
-    stub_auth_token
     stub_offenders_for_prison(prison.code, [build(:nomis_offender, prisonerNumber: nomis_offender_id)])
     stub_poms(prison.code, [
       build(:pom, :prison_officer, emails: []),

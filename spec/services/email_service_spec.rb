@@ -72,7 +72,6 @@ RSpec.describe EmailService do
 
   before do
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
-    stub_auth_token
     create(:case_information, offender: build(:offender, nomis_offender_id: 'G2911GD'))
     stub_offender(offender)
     stub_poms(prison_code, [andrien, leigh])

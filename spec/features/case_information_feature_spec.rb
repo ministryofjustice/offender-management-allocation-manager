@@ -10,7 +10,6 @@ feature 'case information feature', flaky: true do
 
     before do
       stub_signin_spo(spo, [prison.code])
-      stub_auth_token
       stub_offenders_for_prison(prison.code, [offender])
       stub_poms(prison.code, [spo])
     end

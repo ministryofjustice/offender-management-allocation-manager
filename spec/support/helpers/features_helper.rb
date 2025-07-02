@@ -6,16 +6,12 @@ module FeaturesHelper
   end
 
   def stub_signin_spo(pom, prisons = ['LEI'])
-    stub_auth_token
     signin_spo_user(prisons)
     stub_spo_user(pom)
   end
 
   def stub_spo_user(pom)
-    stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM")
-        .to_return(body: { 'staffId': pom.staff_id }.to_json)
-    stub_request(:get, "#{ApiHelper::T3}/staff/#{pom.staff_id}/emails")
-        .to_return(body: pom.emails.to_json)
+    stub_user('MOIC_POM', pom.staff_id, emails: pom.emails.to_json)
   end
 
   def stub_pom_user(pom) = stub_spo_user(pom)
@@ -41,13 +37,6 @@ module FeaturesHelper
     }
 
     OmniAuth.config.add_mock(:hmpps_sso, hmpps_sso_response)
-  end
-
-  def stub_user(staff_id:, username: 'MOIC_POM')
-    stub_request(:get, "#{ApiHelper::T3}/users/#{username}")
-      .to_return(body: { 'staffId': staff_id }.to_json)
-    stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}/emails")
-      .to_return(body: [].to_json)
   end
 
   def stub_dps_header_footer

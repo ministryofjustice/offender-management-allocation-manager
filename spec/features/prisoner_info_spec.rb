@@ -247,8 +247,7 @@ feature 'View a prisoner profile page', flaky: true do
     let!(:prison) { create(:prison) }
 
     before do
-      stub_auth_token
-      stub_user(staff_id: 1234)
+      stub_user('MOIC_POM', 1234)
       stub_keyworker(prison.code, nomis_offender_id, build(:keyworker))
       stub_offender(nomis_offender)
     end

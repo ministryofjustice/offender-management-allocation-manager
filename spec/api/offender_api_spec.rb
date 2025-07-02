@@ -7,7 +7,6 @@ describe 'Offender Early Allocation API' do
   let(:prison) { Prison.find_by(code: "LEI") || create(:prison, code: "LEI") }
 
   before do
-    stub_auth_token
     stub_offender(build(:nomis_offender, prisonerNumber: 'G7266VD', prisonId: prison.code))
     stub_non_existent_offender('A1111AA')
   end

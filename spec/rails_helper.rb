@@ -117,11 +117,10 @@ RSpec.configure do |config|
     WebMock.disable_net_connect!(allow_localhost: true, allow: Rails.configuration.nomis_oauth_host)
   end
 
-  config.before(:each) do
-    stub_request(:get, %r{#{Rails.configuration.prison_api_host}/api/offender-sentences/booking/\d+/sentenceTerms}).to_return(body: [].to_json)
-  end
-
   config.before(:each) do |example|
+    stub_auth_token
+    stub_request(:get, %r{#{Rails.configuration.prison_api_host}/api/offender-sentences/booking/\d+/sentenceTerms}).to_return(body: [].to_json)
+
     if [:feature, :controller].include?(example.metadata[:type]) and
       example.metadata[:skip_dps_header_footer_stubbing].blank?
 

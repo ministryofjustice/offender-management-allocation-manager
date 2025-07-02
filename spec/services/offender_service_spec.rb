@@ -47,7 +47,6 @@ describe OffenderService, type: :feature do
       let(:offender) { build(:nomis_offender, inOutStatus: 'OUT', prisonId: 'OUT') }
 
       before do
-        stub_auth_token
         stub_offender(offender)
       end
 
@@ -61,7 +60,6 @@ describe OffenderService, type: :feature do
       let(:offender) { build(:nomis_offender, prisonId: 'MHI') }
 
       before do
-        stub_auth_token
         stub_offender(offender)
       end
 

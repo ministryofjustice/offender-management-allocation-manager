@@ -12,7 +12,6 @@ RSpec.describe "allocations/history", type: :view do
     assign(:prisoner, offender)
     assign(:history, history + early_allocations.map { |ea| EarlyAllocationHistory.new(ea) })
     assign(:timeline, build(:hmpps_api_prison_timeline, movements: build_list(:movement, 1)))
-    stub_auth_token
     stub_pom_emails 123_456, []
     stub_pom_emails 485_926, []
   end
