@@ -25,24 +25,6 @@ describe HmppsApi::PrisonApi::OffenderApi do
   end
 
   describe 'List of offenders' do
-    describe 'using VCR', vcr: { cassette_name: 'prison_api/offender_hmpps_api_offender_list' } do
-      subject { described_class.get_offenders_in_prison('LEI') }
-
-      it "can get a list of offenders" do
-        expect(subject).not_to be_nil
-        expect(subject).to be_instance_of(Array)
-        expect(subject).to all(be_an HmppsApi::Offender)
-      end
-
-      it "returns category info" do
-        # Find an offender with a category
-        offender_with_category = subject.detect { |o| o.category_code.present? }
-        expect(offender_with_category).not_to be_nil
-        expect(offender_with_category.category_label).not_to be_nil
-        expect(offender_with_category.category_active_since).to be_a(Date)
-      end
-    end
-
     context 'with offenders who are on remand or unsentenced' do
       subject { described_class.get_offenders_in_prison(prison) }
 
@@ -106,6 +88,12 @@ describe HmppsApi::PrisonApi::OffenderApi do
           expect(subject).to be_instance_of(HmppsApi::Offender)
           expect(subject.recalled?).to eq(true)
         end
+
+        it 'can get category info' do
+          expect(subject.category_code).to eq('C')
+          expect(subject.category_label).to eq('Cat C')
+          expect(subject.category_active_since).to eq('29/06/2025'.to_date)
+        end
       end
 
       context "when offender doesn't exist" do
@@ -160,24 +148,6 @@ describe HmppsApi::PrisonApi::OffenderApi do
         end
       end
     end
-
-    it 'can get category info',
-       vcr: { cassette_name: 'prison_api/offender_api_cat_code_spec' } do
-      noms_id = 'G4273GI'
-      response = described_class.get_offender(noms_id)
-      expect(response.category_code).to eq('C')
-      expect(response.category_label).to eq('Cat C')
-      expect(response.category_active_since).to eq('20/01/2017'.to_date)
-    end
-
-    it 'returns nil if unable to find prisoner',
-       vcr: { cassette_name: 'prison_api/offender_api_null_offender_spec'  } do
-      noms_id = 'AAA22D'
-
-      response = described_class.get_offender(noms_id)
-
-      expect(response).to be_nil
-    end
   end
 
   describe 'fetching an image' do
@@ -188,20 +158,14 @@ describe HmppsApi::PrisonApi::OffenderApi do
     let(:details_uri) { "#{ApiHelper::T3}/offender-sentences/bookings" }
     let(:images_uri) { "#{ApiHelper::T3}/images/#{image_id}/data" }
 
-    it "can get a user's jpg", vcr: { cassette_name: 'prison_api/offender_api_image_spec' } do
+    it "can get a user's jpg" do
+      stub_request(:post, details_uri).with(body: "[#{booking_id}]").to_return(
+        body: [{ bookingId: booking_id, facialImageId: image_id }].to_json
+      )
+      stub_request(:get, images_uri).to_return(body: 'image')
+
       response = described_class.get_image(booking_id)
-      expect(response).not_to be_nil
-
-      # JPEG files start with FF D8 FF as the first three bytes ...
-      # .. and end with FF D9 as the last two bytes. This should be
-      # an adequate test to see if we receive a valid JPG from the
-      # API call.
-      jpeg_start_sentinel = [0xFF, 0xD8, 0xFF]
-      jpeg_end_sentinel = [0xFF, 0xD9]
-
-      bytes = response.bytes.to_a
-      expect(bytes[0, 3]).to eq(jpeg_start_sentinel)
-      expect(bytes[-2, 2]).to eq(jpeg_end_sentinel)
+      expect(response).to eq('image')
     end
 
     context 'when image is not found' do

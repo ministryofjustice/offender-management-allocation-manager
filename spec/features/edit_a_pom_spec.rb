@@ -3,9 +3,10 @@
 require "rails_helper"
 
 feature "edit a POM's details" do
+  let!(:prison) { Prison.find_by(code: "LEI") || create(:prison, code: "LEI") }
+
   context 'when not VCR tests' do
     let(:spo) { build(:pom) }
-    let!(:prison) { create(:prison) }
     let(:probation_poms) do
       [
         build(:pom, :probation_officer),
@@ -72,19 +73,29 @@ feature "edit a POM's details" do
       expect(page).to have_field('status-conditional-unavailable', checked: true)
     end
 
-    it "validates a POM when missing data", vcr: { cassette_name: 'prison_api/edit_poms_missing_check' } do
-      visit edit_prison_pom_path('LEI', fulltime_pom_id)
-      expect(page).to have_css('h1', text: 'Edit profile')
+    context 'when missing data' do
+      before do
+        stub_user('MOIC_POM', fulltime_pom_id)
+        stub_pom(
+          build(:pom, staffId: fulltime_pom_id, firstName: 'MOIC', lastName: 'POM'),
+          emails: ['test@example.com']
+        )
+      end
 
-      expect(page.find('#working_pattern-ft')).to be_checked
+      it "validates a POM when missing data" do
+        visit edit_prison_pom_path('LEI', fulltime_pom_id)
+        expect(page).to have_css('h1', text: 'Edit profile')
 
-      # The only way to trigger (and therefore cover) the validation is for a full-time POM
-      # to be edited to part time but not choose a working pattern.
-      choose('part-time-conditional-1')
-      click_on('Save')
+        expect(page.find('#working_pattern-ft')).to be_checked
 
-      expect(page).to have_css('h1', text: 'Edit profile')
-      expect(page).to have_content('Select number of days worked')
+        # The only way to trigger (and therefore cover) the validation is for a full-time POM
+        # to be edited to part time but not choose a working pattern.
+        choose('part-time-conditional-1')
+        click_on('Save')
+
+        expect(page).to have_css('h1', text: 'Edit profile')
+        expect(page).to have_content('Select number of days worked')
+      end
     end
 
     describe "making an inactive POM active", vcr: { cassette_name: 'prison_api/edit_poms_activate_pom_feature' } do
