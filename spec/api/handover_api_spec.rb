@@ -2,7 +2,7 @@
 
 require 'swagger_helper'
 
-describe 'Handover API', vcr: { cassette_name: 'prison_api/handover_api' } do
+describe 'Handover API' do
   let(:Authorization) { 'Bearer TEST_TOKEN' }
 
   path '/api/handovers/{nomsNumber}' do

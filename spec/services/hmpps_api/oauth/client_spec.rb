@@ -8,11 +8,9 @@ describe HmppsApi::Oauth::Client do
 
   context 'with a valid request' do
     it 'sets the Authorization header' do
-      WebMock.stub_request(:post, /\w/).to_return(body: '{}')
-
       client.post(route)
 
-      expect(WebMock).to have_requested(:post, /\w/).with(headers: { 'Authorization': /^Basic .{100,}$/ })
+      expect(WebMock).to have_requested(:post, "#{api_host}#{route}").with(headers: { 'Authorization': /^Basic .*/ })
     end
 
     context 'when a HTTP error response is received' do
