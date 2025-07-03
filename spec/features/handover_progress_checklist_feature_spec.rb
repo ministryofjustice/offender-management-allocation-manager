@@ -11,8 +11,7 @@ RSpec.feature 'Handover progress checklist feature:' do
     allow(OffenderService).to receive(:get_offender).and_return nil
     offender # instantiate and stub
 
-    stub_auth_token
-    stub_user(staff_id: user.staff_id)
+    stub_user('MOIC_POM', user.staff_id)
     allow_any_instance_of(StaffMember).to receive(:has_allocation?).and_return(true)
 
     signin_pom_user([prison_code])

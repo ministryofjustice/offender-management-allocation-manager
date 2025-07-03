@@ -26,15 +26,18 @@ module AuthHelper
 
   def stub_sso_data(prison, username: 'user', roles: [SsoIdentity::SPO_ROLE], emails: [])
     allow(HmppsApi::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
-    session[:sso_data] = { 'expiry' => Time.zone.now + 1.day,
-                           'roles' => roles,
-                           'caseloads' => [prison],
-                           'username' => username,
-                           'token' => USER_ACCESS_TOKEN }
-    stub_request(:get, "#{ApiHelper::T3}/users/#{username}")
-        .to_return(body: { 'staffId': 754_732 }.to_json)
-    stub_request(:get, "#{ApiHelper::T3}/staff/754732/emails")
-        .to_return(body: emails.to_json)
+
+    stub_user(username, 754_732, emails:)
+
+    if defined?(session)
+      session[:sso_data] = {
+        'expiry' => Time.zone.now + 1.day,
+        'roles' => roles,
+        'caseloads' => [prison],
+        'username' => username,
+        'token' => USER_ACCESS_TOKEN,
+      }
+    end
   end
 
   # Stub out authentication and authorization at a high level - does not go near the API calls, simply stubs out

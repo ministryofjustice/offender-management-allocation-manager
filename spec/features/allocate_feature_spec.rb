@@ -33,6 +33,7 @@ feature 'Allocation' do
     )
 
     allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).and_return(nil)
+    allow(HmppsApi::PrisonAlertsApi).to receive(:alerts_for).and_return([])
     allow(OffenderService).to receive(:get_mappa_details).and_return(blank_mappa)
     allow_any_instance_of(StaffMember).to receive(:email_address).and_return('pom@example.com')
     allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
@@ -75,6 +76,9 @@ feature 'Allocation' do
     end
 
     scenario 'using the compare POMs page', vcr: { cassette_name: 'prison_api/use_compare_feature' } do
+      click_button 'Compare workloads'
+      expect(page).to have_css('div#pom-selection-error')
+
       within row_containing 'Moic Pom' do
         find('input[type=checkbox]').click
       end
@@ -95,11 +99,6 @@ feature 'Allocation' do
       expect(page).to have_current_path(start_page)
       expect(page).to have_css('.message', text: "#{recently_allocated_offender_name} allocated to Moic Pom")
       expect(page).to have_css('.govuk-details__summary-text', text: "You can copy information about this allocation to paste into an email to someone else")
-    end
-
-    scenario 'using the compare POM page with no POMs checked', vcr: { cassette_name: 'prison_api/use_compare_with_none_checked_feature' }, flaky: true do
-      click_button 'Compare workloads'
-      expect(page).to have_css('div#pom-selection-error')
     end
 
     scenario 'overriding the recommended POM type', vcr: { cassette_name: 'prison_api/override_allocation_feature_ok' } do

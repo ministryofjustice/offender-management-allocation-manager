@@ -50,9 +50,7 @@ feature 'admin urls' do
   context 'when SPO' do
     before do
       signin_spo_user
-      stub_auth_token
-      stub_request(:get, "#{ApiHelper::T3}/users/#{username}")
-        .to_return(body: { 'staffId': staff_id }.to_json)
+      stub_user(username, staff_id)
       stub_pom_emails staff_id, []
     end
 
@@ -68,9 +66,7 @@ feature 'admin urls' do
   context 'when a global admin' do
     before do
       signin_global_admin_user
-      stub_auth_token
-      stub_request(:get, "#{ApiHelper::T3}/users/#{username}")
-        .to_return(body: { 'staffId': staff_id }.to_json)
+      stub_user(username, staff_id)
       stub_pom_emails staff_id, []
       stub_offenders_for_prison(prison_code, [])
 

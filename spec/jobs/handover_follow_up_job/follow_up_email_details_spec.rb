@@ -20,7 +20,6 @@ describe HandoverFollowUpJob::FollowUpEmailDetails do
 
   describe "the details used in sending the CommunityMailer email" do
     before do
-      stub_auth_token
       stub_poms(prison.code, [build(:pom, staffId: 486_154, firstName: 'MOIC', lastName: 'POM', emails: ['test@example.com'])])
     end
 

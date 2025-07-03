@@ -94,7 +94,7 @@ jobs:
         run: |
           export SPEC_STATUS_PATH=~/spec_status
           bundle exec rspec -t ~@flaky -t ~@local_only \
-            --exclude-pattern "spec/{features,services}/**/*" --format progress spec || \
+            --exclude-pattern "spec/{services}/**/*" --format progress spec || \
             (echo "Flaky tests detected, trying again..." && sleep 15 && bundle exec rspec --only-failures spec)
 
   verify_docker_image:

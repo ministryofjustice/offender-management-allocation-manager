@@ -18,10 +18,8 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
   before do
     create(:allocation_history, prison: prison, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
 
-    stub_auth_token
     stub_offenders_for_prison(prison, [nomis_offender])
-    stub_request(:get, "#{ApiHelper::T3}/users/#{username}")
-      .to_return(body: { 'staffId': nomis_staff_id }.to_json)
+    stub_user(username, nomis_staff_id)
     stub_pom(pom)
     stub_poms(prison, [pom])
     stub_pom_emails(nomis_staff_id, [])

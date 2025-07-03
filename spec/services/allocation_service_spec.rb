@@ -2,10 +2,15 @@ describe AllocationService do
   include ActiveJob::TestHelper
 
   let(:nomis_offender_id) { 'G7266VD' }
+  let(:nomis_staff_id) { 485_758 }
+  let(:pom) { build(:pom, staffId: nomis_staff_id, firstName: 'MOIC', lastName: 'INTEGRATION-TESTS') }
+  let(:prison) { Prison.find_by(code: "LEI") || create(:prison, code: "LEI") }
 
   before do
-    # needed as create_or_update calls a NOMIS API
-    signin_spo_user
+    stub_signed_in_spo_pom(prison.code, nomis_staff_id, 'MOIC_POM')
+
+    stub_pom(pom, emails: [])
+    stub_poms(prison.code, [pom])
   end
 
   describe '#allocate_secondary', :queueing do
@@ -29,7 +34,7 @@ describe AllocationService do
                                               send_secondary_email: nil)
     end
 
-    it 'sends an email to both primary and secondary POMS', :aggregate_failures, vcr: { cassette_name: 'prison_api/allocation_service_allocate_secondary' } do
+    it 'sends an email to both primary and secondary POMS', :aggregate_failures do
       described_class.allocate_secondary(nomis_offender_id: nomis_offender_id,
                                          secondary_pom_nomis_id: secondary_pom_id,
                                          created_by_username: 'MOIC_POM',
@@ -50,7 +55,6 @@ describe AllocationService do
     context 'without an existing' do
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
-        stub_auth_token
         stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM")
           .to_return(body: { staffId: 1, firstName: "MOIC", lastName: 'POM' }.to_json)
         stub_pom_emails 1, []
@@ -81,12 +85,17 @@ describe AllocationService do
     end
 
     context 'when one already exists' do
+      let(:nomis_staff_id) { 485_926 }
+      let(:nomis_offender) { build(:nomis_offender, prisonerNumber: nomis_offender_id, prisonId: prison.code) }
+
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
-        create(:allocation_history, prison: 'LEI', nomis_offender_id: nomis_offender_id)
+        create(:allocation_history, prison: prison.code, nomis_offender_id: nomis_offender_id)
+
+        stub_offender(nomis_offender)
       end
 
-      it 'can update a record and store a version', vcr: { cassette_name: 'prison_api/allocation_service_update_allocation_spec' } do
+      it 'can update a record and store a version' do
         update_params = {
           nomis_offender_id: nomis_offender_id,
           allocated_at_tier: 'B',
@@ -105,11 +114,17 @@ describe AllocationService do
   end
 
   describe '#allocation_history_pom_emails' do
-    it 'can retrieve all the POMs email addresses for', vcr: { cassette_name: 'prison_api/allocation_service_history_spec' } do
-      previous_primary_pom_nomis_id = 485_637
-      updated_primary_pom_nomis_id = 485_926
-      secondary_pom_nomis_id = 485_833
+    let(:previous_primary_pom_nomis_id) { 485_637 }
+    let(:updated_primary_pom_nomis_id) { 485_926 }
+    let(:secondary_pom_nomis_id) { 485_833 }
 
+    before do
+      stub_pom_emails(previous_primary_pom_nomis_id, [])
+      stub_pom_emails(updated_primary_pom_nomis_id, [])
+      stub_pom_emails(secondary_pom_nomis_id, [])
+    end
+
+    it 'can retrieve all the POMs email addresses for' do
       allocation = create(
         :allocation_history,
         prison: build(:prison).code,

@@ -27,9 +27,7 @@ feature 'DPS standard header and footer:', :aggregate_failures, :skip_dps_header
   before do
     stub_poms('LEI', poms)
     stub_offenders_for_prison('LEI', offenders)
-
-    stub_request(:get, "#{Rails.configuration.prison_api_host}/api/users/MOIC_POM")
-      .to_return(body: { 'staffId': 1 }.to_json)
+    stub_user('MOIC_POM', 1)
   end
 
   before :each, :mock_api_error do

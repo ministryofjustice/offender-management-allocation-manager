@@ -16,7 +16,6 @@ RSpec.describe "allocation_staff/index", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
 
   before do
-    stub_auth_token
     stub_poms(prison.code, poms)
     stub_offenders_for_prison(prison.code, [])
 

@@ -69,7 +69,6 @@ feature 'Case History' do
 
   before do
     Timecop.travel Time.zone.local 2021, 2, 28, 11, 25, 35
-    stub_auth_token
   end
 
   after do
@@ -420,7 +419,7 @@ feature 'Case History' do
 
   context 'with a simple case' do
     before do
-      stub_user(username: 'MOIC_POM', staff_id: pom.staff_id)
+      stub_user('MOIC_POM', pom.staff_id)
       stub_offenders_for_prison(open_prison.code, [nomis_offender])
       stub_movements_for nomis_offender.fetch(:prisonerNumber), offender_movements
       signin_spo_user([open_prison.code])

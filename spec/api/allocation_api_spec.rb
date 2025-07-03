@@ -95,7 +95,6 @@ describe 'Allocation API' do
         before do
           allow_any_instance_of(Api::AllocationApiController).to receive(:verify_token)
 
-          stub_auth_token
           stub_pom(
             build(:pom, staffId: staff_id, firstName: 'MOIC', lastName: 'POM'),
             emails: ['test@example.com']

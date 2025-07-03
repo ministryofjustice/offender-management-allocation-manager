@@ -13,7 +13,6 @@ RSpec.describe RecalculateHandoverDateJob, type: :job do
   let(:published_args) { {} }
 
   before do
-    stub_auth_token
     allow(DomainEvents::EventFactory).to receive(:build_handover_event).and_return(event)
     allow(Rails.configuration).to receive(:allocation_manager_host).and_return 'https://test.example.com'
     allow(CommunityMailer).to receive(:with).and_return(community_mailer_with)

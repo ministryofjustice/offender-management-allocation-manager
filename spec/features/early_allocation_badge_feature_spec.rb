@@ -18,8 +18,7 @@ feature 'early allocation badges' do
   before do
     signin_spo_user([prison.code])
 
-    stub_auth_token
-    stub_user(staff_id: 1234)
+    stub_user('MOIC_POM', 1234)
     stub_keyworker(prison.code, offender_no, build(:keyworker))
     stub_offender nomis_offender
 

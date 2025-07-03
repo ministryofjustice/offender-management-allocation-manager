@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'summary summary feature' do
+feature 'summary summary feature', local_only: true do
   before do
     signin_spo_user
   end
