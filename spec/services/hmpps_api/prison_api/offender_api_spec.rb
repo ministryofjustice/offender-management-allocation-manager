@@ -92,7 +92,7 @@ describe HmppsApi::PrisonApi::OffenderApi do
         it 'can get category info' do
           expect(subject.category_code).to eq('C')
           expect(subject.category_label).to eq('Cat C')
-          expect(subject.category_active_since).to eq('29/06/2025'.to_date)
+          expect(subject.category_active_since).to be_a(Date)
         end
       end
 

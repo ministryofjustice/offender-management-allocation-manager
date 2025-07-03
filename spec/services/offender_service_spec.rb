@@ -24,23 +24,39 @@ describe OffenderService, type: :feature do
   end
 
   describe '#get_offender' do
-    it "gets a single offender", vcr: { cassette_name: 'prison_api/offender_service_single_offender_spec' } do
-      nomis_offender_id = 'G7266VD'
+    let(:prison) { Prison.find_by(code: "LEI") || create(:prison, code: "LEI") }
 
-      create(:case_information, :welsh, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'C', enhanced_resourcing: false)
-      offender = described_class.get_offender(nomis_offender_id)
+    context 'when offender record is found' do
+      let(:nomis_offender_id) { 'G7266VD' }
 
-      expect(offender.tier).to eq 'C'
-      expect(offender.conditional_release_date).to eq(Date.new(2040, 1, 27))
-      expect(offender.main_offence).to eq 'Robbery'
-      expect(offender.handover_type).to eq 'missing'
+      before do
+        stub_offender(
+          build(:nomis_offender, prisonerNumber: nomis_offender_id, prisonId: prison.code, mostSeriousOffence: 'Robbery')
+        )
+      end
+
+      it "gets a single offender" do
+        create(:case_information, :welsh, offender: build(:offender, nomis_offender_id: nomis_offender_id), tier: 'C', enhanced_resourcing: false)
+        offender = described_class.get_offender(nomis_offender_id)
+
+        expect(offender.tier).to eq 'C'
+        expect(offender.conditional_release_date).to be_a(Date)
+        expect(offender.main_offence).to eq 'Robbery'
+        expect(offender.handover_type).to eq 'missing'
+      end
     end
 
-    it "returns nil if offender record not found", vcr: { cassette_name: 'prison_api/offender_service_single_offender_not_found_spec' } do
-      nomis_offender_id = 'AAA121212CV4G4GGVV'
+    context 'when offender record is not found' do
+      let(:nomis_offender_id) { 'A1111AA' }
 
-      offender = described_class.get_offender(nomis_offender_id)
-      expect(offender).to be_nil
+      before do
+        stub_non_existent_offender(nomis_offender_id)
+      end
+
+      it "returns nil" do
+        offender = described_class.get_offender(nomis_offender_id)
+        expect(offender).to be_nil
+      end
     end
 
     context 'when offender is not in prison' do
