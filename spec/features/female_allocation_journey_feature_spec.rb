@@ -32,7 +32,7 @@ feature "womens allocation journey" do
     alloc.update! primary_pom_nomis_id: prison_pom.staff_id
     alloc.deallocate_offender_after_release
 
-    stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
+    stub_bank_holidays
     stub_community_offender(nomis_offender_id, build(:community_data))
     allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
   end

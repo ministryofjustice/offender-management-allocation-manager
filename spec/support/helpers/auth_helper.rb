@@ -15,6 +15,11 @@ module AuthHelper
   def stub_auth_token
     allow(HmppsApi::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
 
+    stub_request(:get, "#{ApiHelper::AUTH_HOST}/auth/.well-known/jwks.json")
+      .to_return(body: {
+        'keys' => [{ 'kty' => 'RSA', 'e' => 'AQAB', 'use' => 'unused', 'kid' => 'xxxx1', 'alg' => 'ALGO_UNUSED', 'n' => 'nnnnnnnn1' }]
+      }.to_json)
+
     stub_request(:post, "#{ApiHelper::AUTH_HOST}/auth/oauth/token?grant_type=client_credentials")
       .to_return(body: {
         "access_token": ACCESS_TOKEN.access_token,
