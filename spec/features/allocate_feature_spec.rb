@@ -45,6 +45,8 @@ feature 'Allocation' do
     let(:start_page) { unallocated_prison_prisoners_path('LEI') }
 
     before do
+      stub_bank_holidays
+
       visit start_page
       click_link unallocated_offender_name
 

@@ -200,6 +200,10 @@ module ApiHelper
       .to_return(body: [{ 'agencyId' => 'HOS1', 'description' => 'Hospital One', 'active' => 1 }].to_json)
   end
 
+  def stub_bank_holidays
+    stub_request(:get, BankHolidays::API_URL).to_return(body: {}.to_json)
+  end
+
 private
 
   def search_api_response(offender)

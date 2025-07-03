@@ -10,7 +10,6 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
     stub_signin_spo(pom, [prison_code])
     stub_poms prison_code, [pom]
     stub_offenders_for_prison(prison_code, [offender])
-    stub_request(:get, "https://www.gov.uk/bank-holidays.json").to_return(body: {}.to_json)
 
     create(:allocation_history, nomis_offender_id: offender_no, prison: prison.code, primary_pom_nomis_id: pom.staff_id)
   end
