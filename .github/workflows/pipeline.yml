@@ -93,7 +93,7 @@ jobs:
           DISABLE_COVERAGE: 1
         run: |
           export SPEC_STATUS_PATH=~/spec_status
-          bundle exec rspec -t ~@flaky -t ~@local_only --format progress spec || \
+          bundle exec rspec -t ~@flaky --format progress spec || \
             (echo "Flaky tests detected, trying again..." && sleep 15 && bundle exec rspec --only-failures spec)
 
   verify_docker_image:
