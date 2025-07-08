@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature 'case information feature', flaky: true do
+feature 'case information feature' do
   context 'when doing an allocate and save' do
     let(:prison) { create(:prison) }
     let(:offender) { build(:nomis_offender, prisonId: prison.code) }
@@ -58,7 +58,7 @@ feature 'case information feature', flaky: true do
     end
   end
 
-  context 'with vcr' do
+  context 'with vcr', flaky: true do
     let(:staff_id) { 485_833 }
     let(:poms) { [build(:pom, staffId: staff_id)] }
 
