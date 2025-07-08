@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 feature 'Allocation' do
+  let(:prison) { Prison.find_by(code: "LEI") || create(:prison, code: "LEI") }
   let!(:probation_officer_nomis_staff_id) { 485_636 }
   let!(:prison_officer_nomis_staff_id) { 485_926 }
   let!(:nomis_offender_id) { 'G7266VD' }
@@ -186,17 +187,25 @@ feature 'Allocation' do
     expect(page).to have_content('This reason cannot be more than 175 characters')
   end
 
-  scenario 're-allocating', vcr: { cassette_name: 'prison_api/re_allocate_feature' }, local_only: true do
+  scenario 're-allocating' do
+    pom = build(:pom, staffId: 485_735, firstName: 'MOIC', lastName: 'POM')
+    new_pom = build(:pom, staffId: 485_123, firstName: 'NEW', lastName: 'POM')
+
+    stub_poms(prison.code, [pom, new_pom])
+    stub_signin_spo(pom, prison.code)
+    stub_offenders_for_prison(prison.code, [build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id)])
+    stub_keyworker(prison.code, nomis_offender_id, build(:keyworker))
+
     create(
       :allocation_history,
-      prison: 'LEI',
+      prison: prison.code,
       nomis_offender_id: nomis_offender_id,
       primary_pom_nomis_id: 485_735,
       recommended_pom_type: 'probation'
     )
 
     # Go to 'Allocations' page
-    visit allocated_prison_prisoners_path('LEI')
+    visit allocated_prison_prisoners_path(prison.code)
     expect(page).to have_text('See allocations')
     all('.allocated_offender_row_0 a').first.click # Click the one and only offender
 
@@ -204,25 +213,31 @@ feature 'Allocation' do
     click_link 'Reallocate'
 
     # Now on the 'Review case' page
-    expect(page).to have_text("Currently allocated to Laura Jara Duncan")
-    expect(page).to have_css('.govuk-table__cell', text: 'Laura Jara Duncan')
+    expect(page).to have_text("Currently allocated to Moic Pom")
+    expect(page).to have_css('.govuk-table__cell', text: 'Moic Pom')
 
     click_link 'Choose a POM to allocate to now'
 
     # Now on the 'Choose a POM' page
     expect(page).to have_text('Reallocate a POM to')
-    expect(page).to have_text("Currently allocated to Laura Jara Duncan")
-    expect(page).to have_current_path(prison_prisoner_staff_index_path(prison_id: 'LEI', prisoner_id: nomis_offender_id))
+    expect(page).to have_text("Currently allocated to Moic Pom")
+    expect(page).to have_current_path(prison_prisoner_staff_index_path(prison_id: prison.code, prisoner_id: nomis_offender_id))
 
-    within 'table#available-poms > tbody > tr:first' do
+    within 'table#available-poms > tbody > tr:last' do
       click_link 'Allocate'
     end
 
+    # Takes you to the questionnaire page
+    expect(page).to have_text('Why are you allocating a prison POM?')
+    find('label[for=override-form-override-reasons-suitability-field]').click
+    fill_in 'override-form-suitability-detail-field', with: Faker::Lorem.sentence
+    click_button('Continue')
+
     # Takes you to the 'Check allocation' page
     expect(page).to have_text('Check allocation details')
-    expect(page).to have_text('We will send the information below to')
-    expect(page).to have_text('Allocating from:')
-    expect(page).to have_text('Allocating to:')
+    expect(page).to have_text('We will send the information below to pom@example.com and notify Moic Pom of the reallocation.')
+    expect(page).to have_text('Allocating from: Moic Pom')
+    expect(page).to have_text('Allocating to: New Pom')
 
     click_button 'Complete allocation'
 
@@ -234,10 +249,17 @@ feature 'Allocation' do
   end
 
   context 'with a community override' do
+    let(:pom) { build(:pom, staffId: 485_735, firstName: 'MOIC', lastName: 'POM', emails: ['pom@example.com']) }
+
     before do
+      stub_poms(prison.code, [pom])
+      stub_signin_spo(pom, prison.code)
+      stub_offenders_for_prison(prison.code, [build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id)])
+      stub_keyworker(prison.code, nomis_offender_id, build(:keyworker))
+
       create(
         :allocation_history,
-        prison: 'LEI',
+        prison: prison.code,
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: 485_735,
         recommended_pom_type: 'probation'
@@ -246,11 +268,11 @@ feature 'Allocation' do
       create(:responsibility, nomis_offender_id: nomis_offender_id, value: 'Prison')
     end
 
-    scenario 'removing a community override', vcr: { cassette_name: 'prison_api/allocation_remove_community_override' }, local_only: true do
-      visit prison_dashboard_index_path('LEI')
+    scenario 'removing a community override' do
+      visit prison_dashboard_index_path(prison.code)
       click_link 'All allocated cases'
 
-      #  Now on the allocated offenders page
+      # Now on the allocated offenders page
       all('.allocated_offender_row_0 a').first.click # Click the one and only offender
 
       # Now on the 'Allocation information' page
@@ -272,7 +294,7 @@ feature 'Allocation' do
       expect(page).to have_text('Confirm change of responsibility for this case')
       click_button 'Confirm'
 
-      expect(page).to have_current_path(prison_prisoner_allocation_path('LEI', nomis_offender_id))
+      expect(page).to have_current_path(prison_prisoner_allocation_path(prison.code, nomis_offender_id))
     end
   end
 end

@@ -46,7 +46,7 @@ class SsoIdentity
     if @sso_identity.blank?
       []
     else
-      @sso_identity.fetch(:caseloads).reject { |c| c.casecmp('NWEB') == 0 }
+      Array(@sso_identity.fetch(:caseloads)).reject { |c| c.casecmp('NWEB') == 0 }
     end
   end
 

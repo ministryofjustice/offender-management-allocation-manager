@@ -20,7 +20,9 @@ module HmppsApi
       def self.fetch_email_addresses(nomis_staff_id)
         route = "/staff/#{nomis_staff_id}/emails"
         data = client.get(route)
-        return [] if data.nil?
+
+        return [] if data.blank?
+        return JSON.parse(data) if data.is_a?(String)
 
         data
       end
