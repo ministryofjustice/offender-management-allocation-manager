@@ -6,7 +6,18 @@
     <dl class="govuk-summary-list">
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Main offence</dt>
-        <dd class="govuk-summary-list__value"><%= @offender.main_offence %></dd>
+        <dd class="govuk-summary-list__value">
+          <details class="govuk-details">
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">
+                Display main offence
+              </span>
+            </summary>
+            <div class="govuk-details__text">
+              <%= @offender.main_offence %>
+            </div>
+          </details>
+        </dd>
       </div>
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Category</dt>
