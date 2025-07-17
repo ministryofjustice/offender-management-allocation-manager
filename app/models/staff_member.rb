@@ -29,7 +29,7 @@ class StaffMember
   end
 
   def email_address
-    @email_address ||= HmppsApi::NomisUserRolesApi.email_address(@staff_id)
+    staff_detail.email_address
   end
 
   def has_pom_role?
