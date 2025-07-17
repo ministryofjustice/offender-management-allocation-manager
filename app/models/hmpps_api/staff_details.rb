@@ -6,18 +6,14 @@ module HmppsApi
                 :first_name,
                 :last_name,
                 :status,
-                :thumbnail_id
+                :email_address
 
     def initialize(payload)
       @staff_id = payload['staffId']
       @first_name = payload['firstName']
       @last_name = payload['lastName']
       @status = payload['status']
-      @thumbnail_id = payload['thumbnailId']
-    end
-
-    def email_address
-      HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@staff_id).first
+      @email_address = payload['primaryEmail']
     end
   end
 end
