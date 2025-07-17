@@ -29,7 +29,7 @@ class AutomaticHandoverEmailJob < ApplicationJob
                   [offender.conditional_release_date, offender.parole_eligibility_date, offender.tariff_date].compact.min,
                   Prison.find(offender.prison_id).name,
                   allocation&.primary_pom_name,
-                  allocation&.active? ? HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(allocation.primary_pom_nomis_id).first : nil,
+                  allocation&.active? ? HmppsApi::NomisUserRolesApi.email_address(allocation.primary_pom_nomis_id) : nil,
                   offender.allocated_com_name
                 ]
           end

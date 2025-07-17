@@ -56,19 +56,19 @@ class CaseHistory
   # before (which was to expose the id and let the view work it out via a hash of emails collected using the API)
   # Hopefully soon the model will answer these questions properly
   def primary_pom_email
-    @primary_pom_email ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@allocation.primary_pom_nomis_id).first
+    @primary_pom_email ||= HmppsApi::NomisUserRolesApi.email_address(@allocation.primary_pom_nomis_id)
   end
 
   def secondary_pom_email
-    @secondary_pom_email ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@allocation.secondary_pom_nomis_id).first
+    @secondary_pom_email ||= HmppsApi::NomisUserRolesApi.email_address(@allocation.secondary_pom_nomis_id)
   end
 
   def previous_primary_pom_email
-    @previous_primary_pom_email ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@previous_allocation.primary_pom_nomis_id).first
+    @previous_primary_pom_email ||= HmppsApi::NomisUserRolesApi.email_address(@previous_allocation.primary_pom_nomis_id)
   end
 
   def previous_secondary_pom_email
-    @previous_secondary_pom_email ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@previous_allocation.secondary_pom_nomis_id).first
+    @previous_secondary_pom_email ||= HmppsApi::NomisUserRolesApi.email_address(@previous_allocation.secondary_pom_nomis_id)
   end
 
   def previous_primary_pom_name

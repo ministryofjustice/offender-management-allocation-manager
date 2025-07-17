@@ -10,5 +10,9 @@ module HmppsApi
       data = client.get("/users/staff/#{staff_id}")
       HmppsApi::StaffDetails.new(data)
     end
+
+    def self.email_address(staff_id)
+      staff_details(staff_id).email_address
+    end
   end
 end

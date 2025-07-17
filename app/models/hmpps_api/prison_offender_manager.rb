@@ -33,7 +33,7 @@ module HmppsApi
     end
 
     def email_address
-      @email_address ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@staff_id).first
+      @email_address ||= HmppsApi::NomisUserRolesApi.email_address(@staff_id)
     end
 
     def self.from_json(payload)

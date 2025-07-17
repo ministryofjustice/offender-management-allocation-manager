@@ -64,7 +64,7 @@ class AllocationService
     history = allocation.get_old_versions.append(allocation)
     pom_ids = history.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
 
-    pom_ids.index_with { |pom_id| HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(pom_id).first }
+    pom_ids.index_with { |pom_id| HmppsApi::NomisUserRolesApi.email_address(pom_id) }
   end
 
   # Gets the versions in *forward* order - so often we want to reverse

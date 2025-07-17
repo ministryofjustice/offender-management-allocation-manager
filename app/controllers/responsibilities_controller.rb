@@ -61,7 +61,7 @@ class ResponsibilitiesController < PrisonsApplicationController
       Responsibility.find_by!(nomis_offender_id: nomis_offender_id_from_url).destroy!
 
       if allocation&.active?
-        pom_email = HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(allocation.primary_pom_nomis_id).first
+        pom_email = HmppsApi::NomisUserRolesApi.email_address(allocation.primary_pom_nomis_id)
         emails << pom_email
         ResponsibilityMailer.with(emails: emails.compact,
                                   pom_name: allocation.primary_pom_name,

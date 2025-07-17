@@ -24,12 +24,4 @@ describe HmppsApi::PrisonApi::PrisonOffenderManagerApi do
     expect(response.count).to eq(0)
     expect(response).to all(be_an HmppsApi::PrisonOffenderManager)
   end
-
-  describe '#fetch_email_addresses' do
-    it "can get a user's email addresses" do
-      response = described_class.fetch_email_addresses(staff_id)
-
-      expect(response).to eq(emails)
-    end
-  end
 end
