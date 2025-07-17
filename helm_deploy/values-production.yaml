@@ -85,6 +85,7 @@ generic-service:
     DIGITAL_PRISON_SERVICE_HOST: https://digital.prison.service.justice.gov.uk
     PRISON_ALERTS_API_HOST: https://alerts-api.hmpps.service.justice.gov.uk
     MAILBOX_REGISTER_API_HOST: https://manage-custody-mailbox-register-api.hmpps.service.justice.gov.uk
+    NOMIS_USER_ROLES_API_HOST: https://nomis-user-roles-api.prison.service.justice.gov.uk
 
   namespace_secrets:
     allocation-manager-secrets:
