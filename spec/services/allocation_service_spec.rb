@@ -9,7 +9,7 @@ describe AllocationService do
   before do
     stub_signed_in_spo_pom(prison.code, nomis_staff_id, 'MOIC_POM')
 
-    stub_pom(pom, emails: [])
+    stub_pom(pom)
     stub_poms(prison.code, [pom])
   end
 
@@ -56,8 +56,7 @@ describe AllocationService do
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
         stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM")
-          .to_return(body: { staffId: 1, firstName: "MOIC", lastName: 'POM' }.to_json)
-        stub_pom_emails 1, []
+          .to_return(body: { staffId: 485_833, firstName: "MOIC", lastName: 'POM' }.to_json)
         stub_offender(build(:nomis_offender, prisonId: prison_code, prisonerNumber: nomis_offender_id))
         stub_poms prison_code, [pom]
       end
@@ -119,9 +118,9 @@ describe AllocationService do
     let(:secondary_pom_nomis_id) { 485_833 }
 
     before do
-      stub_pom_emails(previous_primary_pom_nomis_id, [])
-      stub_pom_emails(updated_primary_pom_nomis_id, [])
-      stub_pom_emails(secondary_pom_nomis_id, [])
+      stub_pom(build(:pom, staffId: previous_primary_pom_nomis_id))
+      stub_pom(build(:pom, staffId: updated_primary_pom_nomis_id))
+      stub_pom(build(:pom, staffId: secondary_pom_nomis_id))
     end
 
     it 'can retrieve all the POMs email addresses for' do

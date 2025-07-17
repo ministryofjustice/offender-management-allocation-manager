@@ -11,7 +11,6 @@ RSpec.describe AllocationStaffController, type: :controller do
       build(:pom, :probation_officer)
     ]
   end
-  let(:pom_without_emails) { poms.first }
   let(:prison_code) { create(:prison).code }
   let(:offender) { build(:nomis_offender, prisonId: prison_code) }
   let(:offender_no) { offender.fetch(:prisonerNumber) }

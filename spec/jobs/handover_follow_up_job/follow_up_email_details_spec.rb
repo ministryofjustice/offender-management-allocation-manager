@@ -20,7 +20,7 @@ describe HandoverFollowUpJob::FollowUpEmailDetails do
 
   describe "the details used in sending the CommunityMailer email" do
     before do
-      stub_poms(prison.code, [build(:pom, staffId: 486_154, firstName: 'MOIC', lastName: 'POM', emails: ['test@example.com'])])
+      stub_poms(prison.code, [build(:pom, staffId: 486_154, firstName: 'MOIC', lastName: 'POM', primaryEmail: 'test@example.com')])
     end
 
     it "includes basic details regardless of allocation or sentence type" do

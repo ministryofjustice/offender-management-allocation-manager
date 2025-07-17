@@ -23,7 +23,7 @@ FactoryBot.define do
   end
 
   class Elite2POM
-    attr_accessor :position, :staffId, :emails, :firstName, :lastName, :positionDescription, :status
+    attr_accessor :position, :staffId, :emails, :firstName, :lastName, :positionDescription, :status, :primaryEmail
     attr_writer :agencyId
 
     def first_name
@@ -47,7 +47,7 @@ FactoryBot.define do
     end
 
     def email_address
-      emails.present? ? emails.first : nil
+      emails.present? ? emails.first : primaryEmail
     end
   end
 
@@ -56,6 +56,8 @@ FactoryBot.define do
     emails { [Faker::Internet.email] }
     sequence(:staffId) { |x| x + 1000  }
     status { 'ACTIVE' }
+
+    primaryEmail { emails ? emails.first : Faker::Internet.email }
 
     firstName { Faker::Name.first_name }
     # The POM's last name is titleized as it's passed through StaffMember, e.g. "McDonald" becomes "Mcdonald"

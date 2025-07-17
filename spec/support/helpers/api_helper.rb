@@ -4,6 +4,7 @@ module ApiHelper
   AUTH_HOST = Rails.configuration.nomis_oauth_host
   T3 = "#{Rails.configuration.prison_api_host}/api".freeze
   T3_SEARCH = Rails.configuration.prisoner_search_host
+  NOMIS_USER_ROLES_API_HOST = Rails.configuration.nomis_user_roles_api_host
   ASSESS_RISKS_AND_NEEDS_API_HOST = Rails.configuration.assess_risks_and_needs_api_host
   MANAGE_POM_CASES_AND_DELIUS_HOST = Rails.configuration.manage_pom_cases_and_delius_host
   KEYWORKER_API_HOST = ENV.fetch('KEYWORKER_API_HOST')
@@ -82,20 +83,19 @@ module ApiHelper
       .to_return(body: poms.to_json)
     poms.each do |pom|
       stub_pom(pom)
-      stub_pom_emails(pom.staffId, pom.emails)
     end
   end
 
+  # TODO: this stub will go, keeping it for now for compatibility
   def stub_pom_emails(staff_id, emails)
-    stub_request(:get, "#{T3}/staff/#{staff_id}/emails")
-      .to_return(body: emails.to_json)
+    stub_pom(
+      build(:pom, staffId: staff_id, primaryEmail: emails.first)
+    )
   end
 
-  def stub_pom(pom, emails: nil)
-    stub_request(:get, "#{T3}/staff/#{pom.staffId}")
+  def stub_pom(pom)
+    stub_request(:get, "#{NOMIS_USER_ROLES_API_HOST}/users/staff/#{pom.staffId}")
       .to_return(body: pom.to_json)
-
-    stub_pom_emails(pom.staffId, emails) if emails
   end
 
   def stub_user(username, staff_id, emails: [])

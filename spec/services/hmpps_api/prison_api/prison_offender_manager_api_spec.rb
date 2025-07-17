@@ -10,16 +10,6 @@ describe HmppsApi::PrisonApi::PrisonOffenderManagerApi do
     stub_poms('WEI', [])
   end
 
-  it 'gets staff detail' do
-    list = described_class.list('LEI')
-    response = described_class.staff_detail list.first.staff_id
-
-    expect(response.staff_id).to eq(staff_id)
-    expect(response.first_name).to eq("MOIC")
-    expect(response.last_name).to eq("POM")
-    expect(response.status).to eq("ACTIVE")
-  end
-
   it 'can get an Array of Prison Offender Managers (POMs)' do
     response = described_class.list('LEI')
 
