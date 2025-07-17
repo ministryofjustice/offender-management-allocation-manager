@@ -16,7 +16,7 @@ namespace :reports do
         poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(prison.code)
 
         poms.each do |pom|
-          staff_detail = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(pom.staff_id)
+          staff_detail = HmppsApi::NomisUserRolesApi.staff_details(pom.staff_id)
 
           csv << [
             prison.code,

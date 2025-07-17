@@ -5,26 +5,18 @@ module HmppsApi
     class PrisonOffenderManagerApi
       extend PrisonApiClient
 
-      def self.staff_detail(staff_id)
-        route = "/staff/#{staff_id}"
-        data = client.get(route)
-        HmppsApi::StaffDetails.new data
-      end
-
       def self.list(prison)
         route = "/staff/roles/#{prison}/role/POM"
         data = client.get(route, extra_headers: paging_options)
         api_deserialiser.deserialise_many(HmppsApi::PrisonOffenderManager, data)
       end
 
+      # TODO: delete me.
+      # This is just a helper method to obtain just one attribute
+      # from the new API, but keeping it to avoid lots of refactoring
+      # at this point. Will be cleaned up down the line.
       def self.fetch_email_addresses(nomis_staff_id)
-        route = "/staff/#{nomis_staff_id}/emails"
-        data = client.get(route)
-
-        return [] if data.blank?
-        return JSON.parse(data) if data.is_a?(String)
-
-        data
+        [HmppsApi::NomisUserRolesApi.staff_details(nomis_staff_id).email_address]
       end
 
     private

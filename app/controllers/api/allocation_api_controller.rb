@@ -14,7 +14,7 @@ module Api
     end
 
     def primary_pom
-      staff = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(allocation.primary_pom_nomis_id)
+      staff = HmppsApi::NomisUserRolesApi.staff_details(allocation.primary_pom_nomis_id)
 
       render json: {
         manager: {
