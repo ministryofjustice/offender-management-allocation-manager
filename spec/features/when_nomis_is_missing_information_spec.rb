@@ -74,10 +74,11 @@ context 'when NOMIS is missing information' do
   end
 
   context 'when logged in as an SPO' do
-    let(:pom) { build(:pom) }
+    let(:pom) { build(:pom, staffId: staff_id) }
 
     before do
       stub_signin_spo(pom, [prison_code])
+      stub_pom(pom)
     end
 
     context 'with an NPS offender with an indeterminate sentence, but no release dates' do

@@ -87,7 +87,7 @@ class EmailService
       end
       return nil if previous.blank?
 
-      HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(previous.primary_pom_nomis_id)
+      HmppsApi::NomisUserRolesApi.staff_details(previous.primary_pom_nomis_id)
     end
 
     def send_deallocation_email(pom:, allocation:, further_info:)

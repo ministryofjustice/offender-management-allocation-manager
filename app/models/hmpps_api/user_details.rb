@@ -13,7 +13,6 @@ module HmppsApi
                   :locked_flag,
                   :staff_id,
                   :status,
-                  :thumbnail_id,
                   :username
 
     # custom attribute - Elite2 requires a separate API call to
@@ -34,7 +33,6 @@ module HmppsApi
         obj.locked_flag = payload['lockedFlag']
         obj.staff_id = payload['staffId']&.to_i
         obj.status = payload['status']
-        obj.thumbnail_id = payload['thumbnailId']
         obj.username = payload['username']
       end
     end

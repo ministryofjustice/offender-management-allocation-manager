@@ -20,8 +20,7 @@ describe MovementService, type: :feature do
       .to_return(body: movements.to_json)
 
     stub_pom(
-      build(:pom, staffId: 485_926, firstName: 'MOIC', lastName: 'POM'),
-      emails: ['test@example.com']
+      build(:pom, staffId: 485_926, firstName: 'MOIC', lastName: 'POM', primaryEmail: 'test@example.com')
     )
 
     stub_offender(

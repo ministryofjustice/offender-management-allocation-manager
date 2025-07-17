@@ -110,6 +110,6 @@ private
   end
 
   def staff_detail
-    @staff_detail ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(@staff_id)
+    @staff_detail ||= HmppsApi::NomisUserRolesApi.staff_details(@staff_id)
   end
 end

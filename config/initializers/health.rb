@@ -43,3 +43,6 @@ config.health_checks = Health.new(timeout_in_seconds_per_check: 2, num_retries_p
   .add_check(
     name: 'mailboxRegisterApi',
     get_response: -> { HmppsApi::Client.new(config.mailbox_register_api_host).get('/health/ping', cache: false) })
+  .add_check(
+    name: 'nomisUserRolesApi',
+    get_response: -> { HmppsApi::Client.new(config.nomis_user_roles_api_host).get('/health/ping', cache: false) })

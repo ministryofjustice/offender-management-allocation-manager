@@ -22,7 +22,6 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
     stub_user(username, nomis_staff_id)
     stub_pom(pom)
     stub_poms(prison, [pom])
-    stub_pom_emails(nomis_staff_id, [])
     stub_keyworker(prison, nomis_offender_id, build(:keyworker))
 
     signin_pom_user([prison])

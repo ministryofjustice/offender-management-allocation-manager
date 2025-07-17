@@ -10,7 +10,8 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
 
   let(:prison_code) { 'LEI' }
   let(:offender_no) { 'G8191UI' }
-  let(:primary_pom) { build(:pom, firstName: 'JOHN', lastName: 'DOE') }
+  let(:email_address) { 'test@example.com' }
+  let(:primary_pom) { build(:pom, firstName: 'JOHN', lastName: 'DOE', primaryEmail: email_address) }
   let(:secondary_pom) { build(:pom, firstName: 'ZACHERY', lastName: 'SCHMELER') }
 
   let(:co_working_allocation) do
@@ -65,7 +66,6 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
   end
 
   describe '#primary_pom' do
-    let(:email_address) { 'test@example.com' }
     let(:expected_response) do
       {
         manager: {
@@ -87,7 +87,7 @@ RSpec.describe Api::AllocationApiController, :allocation, type: :controller do
 
       context 'when there is primary pom' do
         before do
-          stub_pom(primary_pom, emails: [email_address])
+          stub_pom(primary_pom)
         end
 
         it 'returns primary pom allocation details' do

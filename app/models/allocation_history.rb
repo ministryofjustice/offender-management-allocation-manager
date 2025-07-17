@@ -167,7 +167,7 @@ private
   def deallocate_offender(event:, event_trigger:)
     return unless active?
 
-    primary_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(primary_pom_nomis_id)
+    primary_pom = HmppsApi::NomisUserRolesApi.staff_details(primary_pom_nomis_id)
 
     # If the offender has been released from prison, OffenderService.get_offender will return nil (due to "OUT" being an unrecognised Prison)
     # So instead we'll call the Prison API directly to get just the Prison record of the offender. We don't need a full MpcOffender object.

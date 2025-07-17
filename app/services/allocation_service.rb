@@ -11,7 +11,7 @@ class AllocationService
       nomis_offender_id: nomis_offender_id
     )
 
-    coworking_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(secondary_pom_nomis_id)
+    coworking_pom = HmppsApi::NomisUserRolesApi.staff_details(secondary_pom_nomis_id)
 
     created_by_user = HmppsApi::PrisonApi::UserApi.user_details(created_by_username)
 
@@ -30,7 +30,7 @@ class AllocationService
   end
 
   def self.create_or_update(params, further_info = {})
-    primary_pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.staff_detail(params[:primary_pom_nomis_id])
+    primary_pom = HmppsApi::NomisUserRolesApi.staff_details(params[:primary_pom_nomis_id])
     created_by_user = HmppsApi::PrisonApi::UserApi.user_details(params[:created_by_username])
 
     params_copy = params.except(:created_by_username).merge(

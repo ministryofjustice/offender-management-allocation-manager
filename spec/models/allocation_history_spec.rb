@@ -147,8 +147,8 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
 
       let(:nomis_offender_id) { 'G2911GD' }
       let(:prison_code) { create(:prison).code }
-      let(:poms) { [build(:pom, staffId: 485_833, emails: pom_emails)] }
-      let(:pom_emails) { ['mrpom@example.com'] }
+      let(:poms) { [build(:pom, staffId: 485_833, primaryEmail: pom_email)] }
+      let(:pom_email) { 'mrpom@example.com' }
 
       let(:offender) do
         build(:nomis_offender, prisonId: prison_code, prisonerNumber: nomis_offender_id)
@@ -231,7 +231,7 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
         end
 
         context 'when primary POM email is blank' do
-          let(:pom_emails) { nil }
+          let(:pom_email) { nil }
 
           it 'sends no email' do
             expect(fake_mailer).not_to have_received(:offender_deallocated)

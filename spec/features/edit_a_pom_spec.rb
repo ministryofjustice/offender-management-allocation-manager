@@ -77,8 +77,7 @@ feature "edit a POM's details" do
       before do
         stub_user('MOIC_POM', fulltime_pom_id)
         stub_pom(
-          build(:pom, staffId: fulltime_pom_id, firstName: 'MOIC', lastName: 'POM'),
-          emails: ['test@example.com']
+          build(:pom, staffId: fulltime_pom_id, firstName: 'MOIC', lastName: 'POM')
         )
       end
 
