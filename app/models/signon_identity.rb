@@ -11,6 +11,7 @@ class SignonIdentity
 
   def initialize(omniauth_data)
     @username = omniauth_data.fetch('info').username
+    @staff_id = omniauth_data.fetch('info').staff_id
     @token = omniauth_data.fetch('credentials').token
     @active_caseload = omniauth_data.fetch('info').active_caseload
     @caseloads = omniauth_data.fetch('info').caseloads
@@ -21,6 +22,7 @@ class SignonIdentity
   def attributes
     {
       username: @username,
+      staff_id: @staff_id,
       token: @token,
       active_caseload: @active_caseload,
       caseloads: @caseloads,

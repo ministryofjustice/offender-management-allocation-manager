@@ -12,6 +12,7 @@ module OmniAuth
       info do
         {
           username: user_details.username,
+          staff_id: user_details.staff_id,
           active_caseload: active_caseload.upcase,
           caseloads: caseload_codes,
           roles: decode_roles
@@ -59,22 +60,22 @@ module OmniAuth
       end
 
       def user_details
-        @user_details = HmppsApi::PrisonApi::UserApi.user_details(username)
-        @user_details.nomis_caseloads = HmppsApi::PrisonApi::UserApi.user_caseloads(
-          @user_details.staff_id)
-        @user_details
+        @user_details = HmppsApi::NomisUserRolesApi.staff_details(staff_id)
       end
 
       def caseload_codes
-        @caseload_codes = @user_details.nomis_caseloads.map do |codes|
-          codes['caseLoadId']
-        end
+        @caseload_codes = @user_details.caseloads
       end
 
       # :nocov:
       def username
         access_token.params.fetch('user_name')
       end
+
+      def staff_id
+        access_token.params.fetch('user_id')
+      end
+      # :nocov:
     end
   end
 end

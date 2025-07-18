@@ -98,10 +98,16 @@ module ApiHelper
       .to_return(body: pom.to_json)
   end
 
-  def stub_user(username, staff_id, emails: [])
-    stub_request(:get, "#{T3}/users/#{username}")
-      .to_return(body: { 'staffId': staff_id }.to_json)
-    stub_pom_emails(staff_id, emails)
+  def stub_user(username, staff_id, **attributes)
+    stub_request(:get, "#{NOMIS_USER_ROLES_API_HOST}/users/#{username}")
+      .to_return(body: {
+        'staffId': staff_id,
+        'username': username,
+        'firstName': attributes.fetch('firstName', 'MOIC'),
+        'lastName': attributes.fetch('lastName', 'POM'),
+        'primaryEmail': attributes.fetch('primaryEmail', 'user@example.com'),
+        'activeCaseloadId': attributes.fetch('activeCaseloadId', 'LEI')
+      }.to_json)
   end
 
   def stub_signed_in_pom(prison, staff_id, username = 'alice')
