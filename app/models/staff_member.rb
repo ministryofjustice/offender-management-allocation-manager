@@ -28,9 +28,11 @@ class StaffMember
     staff_detail.last_name&.titleize
   end
 
+  # rubocop:disable Rails/Delegate
   def email_address
     staff_detail.email_address
   end
+  # rubocop:enable Rails/Delegate
 
   def has_pom_role?
     pom.present?

@@ -2,43 +2,28 @@
 
 module HmppsApi
   class UserDetails
-    attr_accessor :account_status,
-                  :active,
-                  :active_case_load_id,
-                  :expiry_date,
-                  :expired_flag,
-                  :first_name,
-                  :last_name,
-                  :lock_date,
-                  :locked_flag,
-                  :staff_id,
-                  :status,
-                  :username
+    attr_reader :staff_id,
+                :first_name,
+                :last_name,
+                :enabled,
+                :email_address,
+                :username,
+                :active_case_load_id,
+                :role_codes
 
-    # custom attribute - Elite2 requires a separate API call to
-    # fetch a user's caseload
-    attr_accessor :nomis_caseloads,
-                  :email_address
-
-    def self.from_json(payload)
-      UserDetails.new.tap do |obj|
-        obj.account_status = payload['accountStatus']
-        obj.active = payload['active']
-        obj.active_case_load_id = payload['activeCaseLoadId']
-        obj.expiry_date = payload['expiryDate']
-        obj.expired_flag = payload['expiredFlag']
-        obj.first_name = payload['firstName']
-        obj.last_name = payload['lastName']
-        obj.lock_date = payload['lockDate']
-        obj.locked_flag = payload['lockedFlag']
-        obj.staff_id = payload['staffId']&.to_i
-        obj.status = payload['status']
-        obj.username = payload['username']
-      end
+    def initialize(payload)
+      @staff_id = payload['staffId']
+      @first_name = payload['firstName']
+      @last_name = payload['lastName']
+      @enabled = payload['enabled']
+      @email_address = payload['primaryEmail']
+      @username = payload['username']
+      @active_case_load_id = payload['activeCaseloadId']
+      @role_codes = payload['dpsRoleCodes']
     end
 
     def full_name_ordered
-      "#{first_name} #{last_name}".titleize
+      "#{first_name} #{last_name}"
     end
   end
 end
