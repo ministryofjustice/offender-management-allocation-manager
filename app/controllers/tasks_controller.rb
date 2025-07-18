@@ -28,9 +28,9 @@ private
   end
 
   def load_pom
-    user = HmppsApi::PrisonApi::UserApi.user_details(current_user)
+    staff_id = HmppsApi::NomisUserRolesApi.user_details(current_user).staff_id
     poms_list = @prison.get_list_of_poms
 
-    @pom = poms_list.find { |p| p.staff_id.to_i == user.staff_id.to_i }
+    @pom = poms_list.find { |p| p.staff_id.to_i == staff_id.to_i }
   end
 end

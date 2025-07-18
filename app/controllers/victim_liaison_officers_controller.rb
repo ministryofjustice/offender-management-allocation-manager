@@ -11,7 +11,7 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
   # and we also record the context prison as the case history is organised
   # in that way.
   def info_for_paper_trail
-    user = HmppsApi::PrisonApi::UserApi.user_details(current_user)
+    user = HmppsApi::NomisUserRolesApi.user_details(current_user)
     {
       user_first_name: user.first_name,
       user_last_name: user.last_name,

@@ -22,7 +22,7 @@ class ComplexityNewHistory
   def created_by_name
     username = @history[:sourceUser]
     if username
-      user = HmppsApi::PrisonApi::UserApi.user_details(username)
+      user = HmppsApi::NomisUserRolesApi.user_details(username)
       "#{user.last_name}, #{user.first_name}"
     end
   end

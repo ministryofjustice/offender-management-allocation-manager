@@ -13,11 +13,11 @@ class AllocationService
 
     coworking_pom = HmppsApi::NomisUserRolesApi.staff_details(secondary_pom_nomis_id)
 
-    created_by_user = HmppsApi::PrisonApi::UserApi.user_details(created_by_username)
+    created_by_user = HmppsApi::NomisUserRolesApi.user_details(created_by_username)
 
     alloc_version.update!(
       secondary_pom_name: "#{coworking_pom.last_name}, #{coworking_pom.first_name}",
-      created_by_name: "#{created_by_user.first_name} #{created_by_user.last_name}",
+      created_by_name: created_by_user.full_name_ordered,
       secondary_pom_nomis_id: secondary_pom_nomis_id,
       event: AllocationHistory::ALLOCATE_SECONDARY_POM,
       event_trigger: AllocationHistory::USER
@@ -31,11 +31,11 @@ class AllocationService
 
   def self.create_or_update(params, further_info = {})
     primary_pom = HmppsApi::NomisUserRolesApi.staff_details(params[:primary_pom_nomis_id])
-    created_by_user = HmppsApi::PrisonApi::UserApi.user_details(params[:created_by_username])
+    created_by_user = HmppsApi::NomisUserRolesApi.user_details(params[:created_by_username])
 
     params_copy = params.except(:created_by_username).merge(
       primary_pom_name: "#{primary_pom.last_name}, #{primary_pom.first_name}",
-      created_by_name: "#{created_by_user.first_name} #{created_by_user.last_name}",
+      created_by_name: created_by_user.full_name_ordered,
       primary_pom_allocated_at: Time.zone.now.utc
     )
 
