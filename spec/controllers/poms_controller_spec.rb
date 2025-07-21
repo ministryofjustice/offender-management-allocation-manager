@@ -47,7 +47,7 @@ RSpec.describe PomsController, type: :controller do
       missing_offender = create(:case_information)
       create(:allocation_history, nomis_offender_id: missing_offender.nomis_offender_id, primary_pom_nomis_id: active_staff_id, prison: prison.code)
 
-      stub_request(:get, "#{ApiHelper::T3}/staff/#{active_staff_id}")
+      stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{active_staff_id}")
         .to_return(body: { staffId: active_staff_id, lastName: 'LastName', firstName: 'FirstName' }.to_json)
 
       offenders = a_offenders + b_offenders + c_offenders + d_offenders + na_offenders

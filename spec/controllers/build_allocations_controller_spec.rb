@@ -102,6 +102,8 @@ RSpec.describe BuildAllocationsController, type: :controller do
       before do
         session[:latest_allocation_details] = further_info
 
+        stub_user('user', pom.staffId)
+
         put :update, params: {
           allocation_form: { message: notes },
           prison_id: prison.code,
@@ -173,6 +175,8 @@ RSpec.describe BuildAllocationsController, type: :controller do
       context 'with a different POM' do
         before do
           session[:latest_allocation_details] = further_info
+
+          stub_user('user', pom.staffId)
 
           put :update, params: {
             allocation_form: { message: notes },

@@ -13,7 +13,7 @@ context 'when NOMIS is missing information' do
       stub_request(:get, "#{ApiHelper::T3}/staff/roles/#{prison_code}/role/POM")
         .to_return(body: stub_poms.to_json)
 
-      signin_pom_user([prison_code])
+      signin_pom_user([prison_code], staff_id)
       stub_user('MOIC_POM', staff_id)
     end
 
@@ -47,7 +47,7 @@ context 'when NOMIS is missing information' do
                                                                    automaticReleaseDate: Time.zone.today + 3.years,
                                                                    conditionalReleaseDate: Time.zone.today + 22.months))
 
-        stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}")
+        stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{staff_id}")
           .to_return(body: { staffId: staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
 
         stub_request(:post, "#{ApiHelper::T3}/offender-assessments/CATEGORY")
@@ -103,7 +103,7 @@ context 'when NOMIS is missing information' do
         stub_request(:get, "#{ApiHelper::T3}/staff/roles/#{prison_code}/role/POM")
           .to_return(body: stub_poms.to_json)
 
-        stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}")
+        stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{staff_id}")
           .to_return(body: {}.to_json)
 
         stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}/emails")

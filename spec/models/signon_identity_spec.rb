@@ -5,6 +5,7 @@ describe SignonIdentity, model: true do
   let(:user_auth_data) do
     double('user_auth_data',
            username: 'MOIC_POM',
+           staff_id: 123_456,
            active_caseload: 'LEI',
            caseloads: %w[LEI RNI],
            roles: ['ROLE_ALLOC_MGR']
@@ -28,6 +29,7 @@ describe SignonIdentity, model: true do
   it 'can be serialized with #attributes' do
     session = {
       username: 'MOIC_POM',
+      staff_id: 123_456,
       active_caseload: 'LEI',
       caseloads: %w[LEI RNI],
       expiry: time_stamp,

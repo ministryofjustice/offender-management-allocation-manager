@@ -12,8 +12,7 @@ feature 'Case history with complexity level' do
     stub_movements_for offender.fetch(:prisonerNumber), attributes_for_list(:movement, 1, toAgency: prison_code)
     stub_poms prison_code, [pom]
 
-    stub_request(:get, "#{ApiHelper::T3}/users/user")
-      .to_return(body: { staffId: pom.staff_id, firstName: pom.first_name, lastName: pom.last_name }.to_json)
+    stub_user(username, pom.staff_id, firstName: pom.first_name, lastName: pom.last_name)
 
     create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no,
                                 allocated_at_tier: case_info.tier,

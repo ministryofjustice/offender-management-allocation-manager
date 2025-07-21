@@ -20,7 +20,7 @@ describe HmppsApi::NomisUserRolesApi do
       expect(response.email_address).to eq("test@example.com")
     end
 
-    context '.email_address' do
+    describe '.email_address' do
       it "can get a user's email addresses" do
         response = described_class.email_address(staff_id)
         expect(response).to eq('test@example.com')

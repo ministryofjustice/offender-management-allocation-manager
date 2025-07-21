@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe AllocationStaffController, type: :controller do
   let(:poms) do
     [
-      build(:pom, :prison_officer, emails: []),
+      build(:pom, :prison_officer),
       build(:pom, :prison_officer),
       build(:pom, :probation_officer),
       build(:pom, :probation_officer)

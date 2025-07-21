@@ -220,7 +220,7 @@ private
     stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/LEI/offender/#{offender_no}")
       .to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
 
-    stub_request(:get, "#{ApiHelper::T3}/staff/485636")
+    stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/485636")
       .to_return(body: { staffId: 485_636, firstName: "JENNY", lastName: "DUCKETT", status: "ACTIVE", gender: "F", dateOfBirth: "1970-01-01" }.to_json)
   end
 end

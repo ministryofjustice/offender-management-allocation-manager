@@ -14,7 +14,7 @@ RSpec.feature 'Handover progress checklist feature:' do
     stub_user('MOIC_POM', user.staff_id)
     allow_any_instance_of(StaffMember).to receive(:has_allocation?).and_return(true)
 
-    signin_pom_user([prison_code])
+    signin_pom_user([prison_code], user.staff_id)
     stub_poms(prison_code, [user])
 
     allow_any_instance_of(StaffMember).to receive(:unreleased_allocations).and_return([])

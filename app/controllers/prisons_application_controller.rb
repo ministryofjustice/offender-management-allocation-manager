@@ -56,7 +56,7 @@ private
   end
 
   def load_staff_member
-    @staff_id = HmppsApi::NomisUserRolesApi.user_details(current_user).staff_id
+    @staff_id = current_staff_id
     @current_user = StaffMember.new(@prison, @staff_id)
   end
 

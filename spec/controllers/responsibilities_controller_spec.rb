@@ -7,7 +7,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
     offender = create(:case_information, local_delivery_unit: build(:local_delivery_unit))
     create(:responsibility, nomis_offender_id: offender.nomis_offender_id)
 
-    stub_sso_data(prison.code, emails: [sso_email_address])
+    stub_sso_data(prison.code, email: sso_email_address)
 
     allow(ResponsibilityMailer).to receive(:with).and_return(double(responsibility_to_custody: responsibility_to_custody_mailer,
                                                                     responsibility_to_custody_with_pom: responsibility_to_custody_with_pom_mailer))

@@ -103,20 +103,20 @@ module ApiHelper
       .to_return(body: {
         'staffId': staff_id,
         'username': username,
-        'firstName': attributes.fetch('firstName', 'MOIC'),
-        'lastName': attributes.fetch('lastName', 'POM'),
-        'primaryEmail': attributes.fetch('primaryEmail', 'user@example.com'),
-        'activeCaseloadId': attributes.fetch('activeCaseloadId', 'LEI')
+        'firstName': attributes.fetch(:firstName, 'MOIC'),
+        'lastName': attributes.fetch(:lastName, 'POM'),
+        'primaryEmail': attributes.fetch(:primaryEmail, 'user@example.com'),
+        'activeCaseloadId': attributes.fetch(:activeCaseloadId, 'LEI')
       }.to_json)
   end
 
   def stub_signed_in_pom(prison, staff_id, username = 'alice')
-    stub_sso_data(prison, username: username, roles: [SsoIdentity::POM_ROLE])
+    stub_sso_data(prison, staff_id:, username:, roles: [SsoIdentity::POM_ROLE])
     stub_user(username, staff_id)
   end
 
   def stub_signed_in_spo_pom(prison, staff_id, username = 'alice')
-    stub_sso_data(prison, username: username, roles: [SsoIdentity::POM_ROLE, SsoIdentity::SPO_ROLE])
+    stub_sso_data(prison, staff_id:, username:, roles: [SsoIdentity::POM_ROLE, SsoIdentity::SPO_ROLE])
     stub_user(username, staff_id)
   end
 

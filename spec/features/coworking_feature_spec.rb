@@ -22,8 +22,8 @@ feature 'Co-working' do
   let(:prison) { create(:prison) }
   let(:poms) do
     [
-      build(:pom, staffId: 485_926, firstName: 'MOIC', lastName: 'POM', emails: ['pom@digital.justice.gov.uk']),
-      build(:pom, :probation_officer, staffId: 485_758, firstName: 'MOIC', lastName: 'INTEGRATION-TESTS', emails: ['ommiicc@digital.justice.gov.uk']),
+      build(:pom, staffId: 485_926, firstName: 'MOIC', lastName: 'POM', primaryEmail: 'pom@digital.justice.gov.uk'),
+      build(:pom, :probation_officer, staffId: 485_758, firstName: 'MOIC', lastName: 'INTEGRATION-TESTS', primaryEmail: 'ommiicc@digital.justice.gov.uk'),
       build(:pom, staffId: 485_833)
     ]
   end
@@ -187,8 +187,7 @@ feature 'Co-working' do
     before { stub_poms(prison, [another_pom]) }
 
     let(:another_pom) do
-      build(:pom, staffId: 123_456, firstName: 'Some', lastName: 'Other POM',
-                  emails: ['ommiicc@digital.justice.gov.uk'])
+      build(:pom, staffId: 123_456, firstName: 'Some', lastName: 'Other POM', primaryEmail: 'ommiicc@digital.justice.gov.uk')
     end
 
     let!(:allocation) do

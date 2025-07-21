@@ -2,8 +2,7 @@ require 'rails_helper'
 
 describe HmppsApi::PrisonApi::PrisonOffenderManagerApi do
   let(:staff_id) { 485_636 }
-  let(:emails) { ['test@example.com'] }
-  let(:pom) { build(:pom, staffId: staff_id, firstName: 'MOIC', lastName: 'POM', emails:) }
+  let(:pom) { build(:pom, staffId: staff_id, firstName: 'MOIC', lastName: 'POM', primaryEmail: 'test@example.com') }
 
   before do
     stub_poms('LEI', [pom])
