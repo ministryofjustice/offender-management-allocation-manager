@@ -13,7 +13,7 @@ class PrisonOffenderManagerService
     end
 
     def fetch_pom_email(staff_id)
-      HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(staff_id).first
+      HmppsApi::NomisUserRolesApi.email_address(staff_id)
     end
   end
 end

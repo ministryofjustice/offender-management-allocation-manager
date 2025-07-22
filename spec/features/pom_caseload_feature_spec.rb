@@ -229,7 +229,7 @@ feature "view POM's caseload" do
         stub_offender(first_offender)
         stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/#{prison.code}/offender/#{first_offender.fetch(:prisonerNumber)}")
           .to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
-        stub_request(:get, "#{ApiHelper::T3}/staff/#{nomis_staff_id}")
+        stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{nomis_staff_id}")
           .to_return(body: { staffId: nomis_staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
 
         visit prison_staff_caseload_cases_path(prison.code, nomis_staff_id)

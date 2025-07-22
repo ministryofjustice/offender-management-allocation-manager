@@ -18,7 +18,7 @@ describe "POM views their handover caseload" do
   before do
     stub_poms(prison.code, [pom])
     stub_pom_user(pom)
-    signin_pom_user([prison.code])
+    signin_pom_user([prison.code], pom.staff_id)
   end
 
   specify 'POM can view upcoming handovers' do

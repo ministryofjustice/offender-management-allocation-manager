@@ -4,9 +4,10 @@ class ApplicationController < ActionController::Base
   before_action :set_paper_trail_whodunnit
 
   delegate :default_prison_code, :caseloads, :current_user_is_spo?, to: :sso_identity
-  delegate :current_user, to: :sso_identity, allow_nil: true
+  delegate :current_user, :current_staff_id, to: :sso_identity, allow_nil: true
 
   helper_method :current_user,
+                :current_staff_id,
                 :current_user_is_spo?,
                 :dps_header_footer,
                 :default_prison_code

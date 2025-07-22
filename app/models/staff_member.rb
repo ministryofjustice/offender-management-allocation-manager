@@ -28,9 +28,11 @@ class StaffMember
     staff_detail.last_name&.titleize
   end
 
+  # rubocop:disable Rails/Delegate
   def email_address
-    @email_address ||= HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(@staff_id).first
+    staff_detail.email_address
   end
+  # rubocop:enable Rails/Delegate
 
   def has_pom_role?
     pom.present?

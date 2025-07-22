@@ -19,10 +19,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
 
   context 'when there is an existing invalid co-worker' do
     before do
-      stub_request(:get, "#{ApiHelper::T3}/staff/#{primary_pom.staffId}")
-        .to_return(body: { 'firstName' => 'fred' }.to_json)
-      stub_request(:get, "#{ApiHelper::T3}/staff/#{new_secondary_pom.staffId}")
-        .to_return(body: { 'firstName' => 'bill' }.to_json)
+      stub_user('user', primary_pom.staffId)
       stub_pom_emails(user.staffId, [])
 
       create(:allocation_history, prison: prison,

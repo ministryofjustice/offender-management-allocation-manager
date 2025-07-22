@@ -55,8 +55,6 @@ describe AllocationService do
     context 'without an existing' do
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
-        stub_request(:get, "#{ApiHelper::T3}/users/MOIC_POM")
-          .to_return(body: { staffId: 485_833, firstName: "MOIC", lastName: 'POM' }.to_json)
         stub_offender(build(:nomis_offender, prisonId: prison_code, prisonerNumber: nomis_offender_id))
         stub_poms prison_code, [pom]
       end

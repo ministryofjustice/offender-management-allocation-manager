@@ -85,7 +85,7 @@ RSpec.describe EmailService do
     end
 
     it "Can not crash when a pom has no email"  do
-      allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:fetch_email_addresses).and_return([])
+      allow(HmppsApi::NomisUserRolesApi).to receive(:email_address).and_return(nil)
 
       expect {
         described_class.send_email(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id)
@@ -109,7 +109,7 @@ RSpec.describe EmailService do
     end
 
     it "Can not crash when primary pom has no email when deallocating a co-working pom" do
-      allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:fetch_email_addresses).and_return([])
+      allow(HmppsApi::NomisUserRolesApi).to receive(:email_address).and_return(nil)
 
       expect {
         described_class.send_cowork_deallocation_email(allocation: coworking_deallocation,

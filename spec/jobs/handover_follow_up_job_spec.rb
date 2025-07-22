@@ -7,9 +7,7 @@ describe HandoverFollowUpJob do
 
   before do
     stub_offenders_for_prison(prison.code, [build(:nomis_offender, prisonerNumber: nomis_offender_id)])
-    stub_poms(prison.code, [
-      build(:pom, :prison_officer, emails: []),
-    ])
+    stub_poms(prison.code, [build(:pom, :prison_officer)])
 
     allow(CommunityMailer).to receive(:with).and_return(
       double("CommunityMailer", urgent_pipeline_to_community: mailer_double)

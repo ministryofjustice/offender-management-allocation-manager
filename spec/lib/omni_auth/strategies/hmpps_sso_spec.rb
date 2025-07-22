@@ -1,5 +1,6 @@
 require 'rails_helper'
-describe OmniAuth::Strategies::HmppsSso, vcr: { cassette_name: 'prison_api/hmpps_sso' } do
+
+describe OmniAuth::Strategies::HmppsSso do
   subject(:strategy) do
     described_class.new(app, 'client_id', 'secret')
   end
@@ -10,57 +11,38 @@ describe OmniAuth::Strategies::HmppsSso, vcr: { cassette_name: 'prison_api/hmpps
     }.to_app
   end
 
+  let(:username) { 'MOIC_POM' }
+  let(:staff_id) { 485_926 }
+
+  before do
+    stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{staff_id}")
+      .to_return(body: {
+        'staffId': staff_id,
+        'generalAccount': {
+          'username': username,
+          'caseloads': [
+            { "id" => "MDI", "name" => "Moorland (HMP & YOI)" },
+            { "id" => "NWEB", "name" => "Nomis-web Application" },
+            { "id" => "LEI", "name" => "Leeds (HMP)" },
+          ],
+          'activeCaseload': { "id" => "LEI", "name" => "Leeds (HMP)" }
+        }
+      }.to_json)
+  end
+
   context 'when methods' do
+    before do
+      allow(strategy).to receive(:username).and_return(username)
+      allow(strategy).to receive(:staff_id).and_return(staff_id)
+      allow(strategy).to receive(:decode_roles).and_return(['ROLE_ALLOC_MGR'])
+    end
+
     context 'when #info' do
       it 'returns a hash with the username, active caseload, caseloads and email address' do
-        leeds_prison = 'LEI'
-        username = 'MOIC_POM'
-        staff_id = 485_926
-        caseloads = %w[LEI RNI]
-        response = double(
-          'staff_details',
-          staff_id: staff_id,
-          nomis_caseloads: caseloads,
-          active_nomis_caseload: leeds_prison,
-          username: username
-        )
-        allow(response).to receive(:staff_id).and_return(staff_id)
-        allow(response).to receive(:active_case_load_id).and_return('LEI')
-
-        allow(response).to receive(:nomis_caseloads=)
-        allow(response).to receive(:nomis_caseloads).and_return(caseloads)
-        allow(HmppsApi::PrisonApi::UserApi).to receive(:user_details).and_return(response)
-
-        allow(strategy).to receive(:username).and_return(username)
-        allow(strategy).to receive(:decode_roles).and_return(['ROLE_ALLOC_MGR'])
-
         expect(strategy.info[:username]).to eq(username)
-        expect(strategy.info[:active_caseload]).to eq(leeds_prison)
-      end
-
-      it 'sets active caseload from nomis caseloads if not present' do
-        leeds_prison = 'LEI'
-        username = 'MOIC_POM'
-        staff_id = 485_926
-        caseloads = [{ "caseLoadId" => "LEI" }, { "caseLoadId" => "PVI" }, { "caseLoadId" => "SWI" }, { "caseLoadId" => "VEI" }, { "caseLoadId" => "WEI" }]
-        response = double(
-          'staff_details',
-          staff_id: staff_id,
-          nomis_caseloads: caseloads,
-          active_nomis_caseload: leeds_prison,
-          username: username
-        )
-        allow(response).to receive(:staff_id).and_return(staff_id)
-        allow(response).to receive(:active_case_load_id).and_return(nil)
-
-        allow(response).to receive(:nomis_caseloads=)
-        allow(response).to receive(:nomis_caseloads).and_return(caseloads)
-        allow(HmppsApi::PrisonApi::UserApi).to receive(:user_details).and_return(response)
-        allow(strategy).to receive(:username).and_return(username)
-        allow(strategy).to receive(:decode_roles).and_return(['ROLE_ALLOC_MGR'])
-
-        expect(strategy.info[:username]).to eq(username)
-        expect(strategy.info[:active_caseload]).to eq(leeds_prison)
+        expect(strategy.info[:staff_id]).to eq(staff_id)
+        expect(strategy.info[:active_caseload]).to eq('LEI')
+        expect(strategy.info[:caseloads]).to eq(%w[LEI MDI NWEB])
       end
     end
   end

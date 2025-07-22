@@ -56,9 +56,8 @@ private
   end
 
   def load_staff_member
-    user = HmppsApi::PrisonApi::UserApi.user_details(current_user)
-    @current_user = StaffMember.new(@prison, user.staff_id)
-    @staff_id = user.staff_id
+    @staff_id = current_staff_id
+    @current_user = StaffMember.new(@prison, @staff_id)
   end
 
   def service_notifications

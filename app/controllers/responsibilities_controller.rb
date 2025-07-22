@@ -26,9 +26,8 @@ class ResponsibilitiesController < PrisonsApplicationController
   def create
     @responsibility = Responsibility.create! responsibility_params
 
-    me = HmppsApi::PrisonApi::UserApi.user_details(current_user).email_address.try(:first)
-
-    emails = [me, @offender.ldu_email_address].compact
+    me = HmppsApi::NomisUserRolesApi.user_details(current_user).email_address
+    emails = [me, @offender.ldu_email_address].compact_blank
 
     # GovUk notify can only deliver to 1 address at a time.
     emails.each do |email|
@@ -61,7 +60,7 @@ class ResponsibilitiesController < PrisonsApplicationController
       Responsibility.find_by!(nomis_offender_id: nomis_offender_id_from_url).destroy!
 
       if allocation&.active?
-        pom_email = HmppsApi::PrisonApi::PrisonOffenderManagerApi.fetch_email_addresses(allocation.primary_pom_nomis_id).first
+        pom_email = HmppsApi::NomisUserRolesApi.email_address(allocation.primary_pom_nomis_id)
         emails << pom_email
         ResponsibilityMailer.with(emails: emails.compact,
                                   pom_name: allocation.primary_pom_name,

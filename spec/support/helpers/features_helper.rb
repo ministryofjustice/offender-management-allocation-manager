@@ -11,7 +11,7 @@ module FeaturesHelper
   end
 
   def stub_spo_user(pom)
-    stub_user('MOIC_POM', pom.staff_id, emails: pom.emails.to_json)
+    stub_user('MOIC_POM', pom.staff_id)
   end
 
   def stub_pom_user(pom) = stub_spo_user(pom)
@@ -24,13 +24,13 @@ module FeaturesHelper
     mock_sso_response('MOIC_POM', [SsoIdentity::SPO_ROLE, SsoIdentity::ADMIN_ROLE], PrisonService.prison_codes)
   end
 
-  def signin_pom_user(prisons = %w[LEI RSI])
-    mock_sso_response('MOIC_POM', [SsoIdentity::POM_ROLE], prisons)
+  def signin_pom_user(prisons = %w[LEI RSI], staff_id = 485_926)
+    mock_sso_response('MOIC_POM', [SsoIdentity::POM_ROLE], prisons, staff_id)
   end
 
-  def mock_sso_response(username, roles, prisons)
+  def mock_sso_response(username, roles, prisons, staff_id = 485_926)
     hmpps_sso_response = {
-      'info' => double('user_info', username: username, active_caseload: prisons.first, caseloads: prisons, roles: roles),
+      'info' => double('user_info', username:, staff_id:, active_caseload: prisons.first, caseloads: prisons, roles: roles),
       'credentials' => double('credentials', expires_at: Time.zone.local(2030, 1, 1).to_i,
                                              authorities: roles,
                                              token: 'access-token'),
