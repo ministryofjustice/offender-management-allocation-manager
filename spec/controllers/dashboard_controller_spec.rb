@@ -56,8 +56,6 @@ RSpec.describe DashboardController, type: :controller do
 
       before do
         stub_sso_data(prison)
-        stub_request(:get, "#{ApiHelper::T3}/users/")
-          .to_return(body: { staffId: 1 }.to_json)
       end
 
       it 'shows me only SPO tasks' do
