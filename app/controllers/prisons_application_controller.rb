@@ -81,11 +81,10 @@ private
     prison_id = params[:prison_id]
     return if prison_id.blank?
 
-    active_caseload_id = HmppsApi::ActiveCaseloadApi.current_user_active_caseload(sso_identity.token)
-    if active_caseload_id != params[:prison_id]
-      flash[:notice] = t('views.navigation.enforce_active_caseload', name: Prison.find_by_code(active_caseload_id).name)
+    if default_prison_code != prison_id
+      flash[:notice] = t('views.navigation.enforce_active_caseload', name: Prison.find_by_code(default_prison_code).name)
       session.delete(:sso_data)
-      redirect_to prison_dashboard_index_path(prison_id: active_caseload_id)
+      redirect_to prison_dashboard_index_path(prison_id: default_prison_code)
     end
   end
 end
