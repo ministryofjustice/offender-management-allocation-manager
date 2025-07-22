@@ -106,9 +106,6 @@ context 'when NOMIS is missing information' do
         stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{staff_id}")
           .to_return(body: {}.to_json)
 
-        stub_request(:get, "#{ApiHelper::T3}/staff/#{staff_id}/emails")
-          .to_return(body: [].to_json)
-
         stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}")
           .to_return(body: {}.to_json)
 
