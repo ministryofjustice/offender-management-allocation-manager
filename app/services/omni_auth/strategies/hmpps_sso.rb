@@ -60,7 +60,7 @@ module OmniAuth
       end
 
       def user_details
-        @user_details = HmppsApi::NomisUserRolesApi.staff_details(staff_id)
+        @user_details = HmppsApi::NomisUserRolesApi.staff_details(staff_id, cache: false)
       end
 
       def caseload_codes
