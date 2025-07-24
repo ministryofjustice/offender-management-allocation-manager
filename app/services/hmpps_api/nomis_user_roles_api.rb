@@ -6,18 +6,18 @@ module HmppsApi
     end
 
     # See: https://nomis-user-roles-api-dev.prison.service.justice.gov.uk/swagger-ui/index.html#/user-resource/getUserDetailsByStaffId
-    def self.staff_details(staff_id)
+    def self.staff_details(staff_id, cache: true)
       raise ArgumentError, 'NomisUserRolesApi#staff_details(blank)' if staff_id.blank?
 
-      data = client.get("/users/staff/#{staff_id}")
+      data = client.get("/users/staff/#{staff_id}", cache:)
       HmppsApi::StaffDetails.new(data)
     end
 
     # See: https://nomis-user-roles-api-dev.prison.service.justice.gov.uk/swagger-ui/index.html#/user-resource/getUserDetails
-    def self.user_details(username)
+    def self.user_details(username, cache: true)
       raise ArgumentError, 'NomisUserRolesApi#user_details(blank)' if username.blank?
 
-      data = client.get("/users/#{username}")
+      data = client.get("/users/#{username}", cache:)
       HmppsApi::UserDetails.new(data)
     end
 
