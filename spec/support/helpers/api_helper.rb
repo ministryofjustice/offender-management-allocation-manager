@@ -86,6 +86,36 @@ module ApiHelper
     end
   end
 
+  def stub_filtered_pom(prison, pom)
+    pom.agencyId = prison
+
+    stub_request(:get, "#{T3}/staff/roles/#{prison}/role/POM")
+      .with(
+        query: {
+          staffId: pom.staffId
+        },
+        headers: {
+          'Page-Limit' => '100',
+          'Page-Offset' => '0'
+        })
+      .to_return(body: [pom].to_json)
+
+    stub_pom(pom)
+  end
+
+  def stub_inexistent_filtered_pom(prison, nomis_staff_id)
+    stub_request(:get, "#{T3}/staff/roles/#{prison}/role/POM")
+      .with(
+        query: {
+          staffId: nomis_staff_id
+        },
+        headers: {
+          'Page-Limit' => '100',
+          'Page-Offset' => '0'
+        })
+      .to_return(body: [].to_json)
+  end
+
   # TODO: this stub will go, keeping it for now for compatibility
   def stub_pom_emails(staff_id, emails)
     stub_pom(

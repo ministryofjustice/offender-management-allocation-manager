@@ -139,8 +139,7 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
 
     describe 'when an offender moves prison'  do
       before do
-        stub_poms(prison_code, poms)
-
+        stub_filtered_pom(prison_code, poms.first)
         stub_spo_user build(:pom, firstName: "MOIC", lastName: 'POM')
         stub_offender(offender)
       end

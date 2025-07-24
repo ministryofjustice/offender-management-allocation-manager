@@ -33,6 +33,8 @@ feature 'Co-working' do
 
   before(:each) do
     stub_poms(prison.code, poms)
+    poms.each { |pom| stub_filtered_pom(prison.code, pom) }
+
     stub_offenders_for_prison prison.code, [offender]
     stub_signin_spo poms.last, [prison.code]
     stub_keyworker prison.code, 'G4273GI', build(:keyworker)

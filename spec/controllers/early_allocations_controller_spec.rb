@@ -35,6 +35,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     allow(OffenderService).to receive(:get_offender).with(nomis_offender_id).and_return(mpc_offender)
 
     stub_poms(prison, poms)
+    stub_filtered_pom(prison, first_pom)
     stub_offenders_for_prison(prison, [offender])
     allow(EarlyAllocationService).to receive(:process_eligibility_change)
     create(:allocation_history, prison: prison, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)

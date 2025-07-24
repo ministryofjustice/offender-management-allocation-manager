@@ -5,12 +5,11 @@ describe AllocationService do
   let(:nomis_staff_id) { 485_758 }
   let(:pom) { build(:pom, staffId: nomis_staff_id, firstName: 'MOIC', lastName: 'INTEGRATION-TESTS') }
   let(:prison) { Prison.find_by(code: "LEI") || create(:prison, code: "LEI") }
+  let(:prison_code) { prison.code }
 
   before do
     stub_signed_in_spo_pom(prison.code, nomis_staff_id, 'MOIC_POM')
-
-    stub_pom(pom)
-    stub_poms(prison.code, [pom])
+    stub_filtered_pom(prison_code, pom)
   end
 
   describe '#allocate_secondary', :queueing do
@@ -56,7 +55,6 @@ describe AllocationService do
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
         stub_offender(build(:nomis_offender, prisonId: prison_code, prisonerNumber: nomis_offender_id))
-        stub_poms prison_code, [pom]
       end
 
       let(:prison_code) { create(:prison).code }

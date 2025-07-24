@@ -3,7 +3,8 @@
 module HmppsApi
   class PrisonOffenderManager
     attr_reader :staff_id, :first_name, :last_name, :position,
-                :agency_id, :position_description
+                :agency_id, :position_description,
+                :from_date, :to_date, :schedule_type, :hours_per_week
 
     attr_accessor :status, :working_pattern
 
@@ -14,14 +15,18 @@ module HmppsApi
       @agency_id = payload['agencyId']
       @position = payload['position']
       @position_description = payload['positionDescription']
+      @from_date = payload['fromDate']
+      @to_date = payload['toDate']
+      @schedule_type = payload['scheduleType']
+      @hours_per_week = payload['hoursPerWeek']
     end
 
     def prison_officer?
-      @position == RecommendationService::PRISON_POM
+      position == RecommendationService::PRISON_POM
     end
 
     def probation_officer?
-      @position == RecommendationService::PROBATION_POM
+      position == RecommendationService::PROBATION_POM
     end
 
     def full_name

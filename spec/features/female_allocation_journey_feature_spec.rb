@@ -24,6 +24,9 @@ feature "womens allocation journey" do
 
     stub_signin_spo user, [prison.code]
     stub_poms(prison.code, [probation_pom, probation_pom2, prison_pom, inactive_prison_pom])
+    stub_filtered_pom(prison.code, probation_pom)
+    stub_filtered_pom(prison.code, probation_pom2)
+    stub_filtered_pom(prison.code, prison_pom)
     stub_offenders_for_prison(prison.code, offenders + [offender])
 
     create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))

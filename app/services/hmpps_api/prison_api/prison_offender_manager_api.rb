@@ -5,9 +5,9 @@ module HmppsApi
     class PrisonOffenderManagerApi
       extend PrisonApiClient
 
-      def self.list(prison)
+      def self.list(prison, staff_id: nil)
         route = "/staff/roles/#{prison}/role/POM"
-        data = client.get(route, extra_headers: paging_options)
+        data = client.get(route, queryparams: { staffId: staff_id }.compact_blank, extra_headers: paging_options)
         api_deserialiser.deserialise_many(HmppsApi::PrisonOffenderManager, data)
       end
 

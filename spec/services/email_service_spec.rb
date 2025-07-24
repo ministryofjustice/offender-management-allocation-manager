@@ -75,6 +75,7 @@ RSpec.describe EmailService do
     create(:case_information, offender: build(:offender, nomis_offender_id: 'G2911GD'))
     stub_offender(offender)
     stub_poms(prison_code, [andrien, leigh])
+    stub_filtered_pom(prison_code, andrien)
   end
 
   context 'when queueing', :queueing do
