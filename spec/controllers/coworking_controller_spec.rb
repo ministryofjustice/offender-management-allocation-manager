@@ -11,7 +11,10 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
     stub_sso_data(prison)
     stub_offender(offender)
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
-    stub_poms(prison, [primary_pom, new_secondary_pom])
+
+    stub_filtered_pom(prison, primary_pom)
+    stub_filtered_pom(prison, new_secondary_pom)
+
     stub_offenders_for_prison(prison, [offender])
     stub_community_offender(offender_no, build(:community_data))
     allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
@@ -20,7 +23,6 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
   context 'when there is an existing invalid co-worker' do
     before do
       stub_user('user', primary_pom.staffId)
-      stub_pom_emails(user.staffId, [])
 
       create(:allocation_history, prison: prison,
                                   nomis_offender_id: offender_no,

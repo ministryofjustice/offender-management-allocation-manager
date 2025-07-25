@@ -36,15 +36,27 @@ describe PrisonOffenderManagerService do
   end
 
   describe '#get_single_pom' do
-    it "can fetch a single POM for a prison" do
-      pom = prison.get_single_pom(staff_id)
-      expect(pom).not_to be_nil
+    context 'when the POM exists' do
+      before(:each) do
+        stub_filtered_pom(prison.code, poms.first)
+      end
+
+      it "can fetch a single POM for a prison" do
+        pom = prison.get_single_pom(staff_id)
+        expect(pom.staff_id).to eq(staff_id)
+      end
     end
 
-    it "raises an exception when fetching a pom if they are not a POM" do
-      expect {
-        prison.get_single_pom(1234)
-      }.to raise_exception(StandardError, /^Failed to find POM/)
+    context 'when the POM does not exist' do
+      before(:each) do
+        stub_inexistent_filtered_pom(prison.code, 1234)
+      end
+
+      it "raises an exception when fetching a pom if they are not a POM" do
+        expect {
+          prison.get_single_pom(1234)
+        }.to raise_exception(StandardError, /^Failed to find POM/)
+      end
     end
   end
 

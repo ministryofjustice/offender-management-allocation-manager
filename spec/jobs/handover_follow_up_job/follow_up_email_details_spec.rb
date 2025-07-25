@@ -5,6 +5,7 @@ describe HandoverFollowUpJob::FollowUpEmailDetails do
   let(:handover_start_date) { 1.week.from_now }
   let(:handover_date) { 2.weeks.from_now }
   let(:indeterminate_sentence) { false }
+  let(:pom) { build(:pom, staffId: 486_154, firstName: 'MOIC', lastName: 'POM', primaryEmail: 'test@example.com') }
   let(:offender) do
     double("offender",
            offender_no: "OFF1",
@@ -20,7 +21,8 @@ describe HandoverFollowUpJob::FollowUpEmailDetails do
 
   describe "the details used in sending the CommunityMailer email" do
     before do
-      stub_poms(prison.code, [build(:pom, staffId: 486_154, firstName: 'MOIC', lastName: 'POM', primaryEmail: 'test@example.com')])
+      stub_poms(prison.code, [pom])
+      stub_filtered_pom(prison.code, pom)
     end
 
     it "includes basic details regardless of allocation or sentence type" do
@@ -54,7 +56,10 @@ describe HandoverFollowUpJob::FollowUpEmailDetails do
     end
 
     context "when the offender has a POM allocated but is not included in the list of POMs for that prison" do
-      before { FactoryBot.create(:allocation_history, nomis_offender_id: offender.offender_no, prison: prison.code, primary_pom_nomis_id: "9999") }
+      before do
+        FactoryBot.create(:allocation_history, nomis_offender_id: offender.offender_no, prison: prison.code, primary_pom_nomis_id: "9999")
+        stub_inexistent_filtered_pom(prison.code, 9999)
+      end
 
       it "includes fallback POM details in the email" do
         details = described_class.for(offender:)

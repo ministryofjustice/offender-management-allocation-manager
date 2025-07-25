@@ -9,10 +9,10 @@ class Prison < ApplicationRecord
 
   scope :active, -> { where(code: AllocationHistory.distinct.pluck(:prison)) }
 
-  def get_list_of_poms
+  def get_list_of_poms(staff_id: nil)
     # This API call doesn't do what it says on the tin. It can return duplicate
     # staff_ids in the situation where someone has more than one role.
-    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(code)
+    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(code, staff_id:)
       .select { |pom| pom.prison_officer? || pom.probation_officer? }.uniq(&:staff_id)
 
     details = pom_details.where(nomis_staff_id: poms.map(&:staff_id))
@@ -23,11 +23,9 @@ class Prison < ApplicationRecord
   def get_single_pom(nomis_staff_id)
     raise ArgumentError, 'Prison#get_single_pom(nil)' if nomis_staff_id.nil?
 
-    poms_list = get_list_of_poms
-    pom = poms_list.find { |p| p.staff_id == nomis_staff_id.to_i }
-    if pom.blank?
-      pom_staff_ids = poms_list.map(&:staff_id)
-      raise StandardError, "Failed to find POM ##{nomis_staff_id} at #{code} - list is #{pom_staff_ids}"
+    pom = get_list_of_poms(staff_id: nomis_staff_id).first
+    if pom.nil?
+      raise StandardError, "Failed to find POM ##{nomis_staff_id} at #{code}"
     end
 
     pom

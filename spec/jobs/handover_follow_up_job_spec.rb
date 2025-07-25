@@ -26,6 +26,10 @@ describe HandoverFollowUpJob do
   context "when the offender is at an active prison and handover date was a week ago" do
     let(:nomis_offender_id) { 'G7266VD' }
 
+    before do
+      stub_filtered_pom(prison.code, build(:pom, staffId: 486_154))
+    end
+
     it "sends the follow up email to that offender" do
       valid_offender = FactoryBot.create(:offender, nomis_offender_id:)
       FactoryBot.create(:calculated_handover_date, start_date: Time.zone.today - 1.week, offender: valid_offender)
