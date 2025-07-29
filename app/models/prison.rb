@@ -17,7 +17,7 @@ class Prison < ApplicationRecord
 
     details = pom_details.where(nomis_staff_id: poms.map(&:staff_id))
 
-    poms.map { |pom| PomWrapper.new(pom, get_pom_detail(details,  pom.staff_id.to_i)) }
+    poms.map { |pom| PomWrapper.new(pom, get_pom_detail(details,  pom)) }
   end
 
   def get_single_pom(nomis_staff_id)
@@ -84,11 +84,11 @@ private
     @summary ||= AllocationsSummary.new(self)
   end
 
-  def get_pom_detail(details, nomis_staff_id)
-    details.detect { |pd| pd.nomis_staff_id == nomis_staff_id } ||
-      PomDetail.find_or_create_by!(prison_code: code, nomis_staff_id: nomis_staff_id) do |pom|
-        pom.working_pattern = 0.0
-        pom.status = 'active'
+  def get_pom_detail(details, pom)
+    details.detect { |d| d.nomis_staff_id == pom.staff_id } ||
+      PomDetail.find_or_create_by!(prison_code: code, nomis_staff_id: pom.staff_id) do |pd|
+        pd.working_pattern = pom.hours_per_week / PomDetail::FULL_TIME_HOURS_PER_WEEK
+        pd.status = 'active'
       end
   end
 end
