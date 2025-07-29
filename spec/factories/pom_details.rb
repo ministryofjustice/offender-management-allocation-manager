@@ -23,7 +23,9 @@ FactoryBot.define do
   end
 
   class Elite2POM
-    attr_accessor :position, :staffId, :emails, :firstName, :lastName, :positionDescription, :status, :primaryEmail
+    attr_accessor :position, :staffId, :emails, :firstName, :lastName, :positionDescription, :status, :primaryEmail,
+                  :fromDate, :toDate, :scheduleType, :hoursPerWeek
+
     attr_writer :agencyId
 
     def first_name
@@ -49,6 +51,11 @@ FactoryBot.define do
     def email_address
       emails.present? ? emails.first : primaryEmail
     end
+
+    def from_date = fromDate
+    def to_date = toDate
+    def schedule_type = scheduleType
+    def hours_per_week = hoursPerWeek
   end
 
   factory :pom, class: 'Elite2POM' do
@@ -64,6 +71,9 @@ FactoryBot.define do
     # So we also .titleize the last name here to avoid breaking tests
     lastName { Faker::Name.last_name.titleize }
     positionDescription { Faker::Company.type }
+
+    scheduleType { 'FT' }
+    hoursPerWeek { PomDetail::FULL_TIME_HOURS_PER_WEEK }
 
     trait :probation_officer do
       position { 'PO' }

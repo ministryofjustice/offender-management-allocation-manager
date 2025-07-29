@@ -171,4 +171,51 @@ RSpec.describe Prison do
       expect(prison.primary_allocated_offenders).not_to include(allocated_offenders[0])
     end
   end
+
+  describe '#get_list_of_poms' do
+    let(:prison) { create(:prison) }
+    let(:pom1) { build(:pom, hoursPerWeek: 18.75) }
+    let(:pom2) { build(:pom, hoursPerWeek: 11.25) }
+    let(:duplicate_pom1) { build(:pom, staffId: pom1.staff_id) }
+    let(:non_pom) { build(:pom, position: 'STAFF') }
+
+    before do
+      stub_poms(prison.code, [pom1, pom2, duplicate_pom1, non_pom])
+    end
+
+    it 'returns a list of wrapped POMs' do
+      result = prison.get_list_of_poms
+
+      expect(result.size).to eq(2)
+      expect(result).to all(be_a(PomWrapper))
+      expect(result.map(&:staff_id)).to match_array([pom1.staff_id, pom2.staff_id])
+    end
+
+    it 'creates POM details for new POMs' do
+      expect {
+        prison.get_list_of_poms
+      }.to change(PomDetail, :count).by(2)
+    end
+
+    it 'uses working pattern details pulled from the POM' do
+      result = prison.get_list_of_poms
+
+      expect(result.map(&:status)).to all(eq('active'))
+      expect(result[0].working_pattern).to eq(0.5)
+      expect(result[1].working_pattern).to eq(0.3)
+    end
+
+    context 'when fetching a specific POM' do
+      before do
+        stub_filtered_pom(prison.code, pom1)
+      end
+
+      it 'returns only the specified POM' do
+        result = prison.get_list_of_poms(staff_id: pom1.staff_id)
+
+        expect(result.size).to eq(1)
+        expect(result.first.staff_id).to eq(pom1.staff_id)
+      end
+    end
+  end
 end

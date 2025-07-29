@@ -3,6 +3,8 @@
 class PomDetail < ApplicationRecord
   has_paper_trail
 
+  FULL_TIME_HOURS_PER_WEEK = 37.5
+
   validates :nomis_staff_id, presence: true, uniqueness: { scope: :prison_code }
   validates :status, presence: true
   validates :working_pattern, presence: {
