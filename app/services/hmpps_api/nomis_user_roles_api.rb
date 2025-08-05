@@ -1,7 +1,7 @@
 module HmppsApi
   class NomisUserRolesApi
     DEFAULT_USER_SEARCH_FILTER = {
-      userType: 'GENERAL', status: 'ACTIVE', size: 20
+      userType: 'GENERAL', status: 'ACTIVE', accessRoles: %w[ALLOC_CASE_MGR], size: 20
     }.freeze
 
     def self.client
