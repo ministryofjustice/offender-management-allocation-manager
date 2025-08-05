@@ -77,10 +77,12 @@ FactoryBot.define do
 
     trait :probation_officer do
       position { 'PO' }
+      positionDescription { 'Probation Officer POM' }
     end
 
     trait :prison_officer do
       position { 'PRO' }
+      positionDescription { 'Prison Officer POM' }
     end
   end
 end
