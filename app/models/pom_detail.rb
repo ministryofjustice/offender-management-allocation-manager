@@ -16,7 +16,17 @@ class PomDetail < ApplicationRecord
   def allocations
     @allocations ||= begin
       allocations = AllocationHistory.active_pom_allocations(nomis_staff_id, prison_code).pluck(:nomis_offender_id)
-      prison.offenders.select { |o| allocations.include? o.offender_no }
+      allocations.any? ? prison.allocated.select { |o| allocations.include?(o.offender_no) } : []
     end
+  end
+
+  # 37.5 -> 1.0, 33.75 -> 0.9, etc.
+  # If for any reason hours are greater than 37.5 we convert to 1.0 (full-time)
+  def hours_per_week=(hours)
+    self.working_pattern = [(hours / FULL_TIME_HOURS_PER_WEEK).floor(1), 1.0].min
+  end
+
+  def hours_per_week
+    working_pattern * FULL_TIME_HOURS_PER_WEEK
   end
 end
