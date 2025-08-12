@@ -57,7 +57,7 @@ private
 
   def load_staff_member
     @staff_id = current_staff_id
-    @current_user = StaffMember.new(@prison, @staff_id)
+    @current_user = StaffMember.new(@prison, @staff_id, _pom_detail = nil) # No need for POM detail here
   end
 
   def service_notifications
