@@ -201,8 +201,8 @@ RSpec.describe Prison do
       result = prison.get_list_of_poms
 
       expect(result.map(&:status)).to all(eq('active'))
-      expect(result[0].working_pattern).to eq(0.5)
-      expect(result[1].working_pattern).to eq(0.3)
+      expect(result[0].working_pattern).to eq(0.0)
+      expect(result[1].working_pattern).to eq(0.0)
     end
 
     context 'when fetching a specific POM' do

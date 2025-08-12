@@ -87,7 +87,7 @@ private
   def get_pom_detail(details, pom)
     details.detect { |d| d.nomis_staff_id == pom.staff_id } ||
       PomDetail.find_or_create_by!(prison_code: code, nomis_staff_id: pom.staff_id) do |pd|
-        pd.hours_per_week = pom.hours_per_week
+        pd.hours_per_week = 0 # TODO: decide if we want to use `pom.hours_per_week` (NOMIS hours)
         pd.status = 'active'
       end
   end
