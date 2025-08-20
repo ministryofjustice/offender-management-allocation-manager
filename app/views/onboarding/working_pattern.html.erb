@@ -1,0 +1,36 @@
+<% content_for :title, "What is this person's working pattern? – Digital Prison Services" %>
+
+<%= link_to 'Back', position_prison_onboarding_path,
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <%= form_for(@onboarding_form, url: working_pattern_prison_onboarding_path, method: :post,
+                 builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+
+      <%= f.govuk_error_summary %>
+
+      <h1 class="govuk-heading-l">What is this person's working pattern?</h1>
+
+      <div class="govuk-inset-text">
+        <strong>Name:</strong> <%= @details.full_name_ordered %><br/>
+        <strong>Email address:</strong> <%= @details.email_address.presence || 'N/A' %><br/>
+        <strong>Username:</strong> <%= @details.username %><br/>
+      </div>
+
+      <%= f.govuk_radio_buttons_fieldset(:schedule_type, legend: { size: 'm', text: 'Select one option' }) do %>
+        <%= f.hidden_field :schedule_type %>
+        <%= f.govuk_radio_button :schedule_type, 'FT', label: { text: 'Full time' }, link_errors: true %>
+        <%= f.govuk_radio_button :schedule_type, 'PT', label: { text: 'Part time' } do %>
+          <%= f.govuk_radio_buttons_fieldset(:working_pattern, legend: { size: 's', text: 'Select how many days per week they will work' }) do %>
+            <% 9.downto(1).each.with_index do |value, index| %>
+            <%= f.govuk_radio_button :working_pattern, value, label: { text: working_pattern_to_days(value) }, link_errors: index.zero? %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <%= f.govuk_submit 'Continue' %>
+    <% end %>
+  </div>
+</div>

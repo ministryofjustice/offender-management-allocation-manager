@@ -79,19 +79,19 @@ RSpec.describe ApplicationHelper do
     it 'shows staff fallback label' do
       expect(pom_level('STAFF')).to eq('N/A')
     end
-  end
 
-  describe 'displays correct POM level' do
-    it 'show PO level' do
-      expect(pom_level_long('PO')).to eq('Probation Officer POM')
-    end
+    context 'with titleize: false' do
+      it 'shows PO level without capital first letter' do
+        expect(pom_level('PO', titleize: false)).to eq('probation POM')
+      end
 
-    it 'shows POM level' do
-      expect(pom_level_long('PRO')).to eq('Prison Officer POM')
-    end
+      it 'shows POM level without capital first letter' do
+        expect(pom_level('PRO', titleize: false)).to eq('prison POM')
+      end
 
-    it 'shows staff fallback label' do
-      expect(pom_level_long('STAFF')).to eq('N/A')
+      it 'shows staff fallback label with no changes' do
+        expect(pom_level('STAFF', titleize: false)).to eq('N/A')
+      end
     end
   end
 end

@@ -1,0 +1,63 @@
+<% content_for :title, "Check your answers – Digital Prison Services" %>
+
+<%= link_to 'Back', working_pattern_prison_onboarding_path,
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+   <h1 class="govuk-heading-l">Check your answers</h1>
+
+    <dl class="govuk-summary-list govuk-!-margin-bottom-7">
+      <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+        <dt class="govuk-summary-list__key">
+          Name
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <%= @details.full_name_ordered %>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Type of POM
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <%= pom_level(@onboarding_form.position) %>
+        </dd>
+        <dd class="govuk-summary-list__actions">
+          <%= link_to position_prison_onboarding_path(from: :cya) do %>
+            Change<span class="govuk-visually-hidden"> position</span>
+          <% end %>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Working pattern
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <% if @onboarding_form.part_time? %>
+            <%= "Part time – #{working_pattern_to_days(@onboarding_form.working_pattern)} per week" %>
+          <% else %>
+            Full time
+          <% end %>
+        </dd>
+        <dd class="govuk-summary-list__actions">
+          <%= link_to working_pattern_prison_onboarding_path do %>
+            Change<span class="govuk-visually-hidden"> working pattern</span>
+          <% end %>
+        </dd>
+      </div>
+    </dl>
+
+    <div class="govuk-button-group">
+      <%= form_for(@onboarding_form, url: check_answers_prison_onboarding_path, method: :post,
+                   builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+        <%= f.govuk_submit 'Add POM' %>
+      <% end %>
+
+      <%= form_for(@onboarding_form, url: search_prison_onboarding_index_path, method: :post) do |f| %>
+        <%= f.hidden_field :search_query %>
+        <%= f.button 'Cancel', type: 'submit', class: 'app-button--link govuk-link govuk-!-padding-top-1' %>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -69,6 +69,17 @@ en:
           attributes:
             reason_text:
               blank: You must say why you are changing responsibility for this case
+        pom_onboarding_form:
+          format: "%{message}"
+          attributes:
+            search_query:
+              too_short: Enter at least 3 characters
+            position:
+              inclusion: Select a type of POM
+            schedule_type:
+              inclusion: Select full time or part time
+            working_pattern:
+              not_a_number: Select how many days they will work
         early_allocation_date_form:
           format: "%{message}"
           attributes:

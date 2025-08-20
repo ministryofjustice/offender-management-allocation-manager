@@ -71,7 +71,7 @@ describe HmppsApi::NomisUserRolesApi do
             userType: 'GENERAL',
             status: 'ACTIVE',
             accessRoles: 'ALLOC_CASE_MGR',
-            size: 20
+            size: 100
           }
         ).to_return(body: response_body.to_json)
     end

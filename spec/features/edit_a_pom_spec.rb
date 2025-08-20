@@ -128,7 +128,7 @@ feature "edit a POM's details" do
         expect(prison.pom_details.find_by(nomis_staff_id: moic_integration_tests_staff_id).status).to eq('active')
         expect(other_prison.pom_details.find_by(nomis_staff_id: moic_integration_tests_staff_id).status).to eq('inactive')
 
-        expect(page).to have_content('0.5')
+        expect(page).to have_content('Part time – 2.5 days per week')
         expect(page).to have_content('Active')
       end
     end

@@ -1,7 +1,7 @@
 module HmppsApi
   class NomisUserRolesApi
     DEFAULT_USER_SEARCH_FILTER = {
-      userType: 'GENERAL', status: 'ACTIVE', accessRoles: %w[ALLOC_CASE_MGR], size: 20
+      userType: 'GENERAL', status: 'ACTIVE', accessRoles: %w[ALLOC_CASE_MGR], size: 100
     }.freeze
 
     def self.client
@@ -33,7 +33,7 @@ module HmppsApi
     end
 
     # See: https://nomis-user-roles-api-dev.prison.service.justice.gov.uk/swagger-ui/index.html#/staff-member-resource/setJobClassification
-    def self.set_staff_role(agency_id, staff_id, **config)
+    def self.set_staff_role(agency_id, staff_id, config)
       client.put(
         "/agency/#{agency_id}/staff-members/#{staff_id}/staff-role/POM",
         {
