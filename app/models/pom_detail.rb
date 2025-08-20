@@ -8,7 +8,7 @@ class PomDetail < ApplicationRecord
   validates :nomis_staff_id, presence: true, uniqueness: { scope: :prison_code }
   validates :status, presence: true
   validates :working_pattern, presence: {
-    message: 'Select number of days worked'
+    message: 'Select full time or part time'
   }
 
   belongs_to :prison, foreign_key: :prison_code, inverse_of: :pom_details

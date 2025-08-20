@@ -10,7 +10,7 @@ RSpec.describe CaseMixHelper, type: :helper do
 
     it 'renders the key' do
       expect(page.css('.case-mix-key')).to be_present
-      expect(page.css('.govuk-heading-s').text.strip).to eq 'Case mix by tier'
+      expect(page.css('.govuk-heading-s').text.strip).to eq 'Case mix by tier:'
 
       tiers = [
         { label: 'Tier A', swatch_class: 'case-mix__tier_a' },

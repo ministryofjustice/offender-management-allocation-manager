@@ -93,7 +93,7 @@ feature "edit a POM's details" do
         click_on('Save')
 
         expect(page).to have_css('h1', text: 'Edit profile')
-        expect(page).to have_content('Select number of days worked')
+        expect(page).to have_content('Select full time or part time')
       end
     end
 

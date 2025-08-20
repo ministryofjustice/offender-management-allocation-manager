@@ -4,6 +4,11 @@
 .case-mix-key {
   margin: 0;
 
+  figcaption {
+    display: inline;
+    margin-right: 1em;
+  }
+
   ul {
     @extend .govuk-list;
   }
@@ -22,7 +27,7 @@
 .case-mix-horizontal {
   li {
     display: inline;
-    margin-right: 20px;
+    margin-right: 1.5em;
   }
 }
 

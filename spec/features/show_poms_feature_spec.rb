@@ -16,8 +16,8 @@ feature "get poms list", flaky: true do
 
     # shows 3 tabs - probation, prison and inactive
     expect(page).to have_css(".govuk-tabs__list-item", count: 3)
-    expect(page).to have_content("Active Probation officer POMs")
-    expect(page).to have_content("Active Prison officer POMs")
+    expect(page).to have_content("Active probation officer POMs")
+    expect(page).to have_content("Active prison officer POMs")
     expect(page).to have_content("Inactive staff")
   end
 

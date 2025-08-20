@@ -1,25 +1,31 @@
 <% content_for :title, "Manage your staff – Digital Prison Services" %>
 
-<h1 class="govuk-heading-l">Manage your staff</h1>
+<%= render 'layouts/notice', notice: flash[:notice] %>
+
+<div class="moj-page-header-actions govuk-!-margin-bottom-1 govuk-!-padding-top-0">
+  <div class="moj-page-header-actions__title">
+    <h1 class="govuk-heading-xl">Manage your staff</h1>
+  </div>
+
+  <% if FeatureFlags.pom_onboarding.enabled? %>
+  <div class="moj-page-header-actions__actions">
+    <%= link_to 'Add a POM', search_prison_onboarding_index_path(@prison.code), role: 'button',
+                class: 'govuk-button govuk-button--secondary govuk-!-margin-bottom-0',
+                data: { module: 'govuk-button--secondary' } %>
+  </div>
+  <% end %>
+</div>
 
 <div class="govuk-tabs" data-module="govuk-tabs">
-  <h2 class="govuk-tabs__title">Manage your staff</h2>
-  <p class="govuk-body">POMs who are available for allocations are shown here as active.</p>
-  <p class="govuk-body">
-    If someone has left or will be absent for a while, make sure their status is set to inactive by selecting
-    their name below. You will then need to reallocate any cases they have.
-  </p>
-  <br/>
-
-  <ul class="govuk-tabs__list" role='tablist'>
+  <ul class="govuk-tabs__list govuk-!-margin-top-9" role='tablist'>
     <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
       <a class="govuk-tabs__tab" href="#active_probation_poms">
-        Active Probation officer POMs (<%= active_probation_poms(@poms).count %>)
+        Active probation officer POMs (<%= active_probation_poms(@poms).count %>)
       </a>
     </li>
     <li class="govuk-tabs__list-item">
       <a class="govuk-tabs__tab" href="#active_prison_poms">
-        Active Prison officer POMs (<%= active_prison_poms(@poms).count %>)
+        Active prison officer POMs (<%= active_prison_poms(@poms).count %>)
       </a>
     </li>
     <li class="govuk-tabs__list-item">
@@ -30,17 +36,33 @@
   </ul>
 
   <section class="govuk-tabs__panel" id="active_probation_poms">
-    <h2 class="govuk-heading-m">Active Probation officer POMs</h2>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h2 class="govuk-heading-l">Active probation officer POMs</h2>
+        <p class="govuk-body govuk-!-margin-bottom-8">
+          If someone has left or will be absent for a while, make sure their status is set to inactive by selecting
+          their name below. You will then need to reallocate any cases they have.
+        </p>
+      </div>
+    </div>
     <%= render "poms_table", pom_type: 'probation', poms: active_probation_poms(@poms) %>
   </section>
 
   <section class="govuk-tabs__panel" id="active_prison_poms">
-    <h2 class="govuk-heading-m">Active Prison officer POMs</h2>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h2 class="govuk-heading-l">Active prison officer POMs</h2>
+        <p class="govuk-body govuk-!-margin-bottom-8">
+          If someone has left or will be absent for a while, make sure their status is set to inactive by selecting
+          their name below. You will then need to reallocate any cases they have.
+        </p>
+      </div>
+    </div>
     <%= render "poms_table", pom_type: 'prison', poms: active_prison_poms(@poms) %>
   </section>
 
   <section class="govuk-tabs__panel" id="inactive_poms">
-    <h2 class="govuk-heading-m">Inactive staff</h2>
+    <h2 class="govuk-heading-l">Inactive staff</h2>
     <%= render "inactive_poms", poms: inactive_poms(@poms) %>
   </section>
 </div>
