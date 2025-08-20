@@ -1,0 +1,26 @@
+<% content_for :title, "POM added – Digital Prison Services" %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-panel govuk-panel--confirmation govuk-!-margin-bottom-6">
+      <h1 class="govuk-panel__title">
+        POM added
+      </h1>
+      <div class="govuk-panel__body">
+        <%= @pom.full_name_ordered %> added as a <%= pom_level(@pom.position, titleize: false) %>
+      </div>
+    </div>
+
+    <p class="govuk-body">
+      You can now allocate cases to <%= pom_level(@pom.position, titleize: false) %> <%= @pom.full_name_ordered %>.
+      <br/>
+      If you need to change their working pattern, you can do this on
+      the <%= link_to 'staff overview', prison_poms_path(anchor: @pom.probation_officer? ? 'active_probation_poms' : 'active_prison_poms') %>.
+    </p>
+
+    <div class="govuk-form-group govuk-!-padding-top-4">
+      <%= link_to 'Make allocations', unallocated_prison_prisoners_path, class: 'govuk-button govuk-!-margin-right-2' %>
+      <%= link_to 'Add another POM', search_prison_onboarding_index_path, class: 'govuk-button govuk-button--secondary' %>
+    </div>
+  </div>
+</div>

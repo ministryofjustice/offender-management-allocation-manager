@@ -1,0 +1,35 @@
+@use "govuk-frontend/dist/govuk" as *;
+
+@mixin app-button-reset {
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  box-sizing: unset;
+  background-color: transparent;
+  box-shadow: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.app-button--link {
+  @include app-button-reset;
+  @extend %govuk-link;
+
+  vertical-align: top;
+
+  // Buttons can't have different colours for visited/unvisited
+  color: $govuk-link-colour;
+}
+
+.app-button--back-link {
+  @include app-button-reset;
+  @extend %govuk-link;
+
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+a:visited {
+  color: $govuk-link-colour;
+}

@@ -17,12 +17,14 @@ module ApplicationHelper
     time.strftime('%-d %b %Y %H:%M')
   end
 
-  def pom_level(level)
+  def pom_level(level, titleize: true)
     {
-      'PO' => 'Probation POM',
-      'PRO' => 'Prison POM',
-      'STAFF' => 'N/A'
-    }.fetch(level)
+      'PO' => 'probation POM',
+      'PRO' => 'prison POM',
+      'STAFF' => 'N/A',
+    }.fetch(level).tap do |str|
+      return titleize ? str.upcase_first : str
+    end
   end
 
   def pom_level_long(level)

@@ -4,7 +4,7 @@
 # The return value from get_list_of_poms - a combo of PomDetails and PrisonOffenderManager from the API
 class PomWrapper
   delegate :email_address, :full_name, :full_name_ordered, :position_description, :first_name, :last_name,
-           :probation_officer?, :prison_officer?, :staff_id, :agency_id, to: :@pom
+           :probation_officer?, :prison_officer?, :position, :staff_id, :agency_id, to: :@pom
   delegate :status, :working_pattern, :allocations, to: :@pom_detail
 
   def initialize(pom, pom_detail)

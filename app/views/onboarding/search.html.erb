@@ -1,0 +1,95 @@
+<%
+  if defined?(@results)
+    if @results.empty?
+      page_title = 'No results'
+      heading_text = "No results for #{@onboarding_form.search_query}"
+    else
+      page_title = 'Search results'
+      heading_text = "Search results for #{@onboarding_form.search_query}"
+    end
+  else
+    page_title = 'Find a staff member'
+    heading_text = 'Find a staff member'
+  end
+%>
+
+<% content_for :title, "#{page_title} – Digital Prison Services" %>
+
+<%= link_to 'Back', prison_poms_path,
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-half">
+    <div class="moj-search govuk-!-margin-bottom-8">
+      <%= form_for(@onboarding_form, url: search_prison_onboarding_index_path, method: :post,
+                   builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+
+        <%= f.govuk_text_field :search_query, type: :search, class: 'moj-search__input',
+                               autocomplete: 'off', autocorrect: 'off',
+                               label: { text: heading_text, tag: 'h1', size: 'l' },
+                               hint: { text: 'Search people who have not been added to the service yet.', size: 's' } do %>
+          <p class="govuk-!-margin-top-5 govuk-!-margin-bottom-0 govuk-!-font-weight-bold">
+            Use name, email address or username
+          </p>
+        <% end %>
+
+        <%= f.govuk_submit 'Search', class: 'moj-search__button' %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="govuk-grid-column-two-thirds">
+    <% if @total_results > 0 %>
+      <div class="govuk-grid-row pagination">
+        <div class="govuk-grid-column-one-half">
+          <h2 class="govuk-heading-m">Select staff member</h2>
+        </div>
+        <div class="govuk-grid-column-one-half result-count">
+          <p class="moj-pagination__results">
+            Showing <b>1</b> to <b><%= @results.size %></b> of <b><%= @total_results %></b> results
+          </p>
+        </div>
+      </div>
+      <table class="govuk-table" data-module="moj-sortable-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header" aria-sort="ascending">Name</th>
+            <th scope="col" class="govuk-table__header" aria-sort="none">Email address</th>
+            <th scope="col" class="govuk-table__header" aria-sort="none">Username</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          <% @results.each do |user| %>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">
+              <%= link_to "#{user['firstName']} #{user['lastName']}",
+                          position_prison_onboarding_path(@prison.code, user['staffId']) %>
+            </td>
+            <td class="govuk-table__cell">
+              <%= user['email'].presence || 'N/A' %>
+            </td>
+            <td class="govuk-table__cell">
+              <%= user['username'] %>
+            </td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <div class="govuk-grid-row pagination">
+        <div class="govuk-grid-column-one-half">&nbsp;</div>
+        <div class="govuk-grid-column-one-half result-count">
+          <p class="moj-pagination__results">
+            Showing <b>1</b> to <b><%= @results.size %></b> of <b><%= @total_results %></b> results
+          </p>
+        </div>
+      </div>
+    <% elsif defined?(@results) %>
+      <p>Search again or check with a local systems administrator that an account has been created for the person you
+        are looking for.</p>
+    <% end %>
+  </div>
+</div>
+
+<%= javascript_tag nonce: true, type: 'module' do %>
+  window.MOJFrontend.initAll()
+<% end %>

@@ -36,10 +36,7 @@
 @import 'handovers';
 @import 'task_list';
 @import 'compare_poms';
-
-a:visited {
-  color: #005ea5;
-}
+@import 'overrides';
 
 .no-bottom-margin {
   margin-bottom: 0;

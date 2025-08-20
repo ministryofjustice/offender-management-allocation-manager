@@ -40,6 +40,25 @@ Rails.application.routes.draw do
       get 'caseload/global' => 'caseload_global#index'
     end
 
+    # POM onboarding
+    resources :onboarding, only: [], param: :staff_id do
+      member do
+        get :position
+        post :position
+        get :working_pattern
+        post :working_pattern
+        get :check_answers
+        post :check_answers
+        get :confirmation
+      end
+
+      collection do
+        get :search
+        post :search
+        get :error
+      end
+    end
+
     resources :prisoners, only: [:show] do
       constraints ->(request) { !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id)) } do
         get 'new_missing_info' => 'case_information#new'

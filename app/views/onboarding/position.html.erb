@@ -1,0 +1,43 @@
+<% content_for :title, "What type of POM is this person? – Digital Prison Services" %>
+
+<%= form_for(@onboarding_form, url: search_prison_onboarding_index_path, method: :post) do |f| %>
+  <%= f.hidden_field :search_query %>
+  <%= f.button 'Back', type: 'submit', class: 'app-button--back-link govuk-back-link govuk-!-margin-bottom-6' %>
+<% end %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <%= form_for(@onboarding_form, url: position_prison_onboarding_path, method: :post,
+                 builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+
+      <%= f.govuk_error_summary %>
+      <%= hidden_field_tag :from, params[:from] %>
+
+      <h1 class="govuk-heading-l">What type of POM is this person?</h1>
+
+      <div class="govuk-inset-text">
+        <strong>Name:</strong> <%= @details.full_name_ordered %><br/>
+        <strong>Email address:</strong> <%= @details.email_address.presence || 'N/A' %><br/>
+        <strong>Username:</strong> <%= @details.username %><br/>
+      </div>
+
+      <%= f.govuk_collection_radio_buttons(
+            :position,
+            [
+              OpenStruct.new(
+                value: PomOnboardingForm::POSITION_PRISON_POM,
+                label: pom_level(PomOnboardingForm::POSITION_PRISON_POM)
+              ),
+              OpenStruct.new(
+                value: PomOnboardingForm::POSITION_PROBATION_POM,
+                label: pom_level(PomOnboardingForm::POSITION_PROBATION_POM)
+              ),
+            ],
+            :value, :label,
+            legend: { text: 'Select one option', size: 'm' }
+          ) %>
+
+      <%= f.govuk_submit 'Continue' %>
+    <% end %>
+  </div>
+</div>

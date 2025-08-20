@@ -5,21 +5,21 @@ module PomHelper
     if pattern.to_d == 1.0.to_d
       'Full time'
     else
-      "Part time – #{pattern}"
+      "Part time – #{working_pattern_to_days(pattern * 10)} per week"
     end
   end
 
   def working_pattern_to_days(pattern)
-    ['',
-     'half a day',
-     'one day',
-     'one and a half days',
-     'two days',
-     'two and a half days',
-     'three days',
-     'three and a half days',
-     'four days',
-     'four and a half days'
+    ['0 days',
+     '0.5 day',
+     '1 day',
+     '1.5 days',
+     '2 days',
+     '2.5 days',
+     '3 days',
+     '3.5 days',
+     '4 days',
+     '4.5 days'
     ][pattern]
   end
 
