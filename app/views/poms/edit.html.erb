@@ -33,12 +33,15 @@
                   </label>
                 </div>
                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-part-time-conditional-1">
+                  <fieldset class="govuk-fieldset">
+                  <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Select how many days per week they will work</legend>
                   <% 9.downto(1).each do |value| %>
                     <div class="govuk-radios__item">
                       <%= radio_button_tag("edit_pom[working_pattern]", "0.#{value}", @pom.working_pattern.to_s == "0.#{value}", id: "working_pattern-#{value}", class: "govuk-radios__input") %>
-                      <%= label_tag "working_pattern-#{value}", "Part time 0.#{value} - #{working_pattern_to_days(value)}", class: "govuk-label govuk-radios__label" %>
+                      <%= label_tag "working_pattern-#{value}", working_pattern_to_days(value), class: "govuk-label govuk-radios__label" %>
                     </div>
                   <% end %>
+                  </fieldset>
                 </div>
               </div>
             </div>

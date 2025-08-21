@@ -69,8 +69,12 @@
                link: prison_poms_path(@prison.code),
                content: "See what POMs are working on and change their availability."
     %>
-    <div class="govuk-grid-column-one-third"></div>
-    <div class="govuk-grid-column-one-third"></div>
+
+    <%= render 'dashboard_partition',
+               title: "Add a POM",
+               link: search_prison_onboarding_index_path(@prison.code),
+               content: "Add a POM so you can allocate to them." if FeatureFlags.pom_onboarding.enabled?
+    %>
   </div>
 <% end %>
 
@@ -122,7 +126,7 @@
     <%= render 'dashboard_partition',
                title: "Get help with this service",
                link: help_dashboard_path,
-               content: "Adding staff members, missing cases and problems with case responsibility."
+               content: "Adding staff members, missing cases and problems with case responsibility." unless @is_spo
     %>
   </div>
 <% end %>

@@ -60,10 +60,10 @@
         </thead>
         <tbody class="govuk-table__body">
           <% @results.each do |user| %>
+          <% full_name = "#{user['firstName']} #{user['lastName']}" %>
           <tr class="govuk-table__row">
-            <td class="govuk-table__cell">
-              <%= link_to "#{user['firstName']} #{user['lastName']}",
-                          position_prison_onboarding_path(@prison.code, user['staffId']) %>
+            <td class="govuk-table__cell" data-sort-value="<%= full_name %>">
+              <%= link_to full_name, position_prison_onboarding_path(@prison.code, user['staffId']) %>
             </td>
             <td class="govuk-table__cell">
               <%= user['email'].presence || 'N/A' %>

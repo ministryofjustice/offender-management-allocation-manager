@@ -11,6 +11,34 @@ RSpec.describe PomOnboardingForm, type: :model do
   describe 'validations' do
     context 'when validating search_query' do
       it { is_expected.to validate_length_of(:search_query).is_at_least(3).on(:search) }
+
+      context 'when squishing spaces' do
+        subject { described_class.new(search_query: query) }
+
+        context 'when search_query has leading/trailing spaces' do
+          let(:query) { '  John Smith  ' }
+
+          it 'removes the spaces' do
+            expect(subject.search_query).to eq('John Smith')
+          end
+        end
+
+        context 'when search_query has multiple spaces between words' do
+          let(:query) { 'John    Smith' }
+
+          it 'collapses multiple spaces into one' do
+            expect(subject.search_query).to eq('John Smith')
+          end
+        end
+
+        context 'when search_query is nil' do
+          let(:query) { nil }
+
+          it 'returns nil' do
+            expect(subject.search_query).to be_nil
+          end
+        end
+      end
     end
 
     context 'when validating position' do
