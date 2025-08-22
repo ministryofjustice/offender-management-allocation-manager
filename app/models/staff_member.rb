@@ -20,6 +20,12 @@ class StaffMember
   end
   alias_method :full_name, :full_name_ordered
 
+  # In the rare scenarios where the staff might have been deleted from NOMIS
+  # For now it is only used in the "limbo" cases functionality
+  def full_name_or_staff_id
+    full_name_ordered.presence || staff_id
+  end
+
   def first_name
     staff_detail.first_name&.titleize
   end
@@ -56,10 +62,11 @@ class StaffMember
 
   def allocations
     @allocations ||= begin
-      alloc_hash = @prison.allocations_for_pom(@staff_id).index_by(&:nomis_offender_id)
+      alloc_hash = prison.allocations_for_pom(staff_id).index_by(&:nomis_offender_id)
+      return [] if alloc_hash.empty?
 
-      @prison.allocated.select { |a| alloc_hash.key?(a.offender_no) }.map do |offender|
-        AllocatedOffender.new(@staff_id, alloc_hash.fetch(offender.offender_no), offender)
+      prison.allocated.select { |a| alloc_hash.key?(a.offender_no) }.map do |offender|
+        AllocatedOffender.new(staff_id, alloc_hash.fetch(offender.offender_no), offender)
       end
     end
   end
@@ -71,7 +78,7 @@ class StaffMember
   end
 
   def has_allocation?(nomis_offender_id)
-    @prison.allocations_for_pom(@staff_id).detect { |a| a.nomis_offender_id == nomis_offender_id }.present?
+    prison.allocations_for_pom(staff_id).detect { |a| a.nomis_offender_id == nomis_offender_id }.present?
   end
 
   # Counts for ordering
@@ -95,6 +102,10 @@ class StaffMember
     allocations.count
   end
 
+  def last_allocated_date
+    allocations.filter_map(&:primary_pom_allocated_at).max&.to_date
+  end
+
 private
 
   def pom
@@ -102,8 +113,8 @@ private
   end
 
   def fetch_pom
-    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(@prison.code)
-    poms.detect { |pom| pom.staff_id == @staff_id }
+    poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(prison.code)
+    poms.detect { |pom| pom.staff_id == staff_id }
   end
 
   # Attempt to forward-populate the PomDetail table for new records
@@ -112,6 +123,6 @@ private
   end
 
   def staff_detail
-    @staff_detail ||= HmppsApi::NomisUserRolesApi.staff_details(@staff_id)
+    @staff_detail ||= HmppsApi::NomisUserRolesApi.staff_details(staff_id)
   end
 end

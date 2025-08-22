@@ -31,6 +31,14 @@ class Prison < ApplicationRecord
     pom
   end
 
+  def get_removed_poms(existing_poms:)
+    removed_poms = pom_details.where.not(nomis_staff_id: existing_poms.map(&:staff_id))
+
+    removed_poms.filter(&:has_allocations?).map do |pom_detail|
+      StaffMember.new(self, pom_detail.nomis_staff_id, pom_detail)
+    end
+  end
+
   def active?
     self.class.active.pluck(:code).include?(code)
   end

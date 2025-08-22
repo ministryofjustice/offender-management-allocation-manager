@@ -10,3 +10,6 @@ feature_flags:
   pom_onboarding_callout:
     staging: true
     preprod: false
+  limbo_cases:
+    staging: true
+    preprod: false
