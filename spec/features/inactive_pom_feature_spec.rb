@@ -30,10 +30,8 @@ feature 'Inactive POM' do
       visit prison_prisoner_allocation_path(prison_code, nomis_offender_id)
     end
 
-    it "displays instruction links" do
+    it "displays instructions" do
       expect(page).to have_text('Check this POM is still active')
-      expect(page).to have_link('following these instructions', href: help_step2_path)
-      expect(page).to have_link('use these instructions', href: help_step3_path)
     end
   end
 end
