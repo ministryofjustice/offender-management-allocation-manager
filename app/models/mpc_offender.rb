@@ -3,7 +3,6 @@
 # rubocop:disable Style/AccessModifierDeclarations
 
 class MpcOffender
-
   def initialize(prison:, offender:, prison_record:)
     @prison = prison
     @offender = offender
@@ -33,7 +32,6 @@ class MpcOffender
       @offender.calculated_handover_date ||
       HandoverDateService.handover(self)
   end
-
 
   #
   # Handover
@@ -115,7 +113,6 @@ class MpcOffender
     @handover ||= pom_responsible? ? HandoverDateService.handover(self) : OffenderHandover::COM_NO_HANDOVER_DATE
   end
 
-
   #
   # Allocations
   #
@@ -143,7 +140,6 @@ class MpcOffender
       nil
     end
   end
-
 
   #
   # Early allocations
@@ -198,7 +194,6 @@ class MpcOffender
     end
   end
 
-
   #
   # Parole
   #
@@ -251,7 +246,6 @@ class MpcOffender
   def display_current_parole_info? = [tariff_date, parole_eligibility_date, current_parole_review].any?(&:present?)
 
   def determinate_parole? = parole_eligibility_date.present?
-
 
   #
   # MAPPA / RoSH / Alerts
@@ -327,7 +321,6 @@ class MpcOffender
       .map { |alert| alert.dig('alertCode', 'description') }
   end
 
-
   #
   # Sentencing / Movements
   #
@@ -379,13 +372,11 @@ class MpcOffender
 
   def in_open_conditions? = Offenders::PrisonPolicies.new(self).in_open_conditions?
 
-
   #
   # Delegating data from the API
   #
 
   delegate :offender_no,
-
            # Personal / Basic Details
            :first_name,
            :last_name,
@@ -395,7 +386,6 @@ class MpcOffender
            :age,
            :over_18?,
            :get_image,
-
            # Sentencing
            :recalled?,
            :immigration_case?,
@@ -409,7 +399,6 @@ class MpcOffender
            :complexity_level,
            :awaiting_allocation_for,
            :inside_omic_policy?,
-
            # Special Dates
            :sentence_start_date,
            :conditional_release_date,
@@ -425,7 +414,6 @@ class MpcOffender
            :earliest_release,
            :latest_temp_movement_date,
            :release_date,
-
            # Prison
            :prison_id,
            :location,
@@ -433,7 +421,6 @@ class MpcOffender
            :category_code,
            :category_active_since,
            :restricted_patient?,
-
            to: :@api_offender
 
   delegate :crn,
@@ -455,7 +442,6 @@ class MpcOffender
   alias_method :nomis_offender_id, :offender_no
   alias_method :probation_record, :case_information
   alias_method :model, :offender
-
 
   #
   # Misc / Audit
@@ -518,6 +504,5 @@ class MpcOffender
 
     attr_names.index_with { |attr_name| send(attr_name) }
   end
-
 end
 # rubocop:enable Style/AccessModifierDeclarations
