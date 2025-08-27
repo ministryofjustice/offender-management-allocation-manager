@@ -162,18 +162,12 @@ class MpcOffender
     end
   end
 
-  # Separate from next_parole_date as parole case index view sorts by next_parole_date, so it seemed sensible to avoid changing default rails behaviour
-  # for the sake of saving a couple of simple, albeit slightly inefficient, comparisons.
   def next_parole_date_type
-    return nil if next_parole_date.nil?
-
     case next_parole_date
-    when tariff_date
-      'TED'
-    when parole_eligibility_date
-      'PED'
-    when target_hearing_date
-      'Target hearing date'
+    when nil                     then nil
+    when tariff_date             then 'TED'
+    when parole_eligibility_date then 'PED'
+    when target_hearing_date     then 'Target hearing date'
     end
   end
 
