@@ -39,6 +39,17 @@ class MpcOffender
   # Handover
   #
 
+  delegate :handover_progress_task_completion_data,
+           :handover_progress_complete?,
+           :handover_type,
+           :enhanced_handover?,
+           to: :offender
+
+  delegate :ldu_email_address,
+           :team_name,
+           :ldu_name,
+           to: :case_information, allow_nil: true
+
   def handover_start_date = @offender.calculated_handover_date&.start_date
 
   def handover_date = @offender.calculated_handover_date&.handover_date
@@ -192,6 +203,12 @@ class MpcOffender
   # Parole
   #
 
+  delegate :current_parole_review,
+           :previous_parole_reviews,
+           :most_recent_parole_review,
+           :parole_reviews,
+           to: :offender
+
   def approaching_parole? = next_parole_date.present?
 
   def next_parole_date
@@ -239,6 +256,10 @@ class MpcOffender
   #
   # MAPPA / RoSH / Alerts
   #
+
+  delegate :tier,
+           :mappa_level,
+           to: :case_information
 
   def mappa_details = OffenderService.get_mappa_details(crn)
 
@@ -360,19 +381,36 @@ class MpcOffender
 
 
   #
-  # Unsorted delegations
-  # TODO: sort these
+  # Delegating data from the API
   #
 
-  delegate :get_image,
+  delegate :offender_no,
+
+           # Personal / Basic Details
+           :first_name,
+           :last_name,
+           :full_name_ordered,
+           :full_name,
+           :date_of_birth,
+           :age,
+           :over_18?,
+           :get_image,
+
+           # Sentencing
            :recalled?,
            :immigration_case?,
            :indeterminate_sentence?,
            :sentenced?,
-           :over_18?,
            :describe_sentence,
            :legal_status,
            :civil_sentence?,
+           :main_offence,
+           :booking_id,
+           :complexity_level,
+           :awaiting_allocation_for,
+           :inside_omic_policy?,
+
+           # Special Dates
            :sentence_start_date,
            :conditional_release_date,
            :automatic_release_date,
@@ -387,52 +425,31 @@ class MpcOffender
            :earliest_release,
            :latest_temp_movement_date,
            :release_date,
-           :date_of_birth,
-           :main_offence,
-           :awaiting_allocation_for,
+
+           # Prison
+           :prison_id,
            :location,
            :category_label,
-           :complexity_level,
            :category_code,
            :category_active_since,
-           :first_name,
-           :last_name,
-           :full_name_ordered,
-           :full_name,
-           :inside_omic_policy?,
-           :offender_no,
-           :prison_id,
            :restricted_patient?,
-           :age,
-           :booking_id,
+
            to: :@api_offender
 
   delegate :crn,
            :manual_entry?,
-           :tier,
-           :mappa_level,
            to: :case_information
 
-  # These fields make sense to be nil when the case information is nil - the others dont
-  delegate :ldu_email_address,
-           :team_name,
-           :ldu_name,
-           :active_vlo?,
+  delegate :active_vlo?,
            :welsh_offender,
            to: :case_information, allow_nil: true
 
+  # TODO: find out why we directly access these
   delegate :victim_liaison_officers,
-           :handover_progress_task_completion_data,
-           :handover_progress_complete?,
-           :handover_type,
-           :enhanced_handover?,
-           :current_parole_review,
-           :previous_parole_reviews,
-           :most_recent_parole_review,
-           :parole_reviews,
            :case_information,
            to: :offender
 
+  # TODO: find out why we directly access these
   attr_reader :prison, :offender
 
   alias_method :nomis_offender_id, :offender_no
