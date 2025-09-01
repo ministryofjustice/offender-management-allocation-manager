@@ -27,6 +27,10 @@ class NomisUserRolesService
       prison.code, nomis_staff_id, config
     )
 
+    # Expire cache, otherwise the POM just added might not come back in the
+    # list endpoint until any previous cached request expires (which could take 1h)
+    HmppsApi::PrisonApi::PrisonOffenderManagerApi.expire_list_cache(prison.code)
+
     # This should not be neccessary if we decide to use NOMIS working hours
     # upon reading the list of POMS.
     # For now, we are not doing that so we need to create the PomDetail here
@@ -48,7 +52,12 @@ class NomisUserRolesService
       prison.code, staff_id: nomis_staff_id
     ).first
 
-    # We attempt to also expire their POM role, but it may no longer exist
-    HmppsApi::NomisUserRolesApi.expire_staff_role(pom) if pom
+    if pom
+      HmppsApi::NomisUserRolesApi.expire_staff_role(pom)
+
+      # Expire cache, otherwise the POM just removed might still come back in the
+      # list endpoint until any previous cached request expires (which could take 1h)
+      HmppsApi::PrisonApi::PrisonOffenderManagerApi.expire_list_cache(prison.code)
+    end
   end
 end

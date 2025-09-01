@@ -93,6 +93,7 @@ feature 'POM onboarding' do
 
           it 'shows the results table' do
             expect(page).to have_link('Joe Bloggs', href: position_prison_onboarding_path(prison.code, staff_id))
+            expect(page).to have_css('td.govuk-table__cell[data-sort-value="Joe Bloggs"]')
             expect(page).to have_text('joe.bloggs@example.com')
             expect(page).to have_text('TEST_USER')
           end

@@ -72,7 +72,7 @@
 
     <%= render 'dashboard_partition',
                title: "Add a POM",
-               link: search_prison_onboarding_index_path(@prison.code),
+               link: search_prison_onboarding_index_path(@prison.code, from: :home),
                content: "Add a POM so you can allocate to them." if FeatureFlags.pom_onboarding.enabled?
     %>
   </div>
