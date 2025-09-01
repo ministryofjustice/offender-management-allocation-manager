@@ -373,4 +373,30 @@ describe HmppsApi::Client do
       end
     end
   end
+
+  describe 'expiring cache' do
+    let(:memory_store) { ActiveSupport::Cache.lookup_store(:memory_store) }
+    let(:route) { '/api/some/endpoint' }
+    let(:stub_url) { api_host + route }
+    let(:response_body) { '{"key": "value"}' }
+
+    before do
+      allow(Rails).to receive(:cache).and_return(memory_store)
+      Rails.cache.clear
+      WebMock.stub_request(:get, stub_url).to_return(body: response_body)
+    end
+
+    it 'removes the cached response for a request' do
+      # Prime the cache
+      client.get(route)
+      expect(a_request(:get, stub_url)).to have_been_made.once
+
+      # Expire the cache
+      client.expire_cache_key(:get, route)
+
+      # Next request should hit the API again
+      client.get(route)
+      expect(a_request(:get, stub_url)).to have_been_made.twice
+    end
+  end
 end

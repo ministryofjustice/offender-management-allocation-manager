@@ -47,4 +47,15 @@ describe HmppsApi::PrisonApi::PrisonOffenderManagerApi do
       expect(response).to all(be_an HmppsApi::PrisonOffenderManager)
     end
   end
+
+  context 'when expiring cache' do
+    let(:route) { '/staff/roles/LEI/role/POM' }
+    let(:args) { { queryparams: {}, extra_headers: { 'Page-Limit' => '100', 'Page-Offset' => '0' } } }
+
+    it 'expires the cache for the prison' do
+      allow(described_class).to receive(:client).and_return(described_class.client)
+      expect(described_class.client).to receive(:expire_cache_key).with(:get, route, **args)
+      described_class.expire_list_cache('LEI')
+    end
+  end
 end

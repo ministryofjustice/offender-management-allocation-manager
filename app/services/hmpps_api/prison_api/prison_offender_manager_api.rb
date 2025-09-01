@@ -6,18 +6,26 @@ module HmppsApi
       extend PrisonApiClient
 
       def self.list(prison, staff_id: nil)
-        route = "/staff/roles/#{prison}/role/POM"
-        data = client.get(route, queryparams: { staffId: staff_id }.compact_blank, extra_headers: paging_options)
+        route, args = request_config(prison, staff_id:)
+        data = client.get(route, **args)
         api_deserialiser.deserialise_many(HmppsApi::PrisonOffenderManager, data)
+      end
+
+      def self.expire_list_cache(prison)
+        route, args = request_config(prison)
+        client.expire_cache_key(:get, route, **args)
       end
 
     private
 
-      def self.paging_options
-        {
-          'Page-Limit' => '100',
-          'Page-Offset' => '0'
-        }
+      def self.request_config(prison, staff_id: nil)
+        [
+          "/staff/roles/#{prison}/role/POM",
+          {
+            queryparams: { staffId: staff_id }.compact_blank,
+            extra_headers: { 'Page-Limit' => '100', 'Page-Offset' => '0' }
+          }
+        ]
       end
     end
   end

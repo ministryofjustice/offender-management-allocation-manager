@@ -58,6 +58,7 @@ RSpec.describe NomisUserRolesService do
 
     before do
       allow(HmppsApi::NomisUserRolesApi).to receive(:set_staff_role)
+      allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:expire_list_cache)
       allow(prison.pom_details).to receive(:create!)
     end
 
@@ -67,6 +68,10 @@ RSpec.describe NomisUserRolesService do
       expect(HmppsApi::NomisUserRolesApi).to have_received(:set_staff_role).with(
         prison.code, nomis_staff_id, config
       )
+
+      expect(
+        HmppsApi::PrisonApi::PrisonOffenderManagerApi
+      ).to have_received(:expire_list_cache).with(prison.code)
 
       expect(prison.pom_details).to have_received(:create!).with(
         nomis_staff_id: nomis_staff_id,
@@ -84,6 +89,7 @@ RSpec.describe NomisUserRolesService do
       allow(AllocationHistory).to receive(:deallocate_secondary_pom)
 
       allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:list).and_return(pom_list)
+      allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:expire_list_cache)
       allow(HmppsApi::NomisUserRolesApi).to receive(:expire_staff_role)
     end
 
@@ -104,6 +110,10 @@ RSpec.describe NomisUserRolesService do
       described_class.remove_pom(prison, nomis_staff_id)
 
       expect(HmppsApi::NomisUserRolesApi).to have_received(:expire_staff_role).with(pom)
+
+      expect(
+        HmppsApi::PrisonApi::PrisonOffenderManagerApi
+      ).to have_received(:expire_list_cache).with(prison.code)
     end
 
     context 'when POM is not found' do
@@ -113,6 +123,7 @@ RSpec.describe NomisUserRolesService do
         described_class.remove_pom(prison, nomis_staff_id)
 
         expect(HmppsApi::NomisUserRolesApi).not_to have_received(:expire_staff_role)
+        expect(HmppsApi::PrisonApi::PrisonOffenderManagerApi).not_to have_received(:expire_list_cache)
       end
     end
   end

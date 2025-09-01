@@ -77,6 +77,11 @@ module HmppsApi
       )
     end
 
+    def expire_cache_key(method, route, queryparams: {}, extra_headers: {}, body: nil)
+      key = cache_key(method, route, queryparams:, extra_headers:, body:)
+      Rails.cache.delete(key)
+    end
+
   private
 
     def request(method, route, queryparams: {}, extra_headers: {}, body: nil, cache: false)

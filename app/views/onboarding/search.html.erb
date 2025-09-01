@@ -15,7 +15,7 @@
 
 <% content_for :title, "#{page_title} – Digital Prison Services" %>
 
-<%= link_to 'Back', prison_poms_path,
+<%= link_to 'Back', params[:from] == 'home' ? root_path : prison_poms_path,
             class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
 
 <div class="govuk-grid-row">
@@ -23,6 +23,8 @@
     <div class="moj-search govuk-!-margin-bottom-8">
       <%= form_for(@onboarding_form, url: search_prison_onboarding_index_path, method: :post,
                    builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+
+        <%= hidden_field_tag :from, params[:from] %>
 
         <%= f.govuk_text_field :search_query, type: :search, class: 'moj-search__input',
                                autocomplete: 'off', autocorrect: 'off',
