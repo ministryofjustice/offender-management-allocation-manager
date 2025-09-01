@@ -2,6 +2,10 @@
   <div class="card card--clickable">
     <h3 class="govuk-heading-m card__heading">
       <%= link_to title, link, class: %w[govuk-link govuk-link--no-visited-state card__link] %>
+
+      <% if defined?(new_badge) && !!new_badge %>
+        <span class="moj-badge moj-badge--red govuk-!-margin-left-1">New</span>
+      <% end %>
     </h3>
     <p class="govuk-body card__description"><%= content %></p>
   </div>
