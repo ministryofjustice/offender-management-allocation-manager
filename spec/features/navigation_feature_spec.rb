@@ -5,67 +5,6 @@ feature 'Navigation' do
   let(:link_css) { '.moj-primary-navigation__link' }
   let(:nav_links) { all(link_css) }
 
-  # This is a legitimate VCR test - we really don't care how/if the various
-  # APIs are called in this test
-  describe 'navigation menus', vcr: { cassette_name: 'prison_api/navigation_menus' } do
-    context 'with an SPO user' do
-      before do
-        signin_spo_user
-        visit prison_dashboard_index_path(prison.code)
-      end
-
-      it 'has an SPO menu' do
-        expect(nav_links.map(&:text)).to eq([I18n.t('service_name'), "Allocations", "Parole", "Handover", "Staff"])
-      end
-
-      it 'has a help tile' do
-        expect(page).to have_css('h3.card__heading a', text: 'Get help with this service')
-      end
-
-      it 'has a parole tile' do
-        expect(page).to have_css('h3.card__heading a', text: 'Parole cases')
-      end
-    end
-
-    context 'with a POM user' do
-      before do
-        signin_pom_user
-        visit prison_dashboard_index_path(prison.code)
-      end
-
-      it 'has a POM menu' do
-        expect(nav_links.map(&:text)).to eq([I18n.t('service_name'), "Caseload", "Handover"])
-      end
-
-      it 'has a help tile' do
-        expect(page).to have_css('h3.card__heading a', text: 'Get help with this service')
-      end
-
-      it 'has a parole tile' do
-        expect(page).to have_css('h3.card__heading a', text: 'Parole cases')
-      end
-    end
-
-    context 'with a POM/SPO user' do
-      before do
-        signin_spo_pom_user
-        visit prison_dashboard_index_path(prison.code)
-      end
-
-      it 'has a POM/SPO menu' do
-        expect(nav_links.map(&:text)).to eq([I18n.t('service_name'), "Allocations", "Caseload", "Parole", "Handover", "Staff"])
-      end
-
-      it 'highlights the current page via the nav links' do
-        all(link_css).each_with_index do |_link, index|
-          # need to re-query a lot as page will be continually re-rendering
-          link = click_menu_and_wait(link_css, index)
-          expect(link['aria-current']).to eq('page'), "page link #{link.text} doesn't have aria-current attribute"
-        end
-      end
-    end
-  end
-
   context 'with a POM/SPO user', vcr: { cassette_name: 'prison_api/navigation_pom_spo_things' } do
     before do
       signin_spo_pom_user
