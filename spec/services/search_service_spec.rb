@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe SearchService do
-  let(:offenders) {
+  let(:offenders) do
     [
       ["Bob", "Jones", "ABC123"],
       ["Jade", "Smith", "ABC456"],
@@ -13,7 +13,7 @@ describe SearchService do
     ].map do |(first_name, last_name, offender_no)|
       double(first_name:, last_name:, offender_no:)
     end
-  }
+  end
 
   def results_for(term) = described_class.search_for_offenders(term, offenders).map(&:offender_no)
 
