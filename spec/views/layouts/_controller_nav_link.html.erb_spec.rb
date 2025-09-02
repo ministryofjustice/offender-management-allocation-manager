@@ -38,7 +38,7 @@ describe 'layouts/_controller_nav_link' do
 
     let(:controllers) { { test: [], another: [] } }
 
-    it 'sets aria current page to true' do
+    it 'leaves aria current page unset' do
       render('layouts/controller_nav_link', path:, text:, controllers:)
       expect(resulting_link.attr('aria-current')).to be_nil
     end
@@ -66,7 +66,7 @@ describe 'layouts/_controller_nav_link' do
 
     let(:controllers) { { test: [:index], another: [] } }
 
-    it 'sets aria current page to true' do
+    it 'leaves aria current page unset' do
       render('layouts/controller_nav_link', path:, text:, controllers:)
       expect(resulting_link.attr('aria-current')).to be_nil
     end
