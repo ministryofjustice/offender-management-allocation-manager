@@ -42,4 +42,3 @@ def ldu_and_tiers(prisons_range, show_header: true)
     nil
   end
 end
-
