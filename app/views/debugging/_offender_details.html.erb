@@ -66,7 +66,6 @@
         <dd class="govuk-summary-list__value">
           <% if oasys_assessment.nil? %>
             No OASys information
-            <% %>
           <% elsif oasys_assessment.fetch(:assessment_type) == Faraday::ConflictError %>
             This prisoner has more than one OASys record linked to their prison number. Merge these records or delete
             one so we can display their OASys information.
