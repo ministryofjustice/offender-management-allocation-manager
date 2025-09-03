@@ -40,7 +40,8 @@ RSpec.describe MpcOffender, type: :model do
   end
 
   describe '#additional_information' do
-    let(:api_offender) { double(:nomis_offender, recalled?: recalled) }
+    let(:api_offender) { double(:nomis_offender, offender_no: 'A0000BC', recalled?: recalled) }
+    let(:prison_periods) { nil }
     let(:recalled) { false }
 
     let(:prison_timeline) do
@@ -49,6 +50,24 @@ RSpec.describe MpcOffender, type: :model do
 
     before do
       allow(subject).to receive(:prison_timeline).and_return(prison_timeline)
+    end
+
+    context 'when case was previously allocated to another POM' do
+      let(:another_version) { AllocationHistory.new(primary_pom_name: 'Another POM') }
+      let(:previous_version) { AllocationHistory.new(primary_pom_name: 'DOE, JANE') }
+      let(:allocation) { AllocationHistory.new }
+
+      before do
+        # rubocop:disable RSpec/MessageChain
+        allow(AllocationHistory).to receive_message_chain(:inactive, :at_prison).and_return(double(find_by: allocation))
+        # rubocop:enable RSpec/MessageChain
+
+        allow(allocation).to receive(:get_old_versions).and_return([another_version, previous_version])
+      end
+
+      it 'returns the previous POM name' do
+        expect(subject.additional_information).to eq(["Previously allocated to Jane Doe"])
+      end
     end
 
     context 'when prison_timeline returns nil (e.g. when API returns 500)' do

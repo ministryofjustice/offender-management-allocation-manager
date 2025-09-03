@@ -18,7 +18,7 @@ RSpec.describe AllocatedOffender do
     subject { described_class.new(staff_id, allocation, offender) }
 
     let(:staff_id) { 123 }
-    let(:allocation) { instance_double(AllocationHistory, primary_pom_name:) }
+    let(:allocation) { AllocationHistory.new(primary_pom_name:) }
     let(:offender) { instance_double(Offender) }
 
     let(:primary_pom_name) { 'DOE, JOHN' }

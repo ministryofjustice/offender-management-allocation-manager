@@ -337,6 +337,11 @@ class MpcOffender
   end
 
   def additional_information
+    # Check if this was a case previously allocated to another POM
+    allocation = AllocationHistory.inactive.at_prison(prison).find_by(nomis_offender_id:)
+    previous_pom_name = allocation&.previously_allocated_primary_pom_name
+    return ["Previously allocated to #{previous_pom_name}"] if previous_pom_name
+
     return [] if prison_timeline.nil?
 
     attended_prisons = prison_timeline['prisonPeriod'].map { |p| p['prisons'] }.flatten
