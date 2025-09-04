@@ -288,6 +288,10 @@ feature 'POM onboarding' do
         expect(page).to have_text('POM added')
         expect(page).to have_text('John Doe added as a probation POM')
         expect(page).to have_text('You can now allocate cases to probation POM John Doe.')
+
+        # feedback callout
+        expect(page).to have_text('Help us improve')
+        expect(page).to have_text(SERVICE_EMAIL_ADDRESS)
       end
     end
   end
