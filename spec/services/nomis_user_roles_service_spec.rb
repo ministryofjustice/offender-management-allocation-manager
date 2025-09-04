@@ -82,6 +82,8 @@ RSpec.describe NomisUserRolesService do
   end
 
   describe '.remove_pom' do
+    let(:event_trigger) { AllocationHistory::INACTIVE_POM }
+
     before do
       allow(prison.pom_details).to receive(:destroy_by)
 
@@ -96,8 +98,12 @@ RSpec.describe NomisUserRolesService do
     it 'deallocates both primary and secondary POMs' do
       described_class.remove_pom(prison, nomis_staff_id)
 
-      expect(AllocationHistory).to have_received(:deallocate_primary_pom).with(nomis_staff_id, prison.code)
-      expect(AllocationHistory).to have_received(:deallocate_secondary_pom).with(nomis_staff_id, prison.code)
+      expect(AllocationHistory).to have_received(:deallocate_primary_pom).with(
+        nomis_staff_id, prison.code, event_trigger:
+      )
+      expect(AllocationHistory).to have_received(:deallocate_secondary_pom).with(
+        nomis_staff_id, prison.code, event_trigger:
+      )
     end
 
     it 'removes the POM details' do

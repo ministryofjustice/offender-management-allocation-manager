@@ -10,9 +10,7 @@ module SortableAllocation
   # 'Doe, John' -> 'John Doe'
   # 'JOHN DOE'  -> 'John Doe'
   def formatted_pom_name
-    return unless allocation
-
-    allocation.primary_pom_name.split(',').reverse.map(&:strip).join(' ').titleize
+    allocation&.formatted_primary_pom_name
   end
 
   def allocated_pom_role

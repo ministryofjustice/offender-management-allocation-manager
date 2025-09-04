@@ -48,8 +48,12 @@ class PomsController < PrisonStaffApplicationController
 
     if pom_detail.save
       if pom_detail.status == 'inactive'
-        AllocationHistory.deallocate_primary_pom(nomis_staff_id, active_prison_id)
-        AllocationHistory.deallocate_secondary_pom(nomis_staff_id, active_prison_id)
+        AllocationHistory.deallocate_primary_pom(
+          nomis_staff_id, active_prison_id, event_trigger: AllocationHistory::INACTIVE_POM
+        )
+        AllocationHistory.deallocate_secondary_pom(
+          nomis_staff_id, active_prison_id, event_trigger: AllocationHistory::INACTIVE_POM
+        )
       end
       redirect_to prison_pom_path(active_prison_id, id: nomis_staff_id),
                   notice: "Profile updated for #{helpers.full_name_ordered(@pom)}"
