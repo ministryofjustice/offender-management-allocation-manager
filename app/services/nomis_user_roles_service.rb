@@ -43,8 +43,12 @@ class NomisUserRolesService
   # @param [Prison] prison
   # @param [Integer] nomis_staff_id
   def self.remove_pom(prison, nomis_staff_id)
-    AllocationHistory.deallocate_primary_pom(nomis_staff_id, prison.code)
-    AllocationHistory.deallocate_secondary_pom(nomis_staff_id, prison.code)
+    AllocationHistory.deallocate_primary_pom(
+      nomis_staff_id, prison.code, event_trigger: AllocationHistory::INACTIVE_POM
+    )
+    AllocationHistory.deallocate_secondary_pom(
+      nomis_staff_id, prison.code, event_trigger: AllocationHistory::INACTIVE_POM
+    )
 
     prison.pom_details.destroy_by(nomis_staff_id:)
 
@@ -59,5 +63,7 @@ class NomisUserRolesService
       # list endpoint until any previous cached request expires (which could take 1h)
       HmppsApi::PrisonApi::PrisonOffenderManagerApi.expire_list_cache(prison.code)
     end
+
+    true
   end
 end

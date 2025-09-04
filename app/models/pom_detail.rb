@@ -20,6 +20,10 @@ class PomDetail < ApplicationRecord
     end
   end
 
+  def has_allocations?
+    allocations.any?
+  end
+
   # 37.5 -> 1.0, 33.75 -> 0.9, etc.
   # If for any reason hours are greater than 37.5 we convert to 1.0 (full-time)
   def hours_per_week=(hours)

@@ -20,6 +20,7 @@ class AllocationHistory < ApplicationRecord
   OFFENDER_RELEASED = 2
   MANUAL_CHANGE = 3
   LEGAL_STATUS_CHANGED = 4
+  INACTIVE_POM = 5
 
   # IMPORTANT:
   # Dirty changes are reset every time the model saves, not just when a transaction is closed.
@@ -47,9 +48,11 @@ class AllocationHistory < ApplicationRecord
     offender_released: OFFENDER_RELEASED,
     manual_change: MANUAL_CHANGE,
     legal_status_changed: LEGAL_STATUS_CHANGED,
+    inactive_pom: INACTIVE_POM,
   }
 
   scope :active, -> { where.not(primary_pom_nomis_id: nil) }
+  scope :inactive, -> { active.invert_where }
 
   scope :at_prison, ->(prison) { where(prison:) }
 
@@ -60,9 +63,11 @@ class AllocationHistory < ApplicationRecord
   scope :active_allocations_for_prison, ->(prison) { active.at_prison(prison) }
 
   scope :for_pom, lambda { |nomis_staff_id|
-    where(primary_pom_nomis_id: nomis_staff_id)
-      .or(where(secondary_pom_nomis_id: nomis_staff_id))
+    for_primary_pom(nomis_staff_id)
+      .or(for_secondary_pom(nomis_staff_id))
   }
+  scope :for_primary_pom, ->(nomis_staff_id) { where(primary_pom_nomis_id: nomis_staff_id) }
+  scope :for_secondary_pom, ->(nomis_staff_id) { where(secondary_pom_nomis_id: nomis_staff_id) }
 
   validates :allocated_at_tier,
             :event,
@@ -102,13 +107,26 @@ class AllocationHistory < ApplicationRecord
     get_old_versions.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
   end
 
+  # Versions are sorted oldest to newest, thus the reverse
+  def previously_allocated_primary_pom_name
+    get_old_versions.reverse.detect(&:primary_pom_name)&.formatted_primary_pom_name
+  end
+
+  # 'Doe, John' -> 'John Doe'
+  # 'JOHN DOE'  -> 'John Doe'
+  def formatted_primary_pom_name
+    return unless primary_pom_name
+
+    primary_pom_name.split(',').reverse.map(&:squish).join(' ').titleize
+  end
+
   # NOTE: this creates an allocation where the co-working POM is set, but the primary
   # one is not. It should still show up in the 'waiting to allocate' bucket.
   # This appears to be safe as allocations only show up for viewing if they have
   # a non-nil primary_pom_nomis_id
-  def self.deallocate_primary_pom(nomis_staff_id, prison)
-    active_pom_allocations(nomis_staff_id, prison).each do |alloc|
-      alloc.deallocate_primary_pom(event_trigger: USER)
+  def self.deallocate_primary_pom(nomis_staff_id, prison, event_trigger: USER)
+    active_allocations_for_prison(prison).for_primary_pom(nomis_staff_id).each do |alloc|
+      alloc.deallocate_primary_pom(event_trigger:)
     end
   end
 
@@ -122,9 +140,9 @@ class AllocationHistory < ApplicationRecord
     save!
   end
 
-  def self.deallocate_secondary_pom(nomis_staff_id, prison)
-    active_pom_allocations(nomis_staff_id, prison).each do |alloc|
-      alloc.deallocate_secondary_pom(event_trigger: USER)
+  def self.deallocate_secondary_pom(nomis_staff_id, prison, event_trigger: USER)
+    active_allocations_for_prison(prison).for_secondary_pom(nomis_staff_id).each do |alloc|
+      alloc.deallocate_secondary_pom(event_trigger:)
     end
   end
 

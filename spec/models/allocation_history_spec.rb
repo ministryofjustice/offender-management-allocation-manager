@@ -104,7 +104,7 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
     end
 
     describe 'when a POM is inactive' do
-      let!(:another_allocaton) do
+      let!(:another_allocation) do
         create(
           :allocation_history,
           prison: allocation.prison,
@@ -115,7 +115,7 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
         )
       end
 
-      it 'removes them as the primary pom\'s from all allocations' do
+      it 'removes them as the primary pom from all allocations' do
         described_class.deallocate_primary_pom(nomis_staff_id, allocation.prison)
 
         deallocation = described_class.find_by!(nomis_offender_id: nomis_offender_id)
@@ -134,6 +134,92 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
 
         expect(deallocation.secondary_pom_nomis_id).to be_nil
         expect(deallocation.secondary_pom_name).to be_nil
+      end
+    end
+
+    describe 'deallocations of primary and secondary POMs' do
+      let!(:allocation1) do
+        create(:allocation_history,
+               prison: prison.code,
+               nomis_offender_id: 'A1234A',
+               primary_pom_nomis_id: 111,
+               secondary_pom_nomis_id: 222)
+      end
+
+      let!(:allocation2) do
+        create(:allocation_history,
+               prison: prison.code,
+               nomis_offender_id: 'A1234B',
+               primary_pom_nomis_id: 333,
+               secondary_pom_nomis_id: 444)
+      end
+
+      let!(:allocation3) do
+        create(:allocation_history,
+               prison: prison.code,
+               nomis_offender_id: 'A1234C',
+               primary_pom_nomis_id: 222,
+               secondary_pom_nomis_id: 555)
+      end
+
+      context 'when deallocating primary POMs' do
+        it 'only deallocates records where the POM is primary' do
+          described_class.deallocate_primary_pom(111, prison)
+
+          allocation1.reload
+          allocation3.reload
+
+          # Should deallocate A from allocation1
+          expect(allocation1.primary_pom_nomis_id).to be_nil
+          # Should NOT affect B in allocation3
+          expect(allocation3.primary_pom_nomis_id).to eq(222)
+        end
+
+        it 'does not affect records where the POM is secondary' do
+          described_class.deallocate_primary_pom(222, prison)
+
+          allocation1.reload
+          allocation3.reload
+
+          # Should NOT affect A in allocation1
+          expect(allocation1.primary_pom_nomis_id).to eq(111)
+          # Should deallocate B from allocation3
+          expect(allocation3.primary_pom_nomis_id).to be_nil
+        end
+      end
+
+      context 'when deallocating secondary POMs' do
+        it 'only deallocates records where the POM is secondary' do
+          described_class.deallocate_secondary_pom(222, prison)
+
+          allocation1.reload
+          allocation3.reload
+
+          # Should deallocate B from allocation1
+          expect(allocation1.secondary_pom_nomis_id).to be_nil
+          # Should NOT affect E in allocation3
+          expect(allocation3.secondary_pom_nomis_id).to eq(555)
+        end
+
+        it 'does not affect records where the POM is primary' do
+          described_class.deallocate_secondary_pom(222, prison)
+
+          allocation3.reload
+
+          # Should NOT affect B as primary in allocation3
+          expect(allocation3.primary_pom_nomis_id).to eq(222)
+        end
+
+        it 'correctly deallocates when POM is only secondary' do
+          described_class.deallocate_secondary_pom(555, prison)
+
+          allocation3.reload
+
+          # Should deallocate E from allocation3
+          expect(allocation3.secondary_pom_nomis_id).to be_nil
+          # Should NOT affect B as primary in allocation3
+          expect(allocation3.primary_pom_nomis_id).to eq(222)
+        end
       end
     end
 
@@ -325,6 +411,37 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
 
         expect(staff_ids.count).to eq(1)
         expect(staff_ids.first).to eq(previous_primary_pom_nomis_id)
+      end
+    end
+
+    describe '#previously_allocated_primary_pom_name' do
+      it 'returns the formatted name of the previous primary POM if available' do
+        nomis_offender_id = 'GHF5678'
+        previous_primary_pom_nomis_id = 345_567
+        previous_primary_pom_name = 'DOE, JOHN'
+        updated_primary_pom_nomis_id = 485_926
+        updated_primary_pom_name = 'SMITH, JANE'
+
+        allocation = create(
+          :allocation_history,
+          prison: build(:prison).code,
+          nomis_offender_id: nomis_offender_id,
+          primary_pom_nomis_id: previous_primary_pom_nomis_id,
+          primary_pom_name: previous_primary_pom_name
+        )
+
+        allocation.update!(
+          primary_pom_nomis_id: updated_primary_pom_nomis_id,
+          primary_pom_name: updated_primary_pom_name,
+          event: AllocationHistory::REALLOCATE_PRIMARY_POM
+        )
+
+        expect(allocation.previously_allocated_primary_pom_name).to eq('John Doe')
+      end
+
+      it 'returns nil if there is no previous primary POM name' do
+        allocation = create(:allocation_history, prison: build(:prison).code)
+        expect(allocation.previously_allocated_primary_pom_name).to be_nil
       end
     end
   end
