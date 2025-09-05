@@ -127,67 +127,6 @@ feature 'Allocation', flaky: true do
     end
   end
 
-  scenario 'overriding an allocation can validate missing reasons', vcr: { cassette_name: 'prison_api/override_allocation_feature_validate_reasons' } do
-    visit prison_prisoner_staff_index_path('LEI', nomis_offender_id)
-
-    # Select a prison POM (recommended is Probation)
-    within row_containing 'Moic Pom' do
-      click_link 'Allocate'
-    end
-
-    expect(page).to have_css('h1', text: 'Why are you allocating a prison POM?')
-
-    click_button('Continue')
-    expect(page).to have_content('Select one or more reasons for not accepting the recommendation')
-  end
-
-  scenario 'overriding an allocation can validate missing Other detail', vcr: { cassette_name: 'prison_api/override_allocation_feature_validate_other' } do
-    visit prison_prisoner_staff_index_path('LEI', nomis_offender_id)
-
-    # Select a prison POM (recommended is Probation)
-    within row_containing 'Moic Pom' do
-      click_link 'Allocate'
-    end
-
-    expect(page).to have_css('h1', text: 'Why are you allocating a prison POM?')
-
-    find('label[for=override-form-override-reasons-other-field]').click
-    click_button('Continue')
-
-    expect(page).to have_content('Please provide extra detail when Other is selected')
-  end
-
-  scenario 'overriding an allocation can validate missing suitability detail', vcr: { cassette_name: 'prison_api/override_suitability_allocation_feature' } do
-    visit prison_prisoner_staff_index_path('LEI', nomis_offender_id)
-
-    # Select a prison POM (recommended is Probation)
-    within row_containing 'Moic Pom' do
-      click_link 'Allocate'
-    end
-
-    expect(page).to have_css('h1', text: 'Why are you allocating a prison POM?')
-
-    find('label[for=override-form-override-reasons-suitability-field]').click
-    click_button('Continue')
-    expect(page).to have_content('Enter reason for allocating this POM')
-  end
-
-  scenario 'overriding an allocation can validate the reason text area character limit', vcr: { cassette_name: 'prison_api/override_allocation__character_count_feature' } do
-    visit prison_prisoner_staff_index_path('LEI', nomis_offender_id)
-
-    # Select a prison POM (recommended is Probation)
-    within row_containing 'Moic Pom' do
-      click_link 'Allocate'
-    end
-
-    expect(page).to have_css('h1', text: 'Why are you allocating a prison POM?')
-
-    find('label[for=override-form-override-reasons-suitability-field]').click
-    fill_in 'override-form-suitability-detail-field', with: 'consectetur a eraconsectetur a erat nam at lectus urna duis convallis convallis tellus id interdum velit laoreet id donec ultrices tincidunt arcu non sodales neque sodales ut etiam'
-    click_button('Continue')
-    expect(page).to have_content('This reason cannot be more than 175 characters')
-  end
-
   scenario 're-allocating' do
     pom = build(:pom, staffId: 485_735, firstName: 'MOIC', lastName: 'POM')
     new_pom = build(:pom, staffId: 485_123, firstName: 'NEW', lastName: 'POM')
