@@ -168,14 +168,6 @@ Rails.application.routes.draw do
   match '/500', to: 'errors#internal_server_error', via: :all
   match '/503', to: 'errors#internal_server_error', via: :all
 
-  get '/help_step0', to: 'help#help_step0'
-  get '/help_step1', to: 'help#help_step1'
-  get '/help_step2', to: 'help#help_step2'
-  get '/help_step3', to: 'help#help_step3'
-  get '/help_step4', to: 'help#help_step4'
-  get '/help_step5', to: 'help#help_step5'
-  get '/help_step6', to: 'help#help_step6'
-
   get '/help/dashboard', to: 'help#dashboard'
   get '/help', to: redirect('/help/dashboard')
   get '/help/missing_cases', to: 'help#missing_cases'
