@@ -95,4 +95,12 @@ class AllocationService
       end
     end
   end
+
+  def self.previous_pom_name(prison, nomis_offender_id)
+    allocation = AllocationHistory.inactive.at_prison(prison).find_by(nomis_offender_id:)
+    return if allocation.nil?
+
+    # Versions are sorted oldest to newest, thus the reverse
+    allocation.get_old_versions.reverse.detect(&:primary_pom_name)&.formatted_primary_pom_name
+  end
 end

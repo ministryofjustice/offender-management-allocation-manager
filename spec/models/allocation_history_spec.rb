@@ -413,37 +413,6 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
         expect(staff_ids.first).to eq(previous_primary_pom_nomis_id)
       end
     end
-
-    describe '#previously_allocated_primary_pom_name' do
-      it 'returns the formatted name of the previous primary POM if available' do
-        nomis_offender_id = 'GHF5678'
-        previous_primary_pom_nomis_id = 345_567
-        previous_primary_pom_name = 'DOE, JOHN'
-        updated_primary_pom_nomis_id = 485_926
-        updated_primary_pom_name = 'SMITH, JANE'
-
-        allocation = create(
-          :allocation_history,
-          prison: build(:prison).code,
-          nomis_offender_id: nomis_offender_id,
-          primary_pom_nomis_id: previous_primary_pom_nomis_id,
-          primary_pom_name: previous_primary_pom_name
-        )
-
-        allocation.update!(
-          primary_pom_nomis_id: updated_primary_pom_nomis_id,
-          primary_pom_name: updated_primary_pom_name,
-          event: AllocationHistory::REALLOCATE_PRIMARY_POM
-        )
-
-        expect(allocation.previously_allocated_primary_pom_name).to eq('John Doe')
-      end
-
-      it 'returns nil if there is no previous primary POM name' do
-        allocation = create(:allocation_history, prison: build(:prison).code)
-        expect(allocation.previously_allocated_primary_pom_name).to be_nil
-      end
-    end
   end
 
   describe 'publishing a domain event', :push_pom_to_delius do

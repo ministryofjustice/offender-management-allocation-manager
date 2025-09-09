@@ -107,11 +107,6 @@ class AllocationHistory < ApplicationRecord
     get_old_versions.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
   end
 
-  # Versions are sorted oldest to newest, thus the reverse
-  def previously_allocated_primary_pom_name
-    get_old_versions.reverse.detect(&:primary_pom_name)&.formatted_primary_pom_name
-  end
-
   # 'Doe, John' -> 'John Doe'
   # 'JOHN DOE'  -> 'John Doe'
   def formatted_primary_pom_name
