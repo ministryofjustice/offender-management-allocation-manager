@@ -232,4 +232,38 @@ describe AllocationService do
       ])
     end
   end
+
+  describe '.previous_pom_name' do
+    let(:nomis_offender_id) { 'GHF5678' }
+    let(:previous_primary_pom_nomis_id) { 345_567 }
+    let(:previous_primary_pom_name) { 'DOE, JOHN' }
+
+    let!(:allocation) do
+      create(
+        :allocation_history,
+        prison: prison_code,
+        nomis_offender_id: nomis_offender_id,
+        primary_pom_nomis_id: previous_primary_pom_nomis_id,
+        primary_pom_name: previous_primary_pom_name
+      )
+    end
+
+    context 'when there is not a previous allocation' do
+      it 'returns nil' do
+        expect(
+          described_class.previous_pom_name(prison, nomis_offender_id)
+        ).to be_nil
+      end
+    end
+
+    context 'when there is a previous allocation' do
+      it 'returns the formatted name of the previous primary POM if available' do
+        allocation.deallocate_primary_pom
+
+        expect(
+          described_class.previous_pom_name(prison, nomis_offender_id)
+        ).to eq('John Doe')
+      end
+    end
+  end
 end
