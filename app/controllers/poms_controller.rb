@@ -3,7 +3,7 @@
 class PomsController < PrisonStaffApplicationController
   before_action :ensure_spo_user
 
-  before_action :load_pom_staff_member, only: [:show, :edit, :update]
+  before_action :load_pom_staff_member, only: [:show, :edit, :update, :destroy]
   before_action :store_referrer_in_session, only: [:edit]
   before_action :set_referrer
 
@@ -61,6 +61,12 @@ class PomsController < PrisonStaffApplicationController
       @errors = pom_detail.errors
       render :edit
     end
+  end
+
+  def destroy
+    NomisUserRolesService.remove_pom(@prison, nomis_staff_id)
+    redirect_to prison_poms_path(anchor: "#{params[:from]}!top"),
+                notice: "#{@pom.full_name_or_staff_id} removed. Their cases have been moved to @unallocated_link@."
   end
 
 private

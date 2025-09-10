@@ -20,19 +20,23 @@ class StaffMember
   end
   alias_method :full_name, :full_name_ordered
 
+  # In the rare scenario where a NOMIS account might have been deleted
+  # For now it is only used in the "limbo" cases functionality
+  def full_name_or_staff_id
+    full_name_ordered.presence || staff_id
+  end
+
   def first_name
-    staff_detail.first_name&.titleize
+    staff_detail&.first_name&.titleize
   end
 
   def last_name
-    staff_detail.last_name&.titleize
+    staff_detail&.last_name&.titleize
   end
 
-  # rubocop:disable Rails/Delegate
   def email_address
-    staff_detail.email_address
+    staff_detail&.email_address
   end
-  # rubocop:enable Rails/Delegate
 
   def has_pom_role?
     pom.present?
@@ -96,6 +100,10 @@ class StaffMember
     allocations.count
   end
 
+  def last_allocated_date
+    allocations.filter_map(&:primary_pom_allocated_at).max&.to_date
+  end
+
 private
 
   def pom
@@ -112,7 +120,11 @@ private
     prison.pom_details.find_by(nomis_staff_id: staff_id) || prison.pom_details.create!(working_pattern: 0.0, status: 'active', nomis_staff_id: staff_id)
   end
 
+  # This may raise a 404 for no longer existing NOMIS accounts (should be rare).
+  # It is ok to rescue because we will deal with `nil` staff details accordingly.
+  # rubocop:disable Style/RescueModifier
   def staff_detail
-    @staff_detail ||= HmppsApi::NomisUserRolesApi.staff_details(staff_id)
+    @staff_detail ||= HmppsApi::NomisUserRolesApi.staff_details(staff_id) rescue nil
   end
+  # rubocop:enable Style/RescueModifier
 end
