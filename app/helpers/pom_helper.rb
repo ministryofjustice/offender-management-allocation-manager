@@ -67,4 +67,8 @@ module PomHelper
   def inactive_poms(poms)
     poms.reject { |pom| %w[active unavailable].include? pom.status }
   end
+
+  def removed_poms(poms, prison)
+    @removed_poms ||= prison.get_removed_poms(existing_poms: poms)
+  end
 end

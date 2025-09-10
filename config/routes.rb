@@ -142,7 +142,7 @@ Rails.application.routes.draw do
     resources :case_information, only: %i[new create edit update show], param: :prisoner_id, controller: 'case_information',
                                  path_names: { new: 'new/:prisoner_id' }
 
-    resources :poms, only: %i[index show edit update], param: :nomis_staff_id
+    resources :poms, only: %i[index show edit update destroy], param: :nomis_staff_id
     # routes to show the 2 tabs on PomsController#show
     get 'poms/:nomis_staff_id/tabs/:tab', to: 'poms#show', as: :show_pom_tab
 

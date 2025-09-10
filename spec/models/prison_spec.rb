@@ -218,4 +218,44 @@ RSpec.describe Prison do
       end
     end
   end
+
+  describe '#get_removed_poms' do
+    let(:prison) { create(:prison) }
+
+    let(:pom1) { build(:pom) }
+    let(:pom2) { build(:pom) }
+    let(:existing_poms) { [pom1] }
+    let(:offender_no) { 'T0000A' }
+
+    let!(:pom_detail1) { create(:pom_detail, prison: prison, nomis_staff_id: pom1.staff_id) }
+    let!(:pom_detail2) { create(:pom_detail, prison: prison, nomis_staff_id: pom2.staff_id) }
+
+    before do
+      allow(prison).to receive(:allocated).and_return([double(offender_no:)])
+    end
+
+    context 'when removed POM has allocations' do
+      before do
+        create(:allocation_history,
+               prison: prison.code,
+               primary_pom_nomis_id: pom2.staff_id,
+               nomis_offender_id: offender_no)
+      end
+
+      it 'returns removed POMs with allocations' do
+        removed = prison.get_removed_poms(existing_poms:)
+
+        expect(removed.size).to eq(1)
+        expect(removed.first).to be_a(StaffMember)
+        expect(removed.first.staff_id).to eq(pom2.staff_id)
+      end
+    end
+
+    context 'when removed POM has no allocations' do
+      it 'does not return POMs without allocations' do
+        removed = prison.get_removed_poms(existing_poms:)
+        expect(removed).to be_empty
+      end
+    end
+  end
 end

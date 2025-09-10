@@ -1,0 +1,31 @@
+<table class="govuk-table responsive">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header" scope="col">POM</th>
+      <th class="govuk-table__header" scope="col">Last case allocated</th>
+      <th class="govuk-table__header" scope="col">Total cases</th>
+      <th class="govuk-table__header" scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <% poms.each_with_index do |pom, i| %>
+      <tr class="govuk-table__row pom_row_<%= i %>">
+        <td aria-label="POM" class="govuk-table__cell">
+          <%= pom.full_name_or_staff_id %>
+        </td>
+        <td aria-label="Last case allocated" class="govuk-table__cell">
+          <%= I18n.l(pom.last_allocated_date, format: '%-d %B %Y', default: 'N/A') %>
+        </td>
+        <td aria-label="Total cases" class="govuk-table__cell govuk-!-font-weight-bold">
+          <%= pom.total_allocations_count %>
+        </td>
+        <td aria-label="Action" class="govuk-table__cell">
+          <%= form_for(:remove_pom, url: prison_pom_path(@prison.code, pom.staff_id), method: :delete) do |f| %>
+            <%= hidden_field_tag :from, :attention_needed %>
+            <%= f.button 'Remove POM', type: 'submit', class: 'app-button--link govuk-link govuk-!-font-size-19' %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
