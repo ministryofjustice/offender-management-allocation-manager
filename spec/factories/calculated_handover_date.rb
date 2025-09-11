@@ -20,6 +20,14 @@ FactoryBot.define do
       ].sample
     }
     
+    trait :pom do
+      responsibility { CalculatedHandoverDate::CUSTODY_ONLY }
+    end
+    
+    trait :com do
+      responsibility { CalculatedHandoverDate::COMMUNITY_RESPONSIBLE }
+    end
+    
     trait :upcoming_handover do
       before_handover
     end

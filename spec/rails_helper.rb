@@ -167,5 +167,7 @@ FactoryBot.define do
     "T#{number}A#{letter}"
   end
 end
+FactoryBot::SyntaxRunner.send(:include, ApiHelper)
+FactoryBot::SyntaxRunner.send(:delegate, :stub_request, to: WebMock)
 
 Shoryuken::Logging.logger = Rails.logger

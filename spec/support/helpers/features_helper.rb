@@ -1,12 +1,16 @@
 # frozen_string_literal: true
 
 module FeaturesHelper
-  def signin_spo_user(prisons = ['LEI'])
-    mock_sso_response('MOIC_POM', [SsoIdentity::SPO_ROLE], prisons)
+  def signin_spo_user(prisons = ['LEI'], pom = nil)
+    if pom
+      mock_sso_response('MOIC_POM', [SsoIdentity::SPO_ROLE], prisons, pom.staff_id)
+    else
+      mock_sso_response('MOIC_POM', [SsoIdentity::SPO_ROLE], prisons)
+    end
   end
 
   def stub_signin_spo(pom, prisons = ['LEI'])
-    signin_spo_user(prisons)
+    signin_spo_user(prisons, pom)
     stub_spo_user(pom)
   end
 

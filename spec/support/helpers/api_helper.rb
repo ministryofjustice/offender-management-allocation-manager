@@ -82,7 +82,7 @@ module ApiHelper
         })
       .to_return(body: poms.to_json)
     poms.each do |pom|
-      stub_pom(pom)
+      stub_filtered_pom(prison, pom)
     end
   end
 
@@ -193,6 +193,11 @@ module ApiHelper
       .to_return(body: { 'timeline': [] }.to_json)
   end
 
+  def stub_risk_and_needs(crn, response_body = '{"summary": {}}')
+    stub_request(:get, "https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk/risks/crn/#{crn}")
+      .to_return(status: 200, body: response_body, headers: {})
+  end
+
   def stub_multiple_offenders(offenders, bookings)
     stub_request(:post, "#{T3}/prisoners").to_return(
       body: offenders.to_json
@@ -221,14 +226,22 @@ module ApiHelper
       .to_return(body: [].to_json)
   end
 
-  def stub_keyworker(prison_code, offender_id, keyworker)
+  def stub_keyworker(prison_code, offender_id, keyworker = '{}')
     stub_request(:get, "#{KEYWORKER_API_HOST}/key-worker/#{prison_code}/offender/#{offender_id}")
       .to_return(body: keyworker.to_json)
   end
 
-  def stub_community_offender(_nomis_offender_id, _community_data)
+  # Stubs every CRN
+  def stub_community_offender(_nomis_offender_id = nil, _community_data = nil)
     stub_request(:get, Addressable::Template.new("#{MANAGE_POM_CASES_AND_DELIUS_HOST}/case-records/{crn}/risks/mappa"))
         .to_return(body: { "category" => 3, "level" => 1, "reviewDate" => "2021-04-27", "startDate" => "2021-01-27" }.to_json)
+  end
+
+  # Stubs a specific CRN only
+  def stub_specific_community_offender(crn = nil, community_data = nil)
+    community_data ||= { "category" => 3, "level" => 1, "reviewDate" => "2021-04-27", "startDate" => "2021-01-27" }
+    stub_request(:get, "#{MANAGE_POM_CASES_AND_DELIUS_HOST}/case-records/#{crn}/risks/mappa")
+        .to_return(body: community_data.to_json)
   end
 
   def stub_agencies(type)
