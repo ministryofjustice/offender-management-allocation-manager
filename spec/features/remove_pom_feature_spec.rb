@@ -81,7 +81,7 @@ feature "remove a POM no longer present in NOMIS" do
       end
 
       expect(page).to have_css('.moj-banner--success',
-                               text: 'John Doe removed. Their cases have been moved to the allocations list.')
+                               text: 'John Doe removed. If necessary, their cases have been moved to the allocations list.')
 
       expect(page).to have_link('the allocations list',
                                 href: unallocated_prison_prisoners_path(prison))
