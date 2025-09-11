@@ -85,4 +85,7 @@ FactoryBot.define do
       positionDescription { 'Prison Officer POM' }
     end
   end
+  
+  factory :homd, parent: :pom do
+  end
 end
