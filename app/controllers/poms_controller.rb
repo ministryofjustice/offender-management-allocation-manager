@@ -66,7 +66,7 @@ class PomsController < PrisonStaffApplicationController
   def destroy
     NomisUserRolesService.remove_pom(@prison, nomis_staff_id)
     redirect_to prison_poms_path(anchor: "#{params[:from]}!top"),
-                notice: "#{@pom.full_name_or_staff_id} removed. Their cases have been moved to @unallocated_link@."
+                notice: "#{@pom.full_name_or_staff_id} removed. If necessary, their cases have been moved to @unallocated_link@."
   end
 
 private
