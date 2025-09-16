@@ -345,7 +345,7 @@ class MpcOffender
     attended_prisons = prison_timeline['prisonPeriod'].map { |p| p['prisons'] }.flatten
 
     # Remove only ONE of any prison codes that match the current prison
-    previously_attended_prisons = (attended_prisons.reject { |p| p == prison.code }) +
+    previously_attended_prisons = attended_prisons.reject { |p| p == prison.code } +
       attended_prisons.select { |p| p == prison.code }.drop(1)
 
     [].tap do |output|
