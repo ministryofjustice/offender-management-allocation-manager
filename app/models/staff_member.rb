@@ -92,6 +92,10 @@ class StaffMember
     allocations.count(&:pom_responsible?)
   end
 
+  def primary_allocations_count
+    allocations.count(&:primary_pom?)
+  end
+
   def coworking_allocations_count
     allocations.count(&:coworking?)
   end

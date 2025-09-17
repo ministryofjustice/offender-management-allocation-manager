@@ -29,7 +29,7 @@ feature "remove a POM no longer present in NOMIS" do
     end
   end
 
-  context 'when there are POMs with cases in limbo' do
+  context 'when there are POMs with primary cases in limbo' do
     let(:removed_pom_staff_id) { 123_456 }
     let(:removed_pom) { build(:pom, staffId: removed_pom_staff_id, firstName: 'JOHN', lastName: 'DOE') }
     let(:offenders_in_prison) { build_list(:nomis_offender, 1, prisonId: prison.code) }
