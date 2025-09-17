@@ -223,28 +223,46 @@ RSpec.describe StaffMember, type: :model do
     end
   end
 
-  describe '#coworking_allocations_count' do
-    let(:coworking_allocations) do
+  describe '#primary_allocations_count' do
+    let(:allocations) do
       [
-        create(:allocation_history, primary_pom_nomis_id: other_staff_id, nomis_offender_id: 'G1234AB', prison: prison.code, secondary_pom_nomis_id: staff_id),
+        create(:allocation_history, primary_pom_nomis_id: staff_id, nomis_offender_id: 'G1234AB', prison: prison.code),
+        create(:allocation_history, primary_pom_nomis_id: staff_id, nomis_offender_id: 'G1234GG', prison: prison.code),
+        create(:allocation_history, primary_pom_nomis_id: other_staff_id, nomis_offender_id: 'G1234VV', prison: prison.code, secondary_pom_nomis_id: staff_id)
+      ]
+    end
+
+    before do
+      allocations
+    end
+
+    it 'returns the count of primary allocations' do
+      expect(user.primary_allocations_count).to eq(2)
+    end
+  end
+
+  describe '#coworking_allocations_count' do
+    let(:allocations) do
+      [
+        create(:allocation_history, primary_pom_nomis_id: staff_id, nomis_offender_id: 'G1234AB', prison: prison.code, secondary_pom_nomis_id: other_staff_id),
         create(:allocation_history, primary_pom_nomis_id: other_staff_id, nomis_offender_id: 'G1234GG', prison: prison.code, secondary_pom_nomis_id: staff_id)
       ]
     end
 
     before do
-      coworking_allocations
+      allocations
     end
 
     it 'returns the count of coworking allocations' do
-      expect(user.coworking_allocations_count).to eq(2)
+      expect(user.coworking_allocations_count).to eq(1)
     end
   end
 
   describe '#total_allocations_count' do
     let(:allocations) do
       [
-        create(:allocation_history, primary_pom_nomis_id: staff_id, nomis_offender_id: 'G1234AB', prison: prison.code),
-        create(:allocation_history, primary_pom_nomis_id: staff_id, nomis_offender_id: 'G1234GG', prison: prison.code)
+        create(:allocation_history, primary_pom_nomis_id: staff_id, nomis_offender_id: 'G1234AB', prison: prison.code, secondary_pom_nomis_id: other_staff_id),
+        create(:allocation_history, primary_pom_nomis_id: other_staff_id, nomis_offender_id: 'G1234GG', prison: prison.code, secondary_pom_nomis_id: staff_id)
       ]
     end
 

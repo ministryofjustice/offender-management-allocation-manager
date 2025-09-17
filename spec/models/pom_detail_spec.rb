@@ -38,4 +38,30 @@ RSpec.describe PomDetail, type: :model do
       expect(subject.hours_per_week).to eq(37.5)
     end
   end
+
+  describe '#has_primary_allocations?' do
+    let(:nomis_staff_id) { 1234 }
+    let(:pom_detail) { create(:pom_detail, nomis_staff_id:, prison:) }
+    let(:offender) { instance_double(MpcOffender, offender_no: 'A1234BC', active_allocation: allocation) }
+    let(:allocation) { instance_double(AllocationHistory, primary_pom_nomis_id: nomis_staff_id) }
+
+    before do
+      allow(prison).to receive(:allocated).and_return([offender])
+      allow(AllocationHistory).to receive(:active_pom_allocations).with(nomis_staff_id, prison.code).and_return(double(pluck: ['A1234BC']))
+    end
+
+    it 'returns true if there is a primary allocation for this POM' do
+      expect(pom_detail.has_primary_allocations?).to be true
+    end
+
+    it 'returns false if there are no primary allocations for this POM' do
+      allow(allocation).to receive(:primary_pom_nomis_id).and_return(9999)
+      expect(pom_detail.has_primary_allocations?).to be false
+    end
+
+    it 'returns false if there are no allocations' do
+      allow(AllocationHistory).to receive(:active_pom_allocations).with(nomis_staff_id, prison.code).and_return(double(pluck: []))
+      expect(pom_detail.has_primary_allocations?).to be false
+    end
+  end
 end

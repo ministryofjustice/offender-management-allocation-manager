@@ -17,7 +17,7 @@
           <%= I18n.l(pom.last_allocated_date, format: '%-d %B %Y', default: 'N/A') %>
         </td>
         <td aria-label="Total cases" class="govuk-table__cell govuk-!-font-weight-bold">
-          <%= pom.total_allocations_count %>
+          <%= pom.primary_allocations_count %>
         </td>
         <td aria-label="Action" class="govuk-table__cell">
           <%= form_for(:remove_pom, url: prison_pom_path(@prison.code, pom.staff_id), method: :delete) do |f| %>

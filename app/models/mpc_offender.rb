@@ -132,15 +132,6 @@ class MpcOffender
     end
   end
 
-  # TODO: doesn't seem to be used
-  def to_allocated_offender
-    if active_allocation
-      AllocatedOffender.new(active_allocation.primary_pom_nomis_id, active_allocation, self)
-    else
-      nil
-    end
-  end
-
   #
   # Early allocations
   #

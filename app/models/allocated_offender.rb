@@ -40,11 +40,15 @@ class AllocatedOffender
   end
 
   def pom_responsible?
-    @offender.pom_responsible? if @allocation.primary_pom_nomis_id == @staff_id
+    primary_pom? && @offender.pom_responsible?
   end
 
   def pom_supporting?
-    @offender.pom_supporting? if @allocation.primary_pom_nomis_id == @staff_id
+    primary_pom? && @offender.pom_supporting?
+  end
+
+  def primary_pom?
+    @allocation.primary_pom_nomis_id == @staff_id
   end
 
   def coworking?

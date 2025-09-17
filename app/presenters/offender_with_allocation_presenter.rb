@@ -10,8 +10,8 @@ class OffenderWithAllocationPresenter
            :next_parole_date, :next_parole_date_type,
            # used in the allocated page
            :last_name, :location, :restricted_patient?, :earliest_release, :earliest_release_date, :tier, :latest_temp_movement_date,
-           # needed in the caseload global page
-           :pom_responsible?, :pom_supporting?, :coworking?,
+           # needed in the caseload global page and limbo cases page
+           :pom_responsible?, :pom_supporting?, :primary_pom?, :coworking?,
            # needed for search
            :active_allocation, :probation_record, to: :@offender
 

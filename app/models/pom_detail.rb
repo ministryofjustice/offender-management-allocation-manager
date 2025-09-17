@@ -13,6 +13,7 @@ class PomDetail < ApplicationRecord
 
   belongs_to :prison, foreign_key: :prison_code, inverse_of: :pom_details
 
+  # @return [Array<MpcOffender>] Allocated offenders for this POM
   def allocations
     @allocations ||= begin
       allocations = AllocationHistory.active_pom_allocations(nomis_staff_id, prison_code).pluck(:nomis_offender_id)
@@ -20,8 +21,10 @@ class PomDetail < ApplicationRecord
     end
   end
 
-  def has_allocations?
-    allocations.any?
+  def has_primary_allocations?
+    allocations.filter_map(&:active_allocation).any? do |alloc|
+      alloc.primary_pom_nomis_id == nomis_staff_id
+    end
   end
 
   # 37.5 -> 1.0, 33.75 -> 0.9, etc.
