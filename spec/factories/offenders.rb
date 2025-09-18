@@ -49,12 +49,13 @@ FactoryBot.define do
 
     created {Date.new }
   end
-  
+
   factory :stubbed_offender, class: Hash do
     transient do
       nomis_id { generate :nomis_offender_id }
       first_name { Faker::Name.first_name }
       last_name { Faker::Name.last_name.titleize }
+      dob { Date.new(1990, 12, 6).to_s }
       prison_code { 'LEI' }
       tier { 'A' }
       crn { Faker::Alphanumeric.alpha(number: 10) }
@@ -62,29 +63,32 @@ FactoryBot.define do
       responsibility_overridden_to { nil } # :pom or :com
       allocated_to { nil } # pom Elite2POM
       allocated_at { nil } # prison code
+      sentence_type { nil }
     end
-    
+
     initialize_with do
       # DB record
-      create(:offender, :allocatable, :responsibility_overriden, 
-        id: nomis_id, 
-        tier:, 
+      create(:offender, :allocatable, :responsibility_overriden,
+        id: nomis_id,
+        tier:,
         crn:,
         responsibility_of: responsibility,
         responsibility_overridden_to:,
         allocated_to:,
-        allocated_at:,
+        allocated_at:
       )
-      
+
       # API response
-      build(:nomis_offender, 
-        prisonerNumber: nomis_id, 
-        firstName: first_name, 
+      build(:nomis_offender,
+        prisonerNumber: nomis_id,
+        firstName: first_name,
         lastName: last_name,
-        prisonId: prison_code
+        prisonId: prison_code,
+        dateOfBirth: dob,
+        sentence: (sentence_type ? attributes_for(:sentence_detail, sentence_type) : attributes_for(:sentence_detail))
       )
     end
-    
+
     after :build do |offender, evaluator|
       stub_risk_and_needs(evaluator.crn)
       stub_specific_community_offender(evaluator.crn)
@@ -94,7 +98,7 @@ FactoryBot.define do
 
   factory :offender do
     nomis_offender_id
-    
+
     trait :allocatable do
       transient do
         tier { 'A' }
@@ -102,32 +106,32 @@ FactoryBot.define do
         allocated_to { nil } # pom Elite2POM
         allocated_at { nil } # prison code
       end
-      
+
       after :create do |offender, evaluator|
         create(:case_information, offender:, tier: evaluator.tier, crn: evaluator.crn)
-        
+
         if evaluator.allocated_to && evaluator.allocated_at
-          create(:allocation_history, 
+          create(:allocation_history,
             offender:,
-            primary_pom_nomis_id: evaluator.allocated_to.staff_id, 
+            primary_pom_nomis_id: evaluator.allocated_to.staff_id,
             primary_pom_name: evaluator.allocated_to.full_name,
             prison: evaluator.allocated_at
           )
         end
       end
     end
-    
+
     trait :responsibility_overriden do
       transient do
         responsibility_of { nil }
         responsibility_overridden_to { nil }
       end
-      
+
       after :create do |offender, evaluator|
         if evaluator.responsibility_of
           create(:calculated_handover_date, evaluator.responsibility_of, offender:)
         end
-        
+
         if evaluator.responsibility_overridden_to
           create(:responsibility, evaluator.responsibility_overridden_to, offender:)
         end

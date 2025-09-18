@@ -128,5 +128,11 @@ FactoryBot.define do
       releaseDate { Time.zone.today + 3.years }
       conditionalReleaseDate { Time.zone.today + 3.years }
     end
+
+    # this is based on logic taken from a potentially out of date test, update if required
+    trait :outside_omic_policy do
+      releaseDate { 3.years.from_now }
+      sentenceStartDate { nil }
+    end
   end
 end

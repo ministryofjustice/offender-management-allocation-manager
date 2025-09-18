@@ -1,308 +1,155 @@
-require 'rails_helper'
+describe 'View a prisoner profile page' do
+  let(:prison) { create(:prison, code: 'LEI') }
 
-feature 'View a prisoner profile page', flaky: true do
+  let(:offender) { build(:stubbed_offender, nomis_id: 'G1234AB', first_name: 'Any', last_name: 'Case', dob: '1999-12-01') }
+
   before do
-    signin_spo_user([prison.code])
+    stub_signin_spo(build(:homd))
+    stub_offenders_for_prison(prison.code, [offender])
   end
 
-  let(:prison) { build(:prison, code: 'LEI') }
+  context 'with unallocated cases missing case information' do
+    before { CaseInformation.find_by(nomis_offender_id: 'G1234AB').destroy }
 
-  context 'without allocation or case information' do
-    it 'doesnt crash', vcr: { cassette_name: 'prison_api/show_unallocated_offender' } do
-      visit prison_prisoner_path(prison.code, 'G7266VD')
+    it 'shows basic details about the case' do
+      visit prison_prisoner_path(prison.code, 'G1234AB')
 
-      expect(page).to have_css('h1', text: 'Annole, Omistius')
-      expect(page).to have_content('26 Sep 1994')
-      cat_code = find('#category-code').text
-      expect(cat_code).to eq('Cat B')
-      expect(page).to have_css('#prisoner-case-type', text: 'Determinate')
+      expect(page).to have_content('Case, Any')
+      within('div', text: 'Date of birth', match: :first) { expect(page).to have_content('01 Dec 1999') }
+      within('div', text: 'Category', match: :first) { expect(page).to have_content('Cat C') }
     end
   end
 
-  context 'with an existing early allocation', vcr: { cassette_name: 'prison_api/early_allocation_banner' } do
-    before do
-      create(:case_information,
-             offender: build(:offender, nomis_offender_id: 'G7266VD',
-                                        early_allocations: [build(:early_allocation, created_within_referral_window: within_window)]))
-      visit prison_prisoner_path(prison.code, 'G7266VD')
-    end
+  context 'with an existing early allocation' do
+    before { create(:early_allocation, nomis_offender_id: 'G1234AB', created_within_referral_window: within_window) }
 
     context 'with an old early allocation' do
       let(:within_window) { false }
 
-      it 'shows a notification', :js do
-        expect(page).to have_text('Annole, Omistius might be eligible for early allocation to the community probation team')
+      it 'shows a notification' do
+        visit prison_prisoner_path(prison.code, 'G1234AB')
+        expect(page).to have_text('Case, Any might be eligible for early allocation to the community probation team')
       end
     end
 
     context 'with an new early allocation' do
       let(:within_window) { true }
 
-      it 'does not show a notification', :js do
+      it 'does not show a notification' do
+        visit prison_prisoner_path(prison.code, 'G1234AB')
         expect(page).not_to have_text('eligible for early allocation to the community probation team')
       end
     end
   end
 
-  context 'with an allocation', :allocation do
+  context 'when case is allocated' do
+    let(:pom) { build(:pom, staffId: 1234, firstName: 'A', lastName: 'Pom') }
+
     before do
-      create(:case_information, offender: build(:offender, nomis_offender_id: 'G7266VD', victim_liaison_officers: [build(:victim_liaison_officer)]))
-      create(:allocation_history, :co_working, prison: prison.code, nomis_offender_id: 'G7266VD', primary_pom_nomis_id: '485637', primary_pom_name: 'Pobno, Kath')
+      stub_poms(prison.code, [pom])
+      create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: 1234, primary_pom_name: 'A Pom', prison: prison.code)
+      local_delivery_unit = create(:local_delivery_unit, name: 'An LDU', email_address: 'test@example.com')
+      CaseInformation.find_by(nomis_offender_id: 'G1234AB').update(local_delivery_unit:, team_name: 'Team X', com_name: 'Bob Smith')
+      create(:victim_liaison_officer, nomis_offender_id: 'G1234AB', first_name: 'Vii', last_name: 'Ello')
     end
 
-    let(:allocation) { AllocationHistory.last }
-    let(:initial_vlo) { VictimLiaisonOfficer.last }
+    it 'shows basic details about the case' do
+      visit prison_prisoner_path(prison.code, 'G1234AB')
 
-    context 'without anything extra', vcr: { cassette_name: 'prison_api/show_offender_spec' }  do
-      before do
-        visit prison_prisoner_path(prison.code, 'G7266VD')
+      expect(page).to have_content('Case, Any')
+      within('div', text: 'Date of birth', match: :first) { expect(page).to have_content('01 Dec 1999') }
+      within('div', text: 'Category', match: :first) { expect(page).to have_content('Cat C') }
+      within('table', text: 'Prison allocation') { expect(page).to have_content('A Pom') }
+      expect(page).to have_content('POM role Responsible')
+      expect(page).to have_content('Local divisional unit (LDU) An LDU')
+      expect(page).to have_content('Local divisional unit (LDU) email address test@example.com')
+      expect(page).to have_content('Team Team X')
+      expect(page).to have_content('Community Offender Manager (COM) name Bob Smith')
+      within('table', text: 'Victim liaison officer (VLO)') do
+        expect(page).to have_content('Non-Disclosable')
+        expect(page).to have_content('Victim liaison officer name Vii Ello')
       end
 
-      scenario 'adding a VLO', :js do
-        expect(page).to have_content('First Contact')
-        click_link 'Add new VLO contact'
-        find('.govuk-back-link')
-        click_link 'Back'
-        click_link 'Add new VLO contact'
+      # Demonstrate POM roles changing when overridden
+      create(:responsibility, :com, nomis_offender_id: 'G1234AB')
+      visit prison_prisoner_path(prison.code, 'G1234AB')
 
-        fill_in 'First name', with: 'Jim'
-        # This fails as all fields not filled
-        click_button 'Submit'
-
-        # fill in missing fields and submit
-        fill_in 'Last name', with: 'Smith'
-        # email has leading and trailing whitespaces, that are removed before validation
-        fill_in 'Email address', with: ' jim.smith@hotmail.com '
-        click_button 'Submit'
-        find '.vlo-row-1' # wait for page to load
-        expect(page).to have_content('Smith, Jim')
-        expect(page).to have_content('Second Contact')
-
-        # As we had one already, ours is the second contact
-        within '.vlo-row-1' do
-          within '.change-email' do
-            click_link 'Change'
-          end
-        end
-        find('.govuk-back-link')
-        click_link 'Back'
-        find '.vlo-row-1' # wait for page to re-load
-        within '.vlo-row-1' do
-          within '.change-email' do
-            click_link 'Change'
-          end
-        end
-
-        # Blank out first name so it fails
-        fill_in 'First name', with: ''
-        click_button 'Submit'
-
-        # Change first name
-        fill_in 'First name', with: 'Mike'
-        click_button 'Submit'
-        expect(page).to have_content('Smith, Mike')
-
-        # delete the contact we added earlier
-        within '.vlo-row-1' do
-          click_link 'Delete Contact'
-        end
-        click_button 'Confirm'
-        # We should come back to the same page, but with our contact deleted
-        expect(page).to have_content(initial_vlo.full_name)
-        expect(page).not_to have_content('Smith, Mike')
-
-        # Let's go and check out the allocation history
-        click_link 'View'
-        expect(page).to have_content('Victim Liaison Officer contact removed')
-        expect(page).to have_content('by Pom, Moic')
-      end
-
-      it 'shows the prisoner information' do
-        expect(page).to have_css('h1', text: 'Annole, Omistius')
-        expect(page).to have_content('26 Sep 1994')
-        cat_code = find('#category-code').text
-        expect(cat_code).to eq('Cat B')
-      end
-
-      it 'shows the POM name (fetched from NOMIS)' do
-        # check the primary POM name stored in the allocation
-        expect(allocation.primary_pom_name).to eq('Pobno, Kath')
-
-        # ensure that the POM name displayed is the one actually returned from NOMIS
-        pom_name = find('#primary_pom_name').text
-        expect(pom_name).to eq('Pobee-Norris, Kath')
-      end
-
-      it 'shows the prisoner image', vcr: { cassette_name: 'prison_api/show_offender_spec_image' } do
-        visit prison_prisoner_image_path(prison.code, 'G7266VD', format: :jpg)
-        expect(page.response_headers['Content-Type']).to eq('image/jpg')
-      end
-
-      it "has a link to the allocation history", vcr: { cassette_name: 'prison_api/link_to_allocation_history' } do
-        visit prison_prisoner_path(prison.code, 'G7266VD')
-        click_link "View"
-        expect(page).to have_content('Prisoner allocated')
-      end
-
-      it 'displays the non-disclosable badge on the VLO table', vcr: { cassette_name: 'prison_api/vlo_non_disclosable_badge' } do
-        visit prison_prisoner_path(prison.code, 'G7266VD')
-        expect(page).to have_css('#non-disclosable-badge', text: 'Non-Disclosable')
-      end
+      expect(page).to have_content('POM role Supporting')
     end
 
-    context 'with an overridden reponsibility' do
-      before do
-        create(:responsibility, nomis_offender_id: 'G7266VD')
+    it 'can add and remove VLOs to the case' do
+      visit prison_prisoner_path(prison.code, 'G1234AB')
+
+      click_link 'Add new VLO contact'
+      fill_in 'First name', with: 'Jim'
+      # This fails as all fields not filled
+      click_button 'Save details'
+      # fill in missing fields and submit
+      fill_in 'Last name', with: 'Smith'
+      # email has leading and trailing whitespaces, that are removed before validation
+      fill_in 'Email address', with: ' jim.smith@hotmail.com '
+      click_button 'Save details'
+
+      within('table', text: 'Victim liaison officer (VLO)') do
+        expect(page).to have_content('Victim liaison officer name Vii Ello')
+        expect(page).to have_content('Victim liaison officer name Jim Smith')
       end
 
-      it 'shows an overridden responsibility', vcr: { cassette_name: 'prison_api/show_offender_with_override_spec' } do
-        visit prison_prisoner_path(prison.code, 'G7266VD')
-
-        expect(page).to have_content('Supporting')
+      # As we had one already, ours is the second contact
+      within '.vlo-row-1 tr', text: 'Email address jim.smith@hotmail.com' do
+        click_link 'Change'
       end
+
+      # Blank out first name so it fails
+      fill_in 'First name', with: ''
+      click_button 'Save details'
+      # Change first name
+      fill_in 'First name', with: 'Mike'
+      click_button 'Save details'
+
+      within('table', text: 'Victim liaison officer (VLO)') do
+        expect(page).to have_content('Victim liaison officer name Vii Ello')
+        expect(page).to have_content('Victim liaison officer name Mike Smith')
+      end
+
+      # delete the contact we added earlier
+      within '.vlo-row-1 tr', text: 'Second Contact' do
+        click_link 'Delete Contact'
+      end
+      choose 'Yes'
+      click_button 'Confirm'
+
+      within('table', text: 'Victim liaison officer (VLO)') do
+        expect(page).to have_content('Victim liaison officer name Vii Ello')
+        expect(page).not_to have_content('Victim liaison officer name Mike Smith')
+      end
+
+      stub_movements_for('G1234AB', [attributes_for(:movement)])
+
+      # Let's go and check out the allocation history
+      within('tr', text: 'Allocation history') { click_link 'View' }
+      within('.moj-timeline__item', text: 'Contact removed') { expect(page).to have_content('by Pom, Moic') }
     end
   end
 
-  describe 'community information' do
-    context 'with an email address' do
-      let(:ldu) { create(:local_delivery_unit, name: 'An LDU', email_address: 'test@example.com') }
-      let(:team_name) { 'A Nice team' }
+  context 'when case is outside omic policy' do
+    let(:offender) { build(:stubbed_offender, nomis_id: 'G1234AB', first_name: 'Any', last_name: 'Case', sentence_type: :outside_omic_policy) }
 
-      before do
-        create(:case_information,
-               offender: build(:offender, nomis_offender_id: 'G7266VD'),
-               local_delivery_unit: ldu,
-               team_name: team_name,
-               com_name: 'Bob Smith'
-              )
-      end
-
-      it "has community information", vcr: { cassette_name: 'prison_api/show_offender_community_info_full' } do
-        visit prison_prisoner_path(prison.code, 'G7266VD')
-
-        expect(page).to have_content(ldu.name)
-        expect(page).to have_content(ldu.email_address)
-        expect(page).to have_content(team_name)
-        expect(page).to have_content('Bob Smith')
-      end
-    end
-
-    context 'without email address or com name' do
-      before do
-        create(:case_information,
-               offender: build(:offender, nomis_offender_id: 'G7266VD'),
-              )
-
-        visit prison_prisoner_path(prison.code, 'G7266VD')
-      end
-
-      it "displays team and LDU as unknown", :js, vcr: { cassette_name: 'prison_api/show_offender_community_info_partial' } do
-        # Expect an Unknown for LDU Email and Team
-        within '#community_information' do
-          expect(page).to have_content('Unknown', count: 2)
-        end
-      end
+    it 'informs the user' do
+      visit prison_prisoner_path(prison.code, 'G1234AB')
+      expect(page).to have_content("Outside OMIC policy\nAny Case cannot be displayed because they don't fall under OMIC policy")
     end
   end
 
-  context 'when offender does not have a sentence start date',
-          vcr: { cassette_name: 'prison_api/no_sentence_start_date_for_offender' } do
-    let(:api_non_sentenced_offender) do
-      build(:hmpps_api_offender,
-            prisonId: prison.code,
-            prisonerNumber: 'G7266VD',
-            imprisonmentStatus: 'SEC90',
-            sentence: attributes_for(:sentence_detail,
-                                     releaseDate: 3.years.from_now.iso8601,
-                                     sentenceStartDate: nil))
-    end
-    let(:case_info) { create(:case_information, case_allocation: CaseInformation::NPS, offender: build(:offender, nomis_offender_id: 'G7998GJ')) }
-    let(:non_sentenced_offender) do
-      build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_non_sentenced_offender)
-    end
+  context 'when the case needs a COM allocating' do
+    let(:offender) { build(:stubbed_offender, nomis_id: 'G1234AB', responsibility: :com, first_name: 'Any', last_name: 'Case') }
 
-    before do
-      allow(OffenderService).to receive(:get_offender).and_return(non_sentenced_offender)
-    end
+    before { CaseInformation.find_by(nomis_offender_id: 'G1234AB').update(com_name: nil) }
 
-    it 'explains that the offender is not in the service' do
-      visit prison_prisoner_path(prison.code, 'G7998GJ')
-      expect(page).to have_css('h2', text: 'Outside OMIC policy')
-    end
-  end
-
-  context "when the offender needs a COM but one isn't allocated" do
-    let!(:case_info) do
-      create(:case_information,
-             offender: build(:offender, nomis_offender_id: nomis_offender_id),
-             local_delivery_unit: build(:local_delivery_unit)
-            )
-    end
-
-    let(:nomis_offender) do
-      build(:nomis_offender, prisonId: prison.code, sentence: attributes_for(:sentence_detail, :inside_handover_window))
-    end
-
-    let(:nomis_offender_id) { nomis_offender.fetch(:prisonerNumber) }
-    let!(:prison) { create(:prison) }
-
-    before do
-      stub_user('MOIC_POM', 1234)
-      stub_keyworker(prison.code, nomis_offender_id, build(:keyworker))
-      stub_offender(nomis_offender)
-    end
-
-    it 'shows an error message at the top of the page' do
-      visit prison_prisoner_path(prison.code, nomis_offender_id)
-      within '.govuk-error-summary' do
-        expect(page).to have_content 'A Community Offender Manager (COM) must be allocated to this case'
-      end
-    end
-
-    it 'highlights the "COM name" table row in red' do
-      visit prison_prisoner_path(prison.code, nomis_offender_id)
+    it 'informs the user' do
+      visit prison_prisoner_path(prison.code, 'G1234AB')
+      expect(page).to have_content('COM allocation overdue')
       expect(page).to have_css('#com-name.govuk-table__cell-error')
-    end
-
-    describe 'clicking on the warning message', :js do
-      it 'jumps the user down to the "COM name" table row' do
-        visit prison_prisoner_path(prison.code, nomis_offender_id)
-        click_link 'A Community Offender Manager (COM) must be allocated to this case'
-        expect(current_url).to end_with('#com-name')
-      end
-    end
-
-    context 'when the LDU has already been emailed automatically' do
-      let(:date_sent) { 2.days.ago }
-
-      let!(:email_history) do
-        create(:email_history, :open_prison_community_allocation,
-               nomis_offender_id: nomis_offender_id,
-               created_at: date_sent
-        )
-      end
-
-      it 'says that an email has been sent' do
-        visit prison_prisoner_path(prison.code, nomis_offender_id)
-        within '.govuk-error-summary' do
-          reload_page
-          date = date_sent.to_date.to_fs(:rfc822)
-          expect(page).to have_content "We automatically emailed the LDU asking them to allocate a COM on #{date}"
-        end
-      end
-    end
-
-    describe 'after a COM has been allocated (pulled in via nDelius/Community API)' do
-      before do
-        case_info.update!(com_name: "#{Faker::Name.last_name}, #{Faker::Name.first_name}")
-      end
-
-      it 'does not show' do
-        visit prison_prisoner_path(prison.code, nomis_offender_id)
-        expect(page).not_to have_css('.govuk-error-summary')
-        expect(page).not_to have_content('A Community Offender Manager (COM) must be allocated to this case')
-        expect(page).not_to have_css('#com-name.govuk-table__cell-error')
-      end
     end
   end
 end
