@@ -31,13 +31,13 @@
         Inactive staff (<%= inactive_poms(@poms).count %>)
       </a>
     </li>
-    <% if FeatureFlags.limbo_cases.enabled? && (count = removed_poms(@poms, @prison).count).positive? %>
+    <% if @removed_poms.any? %>
     <li class="govuk-tabs__list-item">
       <a class="govuk-tabs__tab" href="#attention_needed">
         Attention needed
       </a>
       <span id="attention-needed-badge" class="moj-notification-badge govuk-!-margin-left-1">
-        <%= count %>
+        <%= @removed_poms.size %>
       </span>
     </li>
     <% end %>
@@ -74,14 +74,14 @@
     <%= render "inactive_poms", poms: inactive_poms(@poms) %>
   </section>
 
-  <% if FeatureFlags.limbo_cases.enabled? && (removed_poms = removed_poms(@poms, @prison)).any? %>
+  <% if @removed_poms.any? %>
   <section class="govuk-tabs__panel" id="attention_needed">
     <h2 class="govuk-heading-l">Attention needed</h2>
     <p>
       These people are no longer recorded as POMs on NOMIS or Digital Prison Services.<br/>
       You must remove them from this service and then reallocate their cases.
     </p>
-    <%= render "removed_poms", poms: removed_poms %>
+    <%= render "removed_poms", poms: @removed_poms %>
   </section>
   <% end %>
 </div>

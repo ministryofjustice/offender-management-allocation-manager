@@ -8,7 +8,3 @@ feature_flags:
     staging: true
     preprod: true
     production: true
-  limbo_cases:
-    staging: true
-    preprod: true
-    production: false
