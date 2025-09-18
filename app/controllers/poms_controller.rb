@@ -9,6 +9,7 @@ class PomsController < PrisonStaffApplicationController
 
   def index
     @poms = @prison.get_list_of_poms.sort_by(&:full_name_ordered)
+    @removed_poms = @prison.get_removed_poms(existing_poms: @poms)
   end
 
   def show

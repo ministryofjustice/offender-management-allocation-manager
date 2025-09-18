@@ -3,7 +3,7 @@
 require 'rake'
 
 namespace :reports do
-  desc 'List all prisons having removed POMs with cases in limbo'
+  desc 'List all prisons having removed POMs with primary cases in limbo'
   task removed_poms_limbo_cases: :environment do
     puts 'Report started'
 
@@ -17,12 +17,7 @@ namespace :reports do
       removed_poms = prison.get_removed_poms(existing_poms: poms)
       next if removed_poms.empty?
 
-      limbo_cases = removed_poms.map do |pom|
-        [
-          pom.allocations.sum { |a| a.allocation.primary_pom_nomis_id == pom.staff_id ? 1 : 0 },
-          pom.allocations.sum { |a| a.allocation.secondary_pom_nomis_id == pom.staff_id ? 1 : 0 },
-        ]
-      end
+      limbo_cases = removed_poms.map(&:primary_allocations_count)
 
       puts "==> #{prison.name}: #{limbo_cases} allocations for #{removed_poms.size} removed POMs"
       total += 1
