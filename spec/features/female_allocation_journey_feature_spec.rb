@@ -48,7 +48,7 @@ feature "womens allocation journey" do
         create(:allocation_history, prison: prison.code, nomis_offender_id: ci.nomis_offender_id, primary_pom_nomis_id: probation_pom.staff_id)
       end
 
-      stub_keyworker(prison.code, offender[:prisonerNumber], build(:keyworker))
+      stub_keyworker(offender[:prisonerNumber])
 
       visit unallocated_prison_prisoners_path prison.code
       click_link offender_name
@@ -134,7 +134,7 @@ feature "womens allocation journey" do
     let(:allocation) { AllocationHistory.find_by!(nomis_offender_id: offender_id) }
 
     before do
-      stub_keyworker prison.code, offender_id, build(:keyworker)
+      stub_keyworker(offender_id)
 
       create(:case_information, tier: 'C', offender: build(:offender, nomis_offender_id: offender_id))
       create(:allocation_history, nomis_offender_id: offender_id, prison: prison.code, primary_pom_nomis_id: probation_pom.staff_id)

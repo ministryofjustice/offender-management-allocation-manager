@@ -19,7 +19,7 @@ feature 'early allocation badges' do
     signin_spo_user([prison.code])
 
     stub_user('MOIC_POM', 1234)
-    stub_keyworker(prison.code, offender_no, build(:keyworker))
+    stub_keyworker(offender_no)
     stub_offender nomis_offender
 
     create(:case_information,

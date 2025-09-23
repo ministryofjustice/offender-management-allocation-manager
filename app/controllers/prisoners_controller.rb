@@ -52,9 +52,7 @@ class PrisonersController < PrisonsApplicationController
       end
     end
 
-    @keyworker = HmppsApi::KeyworkerApi.get_keyworker(
-      active_prison_id, @prisoner.offender_no
-    )
+    @keyworker = KeyworkerService.get_keyworker(@prisoner.offender_no)
 
     @mappa_details = @prisoner.mappa_details
     @coworking = params[:coworking].present?
@@ -79,9 +77,7 @@ class PrisonersController < PrisonsApplicationController
       @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id)
     end
 
-    @keyworker = HmppsApi::KeyworkerApi.get_keyworker(
-      active_prison_id, @prisoner.offender_no
-    )
+    @keyworker = KeyworkerService.get_keyworker(@prisoner.offender_no)
   end
 
   def image

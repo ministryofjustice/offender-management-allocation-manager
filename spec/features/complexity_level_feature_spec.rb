@@ -9,22 +9,21 @@ feature 'complexity level feature' do
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
-    create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
-    create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
+    create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
+    create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
 
     stub_offenders_for_prison(womens_prison.code, offenders)
     stub_signin_spo(spo, [womens_prison.code])
     stub_poms(womens_prison.code, [pom, spo])
-    stub_keyworker(womens_prison.code, offender.fetch(:prisonerNumber), build(:keyworker))
-    # stub_community_offender(offender.fetch(:prisonerNumber), build(:community_data))
+    stub_keyworker(offender_no)
   end
 
   context 'when on allocation information page' do
     it 'can update the complexity level journey' do
-      expect(HmppsApi::ComplexityApi).to receive(:save).with(offender.fetch(:prisonerNumber), level: 'low', username: "MOIC_POM", reason: 'bla bla bla')
+      expect(HmppsApi::ComplexityApi).to receive(:save).with(offender_no, level: 'low', username: "MOIC_POM", reason: 'bla bla bla')
 
       # Journey starts on prisoner profile page. It should display the existing complexity level and a change link.
-      visit prison_prisoner_allocation_path(prisoner_id: offender.fetch(:prisonerNumber), prison_id: womens_prison.code)
+      visit prison_prisoner_allocation_path(prisoner_id: offender_no, prison_id: womens_prison.code)
 
       expect(page).to have_text('Complexity of need level')
       expect(page).to have_css('#complexity-level', text: 'High')
@@ -63,13 +62,13 @@ feature 'complexity level feature' do
 
       click_on('Return to prisoner page')
 
-      expect(page).to have_current_path(prison_prisoner_allocation_path(prisoner_id: offender.fetch(:prisonerNumber), prison_id: womens_prison.code), ignore_query: true)
+      expect(page).to have_current_path(prison_prisoner_allocation_path(prisoner_id: offender_no, prison_id: womens_prison.code), ignore_query: true)
       expect(page).to have_css('#complexity-level', text: 'Low')
       expect(page).to have_css('#complexity-badge', text: 'Low complexity')
     end
 
     it 'can click back link to return to the prisoner profile page' do
-      visit prison_prisoner_allocation_path(prisoner_id: offender.fetch(:prisonerNumber), prison_id: womens_prison.code)
+      visit prison_prisoner_allocation_path(prisoner_id: offender_no, prison_id: womens_prison.code)
       within(:css, "td#complexity-level") do
         click_link('Change')
       end
@@ -78,7 +77,7 @@ feature 'complexity level feature' do
       expect(page).to have_text 'Update complexity of need level'
 
       click_link('Back')
-      expect(page).to have_current_path(prison_prisoner_allocation_path(prisoner_id: offender.fetch(:prisonerNumber), prison_id: womens_prison.code))
+      expect(page).to have_current_path(prison_prisoner_allocation_path(prisoner_id: offender_no, prison_id: womens_prison.code))
     end
   end
 
@@ -98,7 +97,7 @@ feature 'complexity level feature' do
       end
 
       it 'can update the complexity level' do
-        expect(HmppsApi::ComplexityApi).to receive(:save).with(offender.fetch(:prisonerNumber), level: 'low', username: "MOIC_POM", reason: 'bla bla bla')
+        expect(HmppsApi::ComplexityApi).to receive(:save).with(offender_no, level: 'low', username: "MOIC_POM", reason: 'bla bla bla')
 
         visit prison_prisoner_allocation_path(womens_prison.code, offender_no)
 

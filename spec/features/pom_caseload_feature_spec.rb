@@ -225,10 +225,9 @@ feature "view POM's caseload" do
     context 'when clicking through the offender link' do
       it 'shows the new page' do
         stub_user 'MOIC_POM', nomis_staff_id
-
         stub_offender(first_offender)
-        stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/#{prison.code}/offender/#{first_offender.fetch(:prisonerNumber)}")
-          .to_return(body: { staffId: 485_572, firstName: "DOM", lastName: "BULL" }.to_json)
+        stub_keyworker(first_offender.fetch(:prisonerNumber))
+
         stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{nomis_staff_id}")
           .to_return(body: { staffId: nomis_staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
 

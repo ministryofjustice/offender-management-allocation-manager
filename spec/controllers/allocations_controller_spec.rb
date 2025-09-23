@@ -52,7 +52,7 @@ RSpec.describe AllocationsController, type: :controller do
 
       before do
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
-        stub_keyworker(prison_code, offender_no, staffId: 123_456)
+        stub_keyworker(offender_no)
       end
 
       context 'when POM has left' do
@@ -226,9 +226,6 @@ RSpec.describe AllocationsController, type: :controller do
             Timecop.travel 2.days.ago do
               ProcessDeliusDataJob.perform_now offender_no
             end
-
-            stub_request(:get, "#{ApiHelper::KEYWORKER_API_HOST}/key-worker/#{prison_code}/offender/#{offender_no}")
-              .to_return(body: { staffId: 123_456 }.to_json)
           end
 
           it 'shows the correct date on the show page' do

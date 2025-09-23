@@ -89,10 +89,10 @@ FactoryBot.define do
       )
     end
 
-    after :build do |offender, evaluator|
+    after :build do |_offender, evaluator|
       stub_risk_and_needs(evaluator.crn)
       stub_specific_community_offender(evaluator.crn)
-      stub_keyworker(evaluator.prison_code, evaluator.nomis_id)
+      stub_keyworker(evaluator.nomis_id)
     end
   end
 

@@ -3,7 +3,6 @@ require 'rails_helper'
 context 'when NOMIS is missing information' do
   let(:prison_code) { create(:prison).code }
   let(:offender_no) { build(:offender).nomis_offender_id }
-  let(:stub_keyworker_host) { Rails.configuration.keyworker_api_host }
   let(:staff_id) { 123_456 }
 
   describe 'when logged in as a POM' do
@@ -15,6 +14,7 @@ context 'when NOMIS is missing information' do
 
       signin_pom_user([prison_code], staff_id)
       stub_user('MOIC_POM', staff_id)
+      stub_keyworker(offender_no)
     end
 
     describe 'the caseload page' do
@@ -51,9 +51,6 @@ context 'when NOMIS is missing information' do
           .to_return(body: { staffId: staff_id, firstName: "TEST", lastName: "MOIC" }.to_json)
 
         stub_request(:post, "#{ApiHelper::T3}/offender-assessments/CATEGORY")
-          .to_return(body: {}.to_json)
-
-        stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}")
           .to_return(body: {}.to_json)
 
         stub_offender(offender)
@@ -104,9 +101,6 @@ context 'when NOMIS is missing information' do
           .to_return(body: stub_poms.to_json)
 
         stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{staff_id}")
-          .to_return(body: {}.to_json)
-
-        stub_request(:get, "#{stub_keyworker_host}/key-worker/#{prison_code}/offender/#{offender_no}")
           .to_return(body: {}.to_json)
 
         create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: staff_id)

@@ -7,13 +7,13 @@ RSpec.describe ComplexityLevelsController, type: :controller do
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
-    create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
+    create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: pom.staff_id,  prison: womens_prison.code)
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
 
     stub_offenders_for_prison(womens_prison.code, offenders)
     stub_sso_data(womens_prison.code)
     stub_poms(womens_prison.code, [pom, spo])
-    stub_keyworker(womens_prison.code, offender.fetch(:prisonerNumber), build(:keyworker))
+    stub_keyworker(offender_no)
   end
 
   describe '#edit' do
@@ -43,7 +43,7 @@ RSpec.describe ComplexityLevelsController, type: :controller do
           expect(assigns(:prisoner).last_name).to eq('Albright')
 
           expect(HmppsApi::ComplexityApi).to have_received(:save).with(
-            offender.fetch(:prisonerNumber),
+            offender_no,
             level: updated_complexity_level,
             username: 'user',
             reason: 'Just because'

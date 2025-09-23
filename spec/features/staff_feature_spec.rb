@@ -229,7 +229,7 @@ feature "staff pages" do
       stub_poms(female_prison, poms)
 
       offenders_in_prison.map { |o| o.fetch(:prisonerNumber) }.each do |nomis_id|
-        stub_keyworker female_prison, nomis_id, build(:keyworker)
+        stub_keyworker(nomis_id)
       end
 
       create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender[:prisonerNumber]), enhanced_resourcing: true)

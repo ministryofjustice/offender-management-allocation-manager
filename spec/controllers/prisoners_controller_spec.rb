@@ -547,13 +547,16 @@ RSpec.describe PrisonersController, type: :controller do
       let(:offender_no) { offender.fetch(:prisonerNumber) }
       let(:page) { Nokogiri::HTML(response.body) }
 
+      before do
+        stub_keyworker(offender_no)
+        stub_offender(offender)
+      end
+
       context 'when an offender has a previous LAYER_3 OASys assessments' do
         let(:completed_date) { '2021-06-02'.to_date }
 
         before do
           expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_3', completed: completed_date)
-          stub_offender(offender)
-          stub_keyworker prison, offender_no, build(:keyworker)
 
           get :show, params: { prison_id: prison, id: offender_no }
           expect(page.css('#oasys-date')).to have_text('Last completed OASys')
@@ -572,8 +575,6 @@ RSpec.describe PrisonersController, type: :controller do
 
         before do
           expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(assessment_type: 'LAYER_1', completed: completed_date)
-          stub_offender(offender)
-          stub_keyworker prison, offender_no, build(:keyworker)
 
           get :show, params: { prison_id: prison, id: offender_no }
           expect(page.css('#oasys-date')).to have_text('Last completed OASys')
@@ -592,8 +593,6 @@ RSpec.describe PrisonersController, type: :controller do
 
         before do
           expect(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
-          stub_offender(offender)
-          stub_keyworker prison, offender_no, build(:keyworker)
 
           get :show, params: { prison_id: prison, id: offender_no }
           expect(page.css('#oasys-date')).to have_text('Last completed OASys')
@@ -616,7 +615,7 @@ RSpec.describe PrisonersController, type: :controller do
       offender_id = offender[:prisonerNumber]
 
       stub_offender(offender)
-      stub_keyworker prison.code, offender_id, build(:keyworker)
+      stub_keyworker(offender_id)
       stub_sso_data(prison.code)
 
       allow(PrisonOffenderManagerService).to receive(:fetch_pom_name).with(nil).and_raise(Faraday::ResourceNotFound, "the server responded with status 404")
