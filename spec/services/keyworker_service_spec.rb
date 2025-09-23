@@ -26,7 +26,7 @@ RSpec.describe KeyworkerService do
         result = described_class.get_keyworker(offender_no)
         expect(result).to be_a(HmppsApi::KeyworkerDetails)
 
-        expect(result.full_name).to eq('Smith, John')
+        expect(result.full_name).to eq('John Smith')
         expect(result.staff_id).to eq(123_456)
       end
     end
@@ -43,8 +43,21 @@ RSpec.describe KeyworkerService do
         result = described_class.get_keyworker(offender_no)
         expect(result).to be_a(HmppsApi::NullKeyworker)
 
+        expect(result.full_name).to eq('None assigned')
+      end
+    end
+
+    context 'when the API fails' do
+      before do
+        allow(HmppsApi::KeyworkerApi).to receive(:get_keyworker)
+          .with(offender_no).and_return(nil)
+      end
+
+      it 'returns a null keyworker' do
+        result = described_class.get_keyworker(offender_no)
+        expect(result).to be_a(HmppsApi::NullKeyworker)
+
         expect(result.full_name).to eq('Data not available')
-        expect(result.staff_id).to be_nil
       end
     end
   end

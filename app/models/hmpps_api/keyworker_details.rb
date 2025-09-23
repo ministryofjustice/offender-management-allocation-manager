@@ -13,7 +13,7 @@ module HmppsApi
     end
 
     def full_name
-      "#{last_name}, #{first_name}".titleize
+      "#{first_name} #{last_name}".titleize
     end
   end
 end
