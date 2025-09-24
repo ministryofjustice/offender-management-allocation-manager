@@ -14,7 +14,6 @@ feature 'Inactive POM' do
       stub_poms(prison_code, [active_pom])
       stub_signin_spo(active_pom, prison_code)
       stub_offenders_for_prison(prison.code, nomis_offender)
-      stub_keyworker(prison_code, nomis_offender_id, staffId: 123_456)
 
       create(
         :allocation_history,

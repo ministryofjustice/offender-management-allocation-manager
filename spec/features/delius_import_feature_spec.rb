@@ -25,7 +25,7 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
                                                          team: { description: 'Team1',
                                                                  localDeliveryUnit: { code: ldu.code } })]))
 
-      stub_keyworker(prison_code, offender_no, build(:keyworker))
+      stub_keyworker(offender_no)
 
       allow(OffenderService).to receive(:get_probation_record).with(offender_no)
         .and_return(mock_probation_record)

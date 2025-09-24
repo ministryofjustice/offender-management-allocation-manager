@@ -2,6 +2,7 @@ RSpec.describe "prisoners/review_case_details", type: :view do
   before do
     assign(:prison, prison)
     assign(:prisoner, offender)
+    assign(:keyworker, build(:keyworker))
     assign(:alerts, [])
     assign(:mappa_details, { short_description: 'Foo', start_date: '29-Apr-2001' })
     assign(:rosh, { status: :unable })
