@@ -22,7 +22,7 @@ class AllocationsController < PrisonsApplicationController
         @coworker = coworker
       end
     end
-    @keyworker = HmppsApi::KeyworkerApi.get_keyworker(active_prison_id, @prisoner.offender_no)
+    @keyworker = KeyworkerService.get_keyworker(@prisoner.offender_no)
     retrieve_latest_allocation_details
   end
 

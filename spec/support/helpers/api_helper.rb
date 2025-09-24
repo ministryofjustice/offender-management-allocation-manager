@@ -226,9 +226,18 @@ module ApiHelper
       .to_return(body: [].to_json)
   end
 
-  def stub_keyworker(prison_code, offender_id, keyworker = '{}')
-    stub_request(:get, "#{KEYWORKER_API_HOST}/key-worker/#{prison_code}/offender/#{offender_id}")
-      .to_return(body: keyworker.to_json)
+  def stub_keyworker(offender_no)
+    stub_request(:get, "#{KEYWORKER_API_HOST}/prisoners/#{offender_no}/allocations/current")
+      .to_return(body: {
+        "prisonNumber" => offender_no,
+        "hasHighComplexityOfNeeds" => false,
+        "allocations" =>
+          [{
+            "policy" => { "code" => "KEY_WORKER", "description" => "Key worker" },
+            "prison" => { "code" => "LEI", "description" => "Leeds (HMP)" },
+            "staffMember" => { "staffId" => 123_456, "firstName" => "JOHN", "lastName" => "SMITH", "emailAddresses" => [] }
+          }]
+      }.to_json)
   end
 
   # Stubs every CRN

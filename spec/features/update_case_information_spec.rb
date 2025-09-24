@@ -12,8 +12,8 @@ RSpec.feature "Update case information", type: :feature do
     stub_offenders_for_prison(prison.code, offenders)
     stub_signin_spo(spo, [prison.code])
     stub_poms(prison.code, [pom, spo])
-    stub_keyworker(prison.code, offender.fetch(:prisonerNumber), build(:keyworker))
-    stub_community_offender(offender.fetch(:prisonerNumber), build(:community_data))
+    stub_keyworker(offender_no)
+    stub_community_offender(offender_no, build(:community_data))
     allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
   end
 

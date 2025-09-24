@@ -37,7 +37,7 @@ feature 'Co-working' do
 
     stub_offenders_for_prison prison.code, [offender]
     stub_signin_spo poms.last, [prison.code]
-    stub_keyworker prison.code, 'G4273GI', build(:keyworker)
+    stub_keyworker(nomis_offender_id)
     stub_community_offender(nomis_offender_id, build(:community_data))
     allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
 
