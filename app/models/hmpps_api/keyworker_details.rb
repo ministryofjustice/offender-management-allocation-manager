@@ -6,14 +6,14 @@ module HmppsApi
 
     def self.from_json(json)
       KeyworkerDetails.new.tap do |obj|
-        obj.staff_id = json['staffId']&.to_i
-        obj.first_name = json['firstName']
-        obj.last_name = json['lastName']
+        obj.staff_id = json.dig('staffMember', 'staffId')&.to_i
+        obj.first_name = json.dig('staffMember', 'firstName')
+        obj.last_name = json.dig('staffMember', 'lastName')
       end
     end
 
     def full_name
-      "#{last_name}, #{first_name}".titleize
+      "#{first_name} #{last_name}".titleize
     end
   end
 end
