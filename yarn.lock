@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@ministryofjustice/frontend@2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@ministryofjustice/frontend/-/frontend-2.2.0.tgz#1b41e088adc67a486529fad526e0fe6651c853f0"
-  integrity sha512-d6ZPTnsJC7vofU1+nPmDXzmZeYP5oYJXWTthHHf2kABQnEBMeJvTZJdxttH2qw9NjFbV5mWiPNWZsx0wgG4qvg==
+"@ministryofjustice/frontend@2.2.5":
+  version "2.2.5"
+  resolved "https://registry.yarnpkg.com/@ministryofjustice/frontend/-/frontend-2.2.5.tgz#e4371759f915db8d0677c03daee72c5cb6ddbd8e"
+  integrity sha512-UR8WTME0vrYhtCxBESd0XaAvfjdi9UujieeooQj1ddQKdcfI/wkXUMJO8hWWvXjeqRxfKB2v62rw1mSRc+Yqrw==
   dependencies:
     govuk-frontend "^5.0.0"
     moment "^2.27.0"
