@@ -6,6 +6,17 @@
   .task-summary-checklist, strong {
     display: block;
     margin-bottom: 10px !important;
+    
+    li {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      
+      img {
+        margin-top: 0;
+        width: 7%;
+      }
+    }
   }
 }
 
