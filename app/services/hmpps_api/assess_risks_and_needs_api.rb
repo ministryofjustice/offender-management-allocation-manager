@@ -1,6 +1,7 @@
 module HmppsApi
   class AssessRisksAndNeedsApi
     VALID_ASSESSMENT_TYPES = %w[LAYER_1 LAYER1 LAYER_3 LAYER3].freeze
+    TIMEFRAME_IN_WEEKS = 156
 
     def self.client
       host = Rails.configuration.assess_risks_and_needs_api_host
@@ -9,7 +10,7 @@ module HmppsApi
 
     def self.get_rosh_summary(crn)
       safe_crn = URI.encode_www_form_component(crn)
-      route = "/risks/crn/#{safe_crn}"
+      route = "/risks/crn/#{safe_crn}/#{TIMEFRAME_IN_WEEKS}"
       client.get(route)
     end
 
