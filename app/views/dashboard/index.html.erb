@@ -6,20 +6,28 @@
   </p>
 <% end %>
 
-<% if FeatureFlags.pom_onboarding_callout.enabled? && @is_spo %>
-  <div class="moj-banner moj-banner--information govuk-!-margin-bottom-8" role="region" aria-label="information">
-    <svg class="moj-banner__icon" fill="currentColor" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25">
-      <path d="M13.7,18.5h-2.4v-2.4h2.4V18.5z M12.5,13.7c-0.7,0-1.2-0.5-1.2-1.2V7.7c0-0.7,0.5-1.2,1.2-1.2s1.2,0.5,1.2,1.2v4.8 C13.7,13.2,13.2,13.7,12.5,13.7z M12.5,0.5c-6.6,0-12,5.4-12,12s5.4,12,12,12s12-5.4,12-12S19.1,0.5,12.5,0.5z"/>
-    </svg>
-    <div class="moj-banner__message">
-      <h2 class="govuk-heading-m govuk-!-margin-bottom-1">What’s new</h2>
-      <p>
-        New POMs can now be set up quickly and easily in this service by people who allocate cases.<br/>
-        Local system administrators (LSAs) no longer need to do this in NOMIS.
-      </p>
+<div class="govuk-width-container">
+  <a href="#" class="govuk-back-link">Back</a>
+  <main class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+          <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+              Important
+            </h2>
+          </div>
+          <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">
+              You may experience some disruption when using this service between 12pm and 1pm on Thursday 9 October 2025 while we carry out some system maintenance.<br>
+              If you do, wait 15 minutes and then try again.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-<% end %>
+  </main>
+</div>
 
 <h1 class="govuk-heading-xl govuk-!-margin-bottom-4"><%= t('service_name') %></h1>
 
