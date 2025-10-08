@@ -53,12 +53,12 @@ private
     end_time = (end_date + 1.day).to_time
 
     last_before_range = if algorithm == :state
-                          [items.select { |i| i.created_at < start_time }.max_by(&:created_at)]
+                          [items.select { |i| i.created_at.present? && i.created_at < start_time }.max_by(&:created_at)]
                         else
                           []
                         end
 
-    within_range = items.select { |i| i.created_at >= start_time && i.created_at <= end_time }.sort_by(&:created_at)
+    within_range = items.select { |i| i.created_at.present? && i.created_at >= start_time && i.created_at <= end_time }.sort_by(&:created_at)
 
     (last_before_range + within_range).compact
   end
