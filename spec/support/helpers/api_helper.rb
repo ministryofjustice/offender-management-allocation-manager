@@ -37,10 +37,6 @@ module ApiHelper
     stub_request(:get, "#{Rails.configuration.complexity_api_host}/v1/complexity-of-need/offender-no/#{offender_no}")
       .to_return(body: { level: offender.fetch(:complexityLevel) }.to_json)
 
-    # RoSH summary
-    stub_request(:get, Addressable::Template.new("#{Rails.configuration.assess_risks_and_needs_api_host}/risks/crn/{crn}/summary"))
-      .to_return(body: {}.to_json)
-
     # Alerts
     stub_request(:get, "#{Rails.configuration.prison_alerts_api_host}/prisoners/#{offender_no}/alerts")
       .to_return(body: { content: [] }.to_json)
@@ -194,7 +190,7 @@ module ApiHelper
   end
 
   def stub_risk_and_needs(crn, response_body = '{"summary": {}}')
-    stub_request(:get, "https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk/risks/crn/#{crn}")
+    stub_request(:get, "https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk/risks/crn/#{crn}/156")
       .to_return(status: 200, body: response_body, headers: {})
   end
 

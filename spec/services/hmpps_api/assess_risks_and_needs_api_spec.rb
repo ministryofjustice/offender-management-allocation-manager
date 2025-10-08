@@ -201,4 +201,17 @@ describe HmppsApi::AssessRisksAndNeedsApi do
       end
     end
   end
+
+  describe '.get_rosh_summary' do
+    it 'requests the rosh summary from within the last 3 years' do
+      response = double(:response)
+      client = double(:client, get: response)
+      allow(described_class).to receive(:client).and_return(client)
+
+      result = described_class.get_rosh_summary('CRN123')
+
+      expect(result).to eq(response)
+      expect(client).to have_received(:get).with("/risks/crn/CRN123/156")
+    end
+  end
 end
