@@ -48,7 +48,7 @@ jobs:
       PGPASSWORD: postgres
     services:
       postgres:
-        image: postgres:15.2-alpine
+        image: postgres:17.6-alpine
         env:
           POSTGRES_DB: offender-management-allocation-manager_test
           POSTGRES_USER: postgres
@@ -126,7 +126,7 @@ jobs:
     name: Database schema report
     services:
       postgres:
-        image: postgres:15.2-alpine
+        image: postgres:17.6-alpine
         env:
           POSTGRES_DB: mpc_schemaspy
           POSTGRES_USER: schemaspy
