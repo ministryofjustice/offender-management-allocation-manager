@@ -17,11 +17,9 @@ class CaseInformation < ApplicationRecord
   # prisoners it makes sense to have N/A (as this is genuine) but not otherwise
   validates :tier, inclusion: { in: %w[A B C D N/A], message: 'Select the prisoner’s tier' }
 
-  validates :enhanced_resourcing, inclusion: {
-    in: [true, false],
-    allow_nil: true,
-    message: 'Select the handover type for this case'
-  }
+  validates :enhanced_resourcing,
+            inclusion: { in: [true, false], message: 'Select the handover type for this case' },
+            on: :manual_entry
 
   # nil means MAPPA level is completely unknown.
   # 0 means MAPPA level is known to be not relevant for offender
