@@ -1,6 +1,4 @@
-require 'rails_helper'
-
-RSpec.describe CaseInformation, type: :model do
+describe CaseInformation do
   let(:case_info) { create(:case_information) }
 
   context 'with mappa level' do
@@ -56,16 +54,35 @@ RSpec.describe CaseInformation, type: :model do
     end
   end
 
-  it 'validates that enhanced_resourcing is always set to true or false, or "nil"' do
-    aggregate_failures do
-      ci = FactoryBot.build :case_information, enhanced_resourcing: false
-      expect(ci.valid?).to eq true
+  describe 'enhanced_resourcing' do
+    let(:valid_cases) { [true, false] }
 
-      ci = FactoryBot.build :case_information, enhanced_resourcing: true
-      expect(ci.valid?).to eq true
+    context "when receiving values from nDelius job" do
+      it 'can be true' do
+        expect(build(:case_information, enhanced_resourcing: true).valid?).to be(true)
+      end
 
-      ci = FactoryBot.build :case_information, enhanced_resourcing: nil
-      expect(ci.valid?).to eq true
+      it 'can be false' do
+        expect(build(:case_information, enhanced_resourcing: false).valid?).to be(true)
+      end
+
+      it 'can be nil' do
+        expect(build(:case_information, enhanced_resourcing: nil).valid?).to be(true)
+      end
+    end
+
+    context 'when manually entering values from the missing details form' do
+      it 'can be true' do
+        expect(build(:case_information, enhanced_resourcing: true).valid?(:manual_entry)).to be(true)
+      end
+
+      it 'can be false' do
+        expect(build(:case_information, enhanced_resourcing: false).valid?(:manual_entry)).to be(true)
+      end
+
+      it 'cannot be nil' do
+        expect(build(:case_information, enhanced_resourcing: nil).valid?(:manual_entry)).to be(false)
+      end
     end
   end
 end

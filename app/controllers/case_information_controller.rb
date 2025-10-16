@@ -18,7 +18,7 @@ class CaseInformationController < PrisonsApplicationController
   def create
     @case_info.assign_attributes(case_information_params.merge(manual_entry: true))
 
-    if @case_info.save
+    if @case_info.save(context: :manual_entry)
       if params.fetch(:commit) == 'Save'
         redirect_to missing_information_prison_prisoners_path(active_prison_id, sort: params[:sort], page: params[:page])
       else
@@ -30,8 +30,13 @@ class CaseInformationController < PrisonsApplicationController
   end
 
   def update
-    @case_info.update!(case_information_params.merge(manual_entry: true))
-    redirect_to referrer
+    @case_info.assign_attributes(case_information_params.merge(manual_entry: true))
+
+    if @case_info.save(context: :manual_entry)
+      redirect_to referrer
+    else
+      render :edit
+    end
   end
 
 private

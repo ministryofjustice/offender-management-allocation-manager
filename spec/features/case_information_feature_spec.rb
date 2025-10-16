@@ -39,6 +39,14 @@ describe 'case information feature' do
         visit edit_prison_case_information_path(prison.code, offender.fetch(:prisonerNumber))
         expect(page).to have_no_button('Save and allocate')
       end
+
+      it 'requires enhanced resourcing values to be selected' do
+        CaseInformation.find_by(nomis_offender_id: offender.fetch(:prisonerNumber)).update(enhanced_resourcing: nil)
+        visit edit_prison_case_information_path(prison.code, offender.fetch(:prisonerNumber))
+        click_on 'Update'
+        expect(page).to have_content('There is a problem')
+        expect(page).to have_content('Select the handover type for this case')
+      end
     end
 
     context 'when trying to edit a non manual entry' do
