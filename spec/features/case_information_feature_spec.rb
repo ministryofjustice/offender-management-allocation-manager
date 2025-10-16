@@ -1,4 +1,4 @@
-feature 'case information feature' do
+describe 'case information feature' do
   context 'when doing an allocate and save' do
     let(:prison) { create(:prison) }
     let(:offender) { build(:nomis_offender, prisonId: prison.code) }
