@@ -4,7 +4,3 @@
 feature_flags:
   example_feature:
     staging: true
-  pom_onboarding_callout:
-    staging: true
-    preprod: true
-    production: true
