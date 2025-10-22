@@ -160,6 +160,7 @@ Rails.application.routes.draw do
     end
 
     get('/debugging' => 'debugging#debugging')
+    get('/debugging/timeline' => 'debugging#timeline')
     get('prisoners/:id/debugging' => redirect('/prisons/%{prison_id}/debugging?offender_no=%{id}'))
   end
 

@@ -1,0 +1,19 @@
+<% content_for :title, "Debugging Timeline – #{t('global.default_page_title')}" %>
+
+<%= render 'debugging/layout', tab: 'timeline', form_path: prison_debugging_timeline_path(@prison.code) do %>
+
+  <table class="govuk-table govuk-table--small-text-until-tablet">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header" style="width: 150px;">Date/Time</th>
+        <th scope="col" class="govuk-table__header">Data</th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      <% @log.each do |log_item| %>
+        <%= render partial: "debugging/timeline/#{log_item.class.to_s.underscore}", locals: { log_item: } %>
+      <% end %>
+    </tbody>
+  </table>
+
+<% end %>

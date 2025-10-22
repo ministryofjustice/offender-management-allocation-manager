@@ -1,0 +1,34 @@
+<h2 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Debugging</h2>
+
+<div class="search-box govuk-grid-row">
+  <%= form_tag(form_path, method: :get, id: "debugging_form") do %>
+    <div class="govuk-form-group" style="display: inline;">
+      <label class="govuk-label" for="offender_no">
+        Enter a prisoner number
+      </label>
+      <input class="govuk-input" id="offender_no" name="offender_no" type="text" value="<%= @nomis_id %>" autofocus>
+      <input id="search-button" type="submit" class="govuk-button" value="Search">
+    </div>
+  <% end %>
+</div>
+
+<% if @nomis_id.present? %>
+  <nav class="moj-sub-navigation" aria-label="Sub navigation">
+    <ul class="moj-sub-navigation__list">
+      <li class="moj-sub-navigation__item">
+        <a class="moj-sub-navigation__link" <%= ("aria-current=page" if tab == 'overview') %> href="<%= prison_debugging_path(@prison.code, offender_no: @nomis_id) %>">
+          Overview
+        </a>
+      </li>
+      <li class="moj-sub-navigation__item">
+        <a class="moj-sub-navigation__link" <%= ("aria-current=page" if tab == 'timeline') %> href="<%= prison_debugging_timeline_path(@prison.code, offender_no: @nomis_id) %>">
+          Timeline
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+  <%= yield %>
+<% else %>
+  <p class="govuk-body">Please enter a NOMIS Id for the offender</p>
+<% end %>
