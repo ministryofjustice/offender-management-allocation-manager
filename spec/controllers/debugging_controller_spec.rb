@@ -5,13 +5,13 @@ require 'rails_helper'
 RSpec.describe DebuggingController, type: :controller do
   let(:prison) { create(:prison) }
   let(:prison_id) { prison.code }
+  let(:offender_no) { 'G7806VO' }
 
   before do
     stub_sso_data(prison_id, roles: [SsoIdentity::SPO_ROLE, SsoIdentity::ADMIN_ROLE])
   end
 
   context 'when debugging an offender' do
-    let(:offender_no) { 'G7806VO' }
     let(:pom_staff_id) { 543_453 }
     let(:primary_pom_name) { 'Jenae Sporer' }
 
@@ -46,6 +46,25 @@ RSpec.describe DebuggingController, type: :controller do
       expect(movements.movement_type).to eq "TRN"
       expect(movements.from_agency).to eq "LEI"
       expect(movements.to_agency).to eq prison_id
+    end
+  end
+
+  describe 'debugging the timeline of events' do
+    before do
+      stub_offender(build(:nomis_offender, prisonId: prison.code, sentence: attributes_for(:sentence_detail, :indeterminate), prisonerNumber: offender_no))
+
+      create(:audit_event, nomis_offender_id: offender_no, created_at: 60.seconds.ago, tags: %w[event tag one])
+      create(:audit_event, nomis_offender_id: offender_no, created_at: 30.seconds.ago, tags: %w[event tag two])
+      create(:audit_event, nomis_offender_id: offender_no, created_at: 10.seconds.ago, tags: %w[event tag three])
+    end
+
+    it 'displays pertinent records descending in order of creation' do
+      get :timeline, params: { prison_id:, offender_no: }
+
+      log_items = assigns(:log)
+      expect(log_items[0].then { [it.class, it.tags] }).to eq([AuditEvent, %w[event tag three]])
+      expect(log_items[1].then { [it.class, it.tags] }).to eq([AuditEvent, %w[event tag two]])
+      expect(log_items[2].then { [it.class, it.tags] }).to eq([AuditEvent, %w[event tag one]])
     end
   end
 end

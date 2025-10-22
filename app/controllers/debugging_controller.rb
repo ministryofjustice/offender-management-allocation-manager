@@ -29,9 +29,15 @@ class DebuggingController < PrisonsApplicationController
     ).last_movement
   end
 
+  def timeline
+    return unless id
+
+    @nomis_id = id
+    @audit_events = AuditEvent.where(nomis_offender_id: @nomis_id).order('created_at DESC')
+    @log = [@audit_events].flat_map(&:all).sort_by(&:created_at).reverse
+  end
+
 private
 
-  def id
-    params[:offender_no].present? ? params[:offender_no].strip : params[:offender_no]
-  end
+  def id = params[:offender_no]&.strip
 end

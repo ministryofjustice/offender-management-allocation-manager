@@ -1,25 +1,11 @@
 <% content_for :title, "Debugging – #{t('global.default_page_title')}" %>
 
-<h2 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Debugging</h2>
-
-<div class="search-box govuk-grid-row">
-  <%= form_tag(prison_debugging_path(@prison.code), method: :get, id: "debugging_form") do %>
-    <div class="govuk-form-group" style="display: inline;">
-      <label class="govuk-label" for="offender_no">
-        Enter a prisoner number
-      </label>
-      <input class="govuk-input" id="offender_no" name="offender_no" type="text" value="<%= @nomis_id %>" autofocus="true">
-      <input id="search-button" type="submit" class="govuk-button" value="Search"/>
-    </div>
-  <% end %>
-</div>
-
-<% if @nomis_id %>
+<%= render 'debugging/layout', tab: 'overview', form_path: prison_debugging_path(@prison.code) do %>
 
   <%= render partial: "offender_details",
     locals: { oasys_assessment: @oasys_assessment } %>
-  
-  <%= render partial: @overidden_responsibility.present? ? "responsibility_overridden" : "responsibility", 
+
+  <%= render partial: @overidden_responsibility.present? ? "responsibility_overridden" : "responsibility",
     locals: { responsibility: @persisted_handover, override: @overidden_responsibility } %>
   <%= render partial: "responsibility_history",
     locals: { history: @persisted_handover.try(:history) } %>
@@ -30,21 +16,17 @@
     locals: { sentences: @sentences.reverse } %>
   <%= render partial: "parole" %>
   <% end %>
-  
+
   <%= render partial: "parole_history",
     locals: { parole_reviews: @parole_reviews } %>
 
   <%= render partial: "allocation",
     locals: { allocation: @allocation } %>
 
-  <%= render partial: "community", 
+  <%= render partial: "community",
     locals: { case_information: @case_information }  %>
 
   <%= render partial: "movements",
     locals: { movements: @movements } %>
-
-<% else %>
-
-  <p class="govuk-body">Please enter a NOMIS Id for the offender</p>
 
 <% end %>
