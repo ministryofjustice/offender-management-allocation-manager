@@ -34,7 +34,7 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
     allow(RecalculateHandoverDateJob).to receive(:perform_later)
 
     # assert that our setup created a caseload record
-    expect(page.text).to match(/Showing 1 to 1 of 1 results/)
+    expect(page.text).to have_content('Your cases (1)')
   end
 
   context 'with switch' do

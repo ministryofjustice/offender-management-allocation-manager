@@ -148,8 +148,7 @@ feature "view POM's caseload" do
     end
 
     it 'displays paginated cases for a specific POM' do
-      expect(page).to have_content("Showing 1 to 21 of 21 results")
-      expect(page).to have_content("Your cases")
+      expect(page).to have_content("Your cases (21)")
       expect(page).to have_content("All your cases")
       sorted_offenders.first(20).each_with_index do |offender, index|
         name = "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}"
