@@ -1,12 +1,7 @@
-<%# Link showing page number
-  - available local variables
-    page:          a page object for "this" page
-    url:           url to this page
-    current_page:  a page object for the currently displayed page
-    total_pages:   total number of pages
-    per_page:      number of items to fetch per page
-    remote:        data-remote
--%>
-<li class="page<%= ' current' if page.current? %>">
-  <%= link_to_unless page.current?, page, url, {remote: remote, rel: page.rel} %>
+<li class='<%= "govuk-pagination__item #{'govuk-pagination__item--current' if page.current?}" %>'>
+  <%= link_to page, url,
+              class: 'govuk-link govuk-pagination__link govuk-link--no-visited-state',
+              remote: remote, rel: page.rel,
+              'aria-label': "Page #{page}",
+              'aria-current': ('page' if page.current?) %>
 </li>
