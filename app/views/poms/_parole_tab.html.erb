@@ -8,7 +8,6 @@
         <h2 class="govuk-heading-l">No cases approaching parole </h2>
       <% else %>
         <%= render partial: 'shared/pagination', locals: { data: @parole_cases } %>
-        <br/>
         <%= render 'shared/parole_table' %>
         <%= render partial: 'shared/pagination', locals: { data: @parole_cases } %>
       <% end %>

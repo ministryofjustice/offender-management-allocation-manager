@@ -33,7 +33,6 @@
       <p class="govuk-body">No cases allocated</p>
     <% else %>
       <%= render partial: 'shared/pagination', locals: { data: @all_other_allocations } %>
-      <br/>
       <%= render 'caseload_table', header_partial: 'caseload_headers', collection_partial: 'caseload', collection: @all_other_allocations %>
       <%= render partial: 'shared/pagination', locals: { data: @all_other_allocations } %>
     <% end %>
@@ -46,7 +45,6 @@
       <p class="govuk-body">No cases allocated in last 7 days</p>
     <% else %>
       <%= render partial: 'shared/pagination', locals: { data: @recent_allocations, url_params: { anchor: 'last-seven-days' } } %>
-      <br/>
       <%= render 'caseload_table', header_partial: 'caseload_headers', collection_partial: 'caseload', collection: @recent_allocations, selected_filter: 'last-seven-days' %>
       <%= render partial: 'shared/pagination', locals: { data: @recent_allocations, url_params: { anchor: 'last-seven-days' } } %>
     <% end %>
@@ -59,7 +57,6 @@
       <p class="govuk-body">No releases in next 4 weeks</p>
     <% else %>
       <%= render partial: 'shared/pagination', locals: { data: @upcoming_releases, url_params: { anchor: 'upcoming-releases' } } %>
-      <br/>
       <%= render 'caseload_table', header_partial: 'caseload_headers', collection_partial: 'caseload', collection: @upcoming_releases, selected_filter: 'upcoming-releases' %>
       <%= render partial: 'shared/pagination', locals: { data: @upcoming_releases, url_params: { anchor: 'upcoming-releases' } } %>
     <% end %>
