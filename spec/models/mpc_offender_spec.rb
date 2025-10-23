@@ -354,7 +354,7 @@ RSpec.describe MpcOffender, type: :model do
         release_date
         date_of_birth
         main_offence
-        awaiting_allocation_for
+        days_awaiting_allocation
         working_days_since_entering_this_prison
         location
         category_label
@@ -636,7 +636,7 @@ RSpec.describe MpcOffender, type: :model do
     end
   end
 
-  describe '#awaiting_allocation_for' do
+  describe '#days_awaiting_allocation' do
     context 'when the case was never allocated' do
       it 'is the number of days since arriving at the prison'
     end

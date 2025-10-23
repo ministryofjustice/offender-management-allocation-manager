@@ -132,7 +132,7 @@ class MpcOffender
     end
   end
 
-  def awaiting_allocation_for
+  def days_awaiting_allocation
     return if prison_arrival_date.nil?
 
     (Time.zone.today - prison_arrival_date).to_i
@@ -478,7 +478,7 @@ class MpcOffender
       release_date
       date_of_birth
       main_offence
-      awaiting_allocation_for
+      days_awaiting_allocation
       working_days_since_entering_this_prison
       location
       category_label
