@@ -131,11 +131,11 @@ RSpec.describe PrisonersController, type: :controller do
         end
 
         it 'sorts by waiting for allocation descending' do
-          assert_sort_descending(:missing_information, offenders_awaiting_allocation_ascending_order, 'awaiting_allocation_for desc')
+          assert_sort_descending(:missing_information, offenders_awaiting_allocation_ascending_order, 'days_awaiting_allocation desc')
         end
 
         it 'sorts by waiting for allocation ascending' do
-          assert_sort_ascending(:missing_information, offenders_awaiting_allocation_ascending_order, 'awaiting_allocation_for asc')
+          assert_sort_ascending(:missing_information, offenders_awaiting_allocation_ascending_order, 'days_awaiting_allocation asc')
         end
       end
 
@@ -198,11 +198,11 @@ RSpec.describe PrisonersController, type: :controller do
         end
 
         it 'sorts by waiting for allocation ascending' do
-          assert_sort_ascending(:unallocated, offenders_awaiting_allocation_ascending_order, 'awaiting_allocation_for asc')
+          assert_sort_ascending(:unallocated, offenders_awaiting_allocation_ascending_order, 'days_awaiting_allocation asc')
         end
 
         it 'sorts by waiting for allocation descending' do
-          assert_sort_descending(:unallocated, offenders_awaiting_allocation_ascending_order, 'awaiting_allocation_for desc')
+          assert_sort_descending(:unallocated, offenders_awaiting_allocation_ascending_order, 'days_awaiting_allocation desc')
         end
       end
 
@@ -301,7 +301,7 @@ RSpec.describe PrisonersController, type: :controller do
         it 'gets missing_information records' do
           get :missing_information, params: { prison_id: prison }
           # Expecting offender (2) to use sentenceStartDate as it is newer than last arrival date in prison
-          off = assigns(:offenders).map { |o| [o.offender_no, Time.zone.today - o.awaiting_allocation_for] }.to_h
+          off = assigns(:offenders).map { |o| [o.offender_no, Time.zone.today - o.days_awaiting_allocation] }.to_h
           expect(off).to eq("G1234GY" => Date.new(2009, 2, 8),
                             "G7514GW" => Date.new(2018, 10, 1),
                             "G1234VV" => Date.new(2019, 2, 8))
@@ -393,7 +393,7 @@ RSpec.describe PrisonersController, type: :controller do
           stub_request(:post, "#{ApiHelper::T3}/movements/offenders?latestOnly=false&movementTypes=TRN")
             .to_return(body: [].to_json)
 
-          # When viewing allocated, cannot sort by awaiting_allocation_for as it is not available and is
+          # When viewing allocated, cannot sort by days_awaiting_allocation as it is not available and is
           # meaningless in this context. We do not want to crash if passed a field that is not searchable
           # within a specific context.
           offender_id = 'G7514GW'
@@ -403,7 +403,7 @@ RSpec.describe PrisonersController, type: :controller do
           create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
           create(:allocation_history, nomis_offender_id: offender_id, primary_pom_nomis_id: 234, prison: prison)
 
-          get :allocated, params: { prison_id: prison, sort: 'awaiting_allocation_for asc' }
+          get :allocated, params: { prison_id: prison, sort: 'days_awaiting_allocation asc' }
           expect(assigns(:offenders).count).to eq(1)
         end
       end

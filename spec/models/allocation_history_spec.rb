@@ -492,4 +492,73 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
       end
     end
   end
+
+  describe '#previously_allocated_but_now_not?' do
+    context 'when the case was never allocated a primary pom' do
+      it 'returns false' do
+        allocation = described_class.new
+        expect(allocation.previously_allocated_but_now_not?).to eq(false)
+      end
+    end
+
+    context 'when the case has been allocated to a primary pom but has since been deallocated' do
+      it 'returns true' do
+        allocation = described_class.create(
+          nomis_offender_id: 'GA123456',
+          prison: 'LEI',
+          primary_pom_nomis_id: 123_456,
+          primary_pom_name: 'A Pom',
+          recommended_pom_type: 'Prison',
+          primary_pom_allocated_at: 3.days.ago,
+          allocated_at_tier: 'D',
+          event: :allocate_primary_pom,
+          event_trigger: :user,
+        )
+        allocation.deallocate_primary_pom
+        expect(allocation.previously_allocated_but_now_not?).to eq(true)
+      end
+    end
+
+    context 'when the case has been allocated to a primary pom and deallocated the secondary pom' do
+      it 'returns false as they still have aprimary pom' do
+        allocation = described_class.create(
+          nomis_offender_id: 'GA123456',
+          prison: 'LEI',
+          primary_pom_nomis_id: 123_456,
+          primary_pom_name: 'A Pom',
+          recommended_pom_type: 'Prison',
+          primary_pom_allocated_at: 3.days.ago,
+          allocated_at_tier: 'D',
+          event: :allocate_primary_pom,
+          event_trigger: :user,
+        )
+        allocation.deallocate_secondary_pom
+        expect(allocation.previously_allocated_but_now_not?).to eq(false)
+      end
+    end
+
+    context 'when the case has been allocated to a primary pom, deallocated and then allocated again' do
+      it 'returns false' do
+        allocation = described_class.create(
+          nomis_offender_id: 'GA123456',
+          prison: 'LEI',
+          primary_pom_nomis_id: 123_456,
+          primary_pom_name: 'A Pom',
+          recommended_pom_type: 'Prison',
+          primary_pom_allocated_at: 3.days.ago,
+          allocated_at_tier: 'D',
+          event: :allocate_primary_pom,
+          event_trigger: :user,
+        )
+        allocation.deallocate_primary_pom
+        allocation.update(
+          primary_pom_nomis_id: 923_456,
+          primary_pom_name: 'Another Pom',
+          primary_pom_allocated_at: 2.days.ago,
+          event: :reallocate_primary_pom,
+        )
+        expect(allocation.previously_allocated_but_now_not?).to eq(false)
+      end
+    end
+  end
 end

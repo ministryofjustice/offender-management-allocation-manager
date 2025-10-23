@@ -7,7 +7,8 @@ module Sorting
     allocated_com_name
     allocated_pom_role
     allocation_date
-    awaiting_allocation_for
+    days_awaiting_allocation
+    working_days_since_entering_this_prison
     case_owner
     com_allocation_days_overdue
     complexity_level_number

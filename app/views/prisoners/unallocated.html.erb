@@ -77,11 +77,11 @@
         </a>
         <%= sort_arrow('additional_information') %>
       </th>
-      <th class="govuk-table__header sorter-false" scope="col" <%= sort_aria('awaiting_allocation_for') %>>
-        <a href="<%= sort_link('awaiting_allocation_for') %>">
+      <th class="govuk-table__header sorter-false" scope="col" <%= sort_aria('working_days_since_entering_this_prison') %>>
+        <a href="<%= sort_link('working_days_since_entering_this_prison') %>">
           Working days since<br />entering this prison
         </a>
-        <%= sort_arrow('awaiting_allocation_for') %>
+        <%= sort_arrow('working_days_since_entering_this_prison') %>
       </th>
     </tr>
     </thead>
@@ -117,7 +117,7 @@
           <%= offender.additional_information.join('<br />').html_safe %>
         </td>
         <td aria-label="Working days since entering this prison" class="govuk-table__cell">
-          <%= offender.awaiting_allocation_for(only_working_days: true).presence || 'N/A' %> days
+          <%= offender.working_days_since_entering_this_prison.presence || 'N/A' %> days
         </td>
       </tr>
     <% end %>
