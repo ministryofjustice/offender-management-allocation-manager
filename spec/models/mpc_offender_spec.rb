@@ -638,15 +638,31 @@ RSpec.describe MpcOffender, type: :model do
 
   describe '#days_awaiting_allocation' do
     context 'when the case was never allocated' do
-      it 'is the number of days since arriving at the prison'
+      it 'is the number of days since arriving at the prison' do
+        prison_record = double(:nomis_offender, offender_no: nomis_offender_id, prison_arrival_date: 10.days.ago)
+        offender = create(:offender, nomis_offender_id:)
+        mpc_offender = described_class.new(prison:, offender:, prison_record:)
+        expect(mpc_offender.days_awaiting_allocation).to eq(10)
+      end
     end
 
     context 'when the case has been allocated and since deallocated' do
-      it 'is the number days since the case was deallocated'
+      it 'is the number days since the case was deallocated' do
+        create(:allocation_history, nomis_offender_id:, prison: prison.code, event: :deallocate_primary_pom, primary_pom_allocated_at: nil, updated_at: 5.days.ago)
+        prison_record = double(:nomis_offender, offender_no: nomis_offender_id, prison_arrival_date: 10.days.ago)
+        offender = create(:offender, nomis_offender_id:)
+        mpc_offender = described_class.new(prison:, offender:, prison_record:)
+        expect(mpc_offender.days_awaiting_allocation).to eq(5)
+      end
     end
 
     context 'when there is no prison arrival date' do
-      it 'is nil'
+      it 'is nil' do
+        prison_record = double(:nomis_offender, offender_no: nomis_offender_id, prison_arrival_date: nil)
+        offender = create(:offender, nomis_offender_id:)
+        mpc_offender = described_class.new(prison:, offender:, prison_record:)
+        expect(mpc_offender.days_awaiting_allocation).to be_nil
+      end
     end
   end
 
