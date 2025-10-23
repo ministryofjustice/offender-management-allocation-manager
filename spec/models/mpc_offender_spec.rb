@@ -355,6 +355,7 @@ RSpec.describe MpcOffender, type: :model do
         date_of_birth
         main_offence
         awaiting_allocation_for
+        working_days_since_entering_this_prison
         location
         category_label
         complexity_level
@@ -632,6 +633,20 @@ RSpec.describe MpcOffender, type: :model do
       expect(mpc_offender.most_recent_completed_parole_review_for_sentence).not_to eq(incomplete_out_of_date)
       expect(mpc_offender.most_recent_completed_parole_review_for_sentence).not_to eq(completed_out_of_date)
       expect(mpc_offender.most_recent_completed_parole_review_for_sentence).not_to eq(incomplete_in_date)
+    end
+  end
+
+  describe '#awaiting_allocation_for' do
+    context 'when the case was never allocated' do
+      it 'is the number of days since arriving at the prison'
+    end
+
+    context 'when the case has been allocated and since deallocated' do
+      it 'is the number days since the case was deallocated'
+    end
+
+    context 'when there is no prison arrival date' do
+      it 'is nil'
     end
   end
 

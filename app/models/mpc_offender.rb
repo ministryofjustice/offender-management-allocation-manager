@@ -132,6 +132,12 @@ class MpcOffender
     end
   end
 
+  def awaiting_allocation_for
+    return if prison_arrival_date.nil?
+
+    (Time.zone.today - prison_arrival_date).to_i
+  end
+
   #
   # Early allocations
   #
@@ -366,6 +372,12 @@ class MpcOffender
 
   def in_open_conditions? = Offenders::PrisonPolicies.new(self).in_open_conditions?
 
+  def working_days_since_entering_this_prison
+    return if prison_arrival_date.nil?
+
+    WorkingDayCalculator.working_days_between(prison_arrival_date, Time.zone.today)
+  end
+
   #
   # Delegating data from the API
   #
@@ -391,7 +403,6 @@ class MpcOffender
            :main_offence,
            :booking_id,
            :complexity_level,
-           :awaiting_allocation_for,
            :inside_omic_policy?,
            # Special Dates
            :sentence_start_date,
@@ -468,6 +479,7 @@ class MpcOffender
       date_of_birth
       main_offence
       awaiting_allocation_for
+      working_days_since_entering_this_prison
       location
       category_label
       complexity_level

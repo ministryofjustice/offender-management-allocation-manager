@@ -78,6 +78,10 @@ RSpec.configure do |config|
     # We need to use a proper cache store to support the cache-backed session store
     Rails.cache.clear
   end
+  
+  config.before(:each) do
+    stub_bank_holidays
+  end
 
   config.include ActiveSupport::Testing::TimeHelpers
   config.include FeaturesHelper
