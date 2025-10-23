@@ -135,7 +135,7 @@ class MpcOffender
   def days_awaiting_allocation
     return if prison_arrival_date.nil?
 
-    starting_from_date = active_allocation.updated_at if active_allocation&.deallocate_primary_pom?
+    starting_from_date = active_allocation.updated_at if active_allocation&.previously_allocated_but_now_not?
     starting_from_date ||= prison_arrival_date
 
     (Time.zone.today - starting_from_date.to_date).to_i

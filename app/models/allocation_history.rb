@@ -175,6 +175,10 @@ class AllocationHistory < ApplicationRecord
     end
   end
 
+  def previously_allocated_but_now_not?
+    deallocate_primary_pom?
+  end
+
 private
 
   def deallocate_offender(event:, event_trigger:)
