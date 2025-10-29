@@ -1,10 +1,8 @@
-$govuk-global-styles: true;
-$govuk-new-typography-scale: true;
-$govuk-image-url-function: "image-url";
-$govuk-font-url-function: "asset-url";
-
-$govuk-suppressed-warnings: (
-  govuk-typography-scale-14
+@forward "govuk-frontend/dist/govuk/index" with (
+  $govuk-global-styles: true,
+  $govuk-new-typography-scale: true,
+  $govuk-image-url-function: "image-url",
+  $govuk-font-url-function: "asset-url",
 );
 
 @import "govuk-frontend/dist/govuk/index";

@@ -10,10 +10,10 @@
     govuk-frontend "^5.0.0"
     moment "^2.27.0"
 
-govuk-frontend@5.4.0:
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/govuk-frontend/-/govuk-frontend-5.4.0.tgz#8f2e0b55ef7c7552a1efe68c7b40ff1b4a393e72"
-  integrity sha512-F3YwQYrYQqIPfNxsoph6O78Ey1unCB6cy6omx8KeWY9G504lWZFBSIaiUCma1jNLw9bOUU7Ui+tXG09jjqy0Mw==
+govuk-frontend@5.13.0:
+  version "5.13.0"
+  resolved "https://registry.yarnpkg.com/govuk-frontend/-/govuk-frontend-5.13.0.tgz#11126d32a9ef0db17b19276253746da1ade4338b"
+  integrity sha512-6N3pHelWN7wftdM6e4YEzZAfattapa1gnd+Al6d5PUbfTr9D+T2dnphpNpjX75CTEhihlQqlL0RDQ3WIfZ3PSg==
 
 govuk-frontend@^5.0.0:
   version "5.4.1"
