@@ -3,6 +3,7 @@
   $govuk-new-typography-scale: true,
   $govuk-image-url-function: "image-url",
   $govuk-font-url-function: "asset-url",
+  $govuk-assets-path: 'govuk-frontend/dist/govuk/assets/',
   $govuk-suppressed-warnings: (
     govuk-typography-scale-14
   )

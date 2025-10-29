@@ -1,3 +1,5 @@
+@use "govuk-frontend/dist/govuk" as *;
+
 @mixin govuk-link-style-success {
   &:link,
   &:visited {

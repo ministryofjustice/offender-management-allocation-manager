@@ -44,7 +44,10 @@ gem 'ostruct'
 gem 'prawn-rails'
 gem 'rswag-api' # api-documentation
 gem 'rswag-ui'  # api-documentation interface
+
 gem 'sassc-rails'
+gem 'cssbundling-rails'
+
 # simple validation of email addresses.
 # ministryofjustice/email_address_validation thinks Faker emails don't parse which is annoying,
 # whilst also allowing invalid emails through.

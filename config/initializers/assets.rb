@@ -9,7 +9,7 @@ Rails.application.config.assets.version = '1.1'
 Rails.application.config.assets.paths << Rails.root.join('node_modules')
 Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-frontend')
 Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-frontend/dist')
-Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-frontend/dist/govuk/assets/rebrand')
+Rails.application.config.assets.paths << Rails.root.join('node_modules/govuk-frontend/dist/govuk/assets')
 
 Rails.application.config.assets.paths << Rails.root.join('node_modules/@ministryofjustice/frontend')
 Rails.application.config.assets.paths << Rails.root.join('node_modules/@ministryofjustice/frontend/moj/assets/images')
