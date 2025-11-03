@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@ministryofjustice/frontend@5.1.5":
-  version "5.1.5"
-  resolved "https://registry.yarnpkg.com/@ministryofjustice/frontend/-/frontend-5.1.5.tgz#f251aad828ebf644c1027aa0b938737d3f2cc2d0"
-  integrity sha512-qplsAEv1+8FeMxrBh+Z9NznX4LjZBTRBZubMlUqWKntBasssz5mp7rF/C8VeiuJhMtfOgB3YYDvxoahSQaoKGw==
+"@ministryofjustice/frontend@7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@ministryofjustice/frontend/-/frontend-7.1.0.tgz#e3eed534c199657dd5586c88f71c819e3afad39f"
+  integrity sha512-0kh7jAV0xm4EAUjzs16PgpDWbrMQw0mSYLUtpmOlZbihhLbp4c+C9m3eKRWziSuWmjUz/Ehf/QwTULW8jJZeqw==
 
 "@parcel/watcher-android-arm64@2.5.1":
   version "2.5.1"
