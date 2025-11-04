@@ -2,8 +2,9 @@
   "name": "offender-management-allocation-client",
   "private": true,
   "dependencies": {
-    "@ministryofjustice/frontend": "2.2.0",
-    "govuk-frontend": "5.4.0"
+    "@ministryofjustice/frontend": "7.1.0",
+    "govuk-frontend": "5.13.0",
+    "sass": "^1.93.2"
   },
   "description": "This README would normally document whatever steps are necessary to get the application up and running.",
   "version": "1.0.0",
@@ -12,7 +13,8 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "sass ./app/assets/stylesheets/application.scss:./app/assets/builds/application.css --no-source-map --load-path=. --load-path=node_modules"
   },
   "repository": {
     "type": "git",

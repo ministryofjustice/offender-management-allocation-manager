@@ -12,31 +12,31 @@
  */
 
 // Import GOV.UK Design System first
-@import "gov_uk";
+@use "gov_uk";
 
 // GOV.UK Design System customizations
-@import "gov_uk_notification_banner";
+@use "gov_uk_notification_banner";
 
 // Then application specific components
-@import "case_mix";
-@import "case_type_badge";
-@import "hmpps_header";
-@import "notification";
-@import "pages";
-@import "pagination";
-@import "prisoner";
-@import "risk_widgets";
-@import "search";
-@import "service_banner";
-@import "sorting";
-@import "tables";
-@import "timeline";
-@import "vlo_information";
-@import "cards";
-@import 'handovers';
-@import 'task_list';
-@import 'compare_poms';
-@import 'overrides';
+@use "case_mix";
+@use "case_type_badge";
+@use "hmpps_header";
+@use "notification";
+@use "pages";
+@use "pagination";
+@use "prisoner";
+@use "risk_widgets";
+@use "search";
+@use "service_banner";
+@use "sorting";
+@use "tables";
+@use "timeline";
+@use "vlo_information";
+@use "cards";
+@use 'handovers';
+@use 'task_list';
+@use 'compare_poms';
+@use 'overrides';
 
 .no-bottom-margin {
   margin-bottom: 0;

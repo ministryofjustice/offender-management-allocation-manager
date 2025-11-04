@@ -13,5 +13,5 @@
 //= require rails-ujs
 //= require turbolinks
 //= require govuk/all.bundle
-//= require moj/all
+//= require moj/all.bundle
 //= require_tree .
