@@ -1,4 +1,5 @@
 $bright-red: #d4351c;
+$mid-gray: #b1b4b6;
 $purble: #4c2c92; // purple+blue = burple
 
 @media screen and (max-width: 768px) {
@@ -7,12 +8,12 @@ $purble: #4c2c92; // purple+blue = burple
   }
 
   table.responsive tr {
-    border-bottom: 2px solid govuk-colour("mid-grey");
+    border-bottom: 2px solid $mid-gray;
     display: block;
   }
 
   table.responsive td {
-    border-bottom: 1px solid govuk-colour("mid-grey");
+    border-bottom: 1px solid $mid-gray;
     display: block;
     text-align: right;
     &:last-child {
