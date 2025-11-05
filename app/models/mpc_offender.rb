@@ -110,7 +110,7 @@ class MpcOffender
 
   private def handover
     # TODO: calls on responsibility which could in turn call HandoverDateService.handover - does it need this check?
-    @handover ||= pom_responsible? ? HandoverDateService.handover(self) : OffenderHandover::COM_NO_HANDOVER_DATE
+    @handover ||= pom_responsible? ? HandoverDateService.handover(self) : CalculatedHandoverDate::COM_NO_HANDOVER_DATE
   end
 
   #

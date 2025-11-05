@@ -19,7 +19,7 @@ RSpec.describe CalculatedHandoverDate, :disable_push_to_delius do
                                             handover_date: com_responsibility.handover_date,
                                             reason: com_responsibility.reason))
     end
-    let(:com_responsibility) { OffenderHandover::COM_NO_HANDOVER_DATE }
+    let(:com_responsibility) { CalculatedHandoverDate::COM_NO_HANDOVER_DATE }
     let(:record) { offender.calculated_handover_date }
 
     it 'allows nil handover dates' do
