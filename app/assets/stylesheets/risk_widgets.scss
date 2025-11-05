@@ -1,6 +1,8 @@
 // Please ensure that any changes made here are also reflected
 // in https://github.com/ministryofjustice/hmpps-risk-ui-elements
 
+@use "govuk-frontend/dist/govuk" as *;
+
 $low-score-colour: #485b10;
 $low-score-border-colour: #85994b;
 $medium-score-colour: #a34e00;
