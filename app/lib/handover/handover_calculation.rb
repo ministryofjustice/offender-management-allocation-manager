@@ -1,8 +1,4 @@
 module Handover::HandoverCalculation
-  POM_RESPONSIBLE = CalculatedHandoverDate::CUSTODY_ONLY
-  POM_RESPONSIBLE_COM_SUPPORTING = CalculatedHandoverDate::CUSTODY_WITH_COM
-  COM_RESPONSIBLE = CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
-
   class << self
     def calculate_handover_date(sentence_start_date:,
                                 earliest_release_date:,
@@ -29,37 +25,26 @@ module Handover::HandoverCalculation
                                       is_indeterminate:,
                                       open_prison_rules_apply:,
                                       in_womens_prison:)
-      return handover_date unless is_indeterminate && open_prison_rules_apply
+      if is_indeterminate && open_prison_rules_apply
+        # Women's estate: the day the offender's category changed to "open"
+        # Men's estate: the day the offender arrived in the open prison
+        handover_start_date = in_womens_prison ? category_active_since_date : prison_arrival_date
 
-      handover_start_date = if in_womens_prison
-                              # Women's estate: the day the offender's category changed to "open"
-                              category_active_since_date
-                            else
-                              # Men's estate: the day the offender arrived in the open prison
-                              prison_arrival_date
-                            end
-      if handover_start_date.present? && handover_date.present? && handover_start_date < handover_date
-        handover_start_date
+        [handover_start_date, handover_date].compact.min
       else
         handover_date
       end
     end
 
     def calculate_responsibility(handover_date:, handover_start_date:, today: Time.zone.now.utc.to_date)
-      return COM_RESPONSIBLE if handover_date.nil?
-
-      raise HandoverCalculationArgumentError, 'handover_start_date must be given' if handover_start_date.nil?
-
-      if handover_start_date > handover_date
-        raise HandoverCalculationArgumentError, 'handover_start_date cannot be after handover_date'
-      end
-
-      if today < handover_start_date
-        POM_RESPONSIBLE
+      if handover_date.nil?
+        CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
+      elsif today < handover_start_date
+        CalculatedHandoverDate::CUSTODY_ONLY
       elsif today < handover_date
-        POM_RESPONSIBLE_COM_SUPPORTING
+        CalculatedHandoverDate::CUSTODY_WITH_COM
       else
-        COM_RESPONSIBLE
+        CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
       end
     end
 
