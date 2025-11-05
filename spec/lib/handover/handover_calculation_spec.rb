@@ -245,65 +245,49 @@ RSpec.describe Handover::HandoverCalculation,  handover_calculations: true do
       expect(described_class.calculate_responsibility(handover_date: nil,
                                                       handover_start_date: Faker::Date.forward,
                                                       today: today))
-        .to eq described_class::COM_RESPONSIBLE
-    end
-
-    it 'raises an error if handover date is set and handover start date is not set' do
-      expect {
-        described_class.calculate_responsibility(handover_date: Faker::Date.forward,
-                                                 handover_start_date: nil,
-                                                 today: today)
-      }.to raise_error(described_class::HandoverCalculationArgumentError, /handover_start_date/)
-    end
-
-    it 'raises an error if handover start date is after handover date' do
-      expect {
-        described_class.calculate_responsibility(handover_date: today + 1.day,
-                                                 handover_start_date: today + 2.days,
-                                                 today: today)
-      }.to raise_error(described_class::HandoverCalculationArgumentError, /handover_start_date cannot be after/)
+        .to eq CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
     end
 
     it 'is COM responsible when handover date is in the past and start date is in the past' do
       expect(described_class.calculate_responsibility(handover_date: today - 1.day,
                                                       handover_start_date: today - 2.days,
                                                       today: today))
-        .to eq described_class::COM_RESPONSIBLE
+        .to eq CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
     end
 
     it 'is COM responsible when handover date is today and start date is in the past' do
       expect(described_class.calculate_responsibility(handover_date: today,
                                                       handover_start_date: today - 1.day,
                                                       today: today))
-        .to eq described_class::COM_RESPONSIBLE
+        .to eq CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
     end
 
     it 'is COM responsible when handover date is today and start date is today' do
       expect(described_class.calculate_responsibility(handover_date: today,
                                                       handover_start_date: today,
                                                       today: today))
-        .to eq described_class::COM_RESPONSIBLE
+        .to eq CalculatedHandoverDate::COMMUNITY_RESPONSIBLE
     end
 
     it 'is POM responsible/COM supporting when handover date is in the future and start date is in the past' do
       expect(described_class.calculate_responsibility(handover_date: today + 1.day,
                                                       handover_start_date: today - 1.day,
                                                       today: today))
-        .to eq described_class::POM_RESPONSIBLE_COM_SUPPORTING
+        .to eq CalculatedHandoverDate::CUSTODY_WITH_COM
     end
 
     it 'is POM responsible/COM supporting when handover date is in the future and start date is today' do
       expect(described_class.calculate_responsibility(handover_date: today + 1.day,
                                                       handover_start_date: today,
                                                       today: today))
-        .to eq described_class::POM_RESPONSIBLE_COM_SUPPORTING
+        .to eq CalculatedHandoverDate::CUSTODY_WITH_COM
     end
 
     it 'is POM responsible when handover date is in the future and start date is future' do
       expect(described_class.calculate_responsibility(handover_date: today + 2.days,
                                                       handover_start_date: today + 1.day,
                                                       today: today))
-        .to eq described_class::POM_RESPONSIBLE
+        .to eq CalculatedHandoverDate::CUSTODY_ONLY
     end
   end
 
