@@ -5,6 +5,8 @@ class CalculatedHandoverDate < ApplicationRecord
   CUSTODY_WITH_COM = 'CustodyWithCom'
   COMMUNITY_RESPONSIBLE = 'Community'
 
+  COM_NO_HANDOVER_DATE = new(responsibility: COMMUNITY_RESPONSIBLE, reason: :com_responsibility)
+
   REASONS = {
     com_responsibility: 'COM Responsibility',
     recall_case: 'Recall case',
@@ -95,6 +97,12 @@ class CalculatedHandoverDate < ApplicationRecord
   attr_accessor :offender_attributes_to_archive
 
   class << self
+    # builders
+    def pom_only(**attributes) = new(responsibility: CUSTODY_ONLY, **attributes)
+    def pom_with_com(**attributes) = new(responsibility: CUSTODY_WITH_COM, **attributes)
+    def com(**attributes) = new(responsibility: COMMUNITY_RESPONSIBLE, **attributes)
+
+    # Queries
     def by_offender_ids(offender_id_or_ids)
       where(nomis_offender_id: offender_id_or_ids)
     end

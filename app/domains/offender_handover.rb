@@ -1,29 +1,27 @@
 class OffenderHandover < SimpleDelegator
-  COM_NO_HANDOVER_DATE = CalculatedHandoverDate.new(
-    responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
-    reason: :com_responsibility)
-
   def as_calculated_handover_date
     if indeterminate_sentence? && sentences.sentenced_to_additional_future_isp?
-      pom_only(:additional_isp)
+      pom_only(reason: :additional_isp)
     elsif indeterminate_sentence? && thd_12_or_more_months_from_now? && recalled? && mappa_level.in?([nil, 0, 1])
-      pom_with_com(:recall_thd_over_12_months)
+      pom_with_com(reason: :recall_thd_over_12_months)
     elsif indeterminate_sentence? && thd_12_or_more_months_from_now? && parole_outcome_not_release? && mappa_level.in?([2, 3])
-      com(:parole_mappa_2_3)
+      com(reason: :parole_mappa_2_3)
     elsif indeterminate_sentence? && thd_12_or_more_months_from_now? && parole_outcome_not_release?
-      pom_with_com(:thd_over_12_months)
+      pom_with_com(reason: :thd_over_12_months)
     elsif recalled?
-      com(:recall_case)
+      com(reason: :recall_case)
     elsif immigration_case?
-      com(:immigration_case)
+      com(reason: :immigration_case)
     elsif !earliest_release_for_handover
-      pom_only(:release_date_unknown)
+      pom_only(reason: :release_date_unknown)
     else
       general_rules
     end
   end
 
 private
+
+  delegate :pom_only, :pom_with_com, :com, to: CalculatedHandoverDate
 
   def general_rules
     handover_date, reason = Handover::HandoverCalculation.calculate_handover_date(
@@ -51,8 +49,4 @@ private
 
     CalculatedHandoverDate.new(responsibility:, handover_date:, start_date:, reason:)
   end
-
-  def pom_only(reason = nil) = CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::CUSTODY_ONLY, reason:)
-  def pom_with_com(reason = nil) = CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::CUSTODY_WITH_COM, reason:)
-  def com(reason = nil) = CalculatedHandoverDate.new(responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE, reason:)
 end
