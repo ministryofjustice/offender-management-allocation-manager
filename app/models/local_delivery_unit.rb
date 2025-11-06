@@ -16,8 +16,4 @@ class LocalDeliveryUnit < ApplicationRecord
   scope :enabled, -> { where(enabled: true) }
 
   has_many :case_information, dependent: :restrict_with_exception
-
-  def self.ransackable_attributes(_auth_object = nil)
-    %w[code country created_at email_address enabled id name updated_at]
-  end
 end

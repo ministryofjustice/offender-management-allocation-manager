@@ -21,7 +21,6 @@ if ENV['DISABLE_COVERAGE'].blank?
     add_filter 'app/services/hmpps_api/error/'
     add_filter 'lib/allocation_validation.rb'
     add_filter 'app/jobs/custom_stats_logging_job.rb'
-    add_filter 'app/admin/'
     add_group "Services", "app/services"
 
     # Set to very low minimum - now it is simply for mostly informational purposes

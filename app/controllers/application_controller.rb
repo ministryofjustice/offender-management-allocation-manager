@@ -33,11 +33,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # called by active admin
-  def access_denied(_active_admin_context)
-    redirect_to '/401'
-  end
-
   # Store an object's attributes to the session
   # Use this method to safely serialize ActiveRecord objects (or those with an #attributes method).
   # ActiveRecord objects can later be re-hydrated by calling MyModel.new() with attributes loaded from the session.

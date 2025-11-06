@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  ActiveAdmin.routes(self)
   root to: 'root#index'
 
   get '/auth/:provider/callback', to: 'sessions#create'
@@ -189,7 +188,7 @@ Rails.application.routes.draw do
   get '/api/allocation/:offender_no', to: 'api/allocation_api#show'
   get '/subject-access-request', to: 'api/sar#show'
 
-  # '/admin' is already taken by ActiveAdmin
+  # '/admin' was taken by ActiveAdmin in the past
   namespace :manage do
     resources :audit_events, only: %i[index]
 
