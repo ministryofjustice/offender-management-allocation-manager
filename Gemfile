@@ -11,6 +11,7 @@ gem 'aws-sdk-sns'
 gem 'aws-sdk-s3'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 5.0'
+gem 'csv'
 gem 'date_validator'
 gem 'faraday', '~> 1.10.3'
 gem 'govuk_notify_rails', '~> 3.0.0'
@@ -64,8 +65,6 @@ gem 'application_insights'
 
 # Veracode static code analysis
 gem 'veracode'
-
-gem 'activeadmin'
 
 group :development, :test do
   gem 'brakeman', '~> 6.0'

@@ -2,12 +2,8 @@ RSpec.describe 'Audit events' do
   describe 'UI' do
     before do
       allow_any_instance_of(Manage::AuditEventsController).to receive_messages(
-        ensure_admin_user: nil,
         authenticate_user: nil,
-        check_prison_access: nil,
-        load_staff_member: nil,
-        service_notifications: nil,
-        load_roles: nil,
+        ensure_admin_user: nil,
       )
     end
 

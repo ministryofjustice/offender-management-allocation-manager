@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Api::OffendersController < Api::ApiController
-  respond_to :json
-
   def show
     @offender = OffenderService.get_offender(offender_number)
     if @offender.nil?

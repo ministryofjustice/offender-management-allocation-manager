@@ -156,8 +156,9 @@
 
 <% if @user_allocations.empty? %>
   <script>
-      $(function () {
-          document.querySelector('#tab_global-results').click()
-      });
+    document.addEventListener('DOMContentLoaded', function () {
+      const tab = document.querySelector('#tab_global-results');
+      if (tab) tab.click();
+    });
   </script>
 <% end %>

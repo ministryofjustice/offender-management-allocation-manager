@@ -1,4 +1,4 @@
-$(document).on('turbolinks:load', function() {
+document.addEventListener('turbolinks:load', () => {
   if (window.location.hash && window.location.hash.includes('!top')) {
     window.location.hash = window.location.hash.replace('!top', '');
 

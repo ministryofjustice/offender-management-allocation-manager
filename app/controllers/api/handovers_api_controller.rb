@@ -1,6 +1,4 @@
 class Api::HandoversApiController < Api::ApiController
-  respond_to :json
-
   def show
     @handover = CalculatedHandoverDate.find_by(nomis_offender_id: params[:id])
 

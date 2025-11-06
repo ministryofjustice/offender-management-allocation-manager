@@ -47,7 +47,6 @@ Metrics/BlockLength:
   Exclude:
     - 'config/environments/*'
     - 'Guardfile'
-    - 'app/admin/*'
     - 'lib/tasks/*'
     - 'spec/**/*'
 

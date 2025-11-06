@@ -1,5 +1,5 @@
-class Manage::AuditEventsController < PrisonsApplicationController
-  before_action :ensure_admin_user
+class Manage::AuditEventsController < ApplicationController
+  before_action :authenticate_user, :ensure_admin_user
 
   def index
     @nomis_offender_id = params[:nomis_offender_id]
