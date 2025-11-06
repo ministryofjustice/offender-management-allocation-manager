@@ -2,21 +2,14 @@
 
 class BankHolidays
   UnsuccessfulRetrievalError = Class.new(StandardError)
+
   API_URL = 'https://www.gov.uk/bank-holidays.json'
   DEFAULT_GROUP = 'england-and-wales'
 
-  def self.dates
-    new.dates(DEFAULT_GROUP)
-  end
+  def self.dates(group = DEFAULT_GROUP) = new.dates(group)
 
-  def data
-    return raise_error unless response.is_a?(Net::HTTPOK)
-
-    @data ||= JSON.parse(response.body)
-  end
-
-  def dates(group)
-    return if data.empty?
+  def dates(group = DEFAULT_GROUP)
+    return [] if data.empty?
 
     dates = data.dig(group, 'events')&.pluck('date')
     dates.map { |date_string| Date.parse(date_string) }
@@ -24,15 +17,15 @@ class BankHolidays
 
 private
 
-  def response
-    @response ||= Net::HTTP.get_response(uri)
-  end
+  def data
+    @data ||= Rails.cache.fetch('bank-holidays', expires_in: 1.month) do
+      response = Net::HTTP.get_response(URI.parse(API_URL))
 
-  def uri
-    URI.parse(API_URL)
-  end
+      unless response.is_a?(Net::HTTPOK)
+        raise UnsuccessfulRetrievalError, "Retrieval Failed: #{response.message} (#{response.code}) #{response.body}"
+      end
 
-  def raise_error
-    raise UnsuccessfulRetrievalError, "Retrieval Failed: #{response.message} (#{response.code}) #{response.body}"
+      JSON.parse(response.body)
+    end
   end
 end
