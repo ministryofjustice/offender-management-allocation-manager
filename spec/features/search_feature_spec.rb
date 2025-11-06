@@ -1,110 +1,63 @@
-# frozen_string_literal: true
+feature 'Search for offenders' do
+  let(:prison_code) { 'LEI' }
 
-require 'rails_helper'
-
-feature 'Search for offenders', flaky: true do
   before do
-    allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).and_return(nil)
-    signin_spo_user [prison_code]
+    prison = create(:prison, code: prison_code)
+    pom = build(:pom)
+
+    stub_poms(prison.code, [pom])
+    stub_pom_user(pom)
+    stub_signin_spo(build(:homd))
+
+    offenders = [
+      build(:nomis_offender, prisonId: prison.code, prisonerNumber: 'T0000AA', firstName: 'California', lastName: 'Mccoy'),
+      build(:nomis_offender, prisonId: prison.code, prisonerNumber: 'T0000AB', firstName: 'Cally', lastName: 'Agnes'),
+      build(:nomis_offender, prisonId: prison.code, prisonerNumber: 'T0000AC', firstName: 'Jane', lastName: 'Doe'),
+      build(:nomis_offender, prisonId: prison.code, prisonerNumber: 'T0000AD', firstName: 'Janet', lastName: 'Frank'),
+      build(:nomis_offender, prisonId: prison.code, prisonerNumber: 'T0000AE', firstName: 'Bridget', lastName: 'Callins')
+    ]
+
+    offenders.each { stub_keyworker(it[:prisonerNumber]) }
+
+    stub_offenders_for_prison(prison.code, offenders)
   end
 
-  context 'when male prison', vcr: { cassette_name: 'prison_api/dashboard_search_feature' } do
-    let(:prison_code) { 'LEI' }
+  it 'Can search from the dashboard' do
+    visit root_path
+    fill_in 'Find a case', with: 'Cal'
+    click_on 'Search'
 
-    it 'Can search from the dashboard' do
-      visit root_path
+    expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
+    expect(all('[aria-label="Prisoner name"]').map(&:text)).to eq(['Mccoy, California T0000AA', 'Agnes, Cally T0000AB', 'Callins, Bridget T0000AE'])
 
-      expect(page).to have_text(I18n.t('service_name'))
-      fill_in 'q', with: 'Cal'
-      click_on('search-button')
-
-      expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
-      expect(page).to have_css('tbody tr', count: 5)
-    end
-
-    it 'Has valid offender name link' do
-      visit root_path
-      fill_in 'q', with: 'Cal'
-      click_on('search-button')
-
-      # Click on first offender name
-      find('.allocated_offender_row_0 .govuk-table__cell:first a').click
-      expect(page).to have_title "View case information"
-    end
-
-    it 'Has valid Missing details link' do
-      visit root_path
-      fill_in 'q', with: 'Cal'
-      click_on('search-button')
-
-      # Just check that link can be clicked on without crashing
-      within '.allocated_offender_row_0' do
-        click_link 'Add missing details'
-      end
-    end
+    click_on 'Mccoy, California'
+    expect(page).to have_title "View case information"
   end
 
-  context "with female prison" do
-    let(:prison) { create(:womens_prison) }
-    let(:prison_code) { prison.code }
-    let(:offenders) { build_list(:nomis_offender, 5, prisonId: prison.code, complexityLevel: 'high') }
-    let(:pom) { build(:pom) }
+  it 'Can search from the Allocations summary page' do
+    visit allocated_prison_prisoners_path(prison_code)
+    fill_in 'Find a case', with: 'Jane'
+    click_on 'Search'
 
-    before do
-      stub_offenders_for_prison(prison_code, offenders)
-      stub_spo_user pom
-      stub_poms prison_code, [pom]
-    end
-
-    it 'has a valid missing info link' do
-      visit search_prison_prisoners_path(prison_code)
-
-      # Just check that link can be clicked on without crashing
-      within '.allocated_offender_row_0' do
-        click_link 'Add missing details'
-      end
-    end
+    expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
+    expect(all('[aria-label="Prisoner name"]').map(&:text)).to eq(['Doe, Jane T0000AC', 'Frank, Janet T0000AD'])
   end
 
-  context 'with a single allocation' do
-    before do
-      create(:case_information, offender: build(:offender, nomis_offender_id: 'G5359UP'))
-      create(:allocation_history, prison: prison_code, nomis_offender_id: 'G5359UP')
-    end
+  it 'Can search from the Awaiting Allocation summary page' do
+    visit unallocated_prison_prisoners_path(prison_code)
+    fill_in 'Find a case', with: 'Bridget'
+    click_on 'Search'
 
-    let(:prison_code) { 'LEI' }
+    expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
+    expect(all('[aria-label="Prisoner name"]').map(&:text)).to eq(['Callins, Bridget T0000AE'])
+  end
 
-    it 'Can search from the Allocations summary page', vcr: { cassette_name: 'prison_api/allocated_search_feature' } do
-      visit allocated_prison_prisoners_path(prison_code)
+  it 'Can search from the Missing Information summary page' do
+    visit missing_information_prison_prisoners_path(prison_code)
+    fill_in 'Find a case', with: 'Doe'
+    click_on 'Search'
 
-      expect(page).to have_text('See allocations')
-      fill_in 'q', with: 'Fran'
-      click_on('search-button')
-
-      expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
-      expect(page).to have_css('tbody tr', count: 10)
-    end
-
-    it 'Can search from the Awaiting Allocation summary page', vcr: { cassette_name: 'prison_api/waiting_allocation_search_feature' } do
-      visit unallocated_prison_prisoners_path(prison_code)
-
-      expect(page).to have_text('Make allocations')
-      fill_in 'q', with: 'Tre'
-      click_on('search-button')
-
-      expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
-      expect(page).to have_css('tbody tr', count: 1)
-    end
-
-    it 'Can search from the Missing Information summary page', vcr: { cassette_name: 'prison_api/missing_info_search_feature' } do
-      visit missing_information_prison_prisoners_path(prison_code)
-
-      expect(page).to have_text('Make allocations')
-      fill_in 'q', with: 'Ste'
-      click_on('search-button')
-
-      expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
-      expect(page).to have_css('tbody tr', count: 4)
-    end
+    expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
+    expect(all('[aria-label="Prisoner name"]').map(&:text)).to eq(['Doe, Jane T0000AC'])
   end
 end
