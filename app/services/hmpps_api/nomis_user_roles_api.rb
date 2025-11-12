@@ -26,9 +26,11 @@ module HmppsApi
     end
 
     # See: https://nomis-user-roles-api-dev.prison.service.justice.gov.uk/swagger-ui/index.html#/user-resource/getUsers
+    # The search API is case-insensitive. We convert to downcase just to avoid potential
+    # caching issues with search terms using different casing, i.e. Smith/smith
     def self.get_users(caseload:, filter:)
       client.get(
-        '/users', queryparams: { caseload:, nameFilter: filter }.merge(DEFAULT_USER_SEARCH_FILTER)
+        '/users', queryparams: { caseload:, nameFilter: filter.downcase }.merge(DEFAULT_USER_SEARCH_FILTER)
       )
     end
 
@@ -45,6 +47,7 @@ module HmppsApi
       )
     end
 
+    # See: https://nomis-user-roles-api-dev.prison.service.justice.gov.uk/swagger-ui/index.html#/staff-member-resource/setJobClassification
     def self.expire_staff_role(pom)
       client.put(
         "/agency/#{pom.agency_id}/staff-members/#{pom.staff_id}/staff-role/POM",
