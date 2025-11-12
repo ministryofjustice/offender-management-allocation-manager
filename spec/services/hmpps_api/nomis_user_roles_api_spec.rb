@@ -46,7 +46,7 @@ describe HmppsApi::NomisUserRolesApi do
 
   describe '.get_users' do
     let(:caseload) { 'LEI' }
-    let(:filter) { 'smith' }
+    let(:filter) { 'Smith' }
     let(:response_body) do
       {
         'totalElements' => 1,
@@ -67,7 +67,7 @@ describe HmppsApi::NomisUserRolesApi do
         .with(
           query: {
             caseload: caseload,
-            nameFilter: filter,
+            nameFilter: 'smith',
             userType: 'GENERAL',
             status: 'ACTIVE',
             accessRoles: 'ALLOC_CASE_MGR',
