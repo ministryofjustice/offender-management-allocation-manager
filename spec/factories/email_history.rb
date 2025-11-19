@@ -18,6 +18,10 @@ FactoryBot.define do
       Faker::Internet.email
     end
 
+    trait :immediate_community_allocation do
+      event { EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION }
+    end
+    
     trait :auto_early_allocation do
       event { EmailHistory::AUTO_EARLY_ALLOCATION }
     end

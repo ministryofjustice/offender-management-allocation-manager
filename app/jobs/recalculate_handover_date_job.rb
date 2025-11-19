@@ -90,6 +90,7 @@ private
     end
   end
 
+  # TODO: This should probably be a shceduled job - we are effectivly using this like a cron every 2 days
   def assign_com_email(db_offender:, nomis_offender:, case_info:)
     last_com_email = db_offender.email_histories.immediate_community_allocation.last
 
