@@ -1,0 +1,41 @@
+<% content_for :title, "Live handover dates – #{t('global.default_page_title')}" %>
+
+<h2 class="govuk-heading-l">
+  Handover date changes
+</h2>
+
+<div class="govuk-inset-text">
+  Changes that would occur if the job were run this moment
+</div>
+
+<%= render partial: "manage/handover_changes/nav", locals: { tab: 'live' } %>
+
+<details class="govuk-details">
+  <summary class="govuk-details__summary">
+    <span class="govuk-details__summary-text">
+      Filter
+    </span>
+  </summary>
+  <div class="govuk-details__text">
+    <%= form_tag(manage_handover_changes_live_path, method: :get) do %>
+      <div class="govuk-form-group">
+        <div class="govuk-checkboxes govuk-checkboxes--small">
+          <div class="govuk-checkboxes__item">
+            <input name="hide_new_records" type="hidden" value="false">
+            <input class="govuk-checkboxes__input" id="hide_new_records" name="hide_new_records" type="checkbox" value="true" <%= 'checked' if @hide_new_records %>>
+
+            <label class="govuk-label govuk-checkboxes__label" for="hide_new_records">
+              Hide where calculating handover for the first time
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="govuk-button" data-module="govuk-button">
+        View results
+      </button>
+    <% end %>
+  </div>
+</details>
+
+<%= render partial: "manage/handover_changes/table" %>

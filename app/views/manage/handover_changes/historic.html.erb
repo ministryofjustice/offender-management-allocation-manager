@@ -1,0 +1,35 @@
+<% content_for :title, "Current handover dates – #{t('global.default_page_title')}" %>
+
+<h2 class="govuk-heading-l">
+  Handover date changes
+</h2>
+
+<div class="govuk-inset-text">
+  Changes that occured when the job ran <%= @selected_date.today? ? 'this morning' : @selected_date.strftime('%d/%m/%Y') %> for any prison.
+</div>
+
+<%= render partial: "manage/handover_changes/nav", locals: { tab: 'historic' } %>
+
+<details class="govuk-details">
+  <summary class="govuk-details__summary">
+    <span class="govuk-details__summary-text">
+      Filter
+    </span>
+  </summary>
+  <div class="govuk-details__text">
+    <%= form_tag(manage_handover_changes_historic_path, method: :get) do %>
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="date">Date</label>
+        <input class="govuk-input govuk-input--width-10" id="date" name="date" type="text" placeholder="Format: DD/MM/YYYY" autocomplete="on" value="<%= @selected_date.today? ? nil : @selected_date.strftime('%d/%m/%Y') %>">
+      </div>
+    
+      <button type="submit" class="govuk-button" data-module="govuk-button">
+        View results
+      </button>
+    
+      <%= link_to 'Today', manage_handover_changes_historic_path, class: 'govuk-button govuk-button--secondary' %>
+    <% end %>
+  </div>
+</details>
+
+<%= render partial: "manage/handover_changes/table" %>
