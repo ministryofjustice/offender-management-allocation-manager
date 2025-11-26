@@ -11,7 +11,7 @@ class Manage::HandoverChangesController < ApplicationController
       .where(item_type: CalculatedHandoverDate.to_s, event: 'update')
       .where('created_at > ? AND created_at < ?', @selected_date.beginning_of_day, @selected_date.end_of_day)
       .order('nomis_offender_id, created_at desc')
-      .map { HandoverChangeSet.new(it.nomis_offender_id, it.changeset) }
+      .map { historic_handover_change(it) }
   end
 
   def live
@@ -20,7 +20,7 @@ class Manage::HandoverChangesController < ApplicationController
     @handover_changes = OffenderService
       .get_offenders_in_prison(@prison)
       .select(&:inside_omic_policy?)
-      .map { live_changeset_for(it) }
+      .map { live_handover_change(it) }
       .compact
       .select(&:changed?)
       .select { @hide_new_records ? it.last_calculated_at.present? : true }
@@ -28,34 +28,30 @@ class Manage::HandoverChangesController < ApplicationController
 
 private
 
-  def live_changeset_for(offender)
+  def live_handover_change(offender)
     calculated_handover = CalculatedHandoverDate.find_by(nomis_offender_id: offender.nomis_offender_id)
     live_handover = HandoverDateService.handover(offender)
+    live_handover.last_calculated_at = Time.zone.now
 
-    calculated_handover.assign_attributes(live_handover.attributes)
-    calculated_handover.last_calculated_at = Time.zone.now
-
-    HandoverChangeSet.new(offender.nomis_offender_id, calculated_handover.changes)
+    HandoverChange.new(calculated_handover, live_handover)
   rescue StandardError
     nil
   end
 
-  HandoverChangeSet = Struct.new(:nomis_offender_id, :changeset) do
-    def responsibility = changeset['responsibility']&.first
-    def new_responsibility = changeset['responsibility']&.last
-    def handover_date = changeset['handover_date']&.first
-    def new_handover_date = changeset['handover_date']&.last
-    def start_date = changeset['start_date']&.first
-    def new_start_date = changeset['start_date']&.last
-    def reason = changeset['reason']&.first
-    def new_reason = changeset['reason']&.last
-    def last_calculated_at = changeset['last_calculated_at']&.first
-    def new_last_calculated_at = changeset['last_calculated_at']&.last
+  def historic_handover_change(version)
+    old_handover = version.reify
+    new_handover = old_handover.dup
+    new_handover.assign_attributes(version.changeset.transform_values(&:last))
+    HandoverChange.new(old_handover, new_handover)
+  end
 
-    def changed? = changeset.present? &&
-      responsibility != new_responsibility ||
-      handover_date != new_handover_date ||
-      start_date != new_start_date ||
-      reason != new_reason
+  HandoverChange = Struct.new(:old_handover, :new_handover) do
+    delegate :responsibility, :handover_date, :start_date, :reason, :last_calculated_at, :nomis_offender_id, to: :old_handover, allow_nil: true
+    delegate :responsibility, :handover_date, :start_date, :reason, :last_calculated_at, :nomis_offender_id, to: :new_handover, prefix: :new
+
+    def changed?
+      responsibility != new_responsibility || reason != new_reason ||
+      handover_date != new_handover_date || start_date != new_start_date
+    end
   end
 end
