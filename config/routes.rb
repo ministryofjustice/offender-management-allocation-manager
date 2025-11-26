@@ -192,6 +192,9 @@ Rails.application.routes.draw do
   namespace :manage do
     resources :audit_events, only: %i[index]
 
+    get 'handover_changes/live', to: 'handover_changes#live'
+    get 'handover_changes/historic', to: 'handover_changes#historic'
+
     get 'deallocate_poms', to: 'deallocate_poms#search'
     patch 'deallocate_poms/confirm', to: 'deallocate_poms#confirm'
     patch 'deallocate_poms', to: 'deallocate_poms#update', as: :deallocate_poms_update

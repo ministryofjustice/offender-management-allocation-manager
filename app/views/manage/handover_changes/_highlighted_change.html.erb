@@ -1,0 +1,6 @@
+<% if current_value != new_value %>
+  <div class="highlight-primary highlight-cell"><%= new_value || 'empty' %></div>
+  <div class="highlight-secondary highlight-cell"><%= current_value || 'empty' %></div>
+<% else %>
+  <%= new_value || 'empty' %>
+<% end %>

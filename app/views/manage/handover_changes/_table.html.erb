@@ -1,0 +1,16 @@
+<table class="govuk-table govuk-table--small-text-until-tablet">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">NOMIS ID</th>
+      <th scope="col" class="govuk-table__header">Responsibility</th>
+      <th scope="col" class="govuk-table__header">Handover Start Date</th>
+      <th scope="col" class="govuk-table__header">Handover Date</th>
+      <th scope="col" class="govuk-table__header">Reason</th>
+      <th scope="col" class="govuk-table__header">Last Calculated</th>
+    </tr>
+  </thead>
+
+  <tbody class="govuk-table__body">
+    <%= render partial: "manage/handover_changes/handover_change", collection: @handover_changes %>
+  </tbody>
+</table>

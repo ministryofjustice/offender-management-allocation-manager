@@ -1,0 +1,25 @@
+<tr class="govuk-table__row">
+  <td class="govuk-table__cell">
+    <%= link_to handover_change.nomis_offender_id, prison_debugging_path(@prison.code, offender_no: handover_change.nomis_offender_id) %>
+  </td>
+
+  <td class="govuk-table__cell">
+    <%= render 'manage/handover_changes/highlighted_change', current_value: handover_change.responsibility, new_value: handover_change.new_responsibility %>
+  </td>
+
+  <td class="govuk-table__cell">
+    <%= render 'manage/handover_changes/highlighted_change', current_value: handover_change.start_date, new_value: handover_change.new_start_date %>
+  </td>
+
+  <td class="govuk-table__cell">
+    <%= render 'manage/handover_changes/highlighted_change', current_value: handover_change.handover_date, new_value: handover_change.new_handover_date %>
+  </td>
+
+  <td class="govuk-table__cell">
+    <%= render 'manage/handover_changes/highlighted_change', current_value: handover_change.reason, new_value: handover_change.new_reason %>
+  </td>
+
+  <td class="govuk-table__cell">
+    <%= render 'manage/handover_changes/highlighted_change', current_value: handover_change.last_calculated_at, new_value: handover_change.new_last_calculated_at %>
+  </td>
+</tr>

@@ -40,6 +40,7 @@ module AuthHelper
       session[:sso_data] = {
         'expiry' => Time.zone.now + 1.day,
         'roles' => roles,
+        'active_caseload' => prison,
         'caseloads' => [prison],
         'username' => username,
         'staff_id' => staff_id,
