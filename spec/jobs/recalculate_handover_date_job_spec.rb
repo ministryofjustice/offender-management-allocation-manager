@@ -13,7 +13,9 @@ describe RecalculateHandoverDateJob do
 
     it 'calculates and records the results' do
       created_records = CalculatedHandoverDate.where(nomis_offender_id: offender.nomis_offender_id)
+
       expect { recaluclate_handover_dates }.to change { created_records.reload.count }.from(0).to(1)
+
       expect(created_records.first.then { [it.responsibility, it.reason] }).to eq(
         [CalculatedHandoverDate::CUSTODY_ONLY, 'determinate']
       )
@@ -26,9 +28,18 @@ describe RecalculateHandoverDateJob do
       the_responsibility_will_be_calculated_as(CalculatedHandoverDate.pom_only(reason: :determinate))
     end
 
-    it 'does not update the record' do
+    it 'does not update the record (especially running multiple times and other aspects of the offender changing)' do
       record = CalculatedHandoverDate.find_by(nomis_offender_id: offender.nomis_offender_id)
-      expect { recaluclate_handover_dates }.not_to(change { record.reload.updated_at })
+      expect {
+        allow(offender).to receive(:attributes_to_archive).and_return({ no: 'change' })
+        recaluclate_handover_dates
+
+        allow(offender).to receive(:attributes_to_archive).and_return({ some: 'change' })
+        recaluclate_handover_dates
+
+        allow(offender).to receive(:attributes_to_archive).and_return({ even: 'more change' })
+        recaluclate_handover_dates
+      }.not_to(change { record.reload.updated_at })
     end
 
     it 'does not emit an audit event' do
@@ -56,32 +67,40 @@ describe RecalculateHandoverDateJob do
 
     it 'updates the record with the new details' do
       record = CalculatedHandoverDate.find_by(nomis_offender_id: offender.nomis_offender_id)
-      expect { recaluclate_handover_dates }.to change { [record.reload.responsibility, record.reload.reason] }
-        .from([CalculatedHandoverDate::CUSTODY_ONLY, 'determinate'])
-        .to([CalculatedHandoverDate::CUSTODY_WITH_COM, 'determinate_short'])
+
+      expect { recaluclate_handover_dates }.to \
+        change { [record.reload.responsibility, record.reason, record.last_calculated_at] }
+        .from([CalculatedHandoverDate::CUSTODY_ONLY, 'determinate', nil])
+        .to([CalculatedHandoverDate::CUSTODY_WITH_COM, 'determinate_short', be_within(1.second).of(Time.zone.now)])
     end
 
     it 'emits an audit event for the change' do
       expect(handover_change_event).to receive(:publish).with(
-        hash_including(
+        {
           nomis_offender_id: offender.nomis_offender_id,
           system_event: true,
           tags: %w[job recalculate_handover_date handover changed],
-          data: hash_including(
-            'before' => hash_including(
+          data: {
+            'before' => {
               'handover_date' => nil,
               'start_date' => nil,
               'responsibility' => CalculatedHandoverDate::CUSTODY_ONLY,
-              'reason' => 'determinate'
-            ),
-            'after' => hash_including(
+              'reason' => 'determinate',
+              'last_calculated_at' => nil,
+              'nomis_offender_id' => offender.nomis_offender_id,
+            },
+            'after' => {
               'handover_date' => Date.parse('01/01/2026'),
               'start_date' => Date.parse('01/12/2025'),
               'responsibility' => CalculatedHandoverDate::CUSTODY_WITH_COM,
-              'reason' => 'determinate_short'
-            )
-          )
-        )
+              'reason' => 'determinate_short',
+              'last_calculated_at' => be_within(1.second).of(Time.zone.now),
+              'nomis_offender_id' => offender.nomis_offender_id,
+            },
+            'case_info_manual_entry' => false,
+            'nomis_offender_state' => offender.attributes_to_archive
+          }
+        }
       )
       recaluclate_handover_dates
     end
@@ -193,6 +212,28 @@ describe RecalculateHandoverDateJob do
     end
   end
 
+  context 'when the offender is outside of OMiC policy' do
+    before { allow(offender).to receive(:inside_omic_policy?) }
+
+    it 'does not send any emails' do
+      recaluclate_handover_dates
+      expect(request_supporting_com_email).not_to have_received(:deliver_later)
+      expect(assign_com_email).not_to have_received(:deliver_later)
+    end
+
+    it 'does not emit any events' do
+      recaluclate_handover_dates
+      expect(ndelius_event).not_to have_received(:publish)
+      expect(handover_change_event).not_to have_received(:publish)
+    end
+
+    it 'does not change any records' do
+      expect { recaluclate_handover_dates }.not_to(
+        change { CalculatedHandoverDate.find_by(nomis_offender_id: offender.nomis_offender_id)&.updated_at }
+      )
+    end
+  end
+
   def the_responsibility_is_recorded_as(calculated_handover_date)
     calculated_handover_date.nomis_offender_id = offender.nomis_offender_id
     calculated_handover_date.save!
@@ -207,13 +248,19 @@ describe RecalculateHandoverDateJob do
   end
 
   def recaluclate_handover_dates
-    described_class.new.send(:recalculate_dates_for, offender)
+    described_class.new.perform(offender.nomis_offender_id)
   end
 
   def setup_events_and_emails
+    # Offender
+    allow(OffenderService).to receive(:get_offender)
+      .with(offender.nomis_offender_id)
+      .and_return(offender)
+
     # Publish to NDelius event
     allow(ndelius_event).to receive(:publish)
-    allow(DomainEvents::EventFactory).to receive(:build_handover_event).and_return(ndelius_event)
+    allow(DomainEvents::EventFactory).to receive(:build_handover_event)
+      .and_return(ndelius_event)
 
     # Audit Event
     stub_const('AuditEvent', handover_change_event)
