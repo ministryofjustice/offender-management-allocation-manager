@@ -1,32 +1,34 @@
 <% content_for :title, "Case cannot be assessed – Digital Prison Services" %>
 
-<fieldset class="govuk-fieldset" aria-describedby="how-contacted-conditional-hint">
-  <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-    <h1 class="govuk-fieldset__heading">
-      This case cannot be assessed for early allocation
+<%= link_to 'Back', prison_prisoner_path(@prison, @prisoner.offender_no),
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">
+      This case is missing some information
     </h1>
-  </legend>
-</fieldset>
 
-<p class="govuk-body">
-  As there is no community LDU information available for this prisoner, it’s not possible to
-  perform an early allocation assessment.
-</p>
-<p class="govuk-body">
-  This is something we are currently working on.
-</p>
+    <p>We need contact details for the prisoner’s local divisional unit (LDU) before we can assess their case for early allocation.</p>
+    <p>First, check if your manager needs to match the prisoner’s records in NOMIS and NDelius.</p>
+    <p>Then, if you continue to see this message, you can fill out an assessment form offline. To do this:</p>
 
-<p class="govuk-body">
-  You can make the assessment by completing the referral on word and emailing to the relevant LDU.
-</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>
+        Download an
+        <a href="https://equip-portal.rocstac.com/CtrlWebIsapi.dll/?__id=webDiagram.show&map=0%3A9A63E167DE4B400EA07F81A9271E1944&dgm=4F984B45CBC447B1A304B2FFECABB777">early
+          allocation assessment form</a> from EQuiP
+      </li>
+      <li>
+        Check the <%= link_to 'prisoner’s profile page', digital_prison_service_profile_path(@prisoner.offender_no) %>
+        on DPS to find out where they were sentenced
+      </li>
+      <li>
+        Send a completed assessment form to the LDU for that area. Your manager should be able to help you find the
+        email address
+      </li>
+    </ol>
+  </div>
 
-<p class="govuk-body">
-Please speak to your HOMd for more information if required.
-</p>
-
-<p class="govuk-body">
-The Early Allocation referral can be found
-  on <a href="https://equip-portal.rocstac.com/CtrlWebIsapi.dll/?__id=webDiagram.show&map=0%3A9A63E167DE4B400EA07F81A9271E1944&dgm=4F984B45CBC447B1A304B2FFECABB777">Equip</a>
-</p>
-
-<%= back_link %>
+  <%= render 'prisoner_info_sidebar', offender: @prisoner %>
+</div>
