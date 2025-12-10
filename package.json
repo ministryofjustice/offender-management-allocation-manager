@@ -1,5 +1,5 @@
 {
-  "name": "offender-management-allocation-client",
+  "name": "offender-management-allocation-manager",
   "private": true,
   "dependencies": {
     "@ministryofjustice/frontend": "7.1.0",
