@@ -460,6 +460,18 @@ CREATE TABLE public.offenders (
 
 
 --
+-- Name: omic_eligibilities; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.omic_eligibilities (
+    nomis_offender_id character varying,
+    eligible boolean DEFAULT false,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
 -- Name: parole_review_imports; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1086,6 +1098,20 @@ CREATE UNIQUE INDEX index_offender_email_sent_unique_composite_key ON public.off
 
 
 --
+-- Name: index_omic_eligibilities_on_eligible; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_omic_eligibilities_on_eligible ON public.omic_eligibilities USING btree (eligible);
+
+
+--
+-- Name: index_omic_eligibilities_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_omic_eligibilities_on_nomis_offender_id ON public.omic_eligibilities USING btree (nomis_offender_id);
+
+
+--
 -- Name: index_parole_review_imports_on_processed_on; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1164,6 +1190,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251212110634'),
 ('20250403141647'),
 ('20250325141546'),
 ('20250127094859'),
