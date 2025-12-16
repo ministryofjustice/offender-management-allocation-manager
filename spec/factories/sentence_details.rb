@@ -113,6 +113,9 @@ FactoryBot.define do
       recall { true }
     end
 
+    trait :criminal_sentence do
+    end
+    
     trait :civil_sentence do
       imprisonmentStatus {'CIVIL'}
     end

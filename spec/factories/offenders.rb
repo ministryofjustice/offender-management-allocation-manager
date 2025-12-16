@@ -47,6 +47,16 @@ FactoryBot.define do
       lastMovementTypeCode { 'TAP' }
     end
 
+    trait :inside_omic_policy do
+      sentence do
+        attributes_for :sentence_detail, :criminal_sentence
+      end
+    end
+
+    trait :outside_omic_policy do
+      dateOfBirth { 1.day.ago.to_date }
+    end
+
     created {Date.new }
   end
 
