@@ -44,6 +44,8 @@ cronjobs:
   mailbox_register_import:
     enabled: false
     schedule: 0 9 * * *
+  persist_omic_eligibility:
+    enabled: false
   # Below cronjobs are currently only enabled in production
   early_allocation_suitability_email:
     enabled: false
@@ -78,7 +80,7 @@ generic-service:
   serviceAccountName: offender-management-allocation-manager
   productId: DPS030
 
-  containerCommand: ['sh', '-c', 'bundle exec puma']
+  containerCommand: ["sh", "-c", "bundle exec puma"]
 
   image:
     repository: ghcr.io/ministryofjustice/offender-management-allocation-manager

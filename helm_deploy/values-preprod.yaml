@@ -12,6 +12,9 @@ cronjobs:
     enabled: true
   parole_data_import:
     enabled: true
+  persist_omic_eligibility:
+    enabled: true
+    schedule: 0 4 * * *
 
 generic-prometheus-alerts:
   alertSeverity: mpc-alerts-nonprod-preprod
