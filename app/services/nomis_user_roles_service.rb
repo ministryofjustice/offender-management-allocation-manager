@@ -21,8 +21,9 @@ class NomisUserRolesService
 
   # @param [Prison] prison
   # @param [Integer] nomis_staff_id
+  # @param [String] created_by
   # @param [Hash] config
-  def self.add_pom(prison, nomis_staff_id, config)
+  def self.add_pom(prison, nomis_staff_id, created_by, config)
     HmppsApi::NomisUserRolesApi.set_staff_role(
       prison.code, nomis_staff_id, config
     )
@@ -36,7 +37,7 @@ class NomisUserRolesService
     # For now, we are not doing that so we need to create the PomDetail here
     # as part of the onboarding to save the correct hours.
     prison.pom_details.create!(
-      nomis_staff_id:, status: 'active', hours_per_week: config[:hours_per_week]
+      nomis_staff_id:, created_by:, status: 'active', hours_per_week: config[:hours_per_week]
     )
   end
 

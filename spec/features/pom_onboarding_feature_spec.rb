@@ -276,7 +276,7 @@ feature 'POM onboarding' do
     context 'when confirm and submit' do
       before do
         allow(NomisUserRolesService).to receive(:add_pom).with(
-          prison, staff_id, { position: 'PO', schedule_type: 'FT', hours_per_week: 37.5 }
+          prison, staff_id, 'MOIC_POM', { position: 'PO', schedule_type: 'FT', hours_per_week: 37.5 }
         )
 
         # for the confirmation page
