@@ -67,7 +67,7 @@ class OnboardingController < PrisonsApplicationController
   def check_answers
     if request.post?
       NomisUserRolesService.add_pom(
-        @prison, @staff_id,
+        @prison, @staff_id, sso_identity.current_user,
         @onboarding_form.slice(:position, :schedule_type, :hours_per_week)
       )
 

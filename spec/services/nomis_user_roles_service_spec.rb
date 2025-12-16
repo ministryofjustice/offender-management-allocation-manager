@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe NomisUserRolesService do
   let(:prison) { build(:prison) }
   let(:nomis_staff_id) { 123_456 }
+  let(:spo_username) { 'SPO_USER' }
   let(:pom) { build(:pom, staffId: nomis_staff_id) }
   let(:pom_list) { [pom] }
 
@@ -63,7 +64,7 @@ RSpec.describe NomisUserRolesService do
     end
 
     it 'sets the staff role and creates POM detail' do
-      described_class.add_pom(prison, nomis_staff_id, config)
+      described_class.add_pom(prison, nomis_staff_id, spo_username, config)
 
       expect(HmppsApi::NomisUserRolesApi).to have_received(:set_staff_role).with(
         prison.code, nomis_staff_id, config
@@ -75,6 +76,7 @@ RSpec.describe NomisUserRolesService do
 
       expect(prison.pom_details).to have_received(:create!).with(
         nomis_staff_id: nomis_staff_id,
+        created_by: spo_username,
         status: 'active',
         hours_per_week: config[:hours_per_week]
       )

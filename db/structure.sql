@@ -571,7 +571,8 @@ CREATE TABLE public.pom_details (
     status character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    prison_code character varying
+    prison_code character varying,
+    created_by character varying
 );
 
 
@@ -1190,6 +1191,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20251215115700'),
 ('20251212110634'),
 ('20250403141647'),
 ('20250325141546'),
