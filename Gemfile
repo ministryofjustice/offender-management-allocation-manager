@@ -11,6 +11,8 @@ gem 'aws-sdk-sns'
 gem 'aws-sdk-s3'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'coffee-rails', '~> 5.0'
+# Keep version below 3.0.0 for now, as there are breaking changes
+gem 'connection_pool', '< 3.0.0'
 gem 'csv'
 gem 'date_validator'
 gem 'faraday', '~> 1.10.3'
