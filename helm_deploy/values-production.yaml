@@ -30,6 +30,9 @@ cronjobs:
   parole_data_import:
     enabled: true
     schedule: 15 7 * * *
+  persist_omic_eligibility:
+    enabled: true
+    schedule: 30 6 * * *
 
 generic-prometheus-alerts:
   alertSeverity: mpc-alerts-prod
