@@ -16,13 +16,7 @@ namespace :reports do
       Prison.active.order(name: :asc).each do |prison|
         puts ">> Obtaining cases for #{prison.name} (#{prison.code})"
 
-        allocated_high_risk_offenders = prison
-          .primary_allocated_offenders
-          .select { it.tier.in?(['A', 'B']) && it.high_rosh_level? }
-
-        supporting = allocated_high_risk_offenders.select(&:pom_supporting?).count
-        responsible = allocated_high_risk_offenders.select(&:pom_responsible?).count
-        total = supporting + responsible
+        supporting, responsible, total = results_for_prison(prison)
 
         csv << ["#{prison.code} - #{prison.name}", supporting, responsible, total]
 
@@ -36,4 +30,48 @@ namespace :reports do
 
     puts 'Report complete'
   end
+end
+
+def results_for_prison(prison)
+  allocated_high_tiers = AllocationHistory
+    .active_allocations_for_prison(prison.code)
+    .joins('join omic_eligibilities using(nomis_offender_id)')
+    .joins('join case_information using(nomis_offender_id)')
+    .where("case_information.tier in ('A', 'B') and case_information.crn is not null and omic_eligibilities.eligible = true")
+    .pluck(:nomis_offender_id, 'case_information.crn')
+    .to_h
+
+  pom_roles = CalculatedHandoverDate
+    .where(nomis_offender_id: allocated_high_tiers.keys)
+    .joins('left join responsibilities using(nomis_offender_id)')
+    .pluck(
+      Arel.sql(
+        "calculated_handover_dates.nomis_offender_id, (
+          case
+          when coalesce(value, responsibility) in ('Probation', 'Community') then 'supporting'
+          when coalesce(value, responsibility) in ('Prison', 'CustodyOnly', 'CustodyWithCom') then 'responsible'
+          end
+        ) as pom_role"
+      )
+    )
+    .to_h
+
+  supporting = 0
+  responsible = 0
+  total = 0
+
+  allocated_high_tiers.each do |(nomis_offender_id, crn)|
+    next unless HmppsApi::AssessRisksAndNeedsApi
+      .get_rosh_summary(crn)
+      .dig('summary', 'overallRiskLevel')
+      .in?(['HIGH', 'VERY_HIGH'])
+
+    supporting += 1 if pom_roles[nomis_offender_id] == 'supporting'
+    responsible += 1 if pom_roles[nomis_offender_id] == 'responsible'
+    total += 1
+  rescue StandardError
+    next
+  end
+
+  [supporting, responsible, total]
 end
