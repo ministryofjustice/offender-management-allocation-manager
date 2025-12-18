@@ -314,8 +314,6 @@ class MpcOffender
     }
   end
 
-  def high_rosh_level? = rosh_summary && rosh_summary[:overall] == 'HIGH'
-
   def active_alert_labels
     HmppsApi::PrisonAlertsApi.alerts_for(offender_no)
       .select { |alert| alert['isActive'] }
