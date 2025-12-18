@@ -31,10 +31,10 @@ class AllocationStaffController < PrisonsApplicationController
     end
 
     if error_message
-      redirect_to(prison_prisoner_staff_index_path(@prison, @prisoner.offender_no, coworking: coworking?), alert: error_message) and return
+      redirect_to(check_compare_error_route, alert: error_message) and return
     end
 
-    redirect_to prison_prisoner_compare_poms_path(@prison, @prisoner.offender_no, pom_ids: params[:pom_ids], coworking: coworking?)
+    redirect_to check_compare_success_route
   end
 
   def compare_poms
@@ -85,5 +85,17 @@ private
 
   def coworking?
     params[:coworking].present? && params[:coworking] == 'true'
+  end
+
+  def check_compare_success_route
+    prison_prisoner_compare_poms_path(
+      @prison, @prisoner.offender_no, pom_ids: params[:pom_ids], coworking: coworking?
+    )
+  end
+
+  def check_compare_error_route
+    prison_prisoner_staff_index_path(
+      @prison, @prisoner.offender_no, coworking: coworking?
+    )
   end
 end
