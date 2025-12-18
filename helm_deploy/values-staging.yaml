@@ -20,6 +20,7 @@ cronjobs:
     enabled: true
   persist_omic_eligibility:
     enabled: true
+    schedule: 0 10 * * *
 
 generic-prometheus-alerts:
   alertSeverity: mpc-alerts-nonprod-dev
