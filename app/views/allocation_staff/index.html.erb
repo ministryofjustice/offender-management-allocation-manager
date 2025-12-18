@@ -190,7 +190,7 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
             <% end %>
           </td>
 
-          <td aria-label="select" class="govuk-table__cell">
+          <td aria-label="select" class="govuk-table__cell govuk-!-padding-top-0">
             <div class="govuk-form-group govuk-!-margin-bottom-0<%= flash[:alert] ? ' govuk-form-group--error' : '' %>">
               <fieldset class="govuk-fieldset">
                 <div class="govuk-checkboxes__item govuk-checkboxes--small">
@@ -234,10 +234,11 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
       </tbody>
     </table>
   <% end %>
+
   <%= render 'shared/accordion_section',
              id: 'accordion',
              title: "Unavailable POMs",
-             body: '',
+             body: I18n.t!('.poms_unavailable', scope: 'allocation_staff',
+                           count: (@prison_poms + @probation_poms).reject(&:active?).count),
              content: accordion_body %>
 </div>
-

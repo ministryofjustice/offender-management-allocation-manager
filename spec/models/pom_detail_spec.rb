@@ -8,7 +8,7 @@ RSpec.describe PomDetail, type: :model do
   it { is_expected.to validate_presence_of(:nomis_staff_id) }
   it { expect(create(:pom_detail, prison: prison)).to validate_uniqueness_of(:nomis_staff_id).scoped_to(:prison_code) }
   it { is_expected.to validate_presence_of(:working_pattern).with_message('Select full time or part time') }
-  it { is_expected.to validate_presence_of(:status) }
+  it { is_expected.to validate_inclusion_of(:status).in_array(described_class.statuses.values) }
 
   describe '#hours_per_week=' do
     it 'converts hours to working pattern ratio' do

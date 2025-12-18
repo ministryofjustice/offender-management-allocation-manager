@@ -58,7 +58,7 @@ class DomainEvents::Event
       message_attributes: @message_attributes,
       message: ActiveSupport::JSON.encode(full_message),
     }
-    sns_response = self.class.sns_topic.publish(message_data)
+    sns_response = self.class.sns_topic.publish(message_data) unless ENV['DISABLE_SNS_PUBLISH']
 
     audit_tags = ['domain_event_published', *@short_event_type.split('.')]
     audit_tags += ['job', job] if job
@@ -67,7 +67,7 @@ class DomainEvents::Event
       tags: audit_tags,
       system_event: true,
       data: {
-        'sns_message_id' => sns_response.message_id,
+        'sns_message_id' => sns_response.try(:message_id),
         'domain_event' => full_message,
       }
     )
