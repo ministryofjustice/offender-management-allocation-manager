@@ -6,26 +6,20 @@ require 'csv'
 namespace :reports do
   desc 'Create a CSV report listing counds of allocated tier A & B by prison code'
   task high_risk_cases_for_probation_poms: :environment do
-    CSV.open('high_risk_cases_for_probation_poms.csv', 'wb') do |csv|
+    prisons_range = ENV.fetch('PRISONS_RANGE', '0').split('..').map(&:to_i)
+    prisons_range = Range.new(prisons_range[0], prisons_range[1])
+    filename = ENV.fetch('FILENAME', 'high_risk_cases_for_probation_poms.csv')
+
+    CSV.open(filename, 'wb') do |csv|
       csv << %w[prison total_supporting total_responsible total]
 
-      total_supporting = 0
-      total_responsible = 0
-      grand_total = 0
-
-      Prison.active.order(name: :asc).each do |prison|
+      Prison.active.order(name: :asc)[prisons_range].each do |prison|
         puts ">> Obtaining cases for #{prison.name} (#{prison.code})"
 
         supporting, responsible, total = results_for_prison(prison)
 
         csv << ["#{prison.code} - #{prison.name}", supporting, responsible, total]
-
-        total_supporting += supporting
-        total_responsible += responsible
-        grand_total += total
       end
-
-      csv << ['Total', total_supporting, total_responsible, grand_total]
     end
 
     puts 'Report complete'
