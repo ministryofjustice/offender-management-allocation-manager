@@ -29,6 +29,16 @@ describe 'PersistOmicEligibility' do
       expect(eligibility_of('G1234AE')).to eq(false)
       expect(eligibility_of('G1234AF')).to eq(false)
     end
+
+    it 'updates the updated_at of the record regardless of if the value changed or not' do
+      existing_record_that_doesnt_change_value = create(:omic_eligibility, nomis_offender_id: 'G1234AB', eligible: true, updated_at: 1.day.ago)
+      existing_record_that_does_change_value = create(:omic_eligibility, nomis_offender_id: 'G1234AC', eligible: false, updated_at: 1.day.ago)
+
+      PersistOmicEligibility.for_offenders_at('LEI')
+
+      expect(existing_record_that_doesnt_change_value.reload.updated_at).to be_within(1.second).of(Time.zone.now)
+      expect(existing_record_that_does_change_value.reload.updated_at).to be_within(1.second).of(Time.zone.now)
+    end
   end
 
   describe '.cleanup_records_updated_before' do
