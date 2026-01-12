@@ -58,6 +58,18 @@ Rails.application.routes.draw do
       end
     end
 
+    # Bulk reallocation
+    resources :reallocations, only: [], param: :nomis_staff_id do
+      member do
+        get '/' => 'reallocations#index'
+        get :check_compare_list, to: 'reallocations#index'
+        put :check_compare_list
+        get :compare_poms
+        get :caseload
+        get :error
+      end
+    end
+
     resources :prisoners, only: [:show] do
       constraints ->(request) { !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id)) } do
         get 'new_missing_info' => 'case_information#new'
@@ -141,7 +153,12 @@ Rails.application.routes.draw do
     resources :case_information, only: %i[new create edit update show], param: :prisoner_id, controller: 'case_information',
                                  path_names: { new: 'new/:prisoner_id' }
 
-    resources :poms, only: %i[index show edit update destroy], param: :nomis_staff_id
+    resources :poms, only: %i[index show edit update destroy], param: :nomis_staff_id do
+      member do
+        get :reallocate
+      end
+    end
+
     # routes to show the 2 tabs on PomsController#show
     get 'poms/:nomis_staff_id/tabs/:tab', to: 'poms#show', as: :show_pom_tab
 

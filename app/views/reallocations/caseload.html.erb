@@ -1,0 +1,74 @@
+<% content_for :title, "Choose cases to reallocate – Digital Prison Services" %>
+
+<%= link_to 'Back', prison_reallocation_path,
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <% if flash[:alert] %>
+      <div id="pom-selection-error">
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+          <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+          <div class="govuk-error-summary__body">
+            <ul class="govuk-list govuk-error-summary__list">
+              <li>
+                <a href="#pom-select-tbd"><%= flash[:alert] %></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="moj-page-header-actions__title">
+      <h1 class="govuk-heading-l">Choose cases to reallocate</h1>
+
+      <span class="govuk-caption-l">
+        Reallocating from: <%= pom_level(@pom.position, titleize: false) %> <%= @pom.full_name_ordered %>
+      </span>
+      <span class="govuk-caption-l">
+        Reallocating to: <%= pom_level(@new_pom.position, titleize: false) %> <%= @new_pom.full_name_ordered %>
+      </span>
+      <span class="govuk-caption-l">
+        Cases remaining: <%= @pom.primary_allocations_count %>
+      </span>
+    </div>
+  </div>
+
+  <div class="govuk-grid-column-full govuk-!-margin-top-6">
+    <%= form_tag(check_compare_list_prison_reallocation_path, method: :put) do %>
+      <table class="govuk-table" data-module="moj-sortable-table">
+        <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header" aria-sort="none">Select case</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Case</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Recommended POM type</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">POM role needed</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Location</th>
+          <th scope="col" class="govuk-table__header" aria-sort="descending">Earliest release date</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Tier</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Additional information</th>
+        </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+        <% @results.each do |user| %>
+          <% full_name = "#{user['firstName']} #{user['lastName']}" %>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell" data-sort-value="<%= full_name %>">
+              <%= link_to full_name, position_prison_onboarding_path(@prison.code, user['staffId']) %>
+            </td>
+            <td class="govuk-table__cell">
+              <%= user['email'].presence || 'N/A' %>
+            </td>
+            <td class="govuk-table__cell">
+              <%= user['username'] %>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+
+      <%= render 'shared/caseload_table', header_partial: 'shared/caseload_headers', collection_partial: 'shared/caseload', collection: @allocations %>
+    <% end %>
+  </div>
+</div>

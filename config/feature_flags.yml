@@ -4,3 +4,5 @@
 feature_flags:
   example_feature:
     staging: true
+  bulk_reallocation:
+    staging: true

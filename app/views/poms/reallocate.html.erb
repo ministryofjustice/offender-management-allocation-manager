@@ -1,0 +1,73 @@
+<% content_for :title, "Reallocation summary – Digital Prison Services" %>
+
+<%= link_to 'Back', prison_pom_path,
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Reallocate <%= @pom.primary_allocations_count %> cases</h1>
+
+    <p class="govuk-body">
+      <% if @pom.inactive? %>
+        As <%= full_name_ordered(@pom) %> will be away from work, you can reallocate their cases or skip if their cases
+        do not need to be reallocated.
+        <br/>
+        You can also reallocate their cases later.
+      <% else %>
+        <!-- TODO: future `removed` or similar status -->
+        As <%= full_name_ordered(@pom) %> is no longer at <%= @prison.name %>, you must reallocate their cases.
+        <br/>
+        You can do this now or later.
+      <% end %>
+    </p>
+
+    <dl class="govuk-summary-list govuk-!-margin-bottom-7">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Last case allocated
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <%= format_date(@summary.fetch(:last_allocated_date), replacement: 'N/A') %>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Allocations in last 7 days
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <%= @summary.fetch(:last_seven_days) %>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Releases in next 4 weeks
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <%= @summary.fetch(:release_next_four_weeks) %>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Responsible cases
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <%= @pom.allocations.count(&:pom_responsible?) %>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+          Supporting cases
+        </dt>
+        <dd class="govuk-summary-list__value">
+          <%= @pom.allocations.count(&:pom_supporting?) %>
+        </dd>
+      </div>
+    </dl>
+
+    <div class="govuk-button-group">
+      <%= link_to 'Continue', prison_reallocation_path, role: 'button', class: 'govuk-button' %>
+      <%= link_to @pom.inactive? ? 'Skip this' : 'Reallocate cases later', prison_poms_path(anchor: 'attention_needed'),
+                  role: 'button', class: 'govuk-button govuk-button--secondary', data: { module: 'govuk-button--secondary' } %>
+    </div>
+  </div>
+</div>

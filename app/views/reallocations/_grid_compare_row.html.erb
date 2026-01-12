@@ -1,0 +1,7 @@
+<div class="govuk-grid-row">
+  <% poms.each do |pom| %>
+    <div class="govuk-grid-column-one-quarter pom-data">
+      <%= yield pom %>
+    </div>
+  <% end %>
+</div>

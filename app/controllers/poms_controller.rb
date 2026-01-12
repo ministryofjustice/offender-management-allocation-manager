@@ -3,7 +3,7 @@
 class PomsController < PrisonStaffApplicationController
   before_action :ensure_spo_user
 
-  before_action :load_pom_staff_member, only: [:show, :edit, :update, :destroy]
+  before_action :load_pom_staff_member, only: [:show, :edit, :update, :reallocate, :destroy]
   before_action :store_referrer_in_session, only: [:edit]
   before_action :set_referrer
 
@@ -48,13 +48,15 @@ class PomsController < PrisonStaffApplicationController
     pom_detail.status = edit_pom_params[:status] || pom.status
 
     if pom_detail.save
-      if pom_detail.status == 'inactive'
-        AllocationHistory.deallocate_primary_pom(
-          nomis_staff_id, active_prison_id, event_trigger: AllocationHistory::INACTIVE_POM
-        )
-        AllocationHistory.deallocate_secondary_pom(
-          nomis_staff_id, active_prison_id, event_trigger: AllocationHistory::INACTIVE_POM
-        )
+      if pom_detail.inactive?
+        if FeatureFlags.bulk_reallocation.disabled?
+          AllocationHistory.deallocate_primary_pom(
+            nomis_staff_id, active_prison_id, event_trigger: AllocationHistory::INACTIVE_POM
+          )
+          AllocationHistory.deallocate_secondary_pom(
+            nomis_staff_id, active_prison_id, event_trigger: AllocationHistory::INACTIVE_POM
+          )
+        end
       end
       redirect_to prison_pom_path(active_prison_id, id: nomis_staff_id),
                   notice: "Profile updated for #{helpers.full_name_ordered(@pom)}"
@@ -62,6 +64,15 @@ class PomsController < PrisonStaffApplicationController
       @errors = pom_detail.errors
       render :edit
     end
+  end
+
+  def reallocate
+    if @pom.active? || @pom.unavailable?
+      # TODO: maybe design a nicer informational page?
+      redirect_to prison_pom_path, notice: 'Only inactive POMs are eligible for bulk case reallocation.'
+    end
+
+    pom_allocations_summary
   end
 
   def destroy

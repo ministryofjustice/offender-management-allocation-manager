@@ -1,0 +1,77 @@
+<% content_for :title, "Compare POMs – Digital Prison Services" %>
+
+<%= link_to 'Back', prison_reallocation_path,
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="moj-page-header-actions">
+      <div class="moj-page-header-actions__title">
+        <h1 class="govuk-heading-l">Compare workloads</h1>
+
+        <span class="govuk-caption-l">
+          Reallocating from: <%= pom_level(@pom.position, titleize: false) %> <%= @pom.full_name_ordered %>
+        </span>
+        <span class="govuk-caption-l">
+          Cases remaining: <%= @pom.primary_allocations_count %>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="compare-table">
+  <%= render layout: 'grid_compare_row', locals: { poms: @poms } do |pom| %>
+    <h2 class="govuk-cookie-banner__heading govuk-heading-m govuk-!-margin-bottom-0"><%= full_name_ordered(pom) %></h2>
+
+    <p><%= format_working_pattern(pom.working_pattern) %></p>
+
+    <div class="govuk-warning-text govuk-!-margin-bottom-0"></div>
+  <% end %>
+
+  <%= render layout: 'grid_compare_row', locals: { poms: @poms } do |pom| %>
+    <h3 class="govuk-heading-s">Case mix by role</h3>
+    <%= case_mix_bar_by_role(pom.allocations, preserve_space_if_none: true) %>
+    <%= case_mix_vertical_by_role(pom.allocations) %>
+  <% end %>
+
+  <%= render layout: 'grid_compare_row', locals: { poms: @poms } do |pom| %>
+    <h3 class="govuk-heading-s">Case mix by tier</h3>
+    <%= case_mix_bar_by_tiers(pom.allocations, preserve_space_if_none: true) %>
+    <%= case_mix_vertical_by_tiers(pom.allocations) %>
+  <% end %>
+
+  <%= render layout: 'grid_compare_row', locals: { poms: @poms } do |pom| %>
+    <h3 class="govuk-heading-s">Current workload</h3>
+
+    <% recent_count = pom.allocations.count { |a| a.primary_pom_allocated_at.to_date >= 7.days.ago } %>
+    <div class="card--caseload card-total">
+      <a href="<%= prison_show_pom_tab_path(@prison, pom.staff_id, :caseload, anchor: 'recent-allocations') %>" class="govuk-link--no-visited-state">
+        <span class="card__heading--large"><%= recent_count %></span>
+        <p><%= I18n.t!('.recent_cases', scope: 'allocation_staff.grid_compare_row', count: recent_count) %></p>
+      </a>
+    </div>
+  <% end %>
+
+  <%= render layout: 'grid_compare_row', locals: { poms: @poms } do |pom| %>
+    <% handover_count = handover_cases_view_for_pom(pom).upcoming.count %>
+    <div class="card--caseload card-total">
+      <span class="card__heading--large"><%= handover_count %></span>
+      <p><%= I18n.t!('.upcoming_handovers', scope: 'allocation_staff.grid_compare_row', count: handover_count) %></p>
+    </div>
+  <% end %>
+
+  <%= render layout: 'grid_compare_row', locals: { poms: @poms } do |pom| %>
+    <% high_complexity_count = pom.allocations.count(&:high_complexity?) %>
+    <% if @prison.womens? %>
+      <div class="card--caseload card-total">
+        <span class="card__heading--large"><%= high_complexity_count %></span>
+        <p><%= I18n.t!('.high_complexity_cases', scope: 'allocation_staff.grid_compare_row', count: high_complexity_count) %></p>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= render layout: 'grid_compare_row', locals: { poms: @poms } do |pom| %>
+    <%= link_to 'Select this POM', '#', class: 'govuk-button' %>
+  <% end %>
+</div>
