@@ -71,6 +71,50 @@ ALTER SEQUENCE public.allocation_history_id_seq OWNED BY public.allocation_histo
 
 
 --
+-- Name: allocation_history_versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.allocation_history_versions (
+    id bigint NOT NULL,
+    nomis_offender_id character varying NOT NULL,
+    prison character varying NOT NULL,
+    allocated_at_tier character varying,
+    override_reasons character varying,
+    created_by_name character varying,
+    created_by_username character varying,
+    primary_pom_nomis_id integer,
+    secondary_pom_nomis_id integer,
+    event integer NOT NULL,
+    event_trigger integer NOT NULL,
+    primary_pom_allocated_at timestamp(6) without time zone,
+    recommended_pom_type character varying,
+    allocation_history_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    allocation_created_at timestamp(6) without time zone NOT NULL,
+    allocation_updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: allocation_history_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.allocation_history_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: allocation_history_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.allocation_history_versions_id_seq OWNED BY public.allocation_history_versions.id;
+
+
+--
 -- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -734,6 +778,13 @@ ALTER TABLE ONLY public.allocation_history ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: allocation_history_versions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.allocation_history_versions ALTER COLUMN id SET DEFAULT nextval('public.allocation_history_versions_id_seq'::regclass);
+
+
+--
 -- Name: calculated_handover_dates id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -844,6 +895,14 @@ ALTER TABLE ONLY public.victim_liaison_officers ALTER COLUMN id SET DEFAULT next
 
 ALTER TABLE ONLY public.allocation_history
     ADD CONSTRAINT allocation_history_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: allocation_history_versions allocation_history_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.allocation_history_versions
+    ADD CONSTRAINT allocation_history_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -1036,6 +1095,55 @@ CREATE INDEX index_allocation_history_on_prison ON public.allocation_history USI
 
 
 --
+-- Name: index_allocation_history_versions_on_allocation_history_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_allocation_history_versions_on_allocation_history_id ON public.allocation_history_versions USING btree (allocation_history_id);
+
+
+--
+-- Name: index_allocation_history_versions_on_event; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_allocation_history_versions_on_event ON public.allocation_history_versions USING btree (event);
+
+
+--
+-- Name: index_allocation_history_versions_on_event_trigger; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_allocation_history_versions_on_event_trigger ON public.allocation_history_versions USING btree (event_trigger);
+
+
+--
+-- Name: index_allocation_history_versions_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_allocation_history_versions_on_nomis_offender_id ON public.allocation_history_versions USING btree (nomis_offender_id);
+
+
+--
+-- Name: index_allocation_history_versions_on_primary_pom_nomis_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_allocation_history_versions_on_primary_pom_nomis_id ON public.allocation_history_versions USING btree (primary_pom_nomis_id);
+
+
+--
+-- Name: index_allocation_history_versions_on_prison; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_allocation_history_versions_on_prison ON public.allocation_history_versions USING btree (prison);
+
+
+--
+-- Name: index_allocation_history_versions_on_secondary_pom_nomis_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_allocation_history_versions_on_secondary_pom_nomis_id ON public.allocation_history_versions USING btree (secondary_pom_nomis_id);
+
+
+--
 -- Name: index_allocation_versions_secondary_pom_nomis_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1185,12 +1293,21 @@ ALTER TABLE ONLY public.offender_email_sent
 
 
 --
+-- Name: allocation_history_versions fk_rails_7aa6aef710; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.allocation_history_versions
+    ADD CONSTRAINT fk_rails_7aa6aef710 FOREIGN KEY (allocation_history_id) REFERENCES public.allocation_history(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260112094458'),
 ('20251215115700'),
 ('20251212110634'),
 ('20250403141647'),

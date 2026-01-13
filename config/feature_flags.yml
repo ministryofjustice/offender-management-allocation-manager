@@ -4,3 +4,5 @@
 feature_flags:
   example_feature:
     staging: true
+  flatten_allocation_versions:
+    staging: true
