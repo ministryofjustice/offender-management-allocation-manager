@@ -48,6 +48,14 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
   end
 
   describe 'Validations' do
+    subject do
+      build(
+        :allocation_history,
+        prison: create(:prison).code,
+        nomis_offender_id: nomis_offender_id
+      )
+    end
+
     it { is_expected.to validate_presence_of(:nomis_offender_id) }
     it { is_expected.to validate_presence_of(:prison) }
     it { is_expected.to validate_presence_of(:allocated_at_tier) }
@@ -559,6 +567,35 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
         )
         expect(allocation.previously_allocated_but_now_not?).to eq(false)
       end
+    end
+  end
+
+  describe 'flattening of paper trail versions upon allocation updates' do
+    let(:prison_code) { create(:prison).code }
+    let(:allocation) do
+      create(:allocation_history, :primary,
+             nomis_offender_id: nomis_offender_id,
+             prison: prison_code,
+             primary_pom_nomis_id: nomis_staff_id)
+    end
+
+    it 'creates a flattened version when allocation is updated' do
+      expect {
+        allocation.update!(allocated_at_tier: 'B')
+      }.to change(AllocationHistoryVersion, :count).by(1)
+
+      flattened_version = AllocationHistoryVersion.last
+      expect(flattened_version.allocation_history_id).to eq(allocation.id)
+    end
+
+    it 'does not create a flattened version when allocation is created' do
+      expect {
+        create(
+          :allocation_history,
+          :primary,
+          prison: prison_code
+        )
+      }.not_to change(AllocationHistoryVersion, :count)
     end
   end
 end

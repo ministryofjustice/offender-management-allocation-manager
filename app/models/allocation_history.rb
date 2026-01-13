@@ -6,6 +6,7 @@ class AllocationHistory < ApplicationRecord
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   belongs_to :offender, foreign_key: :nomis_offender_id, optional: true
+  has_many :allocation_history_versions # exploded/flat PaperTrail versions
 
   ALLOCATE_PRIMARY_POM = 0
   REALLOCATE_PRIMARY_POM = 1
@@ -25,7 +26,8 @@ class AllocationHistory < ApplicationRecord
   # IMPORTANT:
   # Dirty changes are reset every time the model saves, not just when a transaction is closed.
   # When the `after_commit` callback is executed, we can only enquiry about the most recent saved attributes.
-  after_commit :publish_allocation_changed_event
+  after_commit :publish_allocation_changed_event,
+               :save_flattened_version
 
   # When adding a new 'event' or 'event trigger'
   # make sure the constant it points to
@@ -238,5 +240,13 @@ private
         'eventTrigger' => event_trigger,
       }
     ).publish
+  end
+
+  def save_flattened_version
+    return unless FeatureFlags.flatten_allocation_versions.enabled?
+
+    if (v = versions.where(event: 'update').last)
+      AllocationHistoryVersion.create_from_papertrail!(v)
+    end
   end
 end
