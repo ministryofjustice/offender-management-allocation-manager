@@ -10,16 +10,18 @@
 class AllocationHistoryVersion < ApplicationRecord
   belongs_to :allocation_history
 
-  EXCLUDED_ATTRIBUTES = %w[
-    id
-    override_detail
-    suitability_detail
-    message
-    primary_pom_name
-    secondary_pom_name
-    nomis_booking_id
-    created_at
-    updated_at
+  STORED_ATTRIBUTES = %w[
+    nomis_offender_id
+    prison
+    allocated_at_tier
+    override_reasons
+    created_by_name
+    primary_pom_nomis_id
+    secondary_pom_nomis_id
+    event
+    event_trigger
+    primary_pom_allocated_at
+    recommended_pom_type
   ].freeze
 
   class << self
@@ -33,10 +35,10 @@ class AllocationHistoryVersion < ApplicationRecord
     end
 
     # @param version [PaperTrail::Version] the PaperTrail version to extract attributes from
-    # @return [Hash] a hash of attributes with excluded fields removed and metadata fields added
+    # @return [Hash] a hash of attributes ready for creating an AllocationHistoryVersion record
     def attrs_from_papertrail(version)
       attrs = PaperTrail.serializer.load(version.object)
-      attrs.except(*EXCLUDED_ATTRIBUTES).merge(
+      attrs.slice(*STORED_ATTRIBUTES).merge(
         {
           allocation_history_id: version.item_id,
           created_by_username: version.whodunnit,
