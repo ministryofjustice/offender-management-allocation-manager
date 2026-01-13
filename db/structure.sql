@@ -1293,20 +1293,13 @@ ALTER TABLE ONLY public.offender_email_sent
 
 
 --
--- Name: allocation_history_versions fk_rails_7aa6aef710; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.allocation_history_versions
-    ADD CONSTRAINT fk_rails_7aa6aef710 FOREIGN KEY (allocation_history_id) REFERENCES public.allocation_history(id);
-
-
---
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260114084521'),
 ('20260112094458'),
 ('20251215115700'),
 ('20251212110634'),

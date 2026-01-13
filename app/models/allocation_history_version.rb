@@ -8,9 +8,9 @@
 # append-only intermediate table that simplifies PaperTrail records.
 #
 class AllocationHistoryVersion < ApplicationRecord
-  belongs_to :allocation_history
+  belongs_to :allocation_history, optional: true
 
-  STORED_ATTRIBUTES = %w[
+  ATTRS_FROM_PAPERTRAIL = %w[
     nomis_offender_id
     prison
     allocated_at_tier
@@ -38,13 +38,23 @@ class AllocationHistoryVersion < ApplicationRecord
     # @return [Hash] a hash of attributes ready for creating an AllocationHistoryVersion record
     def attrs_from_papertrail(version)
       attrs = PaperTrail.serializer.load(version.object)
-      attrs.slice(*STORED_ATTRIBUTES).merge(
+
+      # NOTE: only for the bulk historical records import
+      # Some very old records (~2019) have a nil `prison`, which triggers
+      # the PG::NotNullViolation constraint on this new table. Rather than
+      # skipping these rows, we set the `prison` attr to an empty string.
+      attrs['prison'] ||= ''
+
+      attrs.slice(*ATTRS_FROM_PAPERTRAIL).reverse_merge(
         {
           allocation_history_id: version.item_id,
           created_by_username: version.whodunnit,
           created_at: version.created_at,
           allocation_created_at: attrs['created_at'],
           allocation_updated_at: attrs['updated_at'],
+          # below attributes might not exist in very old PT versions, so we set defaults
+          primary_pom_allocated_at: nil,
+          recommended_pom_type: nil,
         }.stringify_keys
       )
     end

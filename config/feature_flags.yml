@@ -6,3 +6,4 @@ feature_flags:
     staging: true
   flatten_allocation_versions:
     staging: true
+    preprod: true
