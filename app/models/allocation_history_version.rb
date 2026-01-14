@@ -48,7 +48,7 @@ class AllocationHistoryVersion < ApplicationRecord
       attrs.slice(*ATTRS_FROM_PAPERTRAIL).reverse_merge(
         {
           allocation_history_id: version.item_id,
-          created_by_username: version.whodunnit,
+          whodunnit: version.whodunnit,
           created_at: version.created_at,
           allocation_created_at: attrs['created_at'],
           allocation_updated_at: attrs['updated_at'],

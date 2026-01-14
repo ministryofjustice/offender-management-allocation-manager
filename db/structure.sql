@@ -81,7 +81,7 @@ CREATE TABLE public.allocation_history_versions (
     allocated_at_tier character varying,
     override_reasons character varying,
     created_by_name character varying,
-    created_by_username character varying,
+    whodunnit character varying,
     primary_pom_nomis_id integer,
     secondary_pom_nomis_id integer,
     event integer NOT NULL,
@@ -1299,6 +1299,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260114110755'),
 ('20260114084521'),
 ('20260112094458'),
 ('20251215115700'),
