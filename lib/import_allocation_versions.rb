@@ -30,7 +30,7 @@ class ImportAllocationVersions
       create_counter += ids.count
       batch_counter += 1
 
-      log("Processed batch #{batch_counter} (#{create_counter} total records)") if batch_counter % 50 == 0
+      log("Processed batch #{batch_counter} (#{create_counter} total records)") if batch_counter % 10 == 0
     end
 
     log("Finished import. Offset was ID #{offset_id}. Total imported versions: #{create_counter}")

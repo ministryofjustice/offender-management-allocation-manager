@@ -1,0 +1,32 @@
+{{- if .Values.cronjobs.import_allocation_versions.enabled }}
+{{- $cronjobName := "import-allocation-versions" }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ $cronjobName }}
+spec:
+  schedule: {{ .Values.cronjobs.import_allocation_versions.schedule }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ index .Values "generic-service" "serviceAccountName" }}
+          restartPolicy: Never
+          securityContext:
+            {{- with index .Values "generic-service" }}{{ toYaml .podSecurityContext | nindent 12 }}{{ end }}
+          containers:
+          - name: {{ $cronjobName }}
+            image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
+            imagePullPolicy: Always
+            securityContext:
+              {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 14 }}{{ end }}
+            command: ["sh", "-c", "bundle exec rake import:allocation_versions:run"]
+              {{- include "moic-helpers.envs_without_prometheus_metrics" . | nindent 12 }}
+            resources:
+              {{- toYaml .Values.cronjob_resources | nindent 14 }}
+---
+{{- end }}
