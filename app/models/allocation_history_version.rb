@@ -37,7 +37,7 @@ class AllocationHistoryVersion < ApplicationRecord
     # @param version [PaperTrail::Version] the PaperTrail version to extract attributes from
     # @return [Hash] a hash of attributes ready for creating an AllocationHistoryVersion record
     def attrs_from_papertrail(version)
-      attrs = PaperTrail.serializer.load(version.object)
+      attrs = papertrail_serializer.load(version.object)
 
       # NOTE: only for the bulk historical records import
       # Some very old records (~2019) have a nil `prison`, which triggers
@@ -57,6 +57,12 @@ class AllocationHistoryVersion < ApplicationRecord
           recommended_pom_type: nil,
         }.stringify_keys
       )
+    end
+
+  private
+
+    def papertrail_serializer
+      @papertrail_serializer ||= PaperTrail::Serializers::YAML
     end
   end
 end
