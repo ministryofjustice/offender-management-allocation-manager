@@ -33,11 +33,6 @@ cronjobs:
   persist_omic_eligibility:
     enabled: true
     schedule: 30 6 * * *
-  # TODO: to be removed once import is done
-  # next run at 2026-01-16 23:30:00
-  import_allocation_versions:
-    enabled: true
-    schedule: 30 23 * * 5
 
 generic-prometheus-alerts:
   alertSeverity: mpc-alerts-prod

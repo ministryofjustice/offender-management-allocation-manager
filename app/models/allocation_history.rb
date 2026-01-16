@@ -243,8 +243,6 @@ private
   end
 
   def save_flattened_version
-    return unless FeatureFlags.flatten_allocation_versions.enabled?
-
     if (v = versions.last) && v.event == 'update'
       AllocationHistoryVersion.create_from_papertrail!(v)
     end

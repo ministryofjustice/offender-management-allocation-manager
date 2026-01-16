@@ -39,12 +39,6 @@ class AllocationHistoryVersion < ApplicationRecord
     def attrs_from_papertrail(version)
       attrs = papertrail_serializer.load(version.object)
 
-      # NOTE: only for the bulk historical records import
-      # Some very old records (~2019) have a nil `prison`, which triggers
-      # the PG::NotNullViolation constraint on this new table. Rather than
-      # skipping these rows, we set the `prison` attr to an empty string.
-      attrs['prison'] ||= ''
-
       attrs.slice(*ATTRS_FROM_PAPERTRAIL).reverse_merge(
         {
           allocation_history_id: version.item_id,
