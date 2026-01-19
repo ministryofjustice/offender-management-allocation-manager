@@ -5,7 +5,7 @@ class PersistOmicEligibility
 
     offenders.each do |offender|
       OmicEligibility.find_or_initialize_by(nomis_offender_id: offender.offender_no)
-        .update(eligible: offender.inside_omic_policy?, updated_at: Time.zone.now)
+        .update(eligible: offender.inside_omic_policy?, prison: prison_code, updated_at: Time.zone.now)
     end
   end
 
