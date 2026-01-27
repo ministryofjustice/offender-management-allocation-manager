@@ -14,6 +14,10 @@ namespace :reports do
     Rails.logger.level = :warn
 
     # rubocop:disable Rake/MethodDefinitionInTask
+    def pom_positions_at(prison)
+      HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(prison.code).map { [it.staff_id, it.position] }.to_h
+    end
+
     def first_allocation_known_for(allocation)
       allocation.get_old_versions.first || allocation
     end
@@ -44,10 +48,12 @@ namespace :reports do
     today = Time.zone.today
 
     CSV.open(ENV.fetch('FILENAME', 'allocations.csv'), 'wb') do |csv|
-      csv << %w[allocation_date prison nomis_offender_id tier CRD remaining_sentence sentence_duration pom_responsible pom_supporting com_responsible com_supporting]
+      csv << %w[allocation_date prison nomis_offender_id tier CRD remaining_sentence sentence_duration pom_position pom_responsible pom_supporting]
 
       Prison.active.order(name: :asc)[prisons_range].each do |prison|
         log ">> Obtaining allocations for #{prison.name} (#{prison.code})"
+
+        pom_positions = pom_positions_at(prison)
 
         AllocationHistory.where(['created_at >= ?', 1.year.ago.at_beginning_of_day]).where(prison:).find_each do |allocation|
           offender = OffenderService.get_offender(
@@ -59,6 +65,9 @@ namespace :reports do
           allocation_version = first_allocation_known_for(allocation)
           responsibility = first_responsibility_known_for(offender.offender)
 
+          # we only want POM responsible/supporting, not COM
+          next unless responsibility && (responsibility.pom_responsible? || responsibility.pom_supporting?)
+
           csv << [
             allocation.created_at,
             allocation.prison,
@@ -67,10 +76,9 @@ namespace :reports do
             offender.conditional_release_date || 'n/a',
             offender.conditional_release_date ? [(offender.conditional_release_date - today).to_i, 0].max : 'n/a',
             offender.sentences.duration.in_days.round,
-            responsibility ? responsibility.pom_responsible? : 'n/a',
-            responsibility ? responsibility.pom_supporting? : 'n/a',
-            responsibility ? responsibility.com_responsible? : 'n/a',
-            responsibility ? responsibility.com_supporting? : 'n/a',
+            pom_positions.fetch(allocation_version.primary_pom_nomis_id, 'n/a'),
+            responsibility.pom_responsible?,
+            responsibility.pom_supporting?,
           ]
 
           total += 1
