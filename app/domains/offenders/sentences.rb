@@ -10,7 +10,7 @@ class Offenders::Sentences < SimpleDelegator
   end
 
   def duration
-    sum(&:duration)
+    any? ? sum(&:duration) : ActiveSupport::Duration.build(0)
   end
 
   def sentenced_to_additional_future_isp?

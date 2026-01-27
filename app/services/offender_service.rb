@@ -1,36 +1,36 @@
 # frozen_string_literal: true
 
 class OffenderService
-  def self.get_offender(offender_no, ignore_legal_status: false)
-    prison_record = HmppsApi::PrisonApi::OffenderApi.get_offender(offender_no, ignore_legal_status:)
-    return unless prison_record
-
-    prison = Prison.find_by(code: prison_record.prison_id)
-    return unless prison
-
-    offender = Offender.find_or_create_by(nomis_offender_id: offender_no)
-    MpcOffender.new(prison:, offender:, prison_record:)
-  end
-
-  def self.get_offenders_in_prison(prison, ignore_legal_status: false)
-    prison_records = HmppsApi::PrisonApi::OffenderApi
-      .get_offenders_in_prison(prison.code, ignore_legal_status:)
-      .index_by(&:offender_no)
-
-    offenders = find_or_create_offenders(prison_records.keys)
-    offenders.map do |offender|
-      MpcOffender.new(
-        prison:,
-        offender:,
-        prison_record: prison_records.fetch(offender.nomis_offender_id)
-      )
-    end
-  end
-
   class << self
-    def get_offenders(offender_numbers, ignore_legal_status: false)
+    def get_offender(offender_no, *args)
+      prison_record = HmppsApi::PrisonApi::OffenderApi.get_offender(offender_no, *args)
+      return unless prison_record
+
+      prison = Prison.find_by(code: prison_record.prison_id)
+      return unless prison
+
+      offender = Offender.find_or_create_by(nomis_offender_id: offender_no)
+      MpcOffender.new(prison:, offender:, prison_record:)
+    end
+
+    def get_offenders_in_prison(prison, *args)
+      prison_records = HmppsApi::PrisonApi::OffenderApi
+                         .get_offenders_in_prison(prison.code, *args)
+                         .index_by(&:offender_no)
+
+      offenders = find_or_create_offenders(prison_records.keys)
+      offenders.map do |offender|
+        MpcOffender.new(
+          prison:,
+          offender:,
+          prison_record: prison_records.fetch(offender.nomis_offender_id)
+        )
+      end
+    end
+
+    def get_offenders(offender_numbers, *args)
       Array(offender_numbers)
-        .map { |offender_number| get_offender(offender_number, ignore_legal_status:) }
+        .map { |offender_number| get_offender(offender_number, *args) }
         .compact
     end
 
