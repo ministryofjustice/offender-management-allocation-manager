@@ -14,6 +14,17 @@ namespace :reports do
     Rails.logger.level = :warn
 
     # rubocop:disable Rake/MethodDefinitionInTask
+    def pom_type_at_version(allocation)
+      return if allocation.recommended_pom_type.blank?
+
+      if allocation.override_reasons.blank?
+        allocation.recommended_pom_type
+      else
+        # the recommendation was overridden, so we flip the type
+        allocation.recommended_pom_type == 'prison' ? 'probation' : 'prison'
+      end
+    end
+
     def first_allocation_known_for(allocation)
       allocation.get_old_versions.first || allocation
     end
@@ -41,10 +52,9 @@ namespace :reports do
     log "NOTE: Using range: #{prisons_range}"
 
     total = 0
-    today = Time.zone.today
 
     CSV.open(ENV.fetch('FILENAME', 'allocations.csv'), 'wb') do |csv|
-      csv << %w[allocation_date prison nomis_offender_id tier CRD remaining_sentence sentence_duration pom_responsible pom_supporting com_responsible com_supporting]
+      csv << %w[allocation_date prison nomis_offender_id tier CRD PRRD SLED remaining_sentence pom_type pom_responsible pom_supporting]
 
       Prison.active.order(name: :asc)[prisons_range].each do |prison|
         log ">> Obtaining allocations for #{prison.name} (#{prison.code})"
@@ -58,19 +68,23 @@ namespace :reports do
 
           allocation_version = first_allocation_known_for(allocation)
           responsibility = first_responsibility_known_for(offender.offender)
+          pom_type = pom_type_at_version(allocation_version)
+
+          # we only want POM responsible/supporting, not COM
+          next unless responsibility && (responsibility.pom_responsible? || responsibility.pom_supporting?)
 
           csv << [
-            allocation.created_at,
+            allocation.created_at.to_date,
             allocation.prison,
             allocation.nomis_offender_id,
             allocation_version.allocated_at_tier,
-            offender.conditional_release_date || 'n/a',
-            offender.conditional_release_date ? [(offender.conditional_release_date - today).to_i, 0].max : 'n/a',
-            offender.sentences.duration.in_days.round,
-            responsibility ? responsibility.pom_responsible? : 'n/a',
-            responsibility ? responsibility.pom_supporting? : 'n/a',
-            responsibility ? responsibility.com_responsible? : 'n/a',
-            responsibility ? responsibility.com_supporting? : 'n/a',
+            offender.conditional_release_date || 'n/a', # CRD
+            offender.post_recall_release_date || 'n/a', # PRRD
+            offender.licence_expiry_date      || 'n/a', # SLED
+            offender.licence_expiry_date ? [(offender.licence_expiry_date - allocation.created_at.to_date).to_i, 0].max : 'n/a',
+            pom_type || 'n/a',
+            responsibility.pom_responsible?,
+            responsibility.pom_supporting?,
           ]
 
           total += 1
