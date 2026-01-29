@@ -77,10 +77,8 @@ Visit [localhost:3000](http://localhost:3000)
 
 ## Running The Specs
 
-The first time you run the specs you'll need to record the VCR cassettes:
-
 ```sh
-VCR=1 bundle exec rspec
+bundle exec rspec
 ```
 
 ## Localstack

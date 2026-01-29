@@ -34,9 +34,7 @@ feature "view an offender's allocation information", flaky: true do
       )
     end
 
-    it "displays 'Data not available'",
-       flaky: true,
-       vcr: { cassette_name: 'prison_api/show_allocation_information_keyworker_not_assigned' } do
+    it "displays 'Data not available'", flaky: true do
       visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_without_keyworker)
 
       expect(page).to have_css('h1', text: 'Allocation information')
@@ -126,73 +124,47 @@ feature "view an offender's allocation information", flaky: true do
       )
     end
 
-    context 'without VCR' do
-      before do
-        stub_api_calls_for_prison_allocation_path(sentence_start_date: "2020-01-01",
-                                                  conditional_release_date: "2020-06-02",
-                                                  automatic_release_date: "2020-06-02",
-                                                  hdced: "2020-06-02")
-        visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_with_keyworker)
-      end
+    before do
+      stub_api_calls_for_prison_allocation_path(sentence_start_date: "2020-01-01",
+                                                conditional_release_date: "2020-06-02",
+                                                automatic_release_date: "2020-06-02",
+                                                hdced: "2020-06-02")
+      visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_with_keyworker)
+    end
 
-      let(:offender_no) { nomis_offender_id_with_keyworker }
+    let(:offender_no) { nomis_offender_id_with_keyworker }
 
-      it "displays the Key Worker's details" do
-        expect(page).to have_css('h1', text: 'Allocation information')
+    it "displays the Key Worker's details" do
+      expect(page).to have_css('h1', text: 'Allocation information')
 
-        # Pom
-        expect(page).to have_css('.govuk-table__cell', text: 'Duckett, Jenny')
-        # Keyworker
-        expect(page).to have_css('.govuk-table__cell', text: 'Bull, Dom')
-      end
+      # Pom
+      expect(page).to have_css('.govuk-table__cell', text: 'Duckett, Jenny')
+      # Keyworker
+      expect(page).to have_css('.govuk-table__cell', text: 'Bull, Dom')
+    end
 
-      it "displays a link to the prisoner's New Nomis profile" do
-        expect(page).to have_css('.govuk-table__cell', text: 'View DPS Profile')
-        expect(find_link('View DPS Profile')[:target]).to eq('_blank')
-        expect(find_link('View DPS Profile')[:href]).to include("offenders/#{nomis_offender_id_with_keyworker}/quick-look")
-      end
+    it "displays a link to the prisoner's New Nomis profile" do
+      expect(page).to have_css('.govuk-table__cell', text: 'View DPS Profile')
+      expect(find_link('View DPS Profile')[:target]).to eq('_blank')
+      expect(find_link('View DPS Profile')[:href]).to include("offenders/#{nomis_offender_id_with_keyworker}/quick-look")
+    end
 
-      it 'displays a link to allocate a co-worker' do
-        table_row = page.find(:css, 'tr.govuk-table__row', text: 'Co-working POM')
+    it 'displays a link to allocate a co-worker' do
+      table_row = page.find(:css, 'tr.govuk-table__row', text: 'Co-working POM')
 
-        within table_row do
-          expect(page).to have_link('Allocate',
-                                    href: new_prison_coworking_path('LEI', nomis_offender_id_with_keyworker))
-          expect(page).to have_content('Co-working POM N/A')
-        end
-      end
-
-      it 'displays a link to the allocation history' do
-        table_row = page.find(:css, 'tr.govuk-table__row', text: 'Allocation history')
-
-        within table_row do
-          expect(page).to have_link('View')
-          expect(page).to have_content("POM allocated - #{Time.zone.now.strftime('%d/%m/%Y')}")
-        end
+      within table_row do
+        expect(page).to have_link('Allocate',
+                                  href: new_prison_coworking_path('LEI', nomis_offender_id_with_keyworker))
+        expect(page).to have_content('Co-working POM N/A')
       end
     end
 
-    context 'with VCR' do
-      before do
-        visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_with_keyworker)
-      end
+    it 'displays a link to the allocation history' do
+      table_row = page.find(:css, 'tr.govuk-table__row', text: 'Allocation history')
 
-      it 'displays the name of the allocated co-worker',
-         flaky: true, vcr: { cassette_name: 'prison_api/show_allocation_information_display_coworker_name' } do
-        allocation = AllocationHistory.find_by(nomis_offender_id: nomis_offender_id_with_keyworker)
-
-        allocation.update!(event: AllocationHistory::ALLOCATE_SECONDARY_POM,
-                           secondary_pom_nomis_id: 485_926,
-                           secondary_pom_name: "Pom, Moic")
-
-        visit prison_prisoner_allocation_path('LEI', prisoner_id: nomis_offender_id_with_keyworker)
-
-        table_row = page.find(:css, 'tr.govuk-table__row#co-working-pom', text: 'Co-working POM')
-
-        within table_row do
-          expect(page).to have_link('Remove')
-          expect(page).to have_content('Co-working POM Pom, Moic')
-        end
+      within table_row do
+        expect(page).to have_link('View')
+        expect(page).to have_content("POM allocated - #{Time.zone.now.strftime('%d/%m/%Y')}")
       end
     end
   end

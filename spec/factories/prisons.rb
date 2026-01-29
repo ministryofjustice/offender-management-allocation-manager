@@ -5,7 +5,6 @@ FactoryBot.define do
     PrisonService::OPEN_PRISON_CODES.include?(x) ||
       PrisonService::ENGLISH_HUB_PRISON_CODES.include?(x) ||
       PrisonService::WOMENS_PRISON_CODES.include?(x) ||
-      # Do not create VCR prisons as we create them in rails_helper.rb
       ['LEI', 'PVI'].include?(x)
   }
 

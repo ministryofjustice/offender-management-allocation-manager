@@ -23,7 +23,6 @@ module OffenderManagementAllocationClient
     config.load_defaults 8.0
     config.exceptions_app = routes
     config.generators.system_tests = nil
-    config.active_support.to_time_preserves_timezone = :zone
 
     config.autoload_lib(ignore: %w[assets tasks])
 

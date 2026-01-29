@@ -32,9 +32,6 @@
 *.iml
 .vscode/
 
-# Ignore Prison API / NOMIS VCR cassettes
-/spec/fixtures/vcr_cassettes/prison_api
-
 # Ignore VIM swap files
 *.swp
 *.swo
