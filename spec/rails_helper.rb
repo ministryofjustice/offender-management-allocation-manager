@@ -32,6 +32,7 @@ rescue ActiveRecord::PendingMigrationError => e
 end
 
 OmniAuth.config.test_mode = true
+WebMock.disable_net_connect!(allow_localhost: true)
 
 RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
@@ -100,25 +101,6 @@ RSpec.configure do |config|
       ActiveJob::Base.queue_adapter = :test
       example.run
       ActiveJob::Base.queue_adapter = adapter
-    end
-  end
-
-  WebMock.disable_net_connect!(allow_localhost: true)
-
-  # in VCR-tagged tests, allow HTTP connections if we're in record mode,
-  # but reset back to default afterward
-  config.around(:each, :vcr) do |example|
-    # VCR tests expect Leeds (HMP) prison to exist
-    unless Prison.where(code: 'LEI').exists?
-      create(:prison, code:'LEI')
-    end
-
-    if [:new_episodes, :all].include?(VCR.configuration.default_cassette_options[:record])
-      WebMock.allow_net_connect!
-      example.run
-      WebMock.disable_net_connect!(allow_localhost: true)
-    else
-      example.run
     end
   end
 

@@ -11,7 +11,7 @@ feature "get poms list", flaky: true do
     signin_spo_user
   end
 
-  it "shows the page", vcr: { cassette_name: 'prison_api/show_poms_feature_list' } do
+  it "shows the page" do
     visit prison_poms_path('LEI')
 
     # shows 3 tabs - probation, prison and inactive
@@ -24,7 +24,7 @@ feature "get poms list", flaky: true do
   # This example is a bit misleading. From what I can tell, this offender (G1247VX) _does_ have a valid sentence.
   # If they were missing the required sentence data, they shouldn't be available in the service.
   # Therefore, I'm not entirely sure what the intention is behind this test aside from showing that allocations are displayed on the POM's caseload.
-  it "handles missing sentence data", vcr: { cassette_name: 'prison_api/show_poms_feature_missing_sentence' } do
+  it "handles missing sentence data" do
     visit prison_prisoner_staff_index_path('LEI', offender_missing_sentence_case_info.nomis_offender_id)
 
     within '#recommended_poms' do
@@ -45,7 +45,7 @@ feature "get poms list", flaky: true do
     expect(page).to have_content(offender_missing_sentence_case_info.nomis_offender_id)
   end
 
-  it "allows viewing a POM", :js, vcr: { cassette_name: 'prison_api/show_poms_feature_view' } do
+  it "allows viewing a POM", :js do
     visit prison_pom_path('LEI', moic_pom_id)
 
     expect(page).to have_content("Moic Pom")
@@ -57,7 +57,7 @@ feature "get poms list", flaky: true do
     expect(page).to have_content "All cases (0)"
   end
 
-  describe 'sorting', vcr: { cassette_name: 'prison_api/show_poms_feature_view_sorting' } do
+  describe 'sorting' do
     before do
       ['G7806VO', 'G2911GD'].each do |offender_id|
         create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
@@ -110,7 +110,7 @@ feature "get poms list", flaky: true do
     end
   end
 
-  it "allows editing a POM", vcr: { cassette_name: 'prison_api/show_poms_feature_edit' } do
+  it "allows editing a POM" do
     visit "/prisons/LEI/poms/#{moic_pom_id}/edit"
 
     expect(page).to have_css(".govuk-button", count: 1)

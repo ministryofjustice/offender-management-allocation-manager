@@ -98,7 +98,6 @@ group :test do
   # https://evilmartians.com/chronicles/testprof-a-good-doctor-for-slow-ruby-tests
   gem 'test-prof'
   gem 'timecop'
-  gem 'vcr'
   gem 'webmock'
 end
 
