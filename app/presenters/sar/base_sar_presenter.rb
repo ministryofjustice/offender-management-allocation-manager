@@ -32,7 +32,7 @@ module Sar
   private
 
     def generic_omitted_attributes
-      [:id, :nomis_offender_id, :crn]
+      [:id, :nomis_offender_id, :crn, :staff_member_id]
     end
 
     def omitted_attributes

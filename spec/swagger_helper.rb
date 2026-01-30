@@ -67,11 +67,9 @@ RSpec.configure do |config|
                   calculatedHandoverDate
                   caseInformation
                   earlyAllocations
-                  emailHistories
                   handoverProgressChecklist
                   offenderEmailSent
                   responsibility
-                  victimLiaisonOfficers
                 ],
                 properties: {
                   nomsNumber: { type: :string },
@@ -229,10 +227,6 @@ RSpec.configure do |config|
                         reason
                         communityDecision
                         prison
-                        createdByFirstname
-                        createdByLastname
-                        updatedByFirstname
-                        updatedByLastname
                         createdWithinReferralWindow
                         outcome
                         createdAt
@@ -255,34 +249,8 @@ RSpec.configure do |config|
                         reason: { type: :string, nullable: true },
                         communityDecision: { type: :boolean, nullable: true },
                         prison: { type: :string, nullable: true },
-                        createdByFirstname: { type: :string, nullable: true },
-                        createdByLastname: { type: :string, nullable: true },
-                        updatedByFirstname: { type: :string, nullable: true },
-                        updatedByLastname: { type: :string, nullable: true },
                         createdWithinReferralWindow: { type: :boolean },
                         outcome: { type: :string },
-                        createdAt: { type: :string },
-                        updatedAt: { type: :string },
-                      }
-                    }
-                  },
-                  emailHistories: {
-                    type: :array,
-                    items: {
-                      type: :object,
-                      required: %w[
-                        prison
-                        name
-                        email
-                        event
-                        createdAt
-                        updatedAt
-                      ],
-                      properties: {
-                        prison: { type: :string },
-                        name: { type: :string },
-                        email: { type: :string },
-                        event: { type: :string },
                         createdAt: { type: :string },
                         updatedAt: { type: :string },
                       }
@@ -313,13 +281,11 @@ RSpec.configure do |config|
                     items: {
                       type: :object,
                       required: %w[
-                        staffMemberId
                         offenderEmailType
                         createdAt
                         updatedAt
                       ],
                       properties: {
-                        staffMemberId: { type: :string },
                         offenderEmailType: { type: :string },
                         createdAt: { type: :string },
                         updatedAt: { type: :string },
@@ -342,26 +308,6 @@ RSpec.configure do |config|
                       value: { type: :string },
                       createdAt: { type: :string },
                       updatedAt: { type: :string },
-                    }
-                  },
-                  victimLiaisonOfficers: {
-                    type: :array,
-                    items: {
-                      type: :object,
-                      required: %w[
-                        firstName
-                        lastName
-                        email
-                        createdAt
-                        updatedAt
-                      ],
-                      properties: {
-                        firstName: { type: :string },
-                        lastName: { type: :string },
-                        email: { type: :string },
-                        createdAt: { type: :string },
-                        updatedAt: { type: :string },
-                      }
                     }
                   }
                 }

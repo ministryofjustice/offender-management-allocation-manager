@@ -61,9 +61,7 @@ RSpec.describe SarOffenderDataService do
           expect(result[:allocationHistory].size).to eq(HISTORY_SIZE)
           expect(result[:auditEvents].size).to eq(HISTORY_SIZE)
           expect(result[:earlyAllocations].size).to eq(HISTORY_SIZE)
-          expect(result[:emailHistories].size).to eq(HISTORY_SIZE)
           expect(result[:offenderEmailSent].size).to eq(HISTORY_SIZE)
-          expect(result[:victimLiaisonOfficers].size).to eq(HISTORY_SIZE)
         end
 
         it 'returns all has_one data' do
@@ -118,7 +116,6 @@ RSpec.describe SarOffenderDataService do
           describe 'with has_many relationship' do
             %i[
               allocationHistory
-              victimLiaisonOfficers
             ].each do |key|
               it "returns records within the range and the last previous for #{key}" do
                 expect(result[key].size).to eq(4)
@@ -175,7 +172,6 @@ RSpec.describe SarOffenderDataService do
           %i[
             auditEvents
             offenderEmailSent
-            emailHistories
             earlyAllocations
           ].each do |key|
             it "returns records within the range for #{key}" do
@@ -272,14 +268,6 @@ RSpec.describe SarOffenderDataService do
 
           it 'humanizes outcome' do
             expect(early_allocation['outcome']).to eq('Eligible')
-          end
-        end
-
-        context 'with email history' do
-          let(:email_history) { result[:emailHistories].last }
-
-          it 'humanizes event' do
-            expect(email_history['event']).to eq('Auto early allocation')
           end
         end
 
