@@ -33,4 +33,48 @@ RSpec.describe SearchHelper do
       end
     end
   end
+
+  describe '#prisoner_path_for_role' do
+    let(:offender) do
+      build(:mpc_offender, prison: prison, offender: build(:case_information).offender, prison_record: build(:hmpps_api_offender))
+    end
+
+    context 'when user is not an SPO' do
+      let(:is_spo) { false }
+
+      it 'returns the prisoner path' do
+        expect(
+          prisoner_path_for_role(is_spo, prison, offender)
+        ).to eq(prison_prisoner_path(prison.code, offender.offender_no))
+      end
+    end
+
+    context 'when user is an SPO' do
+      let(:is_spo) { true }
+
+      context 'with an active allocation' do
+        before do
+          allow(offender).to receive(:active_allocation).and_return(build(:allocation_history))
+        end
+
+        it 'returns the allocation path' do
+          expect(
+            prisoner_path_for_role(is_spo, prison, offender)
+          ).to eq(prison_prisoner_allocation_path(prison.code, prisoner_id: offender.offender_no))
+        end
+      end
+
+      context 'without an active allocation' do
+        before do
+          allow(offender).to receive(:active_allocation).and_return(nil)
+        end
+
+        it 'returns the prisoner path' do
+          expect(
+            prisoner_path_for_role(is_spo, prison, offender)
+          ).to eq(prison_prisoner_path(prison.code, offender.offender_no))
+        end
+      end
+    end
+  end
 end
