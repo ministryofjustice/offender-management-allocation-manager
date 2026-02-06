@@ -6,6 +6,14 @@
         <foreignKey table="offenders" column="nomis_offender_id"/>
       </column>
     </table>
+    <table name="allocation_history_versions">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+      <column name="allocation_history_id">
+        <foreignKey table="allocation_history" column="id"/>
+      </column>
+    </table>
     <table name="audit_events">
       <column name="nomis_offender_id">
         <foreignKey table="offenders" column="nomis_offender_id"/>
@@ -37,6 +45,11 @@
       </column>
     </table>
     <table name="email_histories">
+      <column name="nomis_offender_id">
+        <foreignKey table="offenders" column="nomis_offender_id"/>
+      </column>
+    </table>
+    <table name="omic_eligibilities">
       <column name="nomis_offender_id">
         <foreignKey table="offenders" column="nomis_offender_id"/>
       </column>
