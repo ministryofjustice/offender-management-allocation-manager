@@ -11,8 +11,8 @@ class NomisUserRolesService
     results = response.fetch('content', [])
     total_elements = response.fetch('totalElements', 0)
 
-    # We remove already onboarded POMs from the search results
-    existing_pom_ids = prison.pom_details.pluck(:nomis_staff_id)
+    # We remove existing POMs from the search results
+    existing_pom_ids = prison.get_list_of_poms.map(&:staff_id)
     filtered_results = results.reject { |result| existing_pom_ids.include?(result['staffId']) }
     total_elements -= (results.size - filtered_results.size)
 
@@ -36,9 +36,9 @@ class NomisUserRolesService
     # upon reading the list of POMS.
     # For now, we are not doing that so we need to create the PomDetail here
     # as part of the onboarding to save the correct hours.
-    prison.pom_details.create!(
-      nomis_staff_id:, created_by:, status: 'active', hours_per_week: config[:hours_per_week]
-    )
+    prison.pom_details.find_or_initialize_by(nomis_staff_id:).tap do |pd|
+      pd.update!(created_by:, status: 'active', hours_per_week: config[:hours_per_week])
+    end
   end
 
   # @param [Prison] prison

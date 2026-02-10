@@ -24,7 +24,7 @@ RSpec.describe NomisUserRolesService do
 
     before do
       allow(HmppsApi::NomisUserRolesApi).to receive(:get_users).and_return(api_response)
-      allow(prison.pom_details).to receive(:pluck).with(:nomis_staff_id).and_return([222])
+      allow(prison).to receive(:get_list_of_poms).and_return([double(staff_id: 222)])
     end
 
     it 'calls the NOMIS API with correct parameters' do
@@ -56,14 +56,16 @@ RSpec.describe NomisUserRolesService do
 
   describe '.add_pom' do
     let(:config) { { hours_per_week: 37.5 } }
+    let(:pom_detail) { instance_double(PomDetail) }
 
     before do
       allow(HmppsApi::NomisUserRolesApi).to receive(:set_staff_role)
       allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:expire_list_cache)
-      allow(prison.pom_details).to receive(:create!)
+      allow(prison.pom_details).to receive(:find_or_initialize_by).with(nomis_staff_id:).and_return(pom_detail)
+      allow(pom_detail).to receive(:update!)
     end
 
-    it 'sets the staff role and creates POM detail' do
+    it 'sets the staff role and creates or updates the POM details' do
       described_class.add_pom(prison, nomis_staff_id, spo_username, config)
 
       expect(HmppsApi::NomisUserRolesApi).to have_received(:set_staff_role).with(
@@ -74,8 +76,8 @@ RSpec.describe NomisUserRolesService do
         HmppsApi::PrisonApi::PrisonOffenderManagerApi
       ).to have_received(:expire_list_cache).with(prison.code)
 
-      expect(prison.pom_details).to have_received(:create!).with(
-        nomis_staff_id: nomis_staff_id,
+      expect(prison.pom_details).to have_received(:find_or_initialize_by).with(nomis_staff_id:)
+      expect(pom_detail).to have_received(:update!).with(
         created_by: spo_username,
         status: 'active',
         hours_per_week: config[:hours_per_week]

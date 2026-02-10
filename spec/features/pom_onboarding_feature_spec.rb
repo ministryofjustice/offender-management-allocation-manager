@@ -2,6 +2,7 @@ require 'rails_helper'
 
 feature 'POM onboarding' do
   let!(:prison) { Prison.find_by(code: 'LEI') || create(:prison, code: 'LEI') }
+  let(:existing_poms) { [build(:pom, staffId: 111_222)] }
   let(:staff_id) { 123_456 }
 
   before do
@@ -15,6 +16,8 @@ feature 'POM onboarding' do
     let(:search_response) { { totalElements: 0, content: [] } }
 
     before do
+      stub_poms(prison.code, existing_poms)
+
       stub_request(:get, search_endpoint)
         .to_return(status: 200, body: search_response.to_json)
 
@@ -102,6 +105,7 @@ feature 'POM onboarding' do
     end
 
     context 'when staff has been already onboarded' do
+      let(:existing_poms) { [build(:pom, staffId: staff_id)] }
       let(:search_query) { 'bloggs' }
       let(:search_response) do
         {
@@ -126,10 +130,6 @@ feature 'POM onboarding' do
       end
 
       before do
-        allow_any_instance_of(Prison).to receive(:pom_details).and_return(
-          [{ nomis_staff_id: staff_id }, { nomis_staff_id: 111_222 }]
-        )
-
         fill_in(id: 'pom-onboarding-form-search-query-field', with: search_query)
         click_button 'Search'
       end
