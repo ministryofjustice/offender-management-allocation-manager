@@ -4,7 +4,7 @@ module Sar
   class AuditEvent < BaseSarPresenter
     class << self
       def omitted_attributes
-        [:data]
+        [:username, :user_human_name, :data]
       end
     end
   end

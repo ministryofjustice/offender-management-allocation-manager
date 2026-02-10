@@ -86,7 +86,6 @@ RSpec.configure do |config|
                         suitabilityDetail
                         primaryPomLastName
                         secondaryPomLastName
-                        createdByName
                         event
                         eventTrigger
                         primaryPomAllocatedAt
@@ -103,7 +102,6 @@ RSpec.configure do |config|
                         suitabilityDetail: { type: :string, nullable: true },
                         primaryPomLastName: { type: :string, nullable: true },
                         secondaryPomLastName: { type: :string, nullable: true },
-                        createdByName: { type: :string, nullable: true },
                         event: { type: :string, nullable: true },
                         eventTrigger: { type: :string, nullable: true },
                         primaryPomAllocatedAt: { type: :string, nullable: true },
@@ -121,8 +119,6 @@ RSpec.configure do |config|
                         tags
                         publishedAt
                         systemEvent
-                        username
-                        userHumanName
                         createdAt
                         updatedAt
                       ],
@@ -133,8 +129,6 @@ RSpec.configure do |config|
                         },
                         publishedAt: { type: :string },
                         systemEvent: { type: :boolean, nullable: true },
-                        username: { type: :string, nullable: true },
-                        userHumanName: { type: :string, nullable: true },
                         createdAt: { type: :string },
                         updatedAt: { type: :string },
                       }
@@ -183,10 +177,8 @@ RSpec.configure do |config|
                                  mappaLevel
                                  manualEntry
                                  probationService
-                                 comName
                                  teamName
                                  localDeliveryUnit
-                                 comEmail
                                  activeVlo
                                  enhancedResourcing
                                  createdAt
@@ -196,10 +188,8 @@ RSpec.configure do |config|
                       mappaLevel: { type: :integer, nullable: true },
                       manualEntry: { type: :boolean },
                       probationService: { type: :string, nullable: true },
-                      comName: { type: :string, nullable: true },
                       teamName: { type: :string, nullable: true },
                       localDeliveryUnit: { type: :string, nullable: true },
-                      comEmail: { type: :string, nullable: true },
                       activeVlo: { type: :boolean },
                       enhancedResourcing: { type: :boolean, nullable: true },
                       createdAt: { type: :string },
