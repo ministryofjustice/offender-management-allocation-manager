@@ -78,7 +78,6 @@ components:
                 - suitabilityDetail
                 - primaryPomLastName
                 - secondaryPomLastName
-                - createdByName
                 - event
                 - eventTrigger
                 - primaryPomAllocatedAt
@@ -110,9 +109,6 @@ components:
                   secondaryPomLastName:
                     type: string
                     nullable: true
-                  createdByName:
-                    type: string
-                    nullable: true
                   event:
                     type: string
                     nullable: true
@@ -137,8 +133,6 @@ components:
                 - tags
                 - publishedAt
                 - systemEvent
-                - username
-                - userHumanName
                 - createdAt
                 - updatedAt
                 properties:
@@ -150,12 +144,6 @@ components:
                     type: string
                   systemEvent:
                     type: boolean
-                    nullable: true
-                  username:
-                    type: string
-                    nullable: true
-                  userHumanName:
-                    type: string
                     nullable: true
                   createdAt:
                     type: string
@@ -212,10 +200,8 @@ components:
               - mappaLevel
               - manualEntry
               - probationService
-              - comName
               - teamName
               - localDeliveryUnit
-              - comEmail
               - activeVlo
               - enhancedResourcing
               - createdAt
@@ -232,16 +218,10 @@ components:
                 probationService:
                   type: string
                   nullable: true
-                comName:
-                  type: string
-                  nullable: true
                 teamName:
                   type: string
                   nullable: true
                 localDeliveryUnit:
-                  type: string
-                  nullable: true
-                comEmail:
                   type: string
                   nullable: true
                 activeVlo:
