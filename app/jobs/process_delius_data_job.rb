@@ -3,25 +3,38 @@
 class ProcessDeliusDataJob < ApplicationJob
   queue_as :default
 
-  # HTTP 404 Not Found: Not much point retrying a missing offender
-  discard_on Faraday::ResourceNotFound
-
-  # HTTP 409 Conflict: nDelius API fails like this when trying to read a duplicate offender - so don't retry here either
-  discard_on Faraday::ConflictError
-
   include ApplicationHelper
 
   # identifier_type can be :nomis_offender_id (default), or :crn
   # trigger_method can be :batch (default), or :event
-  def perform(identifier, identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil)
-    ApplicationRecord.transaction do
-      logger.info("#{identifier_type}=#{identifier},trigger_method=#{trigger_method},job=process_delius_data_job,event=started")
-      import_data(identifier, identifier_type, trigger_method, event_type)
-      logger.info("#{identifier_type}=#{identifier},trigger_method=#{trigger_method},job=process_delius_data_job,event=finished")
-    end
+  def perform(identifiers, identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil)
+    identifiers = Array(identifiers)
+
+    prefix = "job=process_delius_data_job,count=#{identifiers.size},identifier_type=#{identifier_type},trigger_method=#{trigger_method}"
+    prefix += ",event_type=#{event_type}" if event_type
+
+    logger.info("#{prefix},event=started")
+    identifiers.each { process_identifier(it, identifier_type, trigger_method, event_type) }
+    logger.info("#{prefix},event=finished")
   end
 
 private
+
+  def process_identifier(identifier, identifier_type, trigger_method, event_type)
+    prefix = "job=process_delius_data_job,#{identifier_type}=#{identifier},trigger_method=#{trigger_method}"
+
+    ApplicationRecord.transaction do
+      logger.info("#{prefix},event=processing")
+      import_data(identifier, identifier_type, trigger_method, event_type)
+      logger.info("#{prefix},event=processed")
+    end
+  rescue Faraday::ResourceNotFound
+    logger.warn("#{prefix},event=resource_not_found")
+  rescue Faraday::ConflictError
+    logger.warn("#{prefix},event=conflict_error")
+  rescue StandardError => e
+    logger.warn("#{prefix},event=exception,message=#{e.message}")
+  end
 
   def import_data(identifier, identifier_type, trigger_method, event_type)
     probation_record = OffenderService.get_probation_record(identifier)
@@ -50,24 +63,37 @@ private
       nomis_offender_id = identifier
     end
 
-    offender = OffenderService.get_offender(nomis_offender_id)
-
-    if offender.nil?
-      logger.error(
-        "nomis_offender_id=#{nomis_offender_id},job=process_delius_data_job,event=missing_offender_record|" \
-        'Failed to retrieve NOMIS offender record'
+    # Only when processing delius data as a consequence of an event received, we need
+    # to check if the offender we've received exists, and falls inside OMiC rules.
+    #
+    # When using a batch/nightly job we don't need to do this as we are already processing
+    # offenders we know are inside OMiC, so this is redundant and very costly/slow.
+    #
+    if trigger_method == :event
+      offender = OffenderService.get_offender(
+        nomis_offender_id,
+        ignore_legal_status: true, fetch_complexities: false, fetch_categories: false, fetch_movements: false
       )
 
-      return
+      if offender.nil?
+        logger.error(
+          "nomis_offender_id=#{nomis_offender_id},job=process_delius_data_job,event=missing_offender_record|" \
+          'Failed to retrieve NOMIS offender record'
+        )
+
+        return
+      end
+
+      return unless offender.inside_omic_policy?
     end
 
-    process_record(probation_record, nomis_offender_id, trigger_method, event_type) if offender.inside_omic_policy?
+    process_record(probation_record, nomis_offender_id, trigger_method, event_type)
   end
 
   def process_record(probation_record, nomis_offender_id, trigger_method, event_type)
     DeliusImportError.where(nomis_offender_id: nomis_offender_id).destroy_all
 
-    prisoner = Offender.find_by!(nomis_offender_id: nomis_offender_id)
+    prisoner = Offender.find_or_create_by!(nomis_offender_id:)
     case_info = prisoner.case_information || prisoner.build_case_information
 
     map_delius_to_case_info!(probation_record, case_info)

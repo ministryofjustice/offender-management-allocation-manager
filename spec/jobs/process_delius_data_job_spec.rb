@@ -304,4 +304,46 @@ RSpec.describe ProcessDeliusDataJob, :disable_push_to_delius, type: :job do
       end
     end
   end
+
+  context 'when passing multiple identifiers' do
+    let(:offender_id_1) { nomis_offender_id }
+    let(:offender_id_2) { 'G4282GV' }
+    let(:identifiers) { [offender_id_1, offender_id_2] }
+
+    before do
+      stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: offender_id_1))
+      stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: offender_id_2))
+
+      allow(
+        OffenderService
+      ).to receive(:get_probation_record).with(
+        offender_id_2
+      ).and_return(
+        mock_probation_record.merge(noms_id: offender_id_2)
+      )
+    end
+
+    it 'processes all identifiers' do
+      expect {
+        described_class.perform_now identifiers
+      }.to change(CaseInformation, :count).by(2)
+    end
+
+    context 'when one fails with an error' do
+      before do
+        allow(OffenderService).to receive(:get_probation_record).with(offender_id_1).and_raise(
+          Faraday::ResourceNotFound, 'not found'
+        )
+      end
+
+      it 'continues processing the others' do
+        expect {
+          described_class.perform_now identifiers
+        }.to change(CaseInformation, :count).by(1)
+
+        expect(CaseInformation.exists?(nomis_offender_id: offender_id_1)).to be(false)
+        expect(CaseInformation.exists?(nomis_offender_id: offender_id_2)).to be(true)
+      end
+    end
+  end
 end
