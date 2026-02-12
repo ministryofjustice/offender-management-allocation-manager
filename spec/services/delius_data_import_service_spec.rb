@@ -274,11 +274,13 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
   end
 
   context 'when using CRN as the identifier' do
+    let(:service) { described_class.new(identifier_type: :crn) }
+
     before do
       stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
       allow(OffenderService).to receive(:get_probation_record).with(crn).and_return(mock_probation_record)
       allow(service.logger).to receive(:error)
-      service.process(crn, identifier_type: :crn)
+      service.process(crn)
     end
 
     context 'when the probation record has a NOMIS offender ID' do

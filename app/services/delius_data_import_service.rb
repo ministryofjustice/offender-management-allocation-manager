@@ -1,18 +1,21 @@
 # frozen_string_literal: true
 
 class DeliusDataImportService
-  attr_reader :logger
+  attr_reader :logger, :identifier_type, :trigger_method, :event_type
 
-  def initialize
+  def initialize(identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil)
     @logger = Rails.logger
+    @identifier_type = identifier_type
+    @trigger_method = trigger_method
+    @event_type = event_type
   end
 
-  def process(identifier, identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil)
+  def process(identifier)
     prefix = "job=process_delius_data_job,#{identifier_type}=#{identifier},trigger_method=#{trigger_method}"
 
     ApplicationRecord.transaction do
       logger.info("#{prefix},event=processing")
-      import_data(identifier, identifier_type, trigger_method, event_type)
+      import_data(identifier)
       logger.info("#{prefix},event=processed")
     end
   rescue Faraday::ResourceNotFound
@@ -25,7 +28,7 @@ class DeliusDataImportService
 
 private
 
-  def import_data(identifier, identifier_type, trigger_method, event_type)
+  def import_data(identifier)
     probation_record = OffenderService.get_probation_record(identifier)
 
     if probation_record.nil?
@@ -76,10 +79,10 @@ private
       return unless offender.inside_omic_policy?
     end
 
-    process_record(probation_record, nomis_offender_id, trigger_method, event_type)
+    process_record(probation_record, nomis_offender_id)
   end
 
-  def process_record(probation_record, nomis_offender_id, trigger_method, event_type)
+  def process_record(probation_record, nomis_offender_id)
     DeliusImportError.where(nomis_offender_id: nomis_offender_id).destroy_all
 
     prisoner = Offender.find_or_create_by!(nomis_offender_id: nomis_offender_id)
