@@ -3,25 +3,36 @@
 namespace :community_api do
   desc 'Import data from Community API'
   task import: :environment do |_task|
-    Rails.logger = Logger.new($stdout) if Rails.env.production?
+    $stdout.sync = true
+    Rails.logger = Logger.new($stdout)
 
-    # Avoid filling up the in-memory SQL query cache – we're going to be reading lots of database records
-    ActiveRecord::Base.connection.disable_query_cache!
+    # avoid lots of log traces from the API calls
+    Rails.logger.level = :warn
 
-    prison_count = Prison.all.count
+    # Minimum ideal job size. We prefer to keep jobs above this size, even if it means
+    # making them larger than this target (up to < 2x).
+    # E.g. with 400: 600 offenders -> 1 job. 850 offenders -> 2 jobs.
+    min_job_size = 400
 
-    Prison.all.each_with_index do |prison, prison_index|
-      prison_log_prefix = "[#{prison_index + 1}/#{prison_count}]"
-      Rails.logger.info("#{prison_log_prefix} Getting offenders for prison #{prison.name} (#{prison.code})")
+    prison_count = Prison.count
 
-      offender_count = prison.all_policy_offenders.each { |offender|
-        ProcessDeliusDataJob.perform_later offender.offender_no
-        Rails.logger.info("#{prison_log_prefix} Queued job for offender #{offender.offender_no}")
-      }.count
+    Prison.order(code: :asc).each.with_index(1) do |prison, index|
+      offender_nos = OmicEligibility.eligible.where(prison: prison.code).pluck(:nomis_offender_id)
 
-      Rails.logger.info("#{prison_log_prefix} Queued jobs for #{offender_count} offenders")
+      batch_count = offender_nos.count / min_job_size
+      batch_count = 1 if batch_count.zero? && offender_nos.any?
+
+      if batch_count > 0
+        offender_nos.in_groups(batch_count, false) do |batch|
+          ProcessDeliusDataJob.perform_later(batch)
+        end
+      end
+
+      Rails.logger.warn(
+        "[#{index}/#{prison_count}] Queued #{offender_nos.count} offenders in #{prison.code} in #{batch_count} jobs"
+      )
     end
 
-    Rails.logger.info('Done')
+    Rails.logger.warn('Done')
   end
 end

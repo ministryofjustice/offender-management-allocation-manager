@@ -46,7 +46,7 @@ cronjobs:
     schedule: 0 9 * * *
   persist_omic_eligibility:
     enabled: false
-    schedule: 30 6 * * *
+    schedule: 45 6 * * *
   # Below cronjobs are currently only enabled in production
   early_allocation_suitability_email:
     enabled: false
