@@ -24,15 +24,15 @@ cronjobs:
   handover_reminder_email:
     enabled: true
     schedule: 5 0 * * *
+  persist_omic_eligibility:
+    enabled: true
+    schedule: 30 5 * * *
   community_api_import:
     enabled: true
     schedule: 0 6 * * *
   parole_data_import:
     enabled: true
     schedule: 15 7 * * *
-  persist_omic_eligibility:
-    enabled: true
-    schedule: 30 6 * * *
 
 generic-prometheus-alerts:
   alertSeverity: mpc-alerts-prod
