@@ -13,11 +13,9 @@ class DeliusDataImportService
   def process(identifier)
     prefix = "job=process_delius_data_job,#{identifier_type}=#{identifier},trigger_method=#{trigger_method}"
 
-    ApplicationRecord.transaction do
-      logger.info("#{prefix},event=processing")
-      import_data(identifier)
-      logger.info("#{prefix},event=processed")
-    end
+    logger.info("#{prefix},event=processing")
+    import_data(identifier)
+    logger.info("#{prefix},event=processed")
   rescue Faraday::ResourceNotFound
     logger.warn("#{prefix},event=resource_not_found")
   rescue Faraday::ConflictError
