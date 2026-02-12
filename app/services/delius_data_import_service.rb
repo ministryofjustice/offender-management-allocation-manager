@@ -120,6 +120,7 @@ private
 
   def map_delius_to_case_info!(probation_record, case_info)
     ldu_code = probation_record.dig(:manager, :team, :local_delivery_unit, :code)
+    ldu_record = LocalDeliveryUnit.find_by(code: ldu_code)
 
     case_info.tap do |ci|
       ci.assign_attributes(
@@ -128,11 +129,11 @@ private
         com_email: probation_record.dig(:manager, :email),
         crn: probation_record.fetch(:crn),
         tier: map_tier(probation_record.fetch(:tier)),
-        local_delivery_unit: map_ldu(ldu_code),
+        local_delivery_unit: ldu_record,
         ldu_code: ldu_code,
         team_name: probation_record.dig(:manager, :team, :description),
         enhanced_resourcing: enhanced_resourcing(probation_record.fetch(:resourcing)),
-        probation_service: map_probation_service(ldu_code),
+        probation_service: ldu_record&.country || 'England',
         mappa_level: probation_record.fetch(:mappa_level),
         active_vlo: probation_record.fetch(:vlo_assigned)
       )
@@ -148,14 +149,6 @@ private
     return nil if surname.blank? && forename.blank?
 
     "#{surname}, #{forename}"
-  end
-
-  def map_ldu(ldu_code)
-    LocalDeliveryUnit.find_by(code: ldu_code)
-  end
-
-  def map_probation_service(ldu_code)
-    LocalDeliveryUnit.find_by(code: ldu_code)&.country || 'England'
   end
 
   def map_tier(tier)
