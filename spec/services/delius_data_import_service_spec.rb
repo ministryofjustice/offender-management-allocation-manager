@@ -187,16 +187,16 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
     context 'with an English LDU' do
       let(:ldu) { create(:local_delivery_unit, country: 'England') }
 
-      it 'maps to false' do
+      it 'maps to England' do
         service.process(nomis_offender_id)
         expect(case_info.probation_service).to eq('England')
       end
     end
 
-    context 'with an Welsh LDU' do
+    context 'with a Welsh LDU' do
       let(:ldu) { create(:local_delivery_unit, country: 'Wales') }
 
-      it 'maps to true' do
+      it 'maps to Wales' do
         service.process(nomis_offender_id)
         expect(case_info.probation_service).to eq('Wales')
       end
