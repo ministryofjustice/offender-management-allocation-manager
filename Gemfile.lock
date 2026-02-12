@@ -181,7 +181,7 @@ GEM
       railties (>= 6.1.0)
     faker (3.6.0)
       i18n (>= 1.8.11, < 2)
-    faraday (1.10.4)
+    faraday (1.10.5)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -678,7 +678,7 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails
   faker
-  faraday (~> 1.10.3)
+  faraday (~> 1.10.5)
   fast_underscore
   govuk_design_system_formbuilder (~> 5.4.1)
   govuk_notify_rails (~> 3.0.0)
