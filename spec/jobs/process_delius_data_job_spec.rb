@@ -16,7 +16,7 @@ RSpec.describe ProcessDeliusDataJob, type: :job do
         described_class.perform_now(offender_id_1)
 
         expect(DeliusDataImportService).to have_received(:new).with(
-          identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil
+          identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil, logger: anything
         )
         expect(import_service).to have_received(:process).with(offender_id_1)
       end
@@ -27,7 +27,7 @@ RSpec.describe ProcessDeliusDataJob, type: :job do
         described_class.perform_now([offender_id_1, offender_id_2])
 
         expect(DeliusDataImportService).to have_received(:new).with(
-          identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil
+          identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil, logger: anything
         )
         expect(import_service).to have_received(:process).with(offender_id_1)
         expect(import_service).to have_received(:process).with(offender_id_2)
@@ -41,7 +41,7 @@ RSpec.describe ProcessDeliusDataJob, type: :job do
         )
 
         expect(DeliusDataImportService).to have_received(:new).with(
-          identifier_type: :crn, trigger_method: :event, event_type: 'foo'
+          identifier_type: :crn, trigger_method: :event, event_type: 'foo', logger: anything
         )
         expect(import_service).to have_received(:process).with(offender_id_1)
       end

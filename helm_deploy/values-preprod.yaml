@@ -1,20 +1,4 @@
 ---
-cronjobs:
-  process_movements:
-    enabled: true
-  recalculate_handover_dates:
-    enabled: true
-  community_api_import:
-    enabled: true
-  deactivate_unsentenced_cnls:
-    enabled: true
-  mailbox_register_import:
-    enabled: true
-  parole_data_import:
-    enabled: true
-  persist_omic_eligibility:
-    enabled: true
-
 generic-prometheus-alerts:
   alertSeverity: mpc-alerts-nonprod-preprod
   businessHoursOnly: true

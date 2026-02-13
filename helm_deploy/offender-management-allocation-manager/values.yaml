@@ -22,31 +22,30 @@ custom_templates_config:
 # IMPORTANT: `staging` and `preprod` turn off RDS instance for cost savings
 # between 10:00 PM - 6:00 AM, so any cronjobs running on those environments
 # that require DB access must be scheduled outside this downtime window.
+# Also, some jobs depend on other services APIs which as well might have
+# their DB or pods shutdown overnight in non-prod envs.
 cronjobs:
-  integration_tests_cleanup:
-    enabled: false # should only be enabled in `staging`
-    schedule: 15 6 * * *
   process_movements:
-    enabled: false
-    schedule: 30 6 * * *
-  recalculate_handover_dates:
-    enabled: false
+    enabled: true
     schedule: 45 6 * * *
-  community_api_import:
-    enabled: false
+  recalculate_handover_dates:
+    enabled: true
     schedule: 0 7 * * *
+  persist_omic_eligibility:
+    enabled: true
+    schedule: 15 7 * * *
+  community_api_import:
+    enabled: true
+    schedule: 30 7 * * *
   deactivate_unsentenced_cnls:
-    enabled: false
+    enabled: true
     schedule: 45 7 * * *
   parole_data_import:
-    enabled: false
+    enabled: true
     schedule: 0 8 * * *
   mailbox_register_import:
-    enabled: false
+    enabled: true
     schedule: 0 9 * * *
-  persist_omic_eligibility:
-    enabled: false
-    schedule: 45 6 * * *
   # Below cronjobs are currently only enabled in production
   early_allocation_suitability_email:
     enabled: false

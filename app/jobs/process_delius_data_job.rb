@@ -16,7 +16,7 @@ class ProcessDeliusDataJob < ApplicationJob
 
     logger.info("#{prefix},event=started")
 
-    import_service = DeliusDataImportService.new(identifier_type:, trigger_method:, event_type:)
+    import_service = DeliusDataImportService.new(identifier_type:, trigger_method:, event_type:, logger:)
 
     identifiers.each do |identifier|
       import_service.process(identifier)
