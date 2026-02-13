@@ -33,7 +33,7 @@ class DebuggingController < PrisonsApplicationController
     return unless id
 
     @nomis_id = id
-    @log = AuditEvent.where(nomis_offender_id: @nomis_id).order(published_at: :desc)
+    @log = AuditEvent.where(nomis_offender_id: @nomis_id).order(created_at: :desc)
   end
 
 private

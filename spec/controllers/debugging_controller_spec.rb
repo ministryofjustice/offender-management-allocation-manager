@@ -53,9 +53,9 @@ RSpec.describe DebuggingController, type: :controller do
     before do
       stub_offender(build(:nomis_offender, prisonId: prison.code, sentence: attributes_for(:sentence_detail, :indeterminate), prisonerNumber: offender_no))
 
-      create(:audit_event, nomis_offender_id: offender_no, published_at: 60.seconds.ago, tags: %w[event tag one])
-      create(:audit_event, nomis_offender_id: offender_no, published_at: 30.seconds.ago, tags: %w[event tag two])
-      create(:audit_event, nomis_offender_id: offender_no, published_at: 10.seconds.ago, tags: %w[event tag three])
+      create(:audit_event, nomis_offender_id: offender_no, created_at: 60.seconds.ago, tags: %w[event tag one])
+      create(:audit_event, nomis_offender_id: offender_no, created_at: 30.seconds.ago, tags: %w[event tag two])
+      create(:audit_event, nomis_offender_id: offender_no, created_at: 10.seconds.ago, tags: %w[event tag three])
     end
 
     it 'displays pertinent records descending in order of publication' do
