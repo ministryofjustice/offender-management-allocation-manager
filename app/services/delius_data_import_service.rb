@@ -3,11 +3,11 @@
 class DeliusDataImportService
   attr_reader :logger, :identifier_type, :trigger_method, :event_type
 
-  def initialize(identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil)
-    @logger = Rails.logger
+  def initialize(identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil, logger: Rails.logger)
     @identifier_type = identifier_type
     @trigger_method = trigger_method
     @event_type = event_type
+    @logger = logger
   end
 
   def process(identifier)
@@ -74,7 +74,14 @@ private
         return
       end
 
-      return unless offender.inside_omic_policy?
+      unless offender.inside_omic_policy?
+        logger.info(
+          "nomis_offender_id=#{nomis_offender_id},job=process_delius_data_job,event=outside_omic_policy|" \
+          'NOMIS offender outside OMIC policy'
+        )
+
+        return
+      end
     end
 
     process_record(probation_record, nomis_offender_id)
@@ -88,32 +95,40 @@ private
 
     map_delius_to_case_info!(probation_record, case_info)
 
-    if case_info.changed?
-      case_info_attrs_before = case_info.changed_attributes
+    # this is the most common scenario so we don't log anything, otherwise we will be
+    # producing thousands of log traces daily saying "no change" which is pointless
+    return unless case_info.changed?
 
-      if case_info.save
-        tags = %w[job process_delius_data_job case_information changed]
-        tags << trigger_method.to_s
-        tags << event_type.downcase if event_type.present?
+    case_info_attrs_before = case_info.changed_attributes
 
-        AuditEvent.publish(
-          nomis_offender_id: nomis_offender_id,
-          tags: tags,
-          system_event: true,
-          data: {
-            'before' => case_info_attrs_before,
-            'after' => case_info.slice(case_info_attrs_before.keys)
-          }
-        )
-      else
-        case_info.errors.each do |error|
-          DeliusImportError.create! nomis_offender_id: nomis_offender_id,
-                                    error_type: error_type(error.attribute)
-        end
-      end
-    else
+    if case_info.save
+      tags = %w[job process_delius_data_job case_information changed]
+      tags << trigger_method.to_s
+      tags << event_type.downcase if event_type.present?
+
+      AuditEvent.publish(
+        nomis_offender_id: nomis_offender_id,
+        tags: tags,
+        system_event: true,
+        data: {
+          'before' => case_info_attrs_before,
+          'after' => case_info.slice(case_info_attrs_before.keys)
+        }
+      )
+
       logger.info(
-        "nomis_offender_id=#{nomis_offender_id},trigger_method=#{trigger_method},job=process_delius_data_job,event=case_information_unchanged"
+        "nomis_offender_id=#{nomis_offender_id},trigger_method=#{trigger_method},job=process_delius_data_job,event=case_information_changed"
+      )
+    else
+      import_errors = []
+      case_info.errors.each do |error|
+        DeliusImportError.create!(nomis_offender_id:, error_type: error_type(error.attribute))
+        import_errors << error.attribute
+      end
+
+      logger.error(
+        "nomis_offender_id=#{nomis_offender_id},trigger_method=#{trigger_method},job=process_delius_data_job,event=case_information_error" \
+        "errors=#{import_errors.join(',')}"
       )
     end
   end

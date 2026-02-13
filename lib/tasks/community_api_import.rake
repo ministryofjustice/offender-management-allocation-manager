@@ -3,9 +3,6 @@
 namespace :community_api do
   desc 'Import data from Community API'
   task import: :environment do |_task|
-    $stdout.sync = true
-    Rails.logger = Logger.new($stdout)
-
     # avoid lots of log traces from the API calls
     Rails.logger.level = :warn
 
@@ -28,11 +25,7 @@ namespace :community_api do
         end
       end
 
-      Rails.logger.warn(
-        "[#{index}/#{prison_count}] Queued #{offender_nos.count} offenders in #{prison.code} in #{batch_count} jobs"
-      )
+      puts "[CommunityApiImport] [#{index}/#{prison_count}] Queued #{offender_nos.count} offenders in #{prison.code} in #{batch_count} jobs"
     end
-
-    Rails.logger.warn('Done')
   end
 end
