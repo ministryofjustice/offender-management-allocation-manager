@@ -1160,6 +1160,34 @@ CREATE INDEX index_allocation_versions_secondary_pom_nomis_id ON public.allocati
 
 
 --
+-- Name: index_audit_events_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_audit_events_on_created_at ON public.audit_events USING btree (created_at);
+
+
+--
+-- Name: index_audit_events_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_audit_events_on_nomis_offender_id ON public.audit_events USING btree (nomis_offender_id);
+
+
+--
+-- Name: index_audit_events_on_published_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_audit_events_on_published_at ON public.audit_events USING btree (published_at);
+
+
+--
+-- Name: index_audit_events_on_tags; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_audit_events_on_tags ON public.audit_events USING gin (tags);
+
+
+--
 -- Name: index_calculated_handover_dates_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1315,6 +1343,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260213115546'),
 ('20260206120702'),
 ('20260119103658'),
 ('20260114110755'),

@@ -33,8 +33,7 @@ class DebuggingController < PrisonsApplicationController
     return unless id
 
     @nomis_id = id
-    @audit_events = AuditEvent.where(nomis_offender_id: @nomis_id).order('created_at DESC')
-    @log = [@audit_events].flat_map(&:all).sort_by(&:created_at).reverse
+    @log = AuditEvent.where(nomis_offender_id: @nomis_id).order(published_at: :desc)
   end
 
 private

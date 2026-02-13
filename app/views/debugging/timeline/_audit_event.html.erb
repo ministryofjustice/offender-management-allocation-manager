@@ -1,12 +1,12 @@
 <% audit_event = log_item %>
 <tr class="govuk-table__row timeline-row">
-  <td class="govuk-table__cell" ><%= audit_event.created_at&.strftime('%d/%m/%Y %H:%M:%S') %></td>
+  <td class="govuk-table__cell" ><%= audit_event.published_at.strftime('%d/%m/%Y %H:%M:%S') %></td>
   <td class="govuk-table__cell" style="display: flex; flex-direction: column; margin-bottom: -1px;">
     <span>
       <strong class="govuk-tag govuk-tag--purple">audit event</strong>
-      <span><%= audit_event.tags.join('.') %></span>
+      <span><%= audit_event.tags.join(' ') %></span>
     </span>
-    
+
     <details class="govuk-details govuk-!-margin-top-3 govuk-!-margin-bottom-2">
       <summary class="govuk-details__summary">
         <span class="govuk-details__summary-text">View data</span>
