@@ -40,7 +40,7 @@
   <tbody class="govuk-table__body">
     <% @audit_events.each do |audit_event| %>
       <tr class="govuk-table__row">
-        <td class="govuk-table__cell"><%= format_time_readably(audit_event.published_at) %></td>
+        <td class="govuk-table__cell"><%= format_time_readably(audit_event.created_at) %></td>
         <td class="govuk-table__cell"><%= audit_event.nomis_offender_id || 'N/A' %></td>
         <td class="govuk-table__cell govuk-body-s"><%= audit_event.tags.join('<br>').html_safe %></td>
         <td class="govuk-table__cell">

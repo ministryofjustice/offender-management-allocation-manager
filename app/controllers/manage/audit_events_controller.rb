@@ -4,7 +4,7 @@ class Manage::AuditEventsController < ApplicationController
   def index
     @nomis_offender_id = params[:nomis_offender_id]
     @tags = params.fetch(:tags, '').strip.split(/[^\w.=]+/)
-    query = AuditEvent.order(published_at: :desc)
+    query = AuditEvent.order(created_at: :desc)
 
     if @nomis_offender_id.present?
       query = query.where(nomis_offender_id: @nomis_offender_id)

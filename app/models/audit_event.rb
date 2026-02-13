@@ -2,7 +2,6 @@ class AuditEvent < ApplicationRecord
   class << self
     def publish(**attrs)
       attrs = attrs.stringify_keys
-      attrs['published_at'] ||= Time.zone.now.utc
       record = create!(**attrs)
 
       system_log = [

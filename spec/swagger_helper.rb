@@ -117,20 +117,16 @@ RSpec.configure do |config|
                       type: :object,
                       required: %w[
                         tags
-                        publishedAt
                         systemEvent
                         createdAt
-                        updatedAt
                       ],
                       properties: {
                         tags: {
                           type: :array,
                           items: { type: :string },
                         },
-                        publishedAt: { type: :string },
                         systemEvent: { type: :boolean, nullable: true },
                         createdAt: { type: :string },
-                        updatedAt: { type: :string },
                       }
                     }
                   },

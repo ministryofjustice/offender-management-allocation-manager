@@ -1,5 +1,5 @@
 RSpec.describe AuditEvent do
-  let(:attributes) { FactoryBot.attributes_for(:audit_event, :system, tags: %w[tag1 tag2]).except(:published_at) }
+  let(:attributes) { FactoryBot.attributes_for(:audit_event, :system, tags: %w[tag1 tag2]).except(:created_at) }
 
   it 'can have username and user_human_name if system_event is false', :aggregate_failures do
     event = FactoryBot.create :audit_event, :user
@@ -32,9 +32,9 @@ RSpec.describe AuditEvent do
       expect(line).to match(/tag1.+tag2/)
     end
 
-    it 'saves a published_at date' do
+    it 'saves a created_at date' do
       record = described_class.publish(**attributes)
-      expect(record.published_at).to be_within(1.second).of(Time.zone.now.utc)
+      expect(record.created_at).to be_within(1.second).of(Time.zone.now.utc)
     end
   end
 

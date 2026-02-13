@@ -134,13 +134,11 @@ CREATE TABLE public.audit_events (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     nomis_offender_id text,
     tags text[] NOT NULL,
-    published_at timestamp(6) without time zone NOT NULL,
     system_event boolean,
     username text,
     user_human_name text,
     data jsonb NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
     CONSTRAINT system_event_cannot_have_user_details CHECK ((((system_event = true) AND (username IS NULL) AND (user_human_name IS NULL)) OR (system_event = false)))
 );
 
@@ -1160,6 +1158,34 @@ CREATE INDEX index_allocation_versions_secondary_pom_nomis_id ON public.allocati
 
 
 --
+-- Name: index_audit_events_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_audit_events_on_created_at ON public.audit_events USING btree (created_at);
+
+
+--
+-- Name: index_audit_events_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_audit_events_on_nomis_offender_id ON public.audit_events USING btree (nomis_offender_id);
+
+
+--
+-- Name: index_audit_events_on_nomis_offender_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_audit_events_on_nomis_offender_id_and_created_at ON public.audit_events USING btree (nomis_offender_id, created_at DESC);
+
+
+--
+-- Name: index_audit_events_on_tags; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_audit_events_on_tags ON public.audit_events USING gin (tags);
+
+
+--
 -- Name: index_calculated_handover_dates_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1315,6 +1341,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260213115546'),
 ('20260206120702'),
 ('20260119103658'),
 ('20260114110755'),
