@@ -1160,17 +1160,17 @@ CREATE INDEX index_allocation_versions_secondary_pom_nomis_id ON public.allocati
 
 
 --
--- Name: index_audit_events_on_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_audit_events_on_created_at ON public.audit_events USING btree (created_at);
-
-
---
 -- Name: index_audit_events_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_audit_events_on_nomis_offender_id ON public.audit_events USING btree (nomis_offender_id);
+
+
+--
+-- Name: index_audit_events_on_nomis_offender_id_and_published_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_audit_events_on_nomis_offender_id_and_published_at ON public.audit_events USING btree (nomis_offender_id, published_at DESC);
 
 
 --
