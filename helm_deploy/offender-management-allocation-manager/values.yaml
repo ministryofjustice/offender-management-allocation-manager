@@ -25,10 +25,6 @@ custom_templates_config:
 # Also, some jobs depend on other services APIs which as well might have
 # their DB or pods shutdown overnight in non-prod envs.
 cronjobs:
-  integration_tests_cleanup:
-    # TODO: job to be removed
-    enabled: false # should only be enabled in `staging`
-    schedule: 15 6 * * *
   process_movements:
     enabled: true
     schedule: 45 6 * * *
