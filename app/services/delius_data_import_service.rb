@@ -127,7 +127,7 @@ private
       end
 
       logger.error(
-        "nomis_offender_id=#{nomis_offender_id},trigger_method=#{trigger_method},job=process_delius_data_job,event=case_information_error" \
+        "nomis_offender_id=#{nomis_offender_id},trigger_method=#{trigger_method},job=process_delius_data_job,event=case_information_error," \
         "errors=#{import_errors.join(',')}"
       )
     end
