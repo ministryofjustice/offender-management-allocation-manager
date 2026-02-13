@@ -58,7 +58,7 @@ RSpec.describe DebuggingController, type: :controller do
       create(:audit_event, nomis_offender_id: offender_no, created_at: 10.seconds.ago, tags: %w[event tag three])
     end
 
-    it 'displays pertinent records descending in order of publication' do
+    it 'displays pertinent records descending in order of creation' do
       get :timeline, params: { prison_id:, offender_no: }
 
       log_items = assigns(:log)

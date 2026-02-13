@@ -2,7 +2,6 @@ FactoryBot.define do
   factory :audit_event do
     nomis_offender_id
     tags { %w[test occurrence] }
-    created_at { Faker::Time.backward }
     system_event { true }
     data do
       {
