@@ -27,25 +27,25 @@ custom_templates_config:
 cronjobs:
   process_movements:
     enabled: true
-    schedule: 45 6 * * *
+    schedule: 45 6 * * 1-5
   recalculate_handover_dates:
     enabled: true
-    schedule: 0 7 * * *
+    schedule: 0 7 * * 1-5
   persist_omic_eligibility:
     enabled: true
-    schedule: 15 7 * * *
+    schedule: 15 7 * * 1-5
   community_api_import:
     enabled: true
-    schedule: 30 7 * * *
+    schedule: 30 7 * * 1-5
   deactivate_unsentenced_cnls:
     enabled: true
-    schedule: 45 7 * * *
+    schedule: 45 7 * * 1-5
   parole_data_import:
     enabled: true
     schedule: 0 8 * * *
   mailbox_register_import:
     enabled: true
-    schedule: 0 9 * * *
+    schedule: 0 9 * * 1-5
   # Below cronjobs are currently only enabled in production
   early_allocation_suitability_email:
     enabled: false
