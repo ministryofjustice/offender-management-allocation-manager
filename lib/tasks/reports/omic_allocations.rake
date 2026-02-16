@@ -40,7 +40,7 @@ namespace :reports do
     end
 
     def log(msg)
-      Rails.logger.warn("#{Time.current.strftime('%Y-%m-%d %H:%M:%S.%3N')} [AllocationsReport] #{msg}")
+      Rails.logger.warn("[AllocationsReport] #{msg}")
     end
     # rubocop:enable Rake/MethodDefinitionInTask
 
@@ -48,8 +48,13 @@ namespace :reports do
     prisons_range = ENV.fetch('PRISONS_RANGE', '0').split('..').map(&:to_i)
     prisons_range = Range.new(prisons_range[0], prisons_range[1])
 
+    # Format for dates: 2026-02-16
+    from_date = ENV.fetch('DATE_FROM', 1.year.ago.to_date.to_s).to_date.at_beginning_of_day
+    to_date = ENV.fetch('DATE_TO', Date.current.end_of_day.to_date.to_s).to_date.end_of_day
+
     log 'Report started'
     log "NOTE: Using range: #{prisons_range}"
+    log "Date range from #{from_date} to #{to_date}."
 
     total = 0
 
@@ -59,7 +64,7 @@ namespace :reports do
       Prison.active.order(name: :asc)[prisons_range].each do |prison|
         log ">> Obtaining allocations for #{prison.name} (#{prison.code})"
 
-        AllocationHistory.where(['created_at >= ?', 1.year.ago.at_beginning_of_day]).where(prison:).find_each do |allocation|
+        AllocationHistory.where(['created_at >= ? AND created_at <= ?', from_date, to_date]).where(prison:).find_each do |allocation|
           offender = OffenderService.get_offender(
             allocation.nomis_offender_id,
             ignore_legal_status: true, fetch_complexities: false, fetch_categories: false, fetch_movements: false
