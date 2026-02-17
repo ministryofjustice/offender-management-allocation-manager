@@ -36,10 +36,11 @@ module DomainEvents
             }
           )
 
-          logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
+          logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type}," \
+                        "crn=#{event.crn_number},old_tier=#{old_tier},new_tier=#{new_tier}"
         else
           logger.error "event=domain_event_handle_failure,domain_event_type=#{event.event_type}," \
-            "crn=#{event.crn_number},new_tier=#{case_info.tier}"
+            "crn=#{event.crn_number}|Error saving case information"
         end
       end
     end
