@@ -248,10 +248,10 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
       }.not_to change(CaseInformation, :count)
     end
 
-    it 'updates tier' do
+    it 'does not update tier' do
       service.process(nomis_offender_id)
 
-      expect(c1.reload.tier).to eq('C')
+      expect(c1.reload.tier).to eq('B')
     end
 
     it 'updates other attributes' do
@@ -263,11 +263,11 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
     end
 
     include_examples 'audit event' do
-      let(:attrs_not_changing) { %w[id created_at updated_at active_vlo nomis_offender_id] }
+      let(:attrs_not_changing) { %w[id created_at updated_at active_vlo nomis_offender_id tier] }
       let(:expected_data) do
         {
           'before' => c1.attributes.except(*attrs_not_changing),
-          'after' => new_case_information_attributes.except(:nomis_offender_id).merge('tier' => 'C').stringify_keys
+          'after' => new_case_information_attributes.except(:nomis_offender_id, :tier).stringify_keys
         }
       end
     end
