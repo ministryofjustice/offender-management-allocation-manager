@@ -373,6 +373,7 @@ RSpec.describe MpcOffender, type: :model do
         manual_entry?
         handover_type
         tier
+        rosh_level
         mappa_level
         welsh_offender
         ldu_email_address
