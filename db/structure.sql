@@ -47,7 +47,8 @@ CREATE TABLE public.allocation_history (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     primary_pom_allocated_at timestamp without time zone,
-    recommended_pom_type character varying
+    recommended_pom_type character varying,
+    allocated_at_rosh character varying
 );
 
 
@@ -91,7 +92,8 @@ CREATE TABLE public.allocation_history_versions (
     allocation_history_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     allocation_created_at timestamp(6) without time zone NOT NULL,
-    allocation_updated_at timestamp(6) without time zone NOT NULL
+    allocation_updated_at timestamp(6) without time zone NOT NULL,
+    allocated_at_rosh character varying
 );
 
 
@@ -211,7 +213,8 @@ CREATE TABLE public.case_information (
     ldu_code character varying,
     com_email character varying,
     active_vlo boolean DEFAULT false,
-    enhanced_resourcing boolean
+    enhanced_resourcing boolean,
+    rosh_level character varying
 );
 
 
@@ -1341,6 +1344,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260217152514'),
 ('20260213115546'),
 ('20260206120702'),
 ('20260119103658'),

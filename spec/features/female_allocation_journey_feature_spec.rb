@@ -70,6 +70,7 @@ feature "womens allocation journey" do
       expect(a.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at))
         .to eq(message: message_text,
                allocated_at_tier: "A",
+               allocated_at_rosh: nil,
                created_by_name: "MOIC POM",
                event: 'allocate_primary_pom',
                event_trigger: "user",
@@ -112,6 +113,7 @@ feature "womens allocation journey" do
       expect(a.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at))
         .to eq(message: message_text,
                allocated_at_tier: "A",
+               allocated_at_rosh: nil,
                created_by_name: "MOIC POM",
                event: 'allocate_primary_pom',
                event_trigger: "user",
@@ -165,6 +167,7 @@ feature "womens allocation journey" do
       expect(allocation.attributes.symbolize_keys.except(:created_at, :updated_at, :id, :primary_pom_allocated_at))
         .to eq(message: message_text,
                allocated_at_tier: "C",
+               allocated_at_rosh: nil,
                created_by_name: "MOIC POM",
                event: 'reallocate_primary_pom',
                event_trigger: "user",

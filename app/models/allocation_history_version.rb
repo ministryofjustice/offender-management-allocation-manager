@@ -14,6 +14,7 @@ class AllocationHistoryVersion < ApplicationRecord
     nomis_offender_id
     prison
     allocated_at_tier
+    allocated_at_rosh
     override_reasons
     created_by_name
     primary_pom_nomis_id
@@ -46,9 +47,10 @@ class AllocationHistoryVersion < ApplicationRecord
           created_at: version.created_at,
           allocation_created_at: attrs['created_at'],
           allocation_updated_at: attrs['updated_at'],
-          # below attributes might not exist in very old PT versions, so we set defaults
+          # below attributes might not exist in previous versions, so we set defaults
           primary_pom_allocated_at: nil,
           recommended_pom_type: nil,
+          allocated_at_rosh: nil,
         }.stringify_keys
       )
     end

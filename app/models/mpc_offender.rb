@@ -252,6 +252,7 @@ class MpcOffender
   #
 
   delegate :tier,
+           :rosh_level,
            :mappa_level,
            to: :case_information
 
@@ -500,6 +501,7 @@ class MpcOffender
       manual_entry?
       handover_type
       tier
+      rosh_level
       mappa_level
       welsh_offender
       ldu_email_address
