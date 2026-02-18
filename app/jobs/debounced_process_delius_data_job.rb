@@ -14,7 +14,8 @@ class DebouncedProcessDeliusDataJob < ApplicationJob
 private
 
   def debounce_token_match?(crn_number, debounce_key, debounce_token)
-    return true if Rails.cache.read(debounce_key) == debounce_token
+    cached_token = Rails.cache.read(debounce_key)
+    return true if cached_token.nil? || cached_token == debounce_token
 
     logger.info("job=debounced_process_delius_data_job,event=skipped,crn=#{crn_number}")
     false

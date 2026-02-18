@@ -48,6 +48,24 @@ RSpec.describe DebouncedProcessDeliusDataJob, type: :job do
     expect(ProcessDeliusDataJob).not_to have_received(:perform_now)
   end
 
+  it 'runs the job when the debounce key is missing or expired' do
+    debounce_token = SecureRandom.uuid
+
+    described_class.perform_now(
+      crn,
+      event_type:,
+      debounce_key:,
+      debounce_token:
+    )
+
+    expect(ProcessDeliusDataJob).to have_received(:perform_now).with(
+      crn,
+      identifier_type: :crn,
+      trigger_method: :event,
+      event_type:
+    )
+  end
+
   it 'do not skip the job when reading from the cache raises an error' do
     debounce_token = SecureRandom.uuid
     allow(Rails.cache).to receive(:read).with(debounce_key).and_raise(StandardError, 'boom')
