@@ -2,5 +2,6 @@
 :concurrency: <%= ENV.fetch('RAILS_MAX_THREADS') { 3 } %>
 
 :queues:
+  - debounce
   - default
   - mailers

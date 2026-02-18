@@ -3,7 +3,8 @@ RSpec.describe DomainEvents::Handlers::ProbationChangeHandler do
 
   before do
     allow(ProcessDeliusDataJob).to receive(:perform_now)
-    expect(ProcessDeliusDataJob).not_to receive(:perform_later)
+    allow(DebouncedProcessDeliusDataJob).to receive(:set).and_return(DebouncedProcessDeliusDataJob)
+    allow(DebouncedProcessDeliusDataJob).to receive(:perform_later)
     allow(Shoryuken::Logging.logger).to receive(:info).and_return(nil)
   end
 
@@ -21,6 +22,16 @@ RSpec.describe DomainEvents::Handlers::ProbationChangeHandler do
 
   let(:crn) { 'X08769' }
 
+  shared_examples 'debounced probation update' do
+    it 'updates case information' do
+      handler.handle(event)
+      expect(DebouncedProcessDeliusDataJob).to have_received(:set).with(wait: described_class::DEBOUNCE_WINDOW)
+      expect(DebouncedProcessDeliusDataJob).to have_received(:perform_later).with(
+        crn, event_type:, debounce_key: "domain_events:probation_change:#{crn}", debounce_token: kind_of(String)
+      )
+    end
+  end
+
   context 'with event type probation-case.registration.*' do
     let(:event_type) { 'probation-case.registration.added' }
 
@@ -31,12 +42,7 @@ RSpec.describe DomainEvents::Handlers::ProbationChangeHandler do
     context 'with cases whose registration type includes MAPP, DASO, INVI' do
       let(:register_type) { 'MAPP' }
 
-      it 'updates case information' do
-        handler.handle(event)
-        expect(ProcessDeliusDataJob).to have_received(:perform_now).with(
-          crn, identifier_type: :crn, trigger_method: :event, event_type:
-        )
-      end
+      include_examples 'debounced probation update'
     end
 
     context 'with cases whose registration type does not includes MAPP, DASO, INVI' do
@@ -45,7 +51,7 @@ RSpec.describe DomainEvents::Handlers::ProbationChangeHandler do
       before { handler.handle(event) }
 
       it 'does not update case information' do
-        expect(ProcessDeliusDataJob).not_to have_received(:perform_now)
+        expect(DebouncedProcessDeliusDataJob).not_to have_received(:perform_later)
       end
 
       it 'emits a noop log info message' do
@@ -54,39 +60,12 @@ RSpec.describe DomainEvents::Handlers::ProbationChangeHandler do
     end
   end
 
-  context 'with event type OFFENDER_MANAGER_CHANGED' do
-    let(:event_type) { 'OFFENDER_MANAGER_CHANGED' }
-    let(:additional_information) { {} }
+  %w[OFFENDER_MANAGER_CHANGED OFFENDER_OFFICER_CHANGED OFFENDER_DETAILS_CHANGED].each do |event_type_value|
+    context "with event type #{event_type_value}" do
+      let(:event_type) { event_type_value }
+      let(:additional_information) { {} }
 
-    it 'updates case information' do
-      handler.handle(event)
-      expect(ProcessDeliusDataJob).to have_received(:perform_now).with(
-        crn, identifier_type: :crn, trigger_method: :event, event_type:
-      )
-    end
-  end
-
-  context 'with event type OFFENDER_OFFICER_CHANGED' do
-    let(:event_type) { 'OFFENDER_OFFICER_CHANGED' }
-    let(:additional_information) { {} }
-
-    it 'updates case information' do
-      handler.handle(event)
-      expect(ProcessDeliusDataJob).to have_received(:perform_now).with(
-        crn, identifier_type: :crn, trigger_method: :event, event_type:
-      )
-    end
-  end
-
-  context 'with event type OFFENDER_DETAILS_CHANGED' do
-    let(:event_type) { 'OFFENDER_DETAILS_CHANGED' }
-    let(:additional_information) { {} }
-
-    it 'updates case information' do
-      handler.handle(event)
-      expect(ProcessDeliusDataJob).to have_received(:perform_now).with(
-        crn, identifier_type: :crn, trigger_method: :event, event_type:
-      )
+      include_examples 'debounced probation update'
     end
   end
 end
