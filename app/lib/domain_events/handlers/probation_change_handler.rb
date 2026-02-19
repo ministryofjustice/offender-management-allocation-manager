@@ -1,6 +1,11 @@
 module DomainEvents
   module Handlers
     class ProbationChangeHandler
+      DEBOUNCE_KEY_PREFIX = 'domain_events:probation_change'.freeze
+      DEBOUNCE_WINDOW = 3.seconds
+
+      HANDLED_REGISTRATION_TYPES = %w[MAPP DASO INVI].freeze
+
       def handle(event, logger: Shoryuken::Logging.logger)
         case event.event_type
         when /probation-case\.registration\..+/
@@ -13,9 +18,7 @@ module DomainEvents
     private
 
       def handle_registration_change(event, logger)
-        registration_types = %w[MAPP DASO INVI]
-
-        if registration_types.include?(event.additional_information['registerTypeCode'])
+        if HANDLED_REGISTRATION_TYPES.include?(event.additional_information['registerTypeCode'])
           call_delius_data_job(event, logger)
         else
           logger.info "event=domain_event_handle_noop,domain_event_type=#{event.event_type},crn=#{event.crn_number}" \
@@ -25,7 +28,20 @@ module DomainEvents
 
       def call_delius_data_job(event, logger)
         logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
-        ProcessDeliusDataJob.perform_now(event.crn_number, identifier_type: :crn, trigger_method: :event, event_type: event.event_type)
+
+        debounce_key = "#{DEBOUNCE_KEY_PREFIX}:#{event.crn_number}"
+        debounce_token = SecureRandom.uuid
+        Rails.cache.write(debounce_key, debounce_token, expires_in: 10.minutes)
+
+        # If we receive multiple events for the same CRN in quick succession, we only
+        # really care about the final probation record data, thus this simple debouncing
+        DebouncedProcessDeliusDataJob.set(wait: DEBOUNCE_WINDOW).perform_later(
+          event.crn_number,
+          event_type: event.event_type,
+          debounce_key:,
+          debounce_token:,
+        )
+
         logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
       end
     end
