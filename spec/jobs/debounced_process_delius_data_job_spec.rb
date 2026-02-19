@@ -6,9 +6,10 @@ RSpec.describe DebouncedProcessDeliusDataJob, type: :job do
   let(:event_type) { 'OFFENDER_DETAILS_CHANGED' }
 
   let(:job_logger) { instance_double(ActiveSupport::Logger, info: nil, warn: nil) }
+  let(:enqueued_job) { instance_double(ActiveJob::Base, job_id: 'job-123') }
 
   before do
-    allow(ProcessDeliusDataJob).to receive(:perform_now)
+    allow(ProcessDeliusDataJob).to receive(:perform_later).and_return(enqueued_job)
     allow_any_instance_of(described_class).to receive(:logger).and_return(job_logger)
   end
 
@@ -23,11 +24,14 @@ RSpec.describe DebouncedProcessDeliusDataJob, type: :job do
       debounce_token:
     )
 
-    expect(ProcessDeliusDataJob).to have_received(:perform_now).with(
+    expect(ProcessDeliusDataJob).to have_received(:perform_later).with(
       crn,
       identifier_type: :crn,
       trigger_method: :event,
       event_type:
+    )
+    expect(job_logger).to have_received(:info).with(
+      "job=debounced_process_delius_data_job,event=enqueued,crn=#{crn},job_id=job-123"
     )
   end
 
@@ -45,7 +49,7 @@ RSpec.describe DebouncedProcessDeliusDataJob, type: :job do
     expect(job_logger).to have_received(:info).with(
       "job=debounced_process_delius_data_job,event=skipped,crn=#{crn}"
     )
-    expect(ProcessDeliusDataJob).not_to have_received(:perform_now)
+    expect(ProcessDeliusDataJob).not_to have_received(:perform_later)
   end
 
   it 'runs the job when the debounce key is missing or expired' do
@@ -58,11 +62,14 @@ RSpec.describe DebouncedProcessDeliusDataJob, type: :job do
       debounce_token:
     )
 
-    expect(ProcessDeliusDataJob).to have_received(:perform_now).with(
+    expect(ProcessDeliusDataJob).to have_received(:perform_later).with(
       crn,
       identifier_type: :crn,
       trigger_method: :event,
       event_type:
+    )
+    expect(job_logger).to have_received(:info).with(
+      "job=debounced_process_delius_data_job,event=enqueued,crn=#{crn},job_id=job-123"
     )
   end
 
@@ -80,6 +87,9 @@ RSpec.describe DebouncedProcessDeliusDataJob, type: :job do
     expect(job_logger).to have_received(:warn).with(
       "job=debounced_process_delius_data_job,event=cache_error,crn=#{crn}|boom"
     )
-    expect(ProcessDeliusDataJob).to have_received(:perform_now)
+    expect(ProcessDeliusDataJob).to have_received(:perform_later)
+    expect(job_logger).to have_received(:info).with(
+      "job=debounced_process_delius_data_job,event=enqueued,crn=#{crn},job_id=job-123"
+    )
   end
 end
