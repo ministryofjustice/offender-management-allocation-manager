@@ -6,8 +6,12 @@ class DebouncedProcessDeliusDataJob < ApplicationJob
   def perform(crn_number, event_type:, debounce_key:, debounce_token:)
     return unless debounce_token_match?(crn_number, debounce_key, debounce_token)
 
-    ProcessDeliusDataJob.perform_now(
+    job = ProcessDeliusDataJob.perform_later(
       crn_number, identifier_type: :crn, trigger_method: :event, event_type:
+    )
+
+    logger.info(
+      "job=debounced_process_delius_data_job,event=enqueued,crn=#{crn_number},job_id=#{job.job_id}"
     )
   end
 
