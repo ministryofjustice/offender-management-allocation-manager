@@ -6,8 +6,7 @@ module Handovers
                             &block)
       thead = handover_list_thead(headers, anchor)
       tbody = tag.tbody(class: 'govuk-table__body') { capture(&block) }
-      tag.table(class: ['govuk-table'] + table_class,
-                data: { module: 'moj-sortable-table' }) do
+      tag.table(class: ['govuk-table'] + table_class) do
         thead + tbody
       end
     end
