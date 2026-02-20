@@ -4,6 +4,13 @@
 
   .result-count {
     text-align: right;
+
+    .pagination__results {
+      display: inline-block;
+      margin-bottom: 0;
+      padding: 5px;
+      vertical-align: middle;
+    }
   }
 }
 
