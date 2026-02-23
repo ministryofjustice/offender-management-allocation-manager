@@ -66,7 +66,11 @@ class PrisonersController < PrisonsApplicationController
     return render 'show_outside_omic_policy' unless @prisoner.inside_omic_policy?
 
     @tasks = @prisoner.pom_tasks
-    @allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no)
+
+    if (allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no))
+      @allocation = CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
+    end
+
     @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@prisoner.offender_no)
 
     if @allocation.present? && @allocation.primary_pom_nomis_id.present?

@@ -177,6 +177,7 @@ feature 'Co-working' do
 
       click_button 'Confirm'
       expect(page).to have_current_path(prison_prisoner_allocation_path(prison.code, 'G4273GI'))
+      expect(page).to have_content("#{secondary_pom[:pom_name]} removed as co-working POM for #{prisoner_name_forwards}")
 
       expect(page).to have_link 'Allocate'
       within '#co-working-pom' do

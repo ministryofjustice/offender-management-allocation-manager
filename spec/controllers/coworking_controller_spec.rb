@@ -40,6 +40,22 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
       expect(response).to redirect_to(allocated_prison_prisoners_path(prison))
       expect(AllocationHistory.find_by(nomis_offender_id: offender_no).secondary_pom_nomis_id).to eq(new_secondary_pom.staffId)
     end
+
+    it 'passes message and stores additional notes' do
+      message = 'Needs support'
+      expect(AllocationService).to receive(:allocate_secondary).with(
+        hash_including(
+          nomis_offender_id: offender_no,
+          secondary_pom_nomis_id: new_secondary_pom.staffId.to_s,
+          created_by_username: 'user',
+          message: message
+        )
+      ).and_call_original
+
+      post :create, params: { prison_id: prison, coworking_allocations: { nomis_offender_id: offender_no, nomis_staff_id: new_secondary_pom.staffId, message: message } }
+
+      expect(session[:latest_allocation_details][:additional_notes]).to eq(message)
+    end
   end
 
   describe '#confirm' do
@@ -72,30 +88,57 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
                                   primary_pom_nomis_id: primary_pom.staffId,
                                   secondary_pom_nomis_id: new_secondary_pom.staffId,
                                   secondary_pom_name: secondary_pom_name)
+
+      allow(EmailService).to receive(:send_cowork_deallocation_email)
+      allow(controller.helpers).to receive(:prisoner_path_for_role).and_return('/prisoners/path')
     end
 
     let(:allocation) { AllocationHistory.last }
     let(:secondary_pom_name) { 'Bloggs, Fred' }
 
     it 'sends a deallocation_email' do
-      fakejob = double
-      allow(fakejob).to receive(:deliver_later)
-
-      allow(PomMailer).to receive(:with).and_return(double(deallocate_coworking_pom: fakejob))
-
       delete :destroy, params: { prison_id: prison, nomis_offender_id: allocation.nomis_offender_id }
 
       aggregate_failures do
-        expect(response).to redirect_to(prison_prisoner_allocation_path(prison, allocation.nomis_offender_id))
-        expect(PomMailer).to have_received(:with).with(
-          secondary_pom_name: secondary_pom_name,
-          email_address: primary_pom.emails.first,
-          nomis_offender_id: offender_no,
-          offender_name: "#{offender.fetch(:lastName)}, #{offender.fetch(:firstName)}",
-          pom_name: primary_pom.firstName.capitalize,
-          url: Rails.application.routes.url_helpers.prison_staff_caseload_url(prison, primary_pom.staffId)
+        expect(response).to redirect_to('/prisoners/path')
+        expect(EmailService).to have_received(:send_cowork_deallocation_email).with(
+          allocation: allocation,
+          pom_nomis_id: primary_pom.staffId,
+          secondary_pom_name: secondary_pom_name
         )
-        expect(fakejob).to have_received(:deliver_later)
+        expect(flash[:notice]).to include(secondary_pom_name)
+        expect(flash[:notice]).to include('removed as co-working POM')
+      end
+    end
+
+    context 'when the secondary pom name is missing' do
+      let(:secondary_pom_name) { nil }
+
+      it 'does not send an email or set a notice' do
+        delete :destroy, params: { prison_id: prison, nomis_offender_id: allocation.nomis_offender_id }
+
+        aggregate_failures do
+          expect(response).to redirect_to('/prisoners/path')
+          expect(EmailService).not_to have_received(:send_cowork_deallocation_email)
+          expect(flash[:notice]).to be_nil
+        end
+      end
+    end
+
+    context 'when the secondary pom is present but the primary pom is missing' do
+      before do
+        allocation.update!(primary_pom_nomis_id: nil)
+      end
+
+      it 'does not send an email' do
+        delete :destroy, params: { prison_id: prison, nomis_offender_id: allocation.nomis_offender_id }
+
+        aggregate_failures do
+          expect(response).to redirect_to('/prisoners/path')
+          expect(EmailService).not_to have_received(:send_cowork_deallocation_email)
+          expect(flash[:notice]).to include(secondary_pom_name)
+          expect(flash[:notice]).to include('removed as co-working POM')
+        end
       end
     end
   end

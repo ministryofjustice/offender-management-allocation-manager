@@ -175,22 +175,20 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
 
           <td aria-label="Working pattern" class="govuk-table__cell"><%= format_working_pattern(pom.working_pattern) %></td>
           <td aria-label="Recent allocations" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.new_allocations_count %></td>
-          <td aria-label="Total suporting" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.supporting_allocations_count %></td>
+          <td aria-label="Total supporting" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.supporting_allocations_count %></td>
           <td aria-label="Total responsible" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.responsible_allocations_count %></td>
           <td aria-label="Total co-working" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.coworking_allocations_count %></td>
           <td aria-label="Total allocations" class="govuk-table__cell govuk-table__cell--numeric govuk-!-font-weight-bold"><%= pom.total_allocations_count %></td>
 
-          <td aria-label="recent allocations" class="govuk-table__cell" style="width: 80px; padding-left: 20px;">
+          <td aria-label="Action" class="govuk-table__cell" style="width: 80px; padding-left: 20px;">
             <% if @coworking %>
-              <% unless @current_pom&.staff_id == pom.staff_id %>
-                <%= link_to 'Allocate', prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @current_pom.staff_id, pom.staff_id) %>
-              <% end %>
+              <%= link_to 'Allocate', prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @current_pom.staff_id, pom.staff_id) %>
             <% else %>
               <%= link_to 'Allocate', new_prison_prisoner_staff_build_allocation_path(@prison.code, @prisoner.offender_no, pom.staff_id) %>
             <% end %>
           </td>
 
-          <td aria-label="select" class="govuk-table__cell govuk-!-padding-top-0">
+          <td aria-label="Compare" class="govuk-table__cell govuk-!-padding-top-0">
             <div class="govuk-form-group govuk-!-margin-bottom-0<%= flash[:alert] ? ' govuk-form-group--error' : '' %>">
               <fieldset class="govuk-fieldset">
                 <div class="govuk-checkboxes__item govuk-checkboxes--small">

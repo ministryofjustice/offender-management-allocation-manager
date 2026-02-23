@@ -2,15 +2,17 @@
 
 <p class="govuk-body">
   You are removing co-working POM <%= @allocation.secondary_pom_name %> who was working with <%= @prisoner.full_name %>.
-  The <%= pom_responsibility_label(@prisoner) %> POM is <%= @allocation.primary_pom_name %>.
+  <br/>
+  The <%= pom_responsibility_label(@prisoner) %> POM is <%= @allocation.primary_pom_name || 'N/A' %>.
 </p>
 
-<p class="govuk-body">We will send a confirmation email to <%= @primary_pom.email_address %></p>
+<% if @primary_pom %>
+  <p class="govuk-body">We will send a confirmation email to <%= @primary_pom.email_address %></p>
+<% end %>
 
 <%= form_tag(prison_coworking_path(@prison.code, @prisoner.offender_no), method: :delete) do %>
   <div class="govuk-form-group">
     <button type="submit" class="govuk-button">Confirm</button>
-    <%= link_to 'Cancel',  prison_prisoner_allocation_path(@prison.code, @prisoner.offender_no),
-                class: 'govuk-link cancel-button' %>
+    <%= link_to 'Cancel', prisoner_path_for_role(@is_spo, @prison, @prisoner), class: 'govuk-link cancel-button' %>
   </div>
 <% end %>
