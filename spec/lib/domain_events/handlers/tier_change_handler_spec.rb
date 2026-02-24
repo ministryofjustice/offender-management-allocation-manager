@@ -79,4 +79,19 @@ RSpec.describe DomainEvents::Handlers::TierChangeHandler do
       expect(Shoryuken::Logging.logger).to have_received(:error).once
     end
   end
+
+  context 'when tiering API returns an error' do
+    let!(:case_information) { create(:case_information, crn: crn, tier: 'A') }
+    let(:tier_from_api) { nil }
+
+    before { handler.handle(event) }
+
+    it 'does not update tier' do
+      expect(case_information.reload.tier).to eq('A')
+    end
+
+    it 'emits no audit event' do
+      expect(AuditEvent).not_to have_received(:publish)
+    end
+  end
 end
