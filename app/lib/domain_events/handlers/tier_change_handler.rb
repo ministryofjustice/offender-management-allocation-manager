@@ -12,7 +12,11 @@ module DomainEvents
           return
         end
 
-        api_tier_info = HmppsApi::TieringApi.get_calculation(event.crn_number, event.additional_information['calculationId'])
+        api_tier_info = HmppsApi::TieringApi.get_calculation(
+          event.crn_number, event.additional_information['calculationId']
+        )
+        return if api_tier_info.try(:[], :tier).nil?
+
         new_tier = api_tier_info[:tier][0]
         old_tier = case_info.tier
 

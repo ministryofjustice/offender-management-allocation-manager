@@ -15,12 +15,13 @@ module HmppsApi
         tier: response.fetch('tierScore'),
         calculation_date: response.fetch('calculationDate').to_date
       }
+    rescue Faraday::Error => e
+      Rails.logger.error("event=tiering_get_calculation,route=#{route}|#{e.message}")
 
-      # it returns nil if an offender can't be found
-    rescue Faraday::ResourceNotFound # 404 Not Found error
-      nil
-    rescue Faraday::ServerError
-      { assessment_type: Faraday::ServerError, completed: nil }
+      # it returns 404 if a calculation can't be found
+      return nil if e.is_a?(Faraday::ResourceNotFound)
+
+      { tier: nil, calculation_date: nil, error: e.class }
     end
   end
 end
