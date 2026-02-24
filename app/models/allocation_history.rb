@@ -26,7 +26,8 @@ class AllocationHistory < ApplicationRecord
   # IMPORTANT:
   # Dirty changes are reset every time the model saves, not just when a transaction is closed.
   # When the `after_commit` callback is executed, we can only enquiry about the most recent saved attributes.
-  after_commit :publish_allocation_changed_event,
+  after_commit :save_audit_event,
+               :publish_allocation_changed_event,
                :save_flattened_version
 
   # When adding a new 'event' or 'event trigger'
@@ -223,6 +224,30 @@ private
                          "event_trigger=#{event_trigger}|" \
                          'Attempted to schedule an email send but the primary POM email address is blank'
     end
+  end
+
+  def save_audit_event
+    return unless previous_changes.any?
+
+    before_changes = previous_changes.transform_values(&:first)
+    after_changes  = previous_changes.transform_values(&:last)
+
+    [before_changes, after_changes].each do |changes_hash|
+      %w[message override_detail suitability_detail].each do |attr|
+        changes_hash[attr] = '[REDACTED]' if changes_hash[attr].present?
+      end
+    end
+
+    AuditEvent.publish(
+      nomis_offender_id:,
+      tags: %w[record allocation changed],
+      system_event: PaperTrail.request.whodunnit.blank?,
+      username: PaperTrail.request.whodunnit,
+      data: {
+        'before' => before_changes,
+        'after' => after_changes
+      }
+    )
   end
 
   def publish_allocation_changed_event
