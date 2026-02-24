@@ -9,7 +9,7 @@ class AllocationsController < PrisonsApplicationController
     @allocation = CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
     @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@prisoner.offender_no)
 
-    @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
+    @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id, nil)
     unless @pom.has_pom_role?
       redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id)
       return
@@ -17,17 +17,15 @@ class AllocationsController < PrisonsApplicationController
 
     secondary_pom_nomis_id = @allocation.secondary_pom_nomis_id
     if secondary_pom_nomis_id.present?
-      coworker = StaffMember.new(@prison, secondary_pom_nomis_id)
-      if coworker.has_pom_role?
-        @coworker = coworker
-      end
+      @coworker = StaffMember.new(@prison, secondary_pom_nomis_id, nil)
     end
+
     @keyworker = KeyworkerService.get_keyworker(@prisoner.offender_no)
+
     retrieve_latest_allocation_details
   end
 
   def history
-    @prisoner = offender(nomis_offender_id_from_url)
     @timeline = HmppsApi::PrisonApi::MovementApi.movements_for nomis_offender_id_from_url
 
     allocation = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id_from_url)
@@ -58,10 +56,6 @@ class AllocationsController < PrisonsApplicationController
   end
 
 private
-
-  def offender(nomis_offender_id)
-    OffenderService.get_offender(nomis_offender_id)
-  end
 
   def nomis_offender_id_from_url
     params.require(:prisoner_id)

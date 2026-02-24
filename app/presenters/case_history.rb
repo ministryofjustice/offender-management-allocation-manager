@@ -4,7 +4,7 @@ class CaseHistory
   delegate :primary_pom_nomis_id, :event_trigger, :secondary_pom_nomis_id,
            :allocated_at_tier, :allocated_at_rosh, :nomis_offender_id, :primary_pom_name,
            :override_reasons, :suitability_detail, :override_detail,
-           :recommended_pom_type, :secondary_pom_name, to: :@allocation
+           :recommended_pom_type, :secondary_pom_name, :prison, to: :@allocation
 
   def initialize(prev_allocation, allocation, version)
     @previous_allocation = prev_allocation
@@ -36,7 +36,7 @@ class CaseHistory
   # If we have a 'first' reallocation for a prison then show it as an allocation because it is -
   # the incorrect data caused by a defect is too hard to change as it is YAML
   def event
-    if @allocation.event == 'reallocate_primary_pom' && @previous_allocation.prison != @allocation.prison
+    if @allocation.event == 'reallocate_primary_pom' && @previous_allocation.prison != prison
       'allocate_primary_pom'
     else
       @allocation.event

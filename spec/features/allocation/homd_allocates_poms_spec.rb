@@ -82,6 +82,30 @@ describe 'HOMD allocates cases to POMS' do
     expect(page).to have_content('Offender, Allocatable')
   end
 
+  specify 'HOMD does not see current primary or co-working POMs when selecting a new POM' do
+    extra_pom = build(:pom, :prison_officer, staffId: 2222, firstName: 'Extra', lastName: 'Pom')
+    stub_poms(prison.code, poms + [extra_pom])
+
+    create(
+      :allocation_history,
+      nomis_offender_id: 'G1234AB',
+      primary_pom_nomis_id: 1234,
+      primary_pom_name: 'Probation Pom',
+      secondary_pom_nomis_id: 9876,
+      secondary_pom_name: 'Prison Pom',
+      prison: prison.code
+    )
+
+    visit allocated_prison_prisoners_path(prison)
+    click_on 'Offender, Allocatable'
+    within('tr', text: 'POM Probation Pom') { click_on 'Reallocate' }
+    click_on 'Choose POM', match: :first
+
+    expect(page).to have_content('Extra Pom')
+    expect(page).not_to have_css('#pom-1234')
+    expect(page).not_to have_css('#pom-9876')
+  end
+
   def when_i_allocate_recommended_pom(pom_name, to_case:)
     visit unallocated_prison_prisoners_path(prison)
 

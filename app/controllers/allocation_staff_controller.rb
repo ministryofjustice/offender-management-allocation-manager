@@ -16,11 +16,18 @@ class AllocationStaffController < PrisonsApplicationController
 
     @previous_poms = previous_pom_ids.map { |staff_id| poms[staff_id] }.compact
     @current_pom = poms[allocation&.primary_pom_nomis_id]
+    @current_coworker = poms[allocation&.secondary_pom_nomis_id]
     @recent_pom_history = AllocationService.pom_terms(allocation).select { |t| t[:ended_at].present? }.reverse.first(MAX_RECENT_POM_HISTORY)
     @coworking = coworking?
 
+    # As primary POM and coworker POM must be different, we filter out
+    # ineligible POMs based on currently allocated staff
+    filtered_poms = active_poms.reject do |pom|
+      [@current_pom&.staff_id, @current_coworker&.staff_id].include?(pom.staff_id)
+    end
+
     sort_dir = @prisoner.recommended_pom_type == RecommendationService::PRISON_POM ? :desc : :asc
-    @available_poms = sort_collection(active_poms, default_sort: :position, default_direction: sort_dir)
+    @available_poms = sort_collection(filtered_poms, default_sort: :position, default_direction: sort_dir)
   end
 
   def check_compare_list

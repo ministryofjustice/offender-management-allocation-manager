@@ -122,7 +122,7 @@ class AllocationHistory < ApplicationRecord
   # This appears to be safe as allocations only show up for viewing if they have
   # a non-nil primary_pom_nomis_id
   def self.deallocate_primary_pom(nomis_staff_id, prison, event_trigger: USER)
-    active_allocations_for_prison(prison).for_primary_pom(nomis_staff_id).each do |alloc|
+    at_prison(prison).for_primary_pom(nomis_staff_id).each do |alloc|
       alloc.deallocate_primary_pom(event_trigger:)
     end
   end
@@ -138,7 +138,7 @@ class AllocationHistory < ApplicationRecord
   end
 
   def self.deallocate_secondary_pom(nomis_staff_id, prison, event_trigger: USER)
-    active_allocations_for_prison(prison).for_secondary_pom(nomis_staff_id).each do |alloc|
+    at_prison(prison).for_secondary_pom(nomis_staff_id).each do |alloc|
       alloc.deallocate_secondary_pom(event_trigger:)
     end
   end
