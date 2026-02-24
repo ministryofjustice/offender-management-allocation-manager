@@ -127,7 +127,8 @@
           N/A
           <%= link_to 'Allocate', prison_prisoner_review_case_details_path(@prison.code, @prisoner.offender_no, coworking: true), class: "govuk-link pull-right" %>
         <% else %>
-          <%= link_to @coworker.full_name, prison_pom_path(@prison.code, @coworker.staff_id), class: "govuk-link" %>
+          <%= link_to_if @coworker.has_pom_role?, @coworker.full_name.presence || 'Unknown',
+                         prison_pom_path(@prison.code, @coworker.staff_id), class: "govuk-link" %>
           <%= link_to 'Remove', prison_coworking_confirm_removal_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right" %>
         <% end %>
       </td>

@@ -123,6 +123,7 @@ feature 'Co-working' do
       within '#co-working-pom' do
         expect(page).to have_content 'Remove'
         expect(page).to have_content 'Moic Integration-Tests'
+        expect(page).to have_link('Moic Integration-Tests', href: prison_pom_path(prison.code, secondary_pom[:staff_id]))
       end
     end
   end
@@ -164,6 +165,10 @@ feature 'Co-working' do
       click_link 'Cancel'
 
       expect(page).to have_current_path(prison_prisoner_allocation_path(prison.code, nomis_offender_id))
+
+      within '#co-working-pom' do
+        expect(page).to have_link(secondary_pom[:pom_name], href: prison_pom_path(prison.code, secondary_pom[:staff_id]))
+      end
     end
 
     scenario 'removing a co-working POM' do
@@ -186,11 +191,12 @@ feature 'Co-working' do
     end
   end
 
-  context 'with a secondary from somewhere else' do
-    before { stub_poms(prison, [another_pom]) }
-
-    let(:another_pom) do
-      build(:pom, staffId: 123_456, firstName: 'Some', lastName: 'Other POM', primaryEmail: 'ommiicc@digital.justice.gov.uk')
+  context 'with a co-worker that is no longer a POM in the prison' do
+    let(:poms) do
+      [
+        build(:pom, staffId: 485_926, firstName: 'MOIC', lastName: 'POM'),
+        build(:pom, staffId: 485_833)
+      ]
     end
 
     let!(:allocation) do
@@ -200,34 +206,26 @@ feature 'Co-working' do
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: prison_pom[:staff_id],
         primary_pom_name: prison_pom[:pom_name],
-        secondary_pom_nomis_id: another_pom.staffId,
-        secondary_pom_name: "#{another_pom.firstName} #{another_pom.lastName}",
+        secondary_pom_nomis_id: secondary_pom[:staff_id],
+        secondary_pom_name: secondary_pom[:pom_name],
         recommended_pom_type: 'probation'
       )
     end
 
-    scenario 'allocating' do
-      expect(allocation.secondary_pom_nomis_id).to eq(123_456)
+    before(:each) do
+      stub_pom(
+        build(:pom, staffId: secondary_pom[:staff_id], firstName: 'MOIC', lastName: 'INTEGRATION-TESTS')
+      )
+    end
 
-      # Go to allocation page
+    scenario 'shows co-working POM name without a profile link' do
       visit prison_prisoner_allocation_path(prison.code, nomis_offender_id)
 
-      within 'tr#co-working-pom' do
-        click_link 'Allocate'
+      within '#co-working-pom' do
+        expect(page).to have_content secondary_pom[:pom_name]
+        expect(page).to have_link 'Remove'
+        expect(page).not_to have_link(secondary_pom[:pom_name], href: prison_pom_path(prison.code, secondary_pom[:staff_id]))
       end
-
-      # Now on Review case page
-      click_link 'Choose a co-working POM to allocate to now' # For some reason it sees the 'Choose co-working POM' button as disabled
-
-      # Now on 'Choose a POM' page
-      within "#pom-485758" do
-        click_link 'Allocate'
-      end
-
-      click_button 'Complete allocation'
-
-      expect(allocation.reload.secondary_pom_nomis_id).to eq(485_758)
-      expect(page).to have_current_path(allocated_prison_prisoners_path(prison.code), ignore_query: true)
     end
   end
 end
