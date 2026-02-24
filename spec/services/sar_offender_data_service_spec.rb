@@ -59,7 +59,7 @@ RSpec.describe SarOffenderDataService do
 
         it 'returns all has_many data' do
           expect(result[:allocationHistory].size).to eq(HISTORY_SIZE)
-          expect(result[:auditEvents].size).to eq(HISTORY_SIZE)
+          expect(result[:auditEvents].size).to eq(HISTORY_SIZE + 1) # +1 as `let!(:allocation)` adds an extra audit record
           expect(result[:earlyAllocations].size).to eq(HISTORY_SIZE)
           expect(result[:offenderEmailSent].size).to eq(HISTORY_SIZE)
         end
@@ -82,7 +82,7 @@ RSpec.describe SarOffenderDataService do
             let(:start_date) { (REFERENCE_TIME - 9.days).to_date }
             let(:end_date) { (REFERENCE_TIME - 8.days).to_date }
 
-            it 'retuns nil' do
+            it 'returns nil' do
               expect(result).to eq(nil)
             end
           end
@@ -91,7 +91,7 @@ RSpec.describe SarOffenderDataService do
             let(:start_date) { (REFERENCE_TIME - 3.days).to_date }
             let(:end_date) { (REFERENCE_TIME + 3.days).to_date }
 
-            it 'retuns record' do
+            it 'returns record' do
               expect(result).not_to eq(nil)
             end
           end
@@ -100,7 +100,7 @@ RSpec.describe SarOffenderDataService do
             let(:start_date) { (REFERENCE_TIME + 3.days).to_date }
             let(:end_date) { (REFERENCE_TIME + 6.days).to_date }
 
-            it 'retuns record' do
+            it 'returns record' do
               expect(result).not_to eq(nil)
             end
           end
@@ -136,7 +136,7 @@ RSpec.describe SarOffenderDataService do
                 let(:start_date) { (REFERENCE_TIME - 5.days).to_date }
                 let(:end_date) { (REFERENCE_TIME - 3.days).to_date }
 
-                it 'retuns nil' do
+                it 'returns nil' do
                   expect(result[key]).to eq(nil)
                 end
               end
@@ -145,7 +145,7 @@ RSpec.describe SarOffenderDataService do
                 let(:start_date) { (REFERENCE_TIME - 3.days).to_date }
                 let(:end_date) { (REFERENCE_TIME + 3.days).to_date }
 
-                it 'retuns record' do
+                it 'returns record' do
                   expect(result[key]).not_to eq(nil)
                 end
               end
@@ -154,7 +154,7 @@ RSpec.describe SarOffenderDataService do
                 let(:start_date) { (REFERENCE_TIME + 3.days).to_date }
                 let(:end_date) { (REFERENCE_TIME + 6.days).to_date }
 
-                it 'retuns record' do
+                it 'returns record' do
                   expect(result[key]).not_to eq(nil)
                 end
               end
@@ -299,7 +299,7 @@ RSpec.describe SarOffenderDataService do
   def create_historic_list(name, nomis_offender_id, trait: nil, **factory_opts)
     args_array = [name, trait].compact
 
-    (0..(HISTORY_SIZE - 1)).to_a.map do |i|
+    HISTORY_SIZE.times do |i|
       Timecop.travel REFERENCE_TIME - i.days do
         create(*args_array, nomis_offender_id: nomis_offender_id, **factory_opts)
       end
