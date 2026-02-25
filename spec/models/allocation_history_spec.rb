@@ -598,4 +598,60 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
       }.not_to change(AllocationHistoryVersion, :count)
     end
   end
+
+  describe '#save_audit_event' do
+    let(:audit_excluded_keys) { described_class::AUDIT_EXCLUDED_KEYS }
+
+    let(:prison) { create(:prison) }
+    let!(:allocation) { create(:allocation_history, prison: prison.code, nomis_offender_id:) }
+
+    before do
+      allow(AuditEvent).to receive(:publish)
+      PaperTrail.request.whodunnit = 'HOMD_USER'
+    end
+
+    after do
+      PaperTrail.request.whodunnit = nil
+    end
+
+    it 'removes sensitive or unnecessary fields from audit data when present' do
+      allocation.update!(
+        message: 'sensitive note',
+        override_detail: 'override details',
+        suitability_detail: 'suitability details',
+        allocated_at_tier: 'B'
+      )
+
+      expect(AuditEvent).to have_received(:publish).once do |payload|
+        expect(payload).to include(
+          nomis_offender_id: allocation.nomis_offender_id,
+          tags: %w[record allocation changed],
+          system_event: false,
+          username: 'HOMD_USER',
+          data: {
+            'before' => {
+              'allocated_at_tier' => 'A',
+              'updated_at' => anything,
+            },
+            'after' => {
+              'allocated_at_tier' => 'B',
+              'updated_at' => anything,
+            }
+          }
+        )
+      end
+    end
+
+    it 'marks system events when whodunnit is blank' do
+      PaperTrail.request.whodunnit = nil
+
+      allocation.update!(allocated_at_tier: 'B')
+
+      expect(AuditEvent).to have_received(:publish).once.with(
+        hash_including(
+          system_event: true, username: nil
+        )
+      )
+    end
+  end
 end
