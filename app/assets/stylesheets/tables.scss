@@ -1,6 +1,8 @@
-$bright-red: #d4351c;
-$mid-gray: #b1b4b6;
-$purble: #4c2c92; // purple+blue = burple
+@use "gov_uk" as *;
+
+$bright-red: govuk-colour("red");
+$mid-gray: $govuk-border-colour;
+$purble: govuk-colour("purple");
 
 @media screen and (max-width: 768px) {
   table.responsive thead {
@@ -47,7 +49,7 @@ $purble: #4c2c92; // purple+blue = burple
 
   .highlight-secondary {
     padding-left: 5px;
-    color: #0b0c0c;
+    color: govuk-colour("black");
     font-size: 16px;
     font-weight: normal;
     line-height: 1.25;

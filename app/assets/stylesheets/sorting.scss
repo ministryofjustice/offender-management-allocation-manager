@@ -1,5 +1,7 @@
+@use "gov_uk" as *;
+
 .sort-arrow {
-    color: #005ea5;
+    color: govuk-colour("blue");
     font-size: 0.9em;
     margin-left: 4px;
 }

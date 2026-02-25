@@ -1,21 +1,21 @@
 // Please ensure that any changes made here are also reflected
 // in https://github.com/ministryofjustice/hmpps-risk-ui-elements
 
-@use "govuk-frontend/dist/govuk" as *;
+@use "gov_uk" as *;
 
 $low-score-colour: #485b10;
 $low-score-border-colour: #85994b;
 $medium-score-colour: #a34e00;
-$medium-score-border-colour: #f47738;
-$high-score-colour: #942514;
-$high-score-border-colour: #d4351c;
+$medium-score-border-colour: govuk-colour("orange");
+$high-score-colour: govuk-colour("red", $variant: "shade-25");
+$high-score-border-colour: govuk-colour("red");
 $very-high-score-colour: #711a0d;
-$very-high-score-border-colour: #942514;
+$very-high-score-border-colour: govuk-colour("red", $variant: "shade-25");
 
-$unknown-score-border-colour: #505a5f;
-$no-score-border-colour: #ffdd00;
+$unknown-score-border-colour: govuk-colour("black", $variant: "tint-25");
+$no-score-border-colour: govuk-colour("yellow");
 
-$mappa-colour: #4c2c92;
+$mappa-colour: govuk-colour("purple");
 
 .rosh-widget {
   border: 2px solid govuk-colour("black");

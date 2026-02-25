@@ -1,10 +1,12 @@
+@use "gov_uk" as *;
+
 #compare-table {
   .govuk-grid-row {
     display: flex;
   }
 
   .pom-data {
-    background-color: #f3f2f1;
+    background-color: govuk-colour("black", $variant: "tint-95");
     border-left: 10px white solid;
     border-right: 10px white solid;
     padding: 15px 20px;

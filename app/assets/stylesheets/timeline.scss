@@ -1,7 +1,8 @@
+@use "gov_uk" as *;
+
 $space-sm: 5px;
 $panel-colour: lightgrey;
-$grey-1: #6f777b;
-$govuk-blue: #005ea5;
+$grey-1: govuk-colour("black", $variant: "tint-25");
 $govuk-heading-l: 2em;
 $govuk-heading-m: 1.2em;
 
@@ -22,8 +23,8 @@ $govuk-heading-m: 1.2em;
       width: calc(2 * 2px);
       height: calc(2 * 2px);
       border-radius: 50%;
-      background-color: #6e777a;
-      border: 8px solid #6f777b;
+      background-color: govuk-colour("black", $variant: "tint-25");
+      border: 8px solid govuk-colour("black", $variant: "tint-25");
       position: absolute;
       z-index: 2;
       left: -32px;
@@ -43,7 +44,7 @@ $govuk-heading-m: 1.2em;
       margin-bottom: 94px;
       left: -3px;
       bottom: 0;
-      border-left: 4px solid #6f777b;
+      border-left: 4px solid govuk-colour("black", $variant: "tint-25");
     }
 
     li {
@@ -105,11 +106,11 @@ $govuk-heading-m: 1.2em;
     font-size: 0.8em;
     padding-bottom: 5px;
     padding-left: 10px;
-    border-left: 4px solid $govuk-blue;
+    border-left: 4px solid govuk-colour("blue");
   }
 }
 
 .time {
-  color: #555;
+  color: $govuk-secondary-text-colour;
   font-size: 16px;
 }

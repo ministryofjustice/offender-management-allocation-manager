@@ -12,14 +12,12 @@
  */
 
 // Import GOV.UK Design System first
-@use "gov_uk";
-
+@use "gov_uk" as *;
 
 // Then application specific components
 @use "case_mix";
 @use "hmpps_header";
 @use "notification";
-@use "pages";
 @use "pagination";
 @use "prisoner";
 @use "risk_widgets";
@@ -46,17 +44,17 @@
 }
 
 .govuk-table__cell-error {
-  border-left: 5px solid #d4351c;
+  border-left: 5px solid $govuk-error-colour;
   padding-left: 10px;
 }
 
 .govuk-table__cell-error-value {
-  color: #d4351c;
+  color: $govuk-error-colour;
   font-weight: bold;
 }
 
 .sidebar-panel {
-  border-top: 10px solid #1d70b8;
+  border-top: 10px solid govuk-colour("blue");
   padding-top: 10px;
 }
 

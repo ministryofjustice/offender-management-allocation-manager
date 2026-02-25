@@ -1,7 +1,8 @@
+@use "gov_uk" as *;
 
 .card {
   margin-bottom: 40px;
-  background: #fff;
+  background: govuk-colour("white");
   border: 1px solid #d9dadb;
   position: relative;
   width: 100%;
@@ -31,7 +32,7 @@
 }
 
 .card-total p {
-  color: #1d70b8;
+  color: govuk-colour("blue");
 }
 
 .card--clickable {
@@ -43,24 +44,24 @@
 }
 
 .card--clickable:hover .card__heading a,.card--clickable:hover .card__link,.card--clickable:active .card__heading a,.card--clickable:active .card__link {
-  color: #003078;
+  color: govuk-colour("blue", $variant: "shade-50");
   text-decoration: none
 }
 
 .card--clickable:hover .card__heading a:focus,.card--clickable:hover .card__link:focus,.card--clickable:active .card__heading a:focus,.card--clickable:active .card__link:focus {
   outline: 3px solid transparent;
-  color: #0b0c0c;
-  background-color: #fd0;
-  box-shadow: 0 -2px #fd0,0 4px #0b0c0c;
+  color: govuk-colour("black");
+  background-color: govuk-colour("yellow");
+  box-shadow: 0 -2px govuk-colour("yellow"), 0 4px govuk-colour("black");
   text-decoration: none
 }
 
 .card--clickable:hover {
-  border-color: #b1b4b6
+  border-color: $govuk-border-colour
 }
 
 .card--clickable:active {
-  border-color: #b1b4b6;
+  border-color: $govuk-border-colour;
   bottom: -1px
 }
 
