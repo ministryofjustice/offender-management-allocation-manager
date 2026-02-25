@@ -600,6 +600,8 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
   end
 
   describe '#save_audit_event' do
+    let(:audit_excluded_keys) { described_class::AUDIT_EXCLUDED_KEYS }
+
     let(:prison) { create(:prison) }
     let!(:allocation) { create(:allocation_history, prison: prison.code, nomis_offender_id:) }
 
@@ -612,7 +614,7 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
       PaperTrail.request.whodunnit = nil
     end
 
-    it 'redacts non-blank sensitive fields in audit data' do
+    it 'removes sensitive or unnecessary fields from audit data when present' do
       allocation.update!(
         message: 'sensitive note',
         override_detail: 'override details',
@@ -620,50 +622,24 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
         allocated_at_tier: 'B'
       )
 
-      expect(AuditEvent).to have_received(:publish).once.with(
-        hash_including(
+      expect(AuditEvent).to have_received(:publish).once do |payload|
+        expect(payload).to include(
           nomis_offender_id: allocation.nomis_offender_id,
           tags: %w[record allocation changed],
           system_event: false,
           username: 'HOMD_USER',
           data: {
-            'before' => hash_including(
-              'message' => nil,
-              'override_detail' => nil,
-              'suitability_detail' => nil
-            ),
-            'after' => hash_including(
-              'message' => '[REDACTED]',
-              'override_detail' => '[REDACTED]',
-              'suitability_detail' => '[REDACTED]'
-            )
+            'before' => {
+              'allocated_at_tier' => 'A',
+              'updated_at' => anything,
+            },
+            'after' => {
+              'allocated_at_tier' => 'B',
+              'updated_at' => anything,
+            }
           }
         )
-      )
-    end
-
-    it 'does not redact blank sensitive fields in audit data' do
-      allocation.update!(
-        message: '   ',
-        override_detail: '',
-        suitability_detail: nil,
-        allocated_at_tier: 'B'
-      )
-
-      expect(AuditEvent).to have_received(:publish).once.with(
-        hash_including(
-          data: {
-            'before' => hash_including(
-              'message' => nil,
-              'override_detail' => nil
-            ),
-            'after' => hash_including(
-              'message' => '   ',
-              'override_detail' => ''
-            )
-          }
-        )
-      )
+      end
     end
 
     it 'marks system events when whodunnit is blank' do

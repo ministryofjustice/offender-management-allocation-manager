@@ -23,6 +23,8 @@ class AllocationHistory < ApplicationRecord
   LEGAL_STATUS_CHANGED = 4
   INACTIVE_POM = 5
 
+  AUDIT_EXCLUDED_KEYS = %w[id nomis_offender_id message override_detail suitability_detail].freeze
+
   # IMPORTANT:
   # Dirty changes are reset every time the model saves, not just when a transaction is closed.
   # When the `after_commit` callback is executed, we can only enquiry about the most recent saved attributes.
@@ -233,9 +235,7 @@ private
     after_changes  = previous_changes.transform_values(&:last)
 
     [before_changes, after_changes].each do |changes_hash|
-      %w[message override_detail suitability_detail].each do |attr|
-        changes_hash[attr] = '[REDACTED]' if changes_hash[attr].present?
-      end
+      AUDIT_EXCLUDED_KEYS.each { changes_hash.delete(it) }
     end
 
     AuditEvent.publish(
