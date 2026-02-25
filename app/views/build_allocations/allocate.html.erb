@@ -26,7 +26,7 @@
           <p>Confirm you want <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %> to stay allocated to <%= "#{@pom.first_name} #{@pom.last_name}".titleize %>.</p>
 
           <%= form.submit "Continue", role: "button", draggable: "false", class: "govuk-button" %>
-          <a class="govuk-link cancel-button" href="<%= prison_prisoner_staff_index_path(@prison.code, @prisoner.offender_no) %>">Choose a different POM</a>
+          <a class="govuk-link app-cancel-link" href="<%= prison_prisoner_staff_index_path(@prison.code, @prisoner.offender_no) %>">Choose a different POM</a>
         <% else %>
           <% if @pom.email_address.blank? %>
             <p>No notification email will be sent to <strong><%= "#{@pom.first_name} #{@pom.last_name}".titleize %></strong> as they have no registered email address in NOMIS.</p>
@@ -52,7 +52,7 @@
           </div>
 
           <%= form.submit "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
-          <%= link_to "Cancel", 'javascript:history.back()', class: "govuk-link cancel-button" %>
+          <%= link_to "Cancel", 'javascript:history.back()', class: "govuk-link app-cancel-link" %>
         <% end %>
       </div>
     </div>

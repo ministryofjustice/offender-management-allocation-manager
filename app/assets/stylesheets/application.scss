@@ -20,7 +20,8 @@
 @use "notification";
 @use "pagination";
 @use "prisoner";
-@use "risk_widgets";
+@use "mappa_widget";
+@use "rosh_widget";
 @use "search";
 @use "service_banner";
 @use "sorting";
@@ -31,43 +32,5 @@
 @use 'handovers';
 @use 'task_list';
 @use 'compare_poms';
+@use 'custom';
 @use 'overrides';
-
-.no-bottom-margin {
-  margin-bottom: 0;
-}
-
-.cancel-button {
-  line-height: 38px;
-  margin-left: 20px;
-  font-size: 1.2em;
-}
-
-.govuk-table__cell-error {
-  border-left: 5px solid $govuk-error-colour;
-  padding-left: 10px;
-}
-
-.govuk-table__cell-error-value {
-  color: $govuk-error-colour;
-  font-weight: bold;
-}
-
-.sidebar-panel {
-  border-top: 10px solid govuk-colour("blue");
-  padding-top: 10px;
-}
-
-// Stop images from being wider than their parent container
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-@media(min-width: 1250px) {
-
-  .govuk-width-container,
-  .moj-primary-navigation__container {
-    max-width: 1170px;
-  }
-}

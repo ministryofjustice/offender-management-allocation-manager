@@ -149,7 +149,7 @@ describe 'View a prisoner profile page' do
     it 'informs the user' do
       visit prison_prisoner_path(prison.code, 'G1234AB')
       expect(page).to have_content('COM allocation overdue')
-      expect(page).to have_css('#com-name.govuk-table__cell-error')
+      expect(page).to have_css('#com-name.app-table__cell--error')
     end
   end
 end

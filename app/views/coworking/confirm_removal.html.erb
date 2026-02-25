@@ -13,6 +13,6 @@
 <%= form_tag(prison_coworking_path(@prison.code, @prisoner.offender_no), method: :delete) do %>
   <div class="govuk-form-group">
     <button type="submit" class="govuk-button">Confirm</button>
-    <%= link_to 'Cancel', prisoner_path_for_role(@is_spo, @prison, @prisoner), class: 'govuk-link cancel-button' %>
+    <%= link_to 'Cancel', prisoner_path_for_role(@is_spo, @prison, @prisoner), class: 'govuk-link app-cancel-link' %>
   </div>
 <% end %>

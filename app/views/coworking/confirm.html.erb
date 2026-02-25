@@ -37,7 +37,7 @@ for <%= "#{@prisoner.first_name} #{@prisoner.last_name}".titleize %></h1>
         <%= hidden_field_tag("coworking_allocations[nomis_offender_id]", @prisoner.offender_no) %>
         <%= hidden_field_tag("coworking_allocations[nomis_staff_id]", @secondary_pom.staff_id) %>
         <%= submit_tag "Complete allocation", role: "button", draggable: "false", class: "govuk-button" %>
-        <%= link_to "Cancel", 'javascript:history.back()', class: "govuk-link cancel-button" %>
+        <%= link_to "Cancel", 'javascript:history.back()', class: "govuk-link app-cancel-link" %>
 
       </div>
     </div>
