@@ -1,12 +1,8 @@
 @forward "govuk-frontend/dist/govuk/index" with (
   $govuk-global-styles: true,
-  $govuk-new-typography-scale: true,
   $govuk-image-url-function: "image-url",
   $govuk-font-url-function: "asset-url",
-  $govuk-assets-path: 'govuk-frontend/dist/govuk/assets/',
-  $govuk-suppressed-warnings: (
-    govuk-typography-scale-14
-  )
+  $govuk-assets-path: 'govuk-frontend/dist/govuk/assets/'
 );
 
 @use "govuk-frontend/dist/govuk/index";
@@ -23,9 +19,6 @@
    padding: 0;
 }
 
-.govuk-accordion__section-summary {
-  margin-bottom: 20px;
-}
 
 .govuk-hint {
   display: block;

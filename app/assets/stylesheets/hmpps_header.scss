@@ -15,8 +15,15 @@
   padding-top: 10px;
 }
 
-.govuk-header__navigation-item a {
-  color: white !important;
+// Style fallback navigation items (govuk-header__navigation-item removed in v6)
+.hmpps-header__navigation-item {
+  display: inline-block;
+  margin-right: 10px;
+
+  a {
+    color: white !important;
+    text-decoration: none;
+  }
 }
 
 .hmpps-header {

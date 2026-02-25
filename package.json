@@ -2,9 +2,9 @@
   "name": "offender-management-allocation-manager",
   "private": true,
   "dependencies": {
-    "@ministryofjustice/frontend": "~8.0.1",
-    "govuk-frontend": "5.13.0",
-    "sass": "^1.93.2"
+    "@ministryofjustice/frontend": "~9.0.0",
+    "govuk-frontend": "~6.0.0",
+    "sass": "^1.97.3"
   },
   "description": "This README would normally document whatever steps are necessary to get the application up and running.",
   "version": "1.0.0",
