@@ -71,7 +71,7 @@ feature "get poms list", flaky: true do
       expect(page).to have_content("Moic Pom")
       click_link 'Caseload'
       expect(page).to have_content("Caseload")
-      expect(page).to have_css('#all-cases .sort-arrow', count: 1)
+      expect(page).to have_css('#all-cases .app-sort-arrow', count: 1)
 
       check_for_order = lambda { |names|
         row0 = page.find(:css, '#all-cases .offender_row_0')

@@ -11,6 +11,11 @@
   display: block;
 }
 
+// Prevent sort links in table headers from showing visited state,
+// since they are UI controls rather than navigation links
+.govuk-table__header a:visited {
+  color: govuk-functional-colour("link");
+}
 
 // Stop images from being wider than their parent container
 img {

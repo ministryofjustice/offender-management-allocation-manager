@@ -25,7 +25,6 @@ module HandoverHelper
     link_params[:pom] = 'user' if pom_view
     url = send("#{action}_prison_handovers_path", link_params)
     aria = (controller.action_name == action) ? { current: 'page' } : nil
-    link_to title, url,
-            class: %w[moj-sub-navigation__link govuk-link--no-visited-state], aria: aria
+    link_to title, url, class: %w[moj-sub-navigation__link], aria: aria
   end
 end
