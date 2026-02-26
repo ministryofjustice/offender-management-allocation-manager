@@ -34,6 +34,7 @@ class PrisonersController < PrisonsApplicationController
     return redirect_to '/404' if @prisoner.nil?
 
     @alerts = @prisoner.active_alert_labels
+    @mappa = @prisoner.mappa_details
     @rosh = @prisoner.rosh_summary
     @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@prisoner.offender_no)
 
@@ -54,7 +55,6 @@ class PrisonersController < PrisonsApplicationController
 
     @keyworker = KeyworkerService.get_keyworker(@prisoner.offender_no)
 
-    @mappa_details = @prisoner.mappa_details
     @coworking = params[:coworking].present?
   end
 

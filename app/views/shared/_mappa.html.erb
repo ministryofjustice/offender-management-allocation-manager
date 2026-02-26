@@ -1,10 +1,18 @@
-<% if level.present? %>
-  <aside class="mappa-widget" aria-label="MAPPA level">
-    <h3 class="govuk-heading-m"><strong><%= level %></strong> MAPPA</h3>
+<aside class="mappa-widget" aria-label="MAPPA level">
+  <% if mappa[:status] == :found %>
+    <h3 class="govuk-heading-m"><strong><%= mappa[:short_description] %></strong> MAPPA</h3>
     <p class="govuk-body-m">Multi-agency public protection arrangements</p>
-    <% if last_updated.present? %>
+    <% if mappa[:review_date].present? %>
       <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-      <p class="govuk-hint govuk-body-m">Last updated: <%= format_date(last_updated) %></p>
+      <p class="govuk-hint govuk-body-m">Last updated: <%= format_date(mappa[:review_date]) %></p>
     <% end %>
-  </aside>
-<% end %>
+  <% elsif mappa[:status] == :not_found %>
+    <h3 class="govuk-heading-m"><strong>NO</strong> MAPPA</h3>
+    <p class="govuk-body-m">Multi-agency public protection arrangements</p>
+  <% else %>
+    <h3 class="govuk-heading-m"><strong>UNKNOWN</strong> MAPPA</h3>
+    <p class="govuk-body-m">Multi-agency public protection arrangements</p>
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+    <p class="govuk-body-m">Something went wrong. We are unable to show MAPPA information at this time. Try again later.</p>
+  <% end %>
+</aside>

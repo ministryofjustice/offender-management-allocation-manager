@@ -1,7 +1,7 @@
-// Please ensure that any changes made here are also reflected
-// in https://github.com/ministryofjustice/hmpps-risk-ui-elements
-
-@use "govuk-frontend/dist/govuk" as *;
+// Keep in line with:
+// https://arns-frontend-components-dev.hmpps.service.justice.gov.uk/rosh-widget
+//
+@use "gov_uk" as *;
 
 $low-score-colour: #485b10;
 $low-score-border-colour: #85994b;
@@ -11,11 +11,7 @@ $high-score-colour: #942514;
 $high-score-border-colour: #d4351c;
 $very-high-score-colour: #711a0d;
 $very-high-score-border-colour: #942514;
-
-$unknown-score-border-colour: #505a5f;
-$no-score-border-colour: #ffdd00;
-
-$mappa-colour: #4c2c92;
+$unknown-score-border-colour: #fd0;
 
 .rosh-widget {
   border: 2px solid govuk-colour("black");
@@ -26,10 +22,6 @@ $mappa-colour: #4c2c92;
     margin-bottom: govuk-spacing(1);
     font-weight: 400;
   }
-}
-
-.rosh-widget--no {
-  border: 2px solid $no-score-border-colour;
 }
 
 .rosh-widget--unknown {
@@ -68,10 +60,6 @@ $mappa-colour: #4c2c92;
   }
 }
 
-.rosh-widget__subheading {
-  font-size: 23px !important;
-}
-
 .rosh-widget__table {
   text-align: left;
   margin: 0;
@@ -101,23 +89,4 @@ $mappa-colour: #4c2c92;
 
 .rosh-widget__risk--very-high {
   color: $very-high-score-colour;
-}
-
-.mappa-widget {
-  border: 2px solid $mappa-colour;
-  padding: govuk-spacing(4);
-  margin-bottom: govuk-spacing(4);
-
-  & h3 {
-    color: $mappa-colour;
-    margin-bottom: govuk-spacing(1);
-    font-weight: 400;
-  }
-}
-
-.risk-flag-widget {
-  border: 2px solid #93afc3;
-  background-color: #ebf7ff;
-  padding: govuk-spacing(4);
-  margin-bottom: govuk-spacing(4);
 }

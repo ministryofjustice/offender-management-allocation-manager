@@ -1,47 +1,24 @@
-@use "govuk-frontend/dist/govuk" as *;
+@use "gov_uk" as *;
 
-@mixin app-button-reset {
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  box-sizing: unset;
-  background-color: transparent;
-  box-shadow: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+@media(min-width: 1250px) {
+  .govuk-width-container,
+  .moj-primary-navigation__container {
+    max-width: 1170px;
+  }
 }
 
-.app-button--link {
-  @include app-button-reset;
-  @extend %govuk-link;
-
-  vertical-align: top;
-
-  // Buttons can't have different colours for visited/unvisited
-  color: $govuk-link-colour;
+.govuk-hint {
+  display: block;
 }
 
-.app-button--back-link {
-  @include app-button-reset;
-  @extend %govuk-link;
-
-  margin-top: 0;
-  padding-top: 0;
-  padding-bottom: 0;
+// Prevent sort links in table headers from showing visited state,
+// since they are UI controls rather than navigation links
+.govuk-table__header a:visited {
+  color: govuk-functional-colour("link");
 }
 
-a:visited {
-  color: $govuk-link-colour;
-}
-
-// This is a GOV.UK Publishing specific component that
-// can be seen at http://govuk-static.herokuapp.com/component-guide/related_items
-//
-.app-related-items {
-  border-top: 2px solid govuk-colour("blue");
-  padding-top: govuk-spacing(2);
-}
-
-.app-related-items .govuk-list > li {
-  margin-bottom: govuk-spacing(2);
+// Stop images from being wider than their parent container
+img {
+  max-width: 100%;
+  height: auto;
 }

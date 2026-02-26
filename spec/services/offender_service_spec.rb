@@ -119,6 +119,10 @@ describe OffenderService, type: :feature do
       }
     end
 
+    it 'returns found status' do
+      expect(result[:status]).to eq(:found)
+    end
+
     it 'gets short description' do
       expect(result[:short_description]).to eq('CAT 3/LEVEL 1')
     end
@@ -132,6 +136,25 @@ describe OffenderService, type: :feature do
 
       it 'uses nil for review_date' do
         expect(result[:review_date]).to eq(nil)
+      end
+    end
+
+    context 'when not found' do
+      before do
+        allow(HmppsApi::ManagePomCasesAndDeliusApi).to receive(:get_mappa_details)
+          .and_raise(Faraday::ResourceNotFound.new(nil))
+      end
+
+      it 'returns not_found status' do
+        expect(result[:status]).to eq(:not_found)
+      end
+    end
+
+    context 'when CRN is blank' do
+      let(:result) { described_class.get_mappa_details('') }
+
+      it 'returns error status' do
+        expect(result[:status]).to eq(:error)
       end
     end
   end

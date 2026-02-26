@@ -1,8 +1,5 @@
 <% if dps_components_retrieved_successfully? %>
   <%= dps_component_html('footer') %>
 <% else %>
-  <footer class="govuk-footer govuk-footer--fallback" role="contentinfo">
-    <div class="govuk-width-container" style="height: 160px">
-    </div>
-  </footer>
+  <footer class="govuk-footer govuk-!-display-none-print"></footer>
 <% end %>

@@ -1,3 +1,5 @@
+@use "gov_uk" as *;
+
 .search-box {
     padding: 12px;
 
@@ -11,8 +13,8 @@
 }
 
 mark {
-    border-bottom: 3px solid #ffbf47;
+    border-bottom: 3px solid govuk-functional-colour("focus");
     margin-right: 1px;
-    background-color: #fff2d3;
+    background-color: govuk-colour("yellow", $variant: "tint-80");
     padding: 2px 0px 0px;
 }

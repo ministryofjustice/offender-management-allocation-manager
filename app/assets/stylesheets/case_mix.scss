@@ -1,4 +1,4 @@
-@use "govuk-frontend/dist/govuk" as *;
+@use "gov_uk" as *;
 
 .case-mix-key {
   margin: 0;
@@ -59,30 +59,30 @@
  * Tier colours
  */
 .case-mix__tier_a {
-  background: govuk-colour("dark-blue");
-  color: white;
+  background: govuk-colour("blue", $variant: "shade-50");
+  color: govuk-colour("white");
 }
 .case-mix__tier_b {
-  background: govuk-colour("light-blue");
+  background: govuk-colour("blue", $variant: "tint-25");
 }
 .case-mix__tier_c {
-  background: govuk-colour("pink");
-  color: white;
+  background: govuk-colour("magenta", $variant: "primary");
+  color: govuk-colour("white");
 }
 .case-mix__tier_d {
-  background: govuk-colour("light-pink");
+  background: govuk-colour("magenta", $variant: "tint-50");
 }
 .case-mix__tier_na {
-  background: govuk-colour("mid-grey");
+  background: govuk-colour("black", $variant: "tint-80");
 }
 .case-mix__responsible {
-  background: govuk-colour("dark-blue");
-  color: white;
+  background: govuk-colour("blue", $variant: "shade-50");
+  color: govuk-colour("white");
 }
 .case-mix__supporting {
-  background: govuk-colour("light-pink");
-  color: white;
+  background: govuk-colour("magenta", $variant: "tint-50");
+  color: govuk-colour("white");
 }
 .case-mix__coworking {
-  background: govuk-colour("mid-grey");
+  background: govuk-colour("black", $variant: "tint-80");
 }

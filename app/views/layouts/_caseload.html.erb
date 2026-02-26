@@ -9,34 +9,34 @@
         <li class="moj-sub-navigation__item">
           <%= link_to "Overview",
                       { controller: :caseload },
-                      class: "moj-sub-navigation__link govuk-link--no-visited-state",
+                      class: "moj-sub-navigation__link",
                       aria: { current: current_page?(controller: :caseload, action: 'index') ? 'page' : '' } %>
         </li>
         <li class="moj-sub-navigation__item">
           <%= link_to "Your cases (#{@summary.fetch(:total_cases)})",
                       { controller: :caseload, action: :cases},
-                      class: "moj-sub-navigation__link govuk-link--no-visited-state",
+                      class: "moj-sub-navigation__link",
                       aria: { current: current_page?(controller: :caseload, action: 'cases') ? 'page' : '' }
           %>
         </li>
         <li class="moj-sub-navigation__item">
           <%= link_to "Parole cases (#{@summary.fetch(:parole_cases_count)})",
                       { controller: :caseload, action: :parole_cases},
-                      class: "moj-sub-navigation__link govuk-link--no-visited-state",
+                      class: "moj-sub-navigation__link",
                       aria: { current: current_page?(controller: :caseload, action: 'parole_cases') ? 'page' : '' }
           %>
         </li>
         <li class="moj-sub-navigation__item">
           <%= link_to "Case updates needed (#{@summary.fetch(:pending_task_count)})",
                       { controller: :caseload, action: 'updates_required' },
-                      class: "moj-sub-navigation__link govuk-link--no-visited-state",
+                      class: "moj-sub-navigation__link",
                       aria: { current: current_page?(controller: :caseload, action: 'updates_required') ? 'page' : '' }
           %>
         </li>
         <li class="moj-sub-navigation__item">
           <%= link_to "Allocations in this prison (#{@summary.fetch(:all_prison_cases)})",
                       { controller: :caseload_global },
-                      class: "moj-sub-navigation__link govuk-link--no-visited-state",
+                      class: "moj-sub-navigation__link",
                       aria: { current: current_page?(controller: :caseload_global) ? 'page' : '' }
           %>
         </li>

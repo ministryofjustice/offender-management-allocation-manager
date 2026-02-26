@@ -12,22 +12,18 @@
  */
 
 // Import GOV.UK Design System first
-@use "gov_uk";
-
-// GOV.UK Design System customizations
-@use "gov_uk_notification_banner";
+@use "gov_uk" as *;
 
 // Then application specific components
 @use "case_mix";
 @use "hmpps_header";
 @use "notification";
-@use "pages";
 @use "pagination";
 @use "prisoner";
-@use "risk_widgets";
+@use "mappa_widget";
+@use "rosh_widget";
 @use "search";
 @use "service_banner";
-@use "sorting";
 @use "tables";
 @use "timeline";
 @use "vlo_information";
@@ -35,43 +31,5 @@
 @use 'handovers';
 @use 'task_list';
 @use 'compare_poms';
+@use 'custom';
 @use 'overrides';
-
-.no-bottom-margin {
-  margin-bottom: 0;
-}
-
-.cancel-button {
-  line-height: 38px;
-  margin-left: 20px;
-  font-size: 1.2em;
-}
-
-.govuk-table__cell-error {
-  border-left: 5px solid #d4351c;
-  padding-left: 10px;
-}
-
-.govuk-table__cell-error-value {
-  color: #d4351c;
-  font-weight: bold;
-}
-
-.sidebar-panel {
-  border-top: 10px solid #1d70b8;
-  padding-top: 10px;
-}
-
-// Stop images from being wider than their parent container
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-@media(min-width: 1250px) {
-
-  .govuk-width-container,
-  .moj-primary-navigation__container {
-    max-width: 1170px;
-  }
-}

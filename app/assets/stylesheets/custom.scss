@@ -1,0 +1,70 @@
+@use "gov_uk" as *;
+
+@mixin app-button-reset {
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  box-sizing: unset;
+  background-color: transparent;
+  box-shadow: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.app-button--link {
+  @include app-button-reset;
+  @extend %govuk-link;
+
+  vertical-align: top;
+
+  // Buttons can't have different colours for visited/unvisited
+  color: govuk-functional-colour("link");
+}
+
+.app-button--back-link {
+  @include app-button-reset;
+  @extend %govuk-link;
+
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.app-cancel-link {
+  line-height: 38px;
+  margin-left: 20px;
+  font-size: 1.2em;
+}
+
+.app-table__cell--error {
+  border-left: 5px solid govuk-functional-colour("error");
+  padding-left: 10px;
+}
+
+.app-table__cell--error-value {
+  color: govuk-functional-colour("error");
+  font-weight: bold;
+}
+
+.app-sidebar-panel {
+  border-top: 10px solid govuk-functional-colour("brand");
+  padding-top: 10px;
+}
+
+.app-sort-arrow {
+  color: govuk-functional-colour("brand");
+  font-size: 0.9em;
+  margin-left: 4px;
+}
+
+// This is a GOV.UK Publishing specific component that
+// can be seen at http://govuk-static.herokuapp.com/component-guide/related_items
+//
+.app-related-items {
+  border-top: 2px solid govuk-functional-colour("brand");
+  padding-top: govuk-spacing(2);
+}
+
+.app-related-items .govuk-list > li {
+  margin-bottom: govuk-spacing(2);
+}

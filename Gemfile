@@ -10,7 +10,6 @@ gem 'aws-sdk-sns'
 # Need AWS S3 SDK for processing PPUD exports
 gem 'aws-sdk-s3'
 gem 'bootsnap', '>= 1.1.0', require: false
-gem 'coffee-rails', '~> 5.0'
 # Keep version below 3.0.0 for now, as there are breaking changes
 gem 'connection_pool', '< 3.0.0'
 gem 'csv'
@@ -48,7 +47,7 @@ gem 'prawn-rails'
 gem 'rswag-api' # api-documentation
 gem 'rswag-ui'  # api-documentation interface
 
-gem 'sassc-rails'
+gem 'sprockets-rails'
 gem 'cssbundling-rails'
 
 # simple validation of email addresses.

@@ -13,7 +13,7 @@
 
           <div class="govuk-grid-column-one-third">
             <div class="card--caseload card-total">
-              <%= link_to prison_staff_caseload_cases_path, class: 'govuk-link--no-visited-state' do %>
+              <%= link_to prison_staff_caseload_cases_path do %>
                 <span class="card__heading--large"><%= @summary.fetch(:total_cases) %></span>
                 <p>total cases</p>
               <% end %>
@@ -24,7 +24,7 @@
           </div>
           <div class="govuk-grid-column-one-third">
             <div class="card--caseload card-total">
-              <%= link_to prison_staff_caseload_parole_cases_path, class: 'govuk-link--no-visited-state' do %>
+              <%= link_to prison_staff_caseload_parole_cases_path do %>
                 <span class="card__heading--large"><%= @summary.fetch(:parole_cases_count) %></span>
                 <p>parole cases</p>
               <% end %>
