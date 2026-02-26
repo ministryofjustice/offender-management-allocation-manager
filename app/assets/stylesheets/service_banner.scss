@@ -1,6 +1,8 @@
+@use "gov_uk" as *;
+
 .service_banner {
   padding: 15px;
-  background-color: #fff2d4;
+  background-color: govuk-colour("yellow", $variant: "tint-80");
   margin-top: 10px;
   margin-bottom: 10px;
 }

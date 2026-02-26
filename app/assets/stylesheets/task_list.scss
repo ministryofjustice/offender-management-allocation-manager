@@ -38,11 +38,11 @@
 }
 
 .app-task-list__item.with-divider {
-  border-bottom: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid govuk-functional-colour("border");
 }
 
 .app-task-list__item.with-divider:first-child {
-  border-top: 1px solid $govuk-border-colour;
+  border-top: 1px solid govuk-functional-colour("border");
 }
 
 .app-task-list__task-name {

@@ -1,8 +1,13 @@
+// NOTE: some hex colours hardcoded here have been left untouched and not
+// migrated to use sass functions (govuk-colour / govuk-functional-colour)
+// because doing so alters slightly the look and feel of the cards and
+// makes them different from the rest of DPS services.
+//
 @use "gov_uk" as *;
 
 .card {
   margin-bottom: 40px;
-  background: govuk-colour("white");
+  background: govuk-functional-colour("body-background");
   border: 1px solid #d9dadb;
   position: relative;
   width: 100%;
@@ -32,7 +37,7 @@
 }
 
 .card-total p {
-  color: govuk-colour("blue");
+  color: govuk-functional-colour("link");
 }
 
 .card--clickable {
@@ -44,24 +49,24 @@
 }
 
 .card--clickable:hover .card__heading a,.card--clickable:hover .card__link,.card--clickable:active .card__heading a,.card--clickable:active .card__link {
-  color: govuk-colour("blue", $variant: "shade-50");
+  color: govuk-functional-colour("link-hover");
   text-decoration: none
 }
 
 .card--clickable:hover .card__heading a:focus,.card--clickable:hover .card__link:focus,.card--clickable:active .card__heading a:focus,.card--clickable:active .card__link:focus {
   outline: 3px solid transparent;
-  color: govuk-colour("black");
-  background-color: govuk-colour("yellow");
-  box-shadow: 0 -2px govuk-colour("yellow"), 0 4px govuk-colour("black");
+  color: govuk-functional-colour("focus-text");
+  background-color: govuk-functional-colour("focus");
+  box-shadow: 0 -2px govuk-functional-colour("focus"), 0 4px govuk-functional-colour("focus-text");
   text-decoration: none
 }
 
 .card--clickable:hover {
-  border-color: $govuk-border-colour
+  border-color: #b1b4b6
 }
 
 .card--clickable:active {
-  border-color: $govuk-border-colour;
+  border-color: #b1b4b6;
   bottom: -1px
 }
 

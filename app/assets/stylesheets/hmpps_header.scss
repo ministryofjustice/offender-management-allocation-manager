@@ -1,7 +1,7 @@
 @use "gov_uk" as *;
 
 .govuk-header {
-  border-bottom: 10px solid govuk-colour("blue");
+  border-bottom: 10px solid govuk-functional-colour("brand");
 }
 
 .govuk-header--fallback {
@@ -49,7 +49,7 @@
 }
 
 .hmpps-header__inner {
-  border-bottom: 10px solid govuk-colour("blue");
+  border-bottom: 10px solid govuk-functional-colour("brand");
 }
 
 .hmpps-header__navigation {
