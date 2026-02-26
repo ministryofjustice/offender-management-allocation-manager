@@ -74,11 +74,11 @@ private
   end
 
   def asc_tag
-    content_tag(:span, '&#9650'.html_safe, class: 'sort-arrow')
+    content_tag(:span, '&#9650'.html_safe, class: 'app-sort-arrow')
   end
 
   def desc_tag
-    content_tag(:span, '&#9660'.html_safe, class: 'sort-arrow')
+    content_tag(:span, '&#9660'.html_safe, class: 'app-sort-arrow')
   end
 
   def invert_sort_parameter(param)

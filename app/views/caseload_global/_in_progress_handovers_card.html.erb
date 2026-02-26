@@ -5,8 +5,7 @@
 
 <div class="card--caseload card-total">
   <% if local_assigns[:with_link] %>
-    <%= link_to information, prison_show_pom_tab_path(@prison.code, @pom.staff_id, :handover, anchor: 'in-progress-handovers'),
-                class: 'govuk-link--no-visited-state' %>
+    <%= link_to information, prison_show_pom_tab_path(@prison.code, @pom.staff_id, :handover, anchor: 'in-progress-handovers') %>
   <% else %>
     <%= information %>
   <% end %>

@@ -17,6 +17,10 @@
     @extend .card;
     width: 85%;
     padding: 15px 20px;
+
+    a:visited {
+      color: govuk-functional-colour("link");
+    }
   }
 }
 
