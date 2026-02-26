@@ -471,69 +471,8 @@
         </a>
       </p>
 
-      <%= render partial: 'shared/mappa', locals: { level: @mappa_details[:short_description], last_updated: @mappa_details[:start_date] } %>
-
-      <div class="govuk-!-padding-4 govuk-!-margin-bottom-3 rosh-widget rosh-widget--<%= widget_class(@rosh) %>">
-        <table class="govuk-table rosh-widget__table">
-          <caption class="govuk-table__caption govuk-table__caption--m">
-            <span class="rosh-widget__risk--<%= level_class(@rosh[:overall]) %>">
-              <%= @rosh[:overall] || 'UNKNOWN LEVEL' %> <span class="govuk-!-font-weight-regular">RoSH</span><br/>
-            </span>
-            <span class="govuk-!-font-weight-regular rosh-widget__subheading">Risk of serious harm</span>
-            <% if @rosh[:status] == :missing %>
-              <br/>
-              <span class="govuk-caption-m govuk-body-s">
-                A ROSH summary has not been completed for this individual. Check OASys for this persons current
-                assessment status.
-              </span>
-            <% elsif @rosh[:status] == :unable %>
-              <br/>
-              <span class="govuk-caption-m govuk-body-s">
-                Something went wrong. We are unable to show ROSH information at this time. Try again later.
-              </span>
-            <% elsif @rosh[:last_updated] %>
-              <br/>
-              <span class="govuk-caption-m govuk-body-s">Last updated: <%= format_date(@rosh[:last_updated]) %></span>
-            <% end %>
-          </caption>
-          <% if @rosh[:custody] && @rosh[:community] %>
-            <thead class="govuk-table__head">
-              <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header">Risk to</th>
-                <th scope="col" class="govuk-table__header">Custody</th>
-                <th scope="col" class="govuk-table__header">Community</th>
-              </tr>
-            </thead>
-            <tbody class="govuk-table__body">
-              <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header">Children</th>
-                <td class="govuk-table__cell rosh-widget__risk--<%= level_class(@rosh[:custody][:children]) %>"><%= @rosh[:custody][:children] %></td>
-                <td class="govuk-table__cell rosh-widget__risk--<%= level_class(@rosh[:community][:children]) %>"><%= @rosh[:community][:children] %></td>
-              </tr>
-              <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header">Public</th>
-                <td class="govuk-table__cell rosh-widget__risk--<%= level_class(@rosh[:custody][:public]) %>"><%= @rosh[:custody][:public] %></td>
-                <td class="govuk-table__cell rosh-widget__risk--<%= level_class(@rosh[:community][:public]) %>"><%= @rosh[:community][:public] %></td>
-              </tr>
-              <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header">Known adult</th>
-                <td class="govuk-table__cell rosh-widget__risk--<%= level_class(@rosh[:custody][:known_adult]) %>"><%= @rosh[:custody][:known_adult] %></td>
-                <td class="govuk-table__cell rosh-widget__risk--<%= level_class(@rosh[:community][:known_adult]) %>"><%= @rosh[:community][:known_adult] %></td>
-              </tr>
-              <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header">Staff</th>
-                <td class="govuk-table__cell rosh-widget__risk--<%= level_class(@rosh[:custody][:staff]) %>"><%= @rosh[:custody][:staff] %></td>
-                <td class="govuk-table__cell rosh-widget__risk--<%= level_class(@rosh[:community][:staff]) %>"><%= @rosh[:community][:staff] %></td>
-              </tr>
-              <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header">Prisoners</th>
-                <td class="govuk-table__cell rosh-widget__risk--<%= level_class(@rosh[:custody][:prisoners]) %>"><%= @rosh[:custody][:prisoners] %></td>
-                <td class="govuk-table__cell">N/A</td>
-              </tr>
-            </tbody>
-          <% end %>
-        </table>
-      </div>
+      <%= render partial: 'shared/mappa', locals: { mappa: @mappa } %>
+      <%= render partial: 'shared/rosh', locals: { rosh: @rosh } %>
     </aside>
   </div>
 </div>

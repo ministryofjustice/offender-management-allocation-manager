@@ -35,13 +35,15 @@ class OffenderService
     end
 
     def get_mappa_details(crn)
-      nil_details = { category: nil, level: nil, short_description: nil, review_date: nil, start_date: nil }
+      error_details = { status: :error, level: nil, short_description: nil, review_date: nil, start_date: nil }
+      not_found_details = { status: :not_found, level: nil, short_description: nil, review_date: nil, start_date: nil }
 
-      return nil_details if crn.blank?
+      return error_details if crn.blank?
 
       details = HmppsApi::ManagePomCasesAndDeliusApi.get_mappa_details(crn)
 
       {
+        status: :found,
         category: details['category'],
         level: details['level'],
         short_description: "CAT #{details['category']}/LEVEL #{details['level']}",
@@ -49,7 +51,9 @@ class OffenderService
         start_date: Date.parse(details['startDate'])
       }
     rescue Faraday::ResourceNotFound
-      nil_details
+      not_found_details
+    rescue Faraday::Error
+      error_details
     end
 
     def get_probation_record(offender_no_or_crn)

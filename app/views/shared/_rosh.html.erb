@@ -1,0 +1,61 @@
+<aside class="rosh-widget <%= "rosh-widget--#{widget_class(rosh)}" if widget_class(rosh).present? %>"
+       aria-label="Risk of serious harm summary">
+  <h3 class="govuk-heading-m"><strong><%= rosh[:overall] || 'UNKNOWN LEVEL' %></strong> ROSH</h3>
+  <p class="govuk-body-m">Risk of serious harm</p>
+  <% if rosh[:status] == :missing %>
+    <p class="govuk-hint govuk-body-m">A ROSH summary has not been completed for this individual. Check OASys for this
+      person's current assessment status.</p>
+  <% elsif rosh[:status] == :unable %>
+    <p class="govuk-hint govuk-body-m">Something went wrong. We are unable to show ROSH information at this time. Try
+      again later.</p>
+  <% else %>
+    <p class="govuk-hint govuk-body-m">
+      Last updated: <%= rosh[:last_updated] ? format_date(rosh[:last_updated]) : 'Not known' %>
+    </p>
+    <% if rosh[:custody] || rosh[:community] %>
+      <div class="moj-scrollable-pane">
+        <table class="govuk-table rosh-widget__table">
+          <caption class="govuk-visually-hidden">Risk of serious harm in Community</caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th class="govuk-table__header">Risk to</th>
+              <% if rosh[:community] %>
+                <th class="govuk-table__header">Community</th>
+              <% end %>
+              <% if rosh[:custody] %>
+                <th class="govuk-table__header">Custody</th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <% [
+              ['Children', :children],
+              ['Public', :public],
+              ['Known adult', :known_adult],
+              ['Staff', :staff],
+              ['Prisoners', :prisoners]
+            ].each.with_index(1) do |(label, key), index| %>
+              <tr class="govuk-table__row">
+                <th data-qa="riskToLabelValue<%= index %>"
+                    class="govuk-table__header"><%= label %></th>
+                <% if rosh[:community] %>
+                  <td data-qa="riskToCommunityValue<%= index %>"
+                      class="govuk-table__cell <%= "rosh-widget__risk--#{level_class(rosh[:community][key])}" if level_class(rosh[:community][key]) %>">
+                    <%= risk_display_text(rosh[:community][key]) %>
+                  </td>
+                <% end %>
+                <% if rosh[:custody] %>
+                  <td data-qa="riskToCustodyValue<%= index %>"
+                      class="govuk-table__cell <%= "rosh-widget__risk--#{level_class(rosh[:custody][key])}" if level_class(rosh[:custody][key]) %>">
+                    <%= risk_display_text(rosh[:custody][key]) %>
+                  </td>
+                <% end %>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  <% end %>
+</aside>
+
