@@ -1,4 +1,4 @@
-FROM ruby:3.4.5-slim-bullseye
+FROM ruby:3.4.5-slim-bookworm
 
 # Incremenent to bust Docker layer cache
 ENV DOCKER_CACHE_BUSTER=1
@@ -42,31 +42,39 @@ RUN \
     libjemalloc-dev \
     unzip \
     ca-certificates \
-    gnupg \
-  && timedatectl set-timezone Europe/London || true \
-  && gem install bundler -v 2.5.12 --no-document \
+  && ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime \
+  && gem install bundler -v 2.6.7 --no-document \
   && apt-get clean
 
- RUN mkdir /home/appuser/.postgresql && \
+RUN mkdir /home/appuser/.postgresql && \
   curl https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
     > /home/appuser/.postgresql/root.crt
 
 # Install official AWS CLI
 RUN \
   set -ex \
+  && ARCH=$(dpkg --print-architecture) \
+  && if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then \
+       AWS_CLI_URL='https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip'; \
+     else \
+       AWS_CLI_URL='https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip'; \
+     fi \
   && touch /tmp/without-this-curl-does-not-write-to-tmp-for-some-reason \
-  && curl -s 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o /tmp/awscliv2.zip \
+  && curl -s "$AWS_CLI_URL" -o /tmp/awscliv2.zip \
   && unzip -qd /tmp/awscliv2 /tmp/awscliv2.zip \
   && /tmp/awscliv2/aws/install
 
 # Install Node.js and Yarn
 RUN set -ex ; \
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | \
+    apt-get update \
+    && apt-get install -y --no-install-recommends gnupg \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | \
         gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_16.x nodistro main" | \
-        tee /etc/apt/sources.list.d/nodesource_nodejs16.list \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | \
+        tee /etc/apt/sources.list.d/nodesource_nodejs20.list \
     && apt-get update \
     && apt-get install -y nodejs \
+    && apt-get purge -y --auto-remove gnupg \
     && apt-get clean \
     && npm --global install yarn
 
