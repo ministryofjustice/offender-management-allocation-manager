@@ -4,61 +4,114 @@
   border-bottom: 10px solid govuk-functional-colour("brand");
 }
 
-.govuk-header--fallback {
-  border: none !important;
-  padding-bottom: 10px;
-}
+.fallback-dps-header {
+  @include govuk-responsive-padding(3, 'top');
+  @include govuk-responsive-padding(3, 'bottom');
+  background-color: govuk-colour('black');
+  color: govuk-colour('white');
 
-.govuk-header__container--fallback {
-  border: none !important;
-  margin-bottom: -10px;
-  padding-top: 10px;
-}
-
-// Style fallback navigation items (govuk-header__navigation-item removed in v6)
-.hmpps-header__navigation-item {
-  display: inline-block;
-  margin-right: 10px;
-
-  a {
-    color: govuk-colour("white") !important;
-    text-decoration: none;
+  &__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-}
 
-.hmpps-header {
-  padding-top: 13px;
-  padding-bottom: 7px;
-}
+  &__logo {
+    @include govuk-responsive-margin(2, 'right');
+    position: relative;
+    top: -2px;
+    fill: govuk-colour('white');
+  }
 
-.hmpps__logotype-crest {
-  display: inline-block;
-  content: "";
-  background: asset-url('Crest@2x.png') no-repeat;
-  background-size: contain;
-  width: 36px;
-  height: 30px;
-  margin-bottom: -2px;
-  margin-right: 10px;
-}
+  &__title {
+    @include govuk-responsive-padding(3, 'right');
+    display: flex;
+    align-items: center;
 
-.hmpps__logotype-crown {
-  display: inline-block;
-  content: "";
-  fill: white;
-}
+    &__organisation-name {
+      @include govuk-responsive-margin(2, 'right');
+      @include govuk-font($size: 24, $weight: 'bold');
+      display: flex;
+      align-items: center;
+    }
 
-.hmpps-header__inner {
-  border-bottom: 10px solid govuk-functional-colour("brand");
-}
+    &__service-name {
+      @include govuk-responsive-margin(2, 'right');
+      @include govuk-font(24);
+      display: none;
 
-.hmpps-header__navigation {
-  margin-top: 10px;
-  float: right;
-  display: inline-block !important;
-}
+      @include govuk-media-query($from: desktop) {
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
 
-.hmpss-header__prison-identifier {
-  color: govuk-colour("white");
-  font-weight: bold;
+  &__link {
+    @include govuk-link-common;
+    @include govuk-link-style-default;
+
+    text-underline-offset: 0.1em;
+
+    &:link,
+    &:visited,
+    &:active {
+      color: govuk-colour('white');
+      text-decoration: none;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:focus {
+      color: govuk-colour('black');
+
+      svg {
+        fill: govuk-colour('black');
+      }
+    }
+  }
+
+  &__navigation {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    @include govuk-media-query($from: tablet) {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    &__item {
+      @include govuk-font(19);
+      margin-bottom: govuk-spacing(1);
+      text-align: right;
+      color: govuk-colour('white');
+
+      @include govuk-media-query($from: tablet) {
+        @include govuk-responsive-margin(4, 'right');
+        @include govuk-responsive-padding(4, 'right');
+        margin-bottom: 0;
+        border-right: 1px solid govuk-colour('white');
+      }
+
+      a {
+        display: inline-block;
+      }
+
+      &:last-child {
+        margin-right: 0;
+        border-right: 0;
+        padding-right: 0;
+      }
+    }
+  }
+
+  @media print {
+    display: none;
+  }
 }

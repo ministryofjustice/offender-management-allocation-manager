@@ -53,7 +53,7 @@ feature 'DPS standard header and footer:', :aggregate_failures, :skip_dps_header
     signin_pom_user
     visit '/'
 
-    expect(page).to have_css('header.govuk-header--fallback')
+    expect(page).to have_css('header.fallback-dps-header')
   end
 
   scenario 'standard DPS footer is used', :mock_api_success do
@@ -68,6 +68,6 @@ feature 'DPS standard header and footer:', :aggregate_failures, :skip_dps_header
     signin_pom_user
     visit '/'
 
-    expect(page).to have_css('footer.govuk-footer--fallback')
+    expect(page).to have_css('footer.govuk-footer')
   end
 end
