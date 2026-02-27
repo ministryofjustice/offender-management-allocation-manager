@@ -37,7 +37,7 @@ feature "womens allocation journey" do
 
     stub_bank_holidays
     stub_community_offender(nomis_offender_id, build(:community_data))
-    allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
+    allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return(RoshSummary.missing)
   end
 
   context 'without an existing allocation' do

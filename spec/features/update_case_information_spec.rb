@@ -14,7 +14,7 @@ RSpec.feature "Update case information", type: :feature do
     stub_poms(prison.code, [pom, spo])
     stub_keyworker(offender_no)
     stub_community_offender(offender_no, build(:community_data))
-    allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
+    allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return(RoshSummary.missing)
   end
 
   context 'when there is a new allocation' do
