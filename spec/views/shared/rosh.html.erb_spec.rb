@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe "shared/_rosh", type: :view do
   let(:page) { Nokogiri::HTML(rendered) }
   let(:widget) { page.at_css('.rosh-widget') }
+  let(:rosh) { RoshSummary.send(:new, **rosh_attrs) }
 
   before do
     render partial: 'shared/rosh', locals: { rosh: rosh }
@@ -24,7 +25,7 @@ RSpec.describe "shared/_rosh", type: :view do
   end
 
   context 'when status is :missing' do
-    let(:rosh) { { status: :missing, overall: nil } }
+    let(:rosh) { RoshSummary.missing }
 
     it_behaves_like 'a rosh widget'
 
@@ -47,7 +48,7 @@ RSpec.describe "shared/_rosh", type: :view do
   end
 
   context 'when status is :unable' do
-    let(:rosh) { { status: :unable, overall: nil } }
+    let(:rosh) { RoshSummary.unable }
 
     it_behaves_like 'a rosh widget'
 
@@ -71,23 +72,23 @@ RSpec.describe "shared/_rosh", type: :view do
 
   context 'when status is found with full data' do
     let(:last_updated) { Date.new(2024, 6, 15) }
-    let(:rosh) do
+    let(:rosh_attrs) do
       {
-        status: 'found',
+        status: :found,
         overall: 'HIGH',
         last_updated: last_updated,
         custody: {
           children: 'low',
           public: 'high',
           known_adult: 'medium',
-          staff: 'very high',
+          staff: 'very_high',
           prisoners: 'low'
         },
         community: {
           children: 'medium',
           public: 'high',
           known_adult: 'low',
-          staff: 'very high',
+          staff: 'very_high',
           prisoners: nil
         }
       }
@@ -153,9 +154,9 @@ RSpec.describe "shared/_rosh", type: :view do
   end
 
   context 'when found with only community data (no custody)' do
-    let(:rosh) do
+    let(:rosh_attrs) do
       {
-        status: 'found',
+        status: :found,
         overall: 'MEDIUM',
         last_updated: Date.new(2024, 1, 1),
         custody: nil,
@@ -185,9 +186,9 @@ RSpec.describe "shared/_rosh", type: :view do
   end
 
   context 'when found with only custody data (no community)' do
-    let(:rosh) do
+    let(:rosh_attrs) do
       {
-        status: 'found',
+        status: :found,
         overall: 'LOW',
         last_updated: Date.new(2024, 1, 1),
         custody: {
@@ -221,10 +222,10 @@ RSpec.describe "shared/_rosh", type: :view do
   end
 
   context 'when found with VERY HIGH overall level' do
-    let(:rosh) do
+    let(:rosh_attrs) do
       {
-        status: 'found',
-        overall: 'VERY HIGH',
+        status: :found,
+        overall: 'VERY_HIGH',
         last_updated: Date.new(2024, 1, 1),
         custody: nil,
         community: nil
@@ -233,6 +234,10 @@ RSpec.describe "shared/_rosh", type: :view do
 
     it 'applies the very-high widget class' do
       expect(widget['class']).to include('rosh-widget--very-high')
+    end
+
+    it 'displays the overall risk level in the heading' do
+      expect(widget.at_css('h3 strong').text).to eq('VERY HIGH')
     end
   end
 end
