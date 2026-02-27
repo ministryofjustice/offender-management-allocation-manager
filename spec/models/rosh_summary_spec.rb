@@ -90,7 +90,7 @@ RSpec.describe RoshSummary do
               'LOW' => ['Known Adult']
             },
             'riskInCustody' => {
-              'HIGH' => ['Know adult'],
+              'HIGH' => ['Known adult'],
               'VERY_HIGH' => ['Staff', 'Prisoners'],
               'LOW' => ['Children', 'Public']
             },

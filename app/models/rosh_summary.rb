@@ -54,7 +54,7 @@ class RoshSummary
     {
       children: levels['Children'],
       public: levels['Public'],
-      known_adult: ['Known Adult', 'Know adult'].filter_map { levels[it] }.first, # Cover capitalisation variants
+      known_adult: ['Known Adult', 'Known adult'].filter_map { levels[it] }.first, # Cover capitalisation variants
       staff: levels['Staff'],
       prisoners: levels['Prisoners'],
     }.freeze
