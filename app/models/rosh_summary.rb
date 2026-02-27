@@ -6,13 +6,18 @@ class RoshSummary
   def self.for(crn)
     return unable if crn.blank?
 
-    parse_api_response(
-      HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(crn)
-    )
+    risks = HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(crn)
+
+    if risks.dig('summary', 'overallRiskLevel').blank?
+      Rails.logger.warn("event=risks_api_blank_value,crn=#{crn}|overallRiskLevel is blank")
+      return unable
+    end
+
+    parse_api_response(risks)
   rescue Faraday::ResourceNotFound
     missing
   rescue Faraday::Error => e
-    Rails.logger.error("event=rosh_api_error,crn=#{crn}|#{e.message}")
+    Rails.logger.error("event=risks_api_error,crn=#{crn}|#{e.message}")
     unable
   end
 
@@ -24,7 +29,7 @@ class RoshSummary
   def unable? = status == :unable
 
   #
-  # All private methods below
+  # Private class methods below
   #
   def initialize(status:, overall: nil, last_updated: nil, custody: nil, community: nil)
     @status = status
@@ -36,8 +41,6 @@ class RoshSummary
 
   def self.parse_api_response(risks)
     summary = risks.fetch('summary', {})
-
-    return unable if summary['overallRiskLevel'].blank?
 
     new(
       status: :found,

@@ -59,9 +59,13 @@ RSpec.describe RoshSummary do
         ).to receive(:get_rosh_summary).and_return({ 'summary' => { 'overallRiskLevel' => nil } })
       end
 
-      it 'returns unable' do
+      it 'returns unable and logs the crn' do
+        allow(Rails.logger).to receive(:warn)
+
         result = described_class.for(crn)
+
         expect(result).to be_unable
+        expect(Rails.logger).to have_received(:warn).with(a_string_including(crn))
       end
     end
 
