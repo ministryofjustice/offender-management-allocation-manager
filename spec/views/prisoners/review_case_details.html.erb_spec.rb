@@ -4,10 +4,9 @@ RSpec.describe "prisoners/review_case_details", type: :view do
     assign(:prisoner, offender)
     assign(:keyworker, build(:keyworker))
     assign(:alerts, [])
-    assign(:mappa, { status: :not_found, short_description: nil, start_date: nil })
-    assign(:rosh, { status: :unable })
 
     stub_template 'shared/_mappa.html.erb' => ''
+    stub_template 'shared/_rosh.html.erb' => ''
   end
 
   let(:page) { Nokogiri::HTML(rendered) }

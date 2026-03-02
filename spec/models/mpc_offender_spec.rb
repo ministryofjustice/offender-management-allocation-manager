@@ -201,108 +201,13 @@ RSpec.describe MpcOffender, type: :model do
   end
 
   describe '#rosh_summary' do
-    before do
+    it 'delegates to RoshSummary.for with crn' do
       allow_any_instance_of(described_class).to receive(:crn).and_return('ABC123')
-    end
+      rosh = instance_double(RoshSummary)
+      allow(RoshSummary).to receive(:for).and_return(rosh)
 
-    context 'when probation record missing' do
-      before do
-        allow(offender_model).to receive(:case_information).and_return(nil)
-      end
-
-      it 'returns status unable' do
-        expect(subject.rosh_summary).to eq({ status: :unable })
-      end
-    end
-
-    context 'when CRN is blank' do
-      before do
-        allow_any_instance_of(described_class).to receive(:crn).and_return(nil)
-      end
-
-      it 'returns status unable' do
-        expect(subject.rosh_summary).to eq({ status: :unable })
-      end
-    end
-
-    context 'when API resource not found' do
-      before do
-        allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_raise(Faraday::ResourceNotFound.new(nil))
-      end
-
-      it 'returns status missing' do
-        expect(subject.rosh_summary).to eq({ status: :missing })
-      end
-    end
-
-    context 'when API forbidden' do
-      before do
-        allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_raise(Faraday::ForbiddenError.new(nil))
-      end
-
-      it 'returns status unable' do
-        expect(subject.rosh_summary).to eq({ status: :unable })
-      end
-    end
-
-    context 'when API error' do
-      before do
-        allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_raise(Faraday::ServerError.new(nil))
-      end
-
-      it 'returns status unable' do
-        expect(subject.rosh_summary).to eq({ status: :unable })
-      end
-    end
-
-    context 'when successful API call' do
-      before do
-        allow_any_instance_of(described_class).to receive(:crn).and_return('ABC123')
-        allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_return(fake_response)
-      end
-
-      let(:fake_response) do
-        {
-          'summary' => {
-            'riskInCommunity' => {
-              'HIGH' => ['Children'],
-              'MEDIUM' => ['Public', 'Staff'],
-              'LOW' => ['Known Adult']
-            },
-            'riskInCustody' => {
-              'HIGH' => ['Know adult'],
-              'VERY_HIGH' => ['Staff', 'Prisoners'],
-              'LOW' => ['Children', 'Public']
-            },
-            'overallRiskLevel' => 'HIGH'
-          },
-          'assessedOn' => '2022-07-05T15:29:01',
-        }
-      end
-
-      it 'returns correct level for each risk' do
-        expect(subject.rosh_summary).to eq(
-          {
-            status: 'found',
-            overall: 'HIGH',
-            last_updated: Date.new(2022, 7, 5),
-            custody: {
-              children: 'low',
-              public: 'low',
-              known_adult: 'high',
-              staff: 'very high',
-              prisoners: 'very high'
-            },
-            community: {
-              children: 'high',
-              public: 'medium',
-              known_adult: 'low',
-              staff: 'medium',
-              prisoners: nil
-            }
-          }
-        )
-      end
+      expect(subject.rosh_summary).to eq(rosh)
+      expect(RoshSummary).to have_received(:for).with('ABC123')
     end
   end
 

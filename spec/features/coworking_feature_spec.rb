@@ -39,7 +39,6 @@ feature 'Co-working' do
     stub_signin_spo poms.last, [prison.code]
     stub_keyworker(nomis_offender_id)
     stub_community_offender(nomis_offender_id, build(:community_data))
-    allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return({ status: :missing })
 
     create(:case_information, offender: build(:offender, nomis_offender_id: nomis_offender_id))
   end

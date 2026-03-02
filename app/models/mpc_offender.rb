@@ -257,63 +257,7 @@ class MpcOffender
            to: :case_information
 
   def mappa_details = OffenderService.get_mappa_details(crn)
-
-  def rosh_summary
-    return { status: :unable } if case_information.blank?
-    return { status: :unable } if crn.blank?
-
-    begin
-      risks = HmppsApi::AssessRisksAndNeedsApi.get_rosh_summary(crn)
-      risks_summary = risks['summary']
-    rescue Faraday::ResourceNotFound
-      return { status: :missing }
-    rescue Faraday::ForbiddenError
-      return { status: :unable }
-    rescue Faraday::ServerError
-      return { status: :unable }
-    end
-
-    if risks_summary['overallRiskLevel'].blank?
-      Rails.logger.warn('event=risks_api_blank_value|overallRiskLevel is blank')
-      return { status: :unable }
-    end
-
-    custody = {}.tap do |out|
-      if risks_summary['riskInCustody'].present?
-        risks_summary['riskInCustody'].each do |level, groups|
-          groups.each { |group| out[group] = level.tr('_', ' ').downcase }
-        end
-      end
-    end
-
-    community = {}.tap do |out|
-      if risks_summary['riskInCommunity'].present?
-        risks_summary['riskInCommunity'].each do |level, groups|
-          groups.each { |group| out[group] = level.tr('_', ' ').downcase }
-        end
-      end
-    end
-
-    {
-      status: 'found',
-      overall: risks_summary['overallRiskLevel'].upcase,
-      last_updated: Date.parse(risks['assessedOn']),
-      custody: {
-        children: custody['Children'],
-        public: custody['Public'],
-        known_adult: custody['Known Adult'] || custody['Know adult'],
-        staff: custody['Staff'],
-        prisoners: custody['Prisoners']
-      },
-      community: {
-        children: community['Children'],
-        public: community['Public'],
-        known_adult: community['Known Adult'],
-        staff: community['Staff'],
-        prisoners: nil
-      }
-    }
-  end
+  def rosh_summary = RoshSummary.for(crn)
 
   def active_alert_labels
     HmppsApi::PrisonAlertsApi.alerts_for(offender_no)
@@ -434,9 +378,7 @@ class MpcOffender
 
   delegate :crn,
            :manual_entry?,
-           to: :case_information
-
-  delegate :active_vlo?,
+           :active_vlo?,
            :welsh_offender,
            to: :case_information, allow_nil: true
 

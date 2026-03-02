@@ -7,7 +7,6 @@ feature "get poms list", flaky: true do
   let(:moic_pom_id) { 485_926 }
 
   before do
-    allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_rosh_summary).and_return({})
     signin_spo_user
   end
 
