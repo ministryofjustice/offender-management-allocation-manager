@@ -5,7 +5,7 @@ class ComplexityChangeHistory
   def initialize(previous, current)
     @previous = previous
     @current = ComplexityNewHistory.new(current)
-    @reasons = current.fetch(:notes)
+    @reasons = current[:notes]
   end
 
   def previous_level
