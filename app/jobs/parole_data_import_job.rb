@@ -3,6 +3,10 @@ require 'csv'
 class ParoleDataImportJob < ApplicationJob
   queue_as :default
 
+  # Purge runs on each attempt, so excessive retries risk purging data
+  # imported by a subsequent scheduled run
+  sidekiq_options retry: 10
+
   def perform(date)
     Rails.logger = Logger.new($stdout) if Rails.env.production?
 

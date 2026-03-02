@@ -3,9 +3,6 @@
 class ProcessPrisonerStatusJob < ApplicationJob
   queue_as :default
 
-  # HTTP 404 Not Found: Not much point retrying a missing offender
-  discard_on Faraday::ResourceNotFound
-
   def perform(nomis_offender_id, trigger_method: :event)
     logger.info("nomis_offender_id=#{nomis_offender_id},trigger_method=#{trigger_method},job=process_prisoner_status_job,event=started")
     process_status_change(nomis_offender_id)
