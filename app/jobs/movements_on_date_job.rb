@@ -1,6 +1,9 @@
 class MovementsOnDateJob < ApplicationJob
   queue_as :default
 
+  # Date-specific job; retrying days later would process stale movement data
+  sidekiq_options retry: 10
+
   def perform(date_string)
     yesterday = Date.parse(date_string) - 1.day
 

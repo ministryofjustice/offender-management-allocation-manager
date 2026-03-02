@@ -3,11 +3,16 @@
 class CommunityEarlyAllocationEmailJob < ApplicationJob
   queue_as :mailers
 
+  # Email content can become stale; avoid retrying for days
+  sidekiq_options retry: 10
+
   self.log_arguments = false
 
   def perform(prison, offender_no, encoded_pdf)
     offender = OffenderService.get_offender(offender_no)
-    allocation = AllocationHistory.find_by!(nomis_offender_id: offender_no)
+    allocation = AllocationHistory.find_by(nomis_offender_id: offender_no)
+    return if offender.nil? || allocation.nil?
+
     pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
     pdf = Base64.decode64 encoded_pdf
     EarlyAllocationMailer.with(email: offender.ldu_email_address,

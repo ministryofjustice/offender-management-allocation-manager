@@ -3,6 +3,9 @@
 class AutomaticHandoverEmailJob < ApplicationJob
   queue_as :mailers
 
+  # Email content (CSV report) can become stale; avoid retrying for days
+  sidekiq_options retry: 10
+
   HEADERS = ['Prisoner', 'CRN', 'Prisoner number', 'COM responsible', 'Release/Parole Date', 'Prison', 'Current POM', 'POM email', 'COM'].freeze
   # Turns out that between? is inclusive at both ends, so a 45-day gap needs a 44-day threshold
   SEND_THRESHOLD = 44.days.freeze

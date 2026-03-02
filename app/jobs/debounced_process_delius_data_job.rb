@@ -3,6 +3,9 @@
 class DebouncedProcessDeliusDataJob < ApplicationJob
   queue_as :debounce
 
+  # Debounce token becomes stale quickly, so long retry cycles are pointless
+  sidekiq_options retry: 3
+
   def perform(crn_number, event_type:, debounce_key:, debounce_token:)
     return unless debounce_token_match?(crn_number, debounce_key, debounce_token)
 

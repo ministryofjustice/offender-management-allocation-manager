@@ -102,7 +102,7 @@ private
         prison_name: PrisonService.name_for(nomis_offender.prison_id),
         prisoner_name: "#{nomis_offender.first_name} #{nomis_offender.last_name}",
         prisoner_number: nomis_offender.offender_no,
-        crn_number: case_info.crn,
+        crn_number: case_info.crn.presence || 'N/A',
       ).assign_com_less_than_10_months.deliver_later
     end
   end

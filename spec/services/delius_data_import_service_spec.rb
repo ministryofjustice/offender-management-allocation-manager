@@ -319,5 +319,29 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
       expect { service.process(nomis_offender_id) }.not_to raise_error
       expect(service.logger).to have_received(:warn).with(/event=conflict_error/)
     end
+
+    it 'handles StandardError and tracks the failed identifier' do
+      allow(OffenderService).to receive(:get_probation_record).and_raise(StandardError, 'something went wrong')
+      allow(service.logger).to receive(:warn)
+
+      expect { service.process(nomis_offender_id) }.not_to raise_error
+      expect(service.logger).to have_received(:warn).with(/event=exception/)
+      expect(service.failed_identifiers).to eq([nomis_offender_id])
+    end
+
+    it 'does not track identifiers that succeed' do
+      service.process(nomis_offender_id)
+
+      expect(service.failed_identifiers).to be_empty
+    end
+
+    it 'does not track identifiers that fail with Faraday::ResourceNotFound' do
+      allow(OffenderService).to receive(:get_probation_record).and_raise(Faraday::ResourceNotFound, 'not found')
+      allow(service.logger).to receive(:warn)
+
+      service.process(nomis_offender_id)
+
+      expect(service.failed_identifiers).to be_empty
+    end
   end
 end

@@ -30,6 +30,16 @@ if Rails.env.production?
       write_timeout: 1.0
     }
 
+    # Logs when a job exhausts all retries and moves to the Dead set.
+    # The Sidekiq logger is set to FATAL so this ensures application-level visibility.
+    config.death_handlers << lambda do |job, ex|
+      Rails.logger.error(
+        "job=#{job['class']},jid=#{job['jid']},queue=#{job['queue']}," \
+        "event=job_dead,retried_count=#{job['retry_count']}," \
+        "error_class=#{ex.class},message=#{ex.message}"
+      )
+    end
+
     # Sidekiq logger initialised and the level is set to FATAL to ensure that sensitive data isn't logged.
     config.logger.level = Logger::FATAL
   end

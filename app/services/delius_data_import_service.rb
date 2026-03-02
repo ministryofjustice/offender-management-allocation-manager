@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 class DeliusDataImportService
-  attr_reader :logger, :identifier_type, :trigger_method, :event_type
+  attr_reader :logger, :identifier_type, :trigger_method, :event_type,
+              :failed_identifiers
 
   def initialize(identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil, logger: Rails.logger)
     @identifier_type = identifier_type
     @trigger_method = trigger_method
     @event_type = event_type
     @logger = logger
+    @failed_identifiers = []
   end
 
   def process(identifier)
@@ -22,6 +24,7 @@ class DeliusDataImportService
     logger.warn("#{prefix},event=conflict_error")
   rescue StandardError => e
     logger.warn("#{prefix},event=exception,message=#{e.message}")
+    @failed_identifiers << identifier
   end
 
 private

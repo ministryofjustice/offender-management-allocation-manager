@@ -1,6 +1,10 @@
 class DeactivateReleasedCnlsJob < ApplicationJob
   queue_as :default
 
+  # This job handles retries internally (with_retries) and rescues errors
+  # per-offender, so it should never raise to Sidekiq
+  sidekiq_options retry: 0
+
   attr_reader :prison, :inactivated_count, :errors_count
 
   def perform(prison)

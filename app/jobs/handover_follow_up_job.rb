@@ -1,6 +1,9 @@
 class HandoverFollowUpJob < ApplicationJob
   queue_as :mailers
 
+  # Email content can become stale; avoid retrying for days
+  sidekiq_options retry: 10
+
   def perform(ldu)
     offenders_due_handover_follow_up = OffenderService
       .get_offenders(ldu.case_information.without_com.pluck(:nomis_offender_id))
