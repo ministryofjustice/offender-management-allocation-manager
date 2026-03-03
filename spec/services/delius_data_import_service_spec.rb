@@ -304,44 +304,56 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
       stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
     end
 
-    it 'handles Faraday::ResourceNotFound' do
-      allow(OffenderService).to receive(:get_probation_record).and_raise(Faraday::ResourceNotFound, 'not found')
-      allow(service.logger).to receive(:warn)
+    context 'with non-retriable client errors' do
+      [
+        Faraday::ResourceNotFound,
+        Faraday::BadRequestError,
+        Faraday::ForbiddenError,
+        Faraday::ConflictError,
+        Faraday::UnprocessableEntityError,
+      ].each do |error_class|
+        it "handles #{error_class} as non-retriable" do
+          allow(OffenderService).to receive(:get_probation_record).and_raise(error_class, 'client error')
+          allow(service.logger).to receive(:warn)
 
-      expect { service.process(nomis_offender_id) }.not_to raise_error
-      expect(service.logger).to have_received(:warn).with(/event=resource_not_found/)
+          expect { service.process(nomis_offender_id) }.not_to raise_error
+          expect(service.logger).to have_received(:warn).with(/event=client_error/)
+          expect(service.errors).to be_empty
+        end
+      end
     end
 
-    it 'handles Faraday::ConflictError' do
-      allow(OffenderService).to receive(:get_probation_record).and_raise(Faraday::ConflictError, 'conflict')
-      allow(service.logger).to receive(:warn)
+    context 'with retriable errors' do
+      it 'handles Faraday::UnauthorizedError as retriable' do
+        allow(OffenderService).to receive(:get_probation_record).and_raise(Faraday::UnauthorizedError, 'unauthorized')
+        allow(service.logger).to receive(:warn)
 
-      expect { service.process(nomis_offender_id) }.not_to raise_error
-      expect(service.logger).to have_received(:warn).with(/event=conflict_error/)
-    end
+        expect { service.process(nomis_offender_id) }.not_to raise_error
+        expect(service.logger).to have_received(:warn).with(/event=unauthorized/)
+        expect(service.errors).to eq(nomis_offender_id => 'unauthorized')
+      end
 
-    it 'handles StandardError and tracks the failed identifier' do
-      allow(OffenderService).to receive(:get_probation_record).and_raise(StandardError, 'something went wrong')
-      allow(service.logger).to receive(:warn)
+      {
+        Faraday::ServerError => 'internal server error',
+        Faraday::TimeoutError => 'request timed out',
+        Faraday::ConnectionFailed => 'connection refused',
+        StandardError => 'something went wrong',
+      }.each do |error_class, message|
+        it "tracks #{error_class}" do
+          allow(OffenderService).to receive(:get_probation_record).and_raise(error_class, message)
+          allow(service.logger).to receive(:warn)
 
-      expect { service.process(nomis_offender_id) }.not_to raise_error
-      expect(service.logger).to have_received(:warn).with(/event=exception/)
-      expect(service.failed_identifiers).to eq([nomis_offender_id])
+          expect { service.process(nomis_offender_id) }.not_to raise_error
+          expect(service.logger).to have_received(:warn).with(/event=exception/)
+          expect(service.errors).to eq(nomis_offender_id => message)
+        end
+      end
     end
 
     it 'does not track identifiers that succeed' do
       service.process(nomis_offender_id)
 
-      expect(service.failed_identifiers).to be_empty
-    end
-
-    it 'does not track identifiers that fail with Faraday::ResourceNotFound' do
-      allow(OffenderService).to receive(:get_probation_record).and_raise(Faraday::ResourceNotFound, 'not found')
-      allow(service.logger).to receive(:warn)
-
-      service.process(nomis_offender_id)
-
-      expect(service.failed_identifiers).to be_empty
+      expect(service.errors).to be_empty
     end
   end
 end

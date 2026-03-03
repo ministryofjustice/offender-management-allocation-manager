@@ -2,14 +2,14 @@
 
 class DeliusDataImportService
   attr_reader :logger, :identifier_type, :trigger_method, :event_type,
-              :failed_identifiers
+              :errors
 
   def initialize(identifier_type: :nomis_offender_id, trigger_method: :batch, event_type: nil, logger: Rails.logger)
     @identifier_type = identifier_type
     @trigger_method = trigger_method
     @event_type = event_type
     @logger = logger
-    @failed_identifiers = []
+    @errors = {}
   end
 
   def process(identifier)
@@ -18,13 +18,18 @@ class DeliusDataImportService
     logger.info("#{prefix},event=processing")
     import_data(identifier)
     logger.info("#{prefix},event=processed")
-  rescue Faraday::ResourceNotFound
-    logger.warn("#{prefix},event=resource_not_found")
-  rescue Faraday::ConflictError
-    logger.warn("#{prefix},event=conflict_error")
+  rescue Faraday::UnauthorizedError => e
+    # we consider 401 a transient error and will retry
+    logger.warn("#{prefix},event=unauthorized,message=#{e.message}")
+    @errors.store(identifier, e.message)
+  rescue Faraday::ClientError => e
+    # 400, 403, 404, 409, 422, etc. but NOT 401 (handled above)
+    # these are almost certainly non-transient and retrying will not help
+    logger.warn("#{prefix},event=client_error,message=#{e.message}")
   rescue StandardError => e
+    # these include 500, 502, 503 and other issues, can be retriable
     logger.warn("#{prefix},event=exception,message=#{e.message}")
-    @failed_identifiers << identifier
+    @errors.store(identifier, e.message)
   end
 
 private
