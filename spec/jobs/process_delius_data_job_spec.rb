@@ -3,7 +3,7 @@
 RSpec.describe ProcessDeliusDataJob, type: :job do
   let(:offender_id_1) { 'G4281GV' }
   let(:offender_id_2) { 'G4282GV' }
-  let(:import_service) { instance_double(DeliusDataImportService, failed_identifiers: []) }
+  let(:import_service) { instance_double(DeliusDataImportService, errors: {}) }
 
   before do
     allow(DeliusDataImportService).to receive(:new).and_return(import_service)
@@ -48,7 +48,7 @@ RSpec.describe ProcessDeliusDataJob, type: :job do
     end
 
     context 'when processing fails for some identifiers in a batch', :queueing do
-      let(:import_service) { instance_double(DeliusDataImportService, failed_identifiers: [offender_id_1]) }
+      let(:import_service) { instance_double(DeliusDataImportService, errors: { offender_id_1 => 'timeout' }) }
 
       it 'processes all identifiers' do
         described_class.perform_now([offender_id_1, offender_id_2])
@@ -68,30 +68,43 @@ RSpec.describe ProcessDeliusDataJob, type: :job do
     end
 
     context 'when processing fails for all identifiers in a batch' do
-      let(:import_service) { instance_double(DeliusDataImportService, failed_identifiers: [offender_id_1, offender_id_2]) }
+      let(:import_service) do
+        instance_double(
+          DeliusDataImportService,
+          errors: { offender_id_1 => 'timeout', offender_id_2 => 'connection refused' }
+        )
+      end
 
       it 'raises the error so Sidekiq retries the job' do
         expect {
           described_class.perform_now([offender_id_1, offender_id_2])
-        }.to raise_error(RuntimeError, 'All 2 identifier(s) failed to process')
+        }.to raise_error(
+          ProcessDeliusDataJob::ImportTransientError,
+          "job=process_delius_data_job,count=2,identifier_type=nomis_offender_id,trigger_method=batch," \
+          "event=retrying_failures|#{offender_id_1}: timeout; #{offender_id_2}: connection refused"
+        )
       end
 
       it 'does not re-enqueue a separate job', :queueing do
         expect {
           described_class.perform_now([offender_id_1, offender_id_2])
-        }.to raise_error(RuntimeError)
+        }.to raise_error(ProcessDeliusDataJob::ImportTransientError)
 
         expect(described_class).not_to have_been_enqueued
       end
     end
 
     context 'when processing a single identifier fails' do
-      let(:import_service) { instance_double(DeliusDataImportService, failed_identifiers: [offender_id_1]) }
+      let(:import_service) { instance_double(DeliusDataImportService, errors: { offender_id_1 => 'timeout' }) }
 
       it 'raises the error so Sidekiq retries the job' do
         expect {
           described_class.perform_now(offender_id_1)
-        }.to raise_error(RuntimeError, 'All 1 identifier(s) failed to process')
+        }.to raise_error(
+          ProcessDeliusDataJob::ImportTransientError,
+          "job=process_delius_data_job,count=1,identifier_type=nomis_offender_id,trigger_method=batch," \
+          "event=retrying_failures|#{offender_id_1}: timeout"
+        )
       end
     end
   end
