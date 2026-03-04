@@ -6,8 +6,7 @@ module HmppsApi
     def self.get_keyworker(offender_no)
       client.get("/prisoners/#{offender_no}/allocations/current")
     rescue Faraday::Error => e
-      Rails.logger.error(
-        "nomis_offender_id=#{offender_no},event=keyworker_api_error|#{e.inspect},#{e.backtrace.join(',')}")
+      Rails.logger.error("event=keyworker_api_error,nomis_offender_id=#{offender_no}|#{e.message}")
       nil
     end
 
