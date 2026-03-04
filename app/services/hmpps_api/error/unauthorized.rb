@@ -2,6 +2,6 @@
 
 module HmppsApi
   module Error
-    class Unauthorized < StandardError; end
+    class Unauthorized < Faraday::UnauthorizedError; end
   end
 end

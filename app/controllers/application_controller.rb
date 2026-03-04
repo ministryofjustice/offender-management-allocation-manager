@@ -53,8 +53,8 @@ class ApplicationController < ActionController::Base
         'footer' => HmppsApi::DpsFrontendComponentsApi.footer(sso_identity.token),
         'status' => 'ok',
       }
-    rescue Faraday::ServerError, Faraday::ClientError, NoMethodError => e
-      logger.error "event=dps_header_footer_retrieval_error|#{e.inspect},#{e.backtrace.join(',')}"
+    rescue StandardError => e
+      logger.error "event=dps_header_footer_retrieval_error|#{e.message}"
       @dps_header_footer ||= { 'status' => 'fallback' }
     end
 

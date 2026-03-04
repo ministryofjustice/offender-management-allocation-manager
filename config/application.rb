@@ -95,7 +95,6 @@ module OffenderManagementAllocationClient
       'prisoner-offender-search.prisoner.released' => 'DomainEvents::Handlers::PrisonerReleasedHandler',
       'probation-case.registration.added' => 'DomainEvents::Handlers::ProbationChangeHandler',
       'probation-case.registration.deleted' => 'DomainEvents::Handlers::ProbationChangeHandler',
-      'probation-case.registration.deregistered' => 'DomainEvents::Handlers::ProbationChangeHandler',
       'probation-case.registration.updated' => 'DomainEvents::Handlers::ProbationChangeHandler',
       'tier.calculation.complete' => 'DomainEvents::Handlers::TierChangeHandler',
       'OFFENDER_MANAGER_CHANGED' => 'DomainEvents::Handlers::ProbationChangeHandler',
