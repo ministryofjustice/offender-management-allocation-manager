@@ -89,7 +89,7 @@ module HmppsApi
       cached_response = response_cache.read(method:, route:, queryparams:, extra_headers:, body:)
 
       if cached_response
-        Rails.logger.debug("[#{self.class}] [#{@root}] event=cache_hit,method=#{method.upcase},route=#{route}")
+        Rails.logger.info("[#{self.class}] [#{@root}] event=cache_hit,method=#{method.upcase},route=#{route}")
         return cached_response
       end
 
