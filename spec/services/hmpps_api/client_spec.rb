@@ -185,7 +185,7 @@ describe HmppsApi::Client do
             2.times { client.get(route, cache: true) }
 
             expect(Rails.logger).to have_received(:debug)
-              .with(include('event=cache_hit,method=get,route=/api/some/endpoint'))
+              .with(include('event=cache_hit,method=GET,route=/api/some/endpoint'))
               .once
           end
         end
@@ -290,7 +290,7 @@ describe HmppsApi::Client do
             2.times { client.post(route, request_body, cache: true) }
 
             expect(Rails.logger).to have_received(:debug)
-              .with(include('event=cache_hit,method=post,route=/api/some/endpoint'))
+              .with(include('event=cache_hit,method=POST,route=/api/some/endpoint'))
               .once
           end
         end

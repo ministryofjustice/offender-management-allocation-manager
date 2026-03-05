@@ -78,8 +78,7 @@ module HmppsApi
     end
 
     def expire_cache_key(method, route, queryparams: {}, extra_headers: {}, body: nil)
-      key = cache_key(method, route, queryparams:, extra_headers:, body:)
-      Rails.cache.delete(key)
+      response_cache.expire(method:, route:, queryparams:, extra_headers:, body:)
     end
 
   private
@@ -87,15 +86,19 @@ module HmppsApi
     def request(method, route, queryparams: {}, extra_headers: {}, body: nil, cache: false)
       return send_request(method, route, queryparams:, extra_headers:, body:) unless cache
 
-      key = cache_key(method, route, queryparams:, extra_headers:, body:)
+      cached_response = response_cache.read(method:, route:, queryparams:, extra_headers:, body:)
 
-      if (cached_response = Rails.cache.read(key))
-        Rails.logger.debug("[#{self.class}] event=cache_hit,method=#{method},route=#{route}")
+      if cached_response
+        Rails.logger.debug("[#{self.class}] [#{@root}] event=cache_hit,method=#{method.upcase},route=#{route}")
         return cached_response
       end
 
       response = send_request(method, route, queryparams:, extra_headers:, body:)
-      Rails.cache.write(key, response, expires_in: Rails.configuration.cache_expiry) if cacheable_response?(response)
+      if cacheable_response?(response)
+        response_cache.write(
+          method:, route:, queryparams:, extra_headers:, body:, response:
+        )
+      end
 
       response
     end
@@ -136,18 +139,12 @@ module HmppsApi
       false
     end
 
-    def cache_key(method, route, queryparams:, extra_headers:, body:)
-      # An array of everything that makes this request unique
-      request_parameters = [@root, method, route, queryparams, extra_headers, body]
-
-      # Create a SHA256 hash which uniquely identifies this request
-      fingerprint = Digest::SHA256.hexdigest(request_parameters.to_json)
-
-      "hmpps_api_request_#{fingerprint}"
-    end
-
     def token
       HmppsApi::Oauth::TokenService.valid_token
+    end
+
+    def response_cache
+      @response_cache ||= HmppsApi::ResponseCache.new(@root)
     end
   end
 end
