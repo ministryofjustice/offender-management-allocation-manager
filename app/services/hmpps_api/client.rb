@@ -27,9 +27,9 @@ module HmppsApi
 
     # Performs a basic GET request without processing the response. This is mostly
     # used for when we do not want a JSON response from an endpoint.
-    def raw_get(route, queryparams: {}, extra_headers: {})
+    def raw_get(route, queryparams: {}, extra_headers: {}, cache: true)
       response = request(
-        :get, route, queryparams: queryparams, extra_headers: extra_headers
+        :get, route, queryparams: queryparams, extra_headers: extra_headers, cache: cache
       )
       response.body
     end
@@ -85,16 +85,19 @@ module HmppsApi
   private
 
     def request(method, route, queryparams: {}, extra_headers: {}, body: nil, cache: false)
-      if cache
-        # Cache the request
-        key = cache_key(method, route, queryparams: queryparams, extra_headers: extra_headers, body: body)
-        Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) do
-          send_request(method, route, queryparams: queryparams, extra_headers: extra_headers, body: body)
-        end
-      else
-        # Don't cache the request
-        send_request(method, route, queryparams: queryparams, extra_headers: extra_headers, body: body)
+      return send_request(method, route, queryparams:, extra_headers:, body:) unless cache
+
+      key = cache_key(method, route, queryparams:, extra_headers:, body:)
+
+      if (cached_response = Rails.cache.read(key))
+        Rails.logger.debug("[#{self.class}] event=cache_hit,method=#{method},route=#{route}")
+        return cached_response
       end
+
+      response = send_request(method, route, queryparams:, extra_headers:, body:)
+      Rails.cache.write(key, response, expires_in: Rails.configuration.cache_expiry) if cacheable_response?(response)
+
+      response
     end
 
     def send_request(method, route, queryparams:, extra_headers:, body:)
@@ -114,6 +117,23 @@ module HmppsApi
 
       # cast and re-raise as it is handled up the chain
       raise HmppsApi::Error::Unauthorized, e
+    end
+
+    def cacheable_response?(response)
+      return false if response.status == 204
+      return false if empty_response_body?(response)
+
+      true
+    end
+
+    def empty_response_body?(response)
+      body = response.body.to_s.strip
+      return true if body.empty?
+
+      parsed = JSON.parse(body)
+      parsed.respond_to?(:empty?) && parsed.empty?
+    rescue JSON::ParserError
+      false
     end
 
     def cache_key(method, route, queryparams:, extra_headers:, body:)
