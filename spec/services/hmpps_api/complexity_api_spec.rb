@@ -128,7 +128,7 @@ describe HmppsApi::ComplexityApi do
     end
 
     before do
-      stub_request(:put, endpoint).to_return(body:)
+      stub_request(:put, endpoint).with(body: {}).to_return(body:)
     end
 
     scenario 'item present' do
