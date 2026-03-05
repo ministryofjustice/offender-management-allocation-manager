@@ -301,7 +301,7 @@ RSpec.describe AllocationHistory, :enable_allocation_change_publish, type: :mode
         let(:alloc) { described_class.find_by(nomis_offender_id: nomis_offender_id) }
         let(:deallocation) { alloc.reload }
         let(:fake_mailer) { double(offender_deallocated: double(deliver_later: nil)) }
-        let(:fake_logger) { double(error: nil, info: nil) }
+        let(:fake_logger) { double(error: nil, info: nil, debug: nil) }
 
         it 'removes the primary pom details in an Offender\'s allocation' do
           expect(deallocation.primary_pom_nomis_id).to be_nil
