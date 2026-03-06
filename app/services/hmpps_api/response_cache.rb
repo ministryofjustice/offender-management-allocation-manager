@@ -5,7 +5,15 @@ module HmppsApi
     CACHE_EXPIRY = Rails.configuration.cache_expiry
     CACHE_KEY_VERSION = 2
 
-    CachedResponse = Struct.new(:status, :body, keyword_init: true)
+    CachedResponse = Struct.new(:status, :body, keyword_init: true) do
+      def to_cache_payload
+        { 'status' => status, 'body' => body }
+      end
+
+      def self.from_cache_payload(payload)
+        new(status: payload.fetch('status'), body: payload.fetch('body'))
+      end
+    end
 
     def initialize(root)
       @root = root
@@ -43,16 +51,11 @@ module HmppsApi
     end
 
     def serialize_for_cache(response)
-      {
-        'status' => response.status,
-        'body' => response.body
-      }
+      CachedResponse.new(status: response.status, body: response.body).to_cache_payload
     end
 
     def deserialize_from_cache(payload)
-      CachedResponse.new(
-        **payload.slice('status', 'body').transform_keys(&:to_sym)
-      )
+      CachedResponse.from_cache_payload(payload)
     end
   end
 end

@@ -188,12 +188,32 @@ describe HmppsApi::Client do
               .with(include('event=cache_hit,method=GET,route=/api/some/endpoint'))
               .once
           end
+
+          it 'logs a cache miss before writing to cache' do
+            allow(Rails.logger).to receive(:info)
+
+            client.get(route, cache: true)
+
+            expect(Rails.logger).to have_received(:info)
+              .with(include('event=cache_miss,method=GET,route=/api/some/endpoint'))
+              .once
+          end
         end
 
         context 'with cache: false' do
           it 'does not cache responses' do
             5.times { client.get(route, cache: false) }
             expect(a_request(:get, stub_url)).to have_been_made.times(5)
+          end
+
+          it 'logs when cache is disabled' do
+            allow(Rails.logger).to receive(:info)
+
+            client.get(route, cache: false)
+
+            expect(Rails.logger).to have_received(:info)
+              .with(include('event=cache_disabled,method=GET,route=/api/some/endpoint'))
+              .once
           end
         end
 
@@ -293,12 +313,32 @@ describe HmppsApi::Client do
               .with(include('event=cache_hit,method=POST,route=/api/some/endpoint'))
               .once
           end
+
+          it 'logs a cache miss before writing to cache' do
+            allow(Rails.logger).to receive(:info)
+
+            client.post(route, request_body, cache: true)
+
+            expect(Rails.logger).to have_received(:info)
+              .with(include('event=cache_miss,method=POST,route=/api/some/endpoint'))
+              .once
+          end
         end
 
         context 'with cache: false' do
           it 'does not cache responses' do
             5.times { client.post(route, request_body, cache: false) }
             expect(a_request(:post, stub_url)).to have_been_made.times(5)
+          end
+
+          it 'logs when cache is disabled' do
+            allow(Rails.logger).to receive(:info)
+
+            client.post(route, request_body, cache: false)
+
+            expect(Rails.logger).to have_received(:info)
+              .with(include('event=cache_disabled,method=POST,route=/api/some/endpoint'))
+              .once
           end
         end
 
