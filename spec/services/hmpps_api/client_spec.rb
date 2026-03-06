@@ -185,7 +185,7 @@ describe HmppsApi::Client do
             2.times { client.get(route, cache: true) }
 
             expect(Rails.logger).to have_received(:info)
-              .with(include('event=cache_hit,method=GET,route=/api/some/endpoint'))
+              .with(include('method=GET,route=/api/some/endpoint,event=cache_hit'))
               .once
           end
 
@@ -195,7 +195,7 @@ describe HmppsApi::Client do
             client.get(route, cache: true)
 
             expect(Rails.logger).to have_received(:info)
-              .with(include('event=cache_miss,method=GET,route=/api/some/endpoint'))
+              .with(include('method=GET,route=/api/some/endpoint,event=cache_miss'))
               .once
           end
         end
@@ -212,7 +212,7 @@ describe HmppsApi::Client do
             client.get(route, cache: false)
 
             expect(Rails.logger).to have_received(:info)
-              .with(include('event=cache_disabled,method=GET,route=/api/some/endpoint'))
+              .with(include('method=GET,route=/api/some/endpoint,event=cache_disabled'))
               .once
           end
         end
@@ -310,7 +310,7 @@ describe HmppsApi::Client do
             2.times { client.post(route, request_body, cache: true) }
 
             expect(Rails.logger).to have_received(:info)
-              .with(include('event=cache_hit,method=POST,route=/api/some/endpoint'))
+              .with(include('method=POST,route=/api/some/endpoint,event=cache_hit'))
               .once
           end
 
@@ -320,7 +320,7 @@ describe HmppsApi::Client do
             client.post(route, request_body, cache: true)
 
             expect(Rails.logger).to have_received(:info)
-              .with(include('event=cache_miss,method=POST,route=/api/some/endpoint'))
+              .with(include('method=POST,route=/api/some/endpoint,event=cache_miss'))
               .once
           end
         end
@@ -337,7 +337,7 @@ describe HmppsApi::Client do
             client.post(route, request_body, cache: false)
 
             expect(Rails.logger).to have_received(:info)
-              .with(include('event=cache_disabled,method=POST,route=/api/some/endpoint'))
+              .with(include('method=POST,route=/api/some/endpoint,event=cache_disabled'))
               .once
           end
         end
