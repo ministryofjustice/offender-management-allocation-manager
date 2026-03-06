@@ -3,7 +3,7 @@
 module HmppsApi
   class ResponseCache
     CACHE_EXPIRY = Rails.configuration.cache_expiry
-    CACHE_KEY_VERSION = 2
+    CACHE_VERSION = 2
 
     CachedResponse = Struct.new(:status, :body, keyword_init: true) do
       def to_cache_payload
@@ -47,7 +47,7 @@ module HmppsApi
       # Create a SHA256 hash which uniquely identifies this request
       fingerprint = Digest::SHA256.hexdigest(request_parameters.to_json)
 
-      "hmpps_api_request_v#{CACHE_KEY_VERSION}_#{fingerprint}"
+      "hmpps_api_request_v#{CACHE_VERSION}_#{fingerprint}"
     end
 
     def serialize_for_cache(response)

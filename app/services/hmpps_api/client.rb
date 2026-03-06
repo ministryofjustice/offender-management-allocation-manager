@@ -84,19 +84,21 @@ module HmppsApi
   private
 
     def request(method, route, queryparams: {}, extra_headers: {}, body: nil, cache: false)
+      log_msg = "[#{self.class}] [#{@root}] event=%s,method=#{method.upcase},route=#{route}"
+
       unless cache
-        Rails.logger.info("[#{self.class}] [#{@root}] event=cache_disabled,method=#{method.upcase},route=#{route}")
+        Rails.logger.info(format(log_msg, 'cache_disabled'))
         return send_request(method, route, queryparams:, extra_headers:, body:)
       end
 
       cached_response = response_cache.read(method:, route:, queryparams:, extra_headers:, body:)
 
       if cached_response
-        Rails.logger.info("[#{self.class}] [#{@root}] event=cache_hit,method=#{method.upcase},route=#{route}")
+        Rails.logger.info(format(log_msg, 'cache_hit'))
         return cached_response
       end
 
-      Rails.logger.info("[#{self.class}] [#{@root}] event=cache_miss,method=#{method.upcase},route=#{route}")
+      Rails.logger.info(format(log_msg, 'cache_miss'))
 
       response = send_request(method, route, queryparams:, extra_headers:, body:)
       if cacheable_response?(response)
