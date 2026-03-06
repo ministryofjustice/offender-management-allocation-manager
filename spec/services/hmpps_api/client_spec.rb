@@ -180,11 +180,11 @@ describe HmppsApi::Client do
           end
 
           it 'logs when serving a cached response' do
-            allow(Rails.logger).to receive(:debug)
+            allow(Rails.logger).to receive(:info)
 
             2.times { client.get(route, cache: true) }
 
-            expect(Rails.logger).to have_received(:debug)
+            expect(Rails.logger).to have_received(:info)
               .with(include('event=cache_hit,method=GET,route=/api/some/endpoint'))
               .once
           end
@@ -285,11 +285,11 @@ describe HmppsApi::Client do
           end
 
           it 'logs when serving a cached response' do
-            allow(Rails.logger).to receive(:debug)
+            allow(Rails.logger).to receive(:info)
 
             2.times { client.post(route, request_body, cache: true) }
 
-            expect(Rails.logger).to have_received(:debug)
+            expect(Rails.logger).to have_received(:info)
               .with(include('event=cache_hit,method=POST,route=/api/some/endpoint'))
               .once
           end
