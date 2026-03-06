@@ -14,7 +14,7 @@ config.health_checks = Health.new(timeout_in_seconds_per_check: 2, num_retries_p
     get_response: -> { HmppsApi::Client.new(config.prisoner_search_host).get('/health/ping', cache: false) })
   .add_check(
     name: 'complexityOfNeedApi',
-    get_response: -> { HmppsApi::Client.new(config.complexity_api_host).raw_get('/health/ping') },
+    get_response: -> { HmppsApi::Client.new(config.complexity_api_host).raw_get('/health/ping', cache: false) },
     check_response: ->(response) { response == 'pong' })
   .add_check(
     name: 'dpsFrontendComponentsApi',
@@ -27,7 +27,7 @@ config.health_checks = Health.new(timeout_in_seconds_per_check: 2, num_retries_p
     get_response: -> { HmppsApi::Client.new(config.manage_pom_cases_and_delius_host).get('/health/ping', cache: false) })
   .add_check(
     name: 'hmppsAuth',
-    get_response: -> { HmppsApi::Client.new(config.nomis_oauth_host).raw_get('/auth/ping') },
+    get_response: -> { HmppsApi::Client.new(config.nomis_oauth_host).raw_get('/auth/ping', cache: false) },
     check_response: ->(response) { response == 'pong' })
   .add_check(
     name: 'tieringApi',

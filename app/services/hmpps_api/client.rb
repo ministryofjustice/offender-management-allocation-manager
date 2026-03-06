@@ -27,9 +27,9 @@ module HmppsApi
 
     # Performs a basic GET request without processing the response. This is mostly
     # used for when we do not want a JSON response from an endpoint.
-    def raw_get(route, queryparams: {}, extra_headers: {})
+    def raw_get(route, queryparams: {}, extra_headers: {}, cache: false)
       response = request(
-        :get, route, queryparams: queryparams, extra_headers: extra_headers
+        :get, route, queryparams: queryparams, extra_headers: extra_headers, cache: cache
       )
       response.body
     end
@@ -78,23 +78,36 @@ module HmppsApi
     end
 
     def expire_cache_key(method, route, queryparams: {}, extra_headers: {}, body: nil)
-      key = cache_key(method, route, queryparams:, extra_headers:, body:)
-      Rails.cache.delete(key)
+      response_cache.expire(method:, route:, queryparams:, extra_headers:, body:)
     end
 
   private
 
     def request(method, route, queryparams: {}, extra_headers: {}, body: nil, cache: false)
-      if cache
-        # Cache the request
-        key = cache_key(method, route, queryparams: queryparams, extra_headers: extra_headers, body: body)
-        Rails.cache.fetch(key, expires_in: Rails.configuration.cache_expiry) do
-          send_request(method, route, queryparams: queryparams, extra_headers: extra_headers, body: body)
-        end
-      else
-        # Don't cache the request
-        send_request(method, route, queryparams: queryparams, extra_headers: extra_headers, body: body)
+      log_prefix = "[#{self.class}] [#{@root}] method=#{method.upcase},route=#{route}"
+
+      unless cache
+        Rails.logger.info("#{log_prefix},event=cache_disabled")
+        return send_request(method, route, queryparams:, extra_headers:, body:)
       end
+
+      cached_response = response_cache.read(method:, route:, queryparams:, extra_headers:, body:)
+
+      if cached_response
+        Rails.logger.info("#{log_prefix},event=cache_hit")
+        return cached_response
+      end
+
+      Rails.logger.info("#{log_prefix},event=cache_miss")
+
+      response = send_request(method, route, queryparams:, extra_headers:, body:)
+      if cacheable_response?(response)
+        response_cache.write(
+          method:, route:, queryparams:, extra_headers:, body:, response:
+        )
+      end
+
+      response
     end
 
     def send_request(method, route, queryparams:, extra_headers:, body:)
@@ -116,18 +129,29 @@ module HmppsApi
       raise HmppsApi::Error::Unauthorized, e
     end
 
-    def cache_key(method, route, queryparams:, extra_headers:, body:)
-      # An array of everything that makes this request unique
-      request_parameters = [@root, method, route, queryparams, extra_headers, body]
+    def cacheable_response?(response)
+      return false if response.status == 204
+      return false if empty_response_body?(response)
 
-      # Create a SHA256 hash which uniquely identifies this request
-      fingerprint = Digest::SHA256.hexdigest(request_parameters.to_json)
+      true
+    end
 
-      "hmpps_api_request_#{fingerprint}"
+    def empty_response_body?(response)
+      body = response.body.to_s.strip
+      return true if body.empty?
+
+      parsed = JSON.parse(body)
+      parsed.respond_to?(:empty?) && parsed.empty?
+    rescue JSON::ParserError
+      false
     end
 
     def token
       HmppsApi::Oauth::TokenService.valid_token
+    end
+
+    def response_cache
+      @response_cache ||= HmppsApi::ResponseCache.new(@root)
     end
   end
 end

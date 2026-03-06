@@ -49,6 +49,12 @@ Rails.application.configure do
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
 
+  # Temporary local toggle to reduce noisy SQL logs.
+  if ENV['DISABLE_SQL_LOGGING'] == 'true'
+    config.active_record.logger = nil
+    config.active_record.verbose_query_logs = false
+  end
+
   # Debug mode disables concatenation and preprocessing of assets.
   # This option may cause significant delays in view rendering with a large
   # number of complex assets.
