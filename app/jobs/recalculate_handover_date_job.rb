@@ -92,6 +92,9 @@ private
 
   # TODO: This should probably be a shceduled job - we are effectivly using this like a cron every 2 days
   def assign_com_email(db_offender:, nomis_offender:, case_info:)
+    # There is frequently bad data on staging/dev, thus this check
+    return if case_info.nil? || case_info.crn.blank?
+
     last_com_email = db_offender.email_histories.immediate_community_allocation.last
 
     # send email for the first time, or resend it if we haven't recently
@@ -102,7 +105,7 @@ private
         prison_name: PrisonService.name_for(nomis_offender.prison_id),
         prisoner_name: "#{nomis_offender.first_name} #{nomis_offender.last_name}",
         prisoner_number: nomis_offender.offender_no,
-        crn_number: case_info.crn.presence || 'N/A',
+        crn_number: case_info.crn,
       ).assign_com_less_than_10_months.deliver_later
     end
   end
