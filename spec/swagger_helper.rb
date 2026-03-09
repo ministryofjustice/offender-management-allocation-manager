@@ -62,7 +62,6 @@ RSpec.configure do |config|
                 type: :object,
                 required: %w[
                   nomsNumber
-                  auditEvents
                   calculatedEarlyAllocationStatus
                   calculatedHandoverDate
                   caseInformation
@@ -84,8 +83,6 @@ RSpec.configure do |config|
                         overrideDetail
                         message
                         suitabilityDetail
-                        primaryPomLastName
-                        secondaryPomLastName
                         event
                         eventTrigger
                         primaryPomAllocatedAt
@@ -100,33 +97,12 @@ RSpec.configure do |config|
                         overrideDetail: { type: :string, nullable: true },
                         message: { type: :string, nullable: true },
                         suitabilityDetail: { type: :string, nullable: true },
-                        primaryPomLastName: { type: :string, nullable: true },
-                        secondaryPomLastName: { type: :string, nullable: true },
                         event: { type: :string, nullable: true },
                         eventTrigger: { type: :string, nullable: true },
                         primaryPomAllocatedAt: { type: :string, nullable: true },
                         recommendedPomType: { type: :string, nullable: true },
                         createdAt: { type: :string },
                         updatedAt: { type: :string },
-                      }
-                    }
-                  },
-                  auditEvents: {
-                    type: :array,
-                    items: {
-                      type: :object,
-                      required: %w[
-                        tags
-                        systemEvent
-                        createdAt
-                      ],
-                      properties: {
-                        tags: {
-                          type: :array,
-                          items: { type: :string },
-                        },
-                        systemEvent: { type: :boolean, nullable: true },
-                        createdAt: { type: :string },
                       }
                     }
                   },
