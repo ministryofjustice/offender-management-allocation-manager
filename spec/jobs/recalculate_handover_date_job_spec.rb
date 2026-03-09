@@ -14,7 +14,7 @@ describe RecalculateHandoverDateJob do
     it 'calculates and records the results' do
       created_records = CalculatedHandoverDate.where(nomis_offender_id: offender.nomis_offender_id)
 
-      expect { recaluclate_handover_dates }.to change { created_records.reload.count }.from(0).to(1)
+      expect { recalculate_handover_dates }.to change { created_records.reload.count }.from(0).to(1)
 
       expect(created_records.first.then { [it.responsibility, it.reason] }).to eq(
         [CalculatedHandoverDate::CUSTODY_ONLY, 'determinate']
@@ -32,23 +32,23 @@ describe RecalculateHandoverDateJob do
       record = CalculatedHandoverDate.find_by(nomis_offender_id: offender.nomis_offender_id)
       expect {
         allow(offender).to receive(:attributes_to_archive).and_return({ no: 'change' })
-        recaluclate_handover_dates
+        recalculate_handover_dates
 
         allow(offender).to receive(:attributes_to_archive).and_return({ some: 'change' })
-        recaluclate_handover_dates
+        recalculate_handover_dates
 
         allow(offender).to receive(:attributes_to_archive).and_return({ even: 'more change' })
-        recaluclate_handover_dates
+        recalculate_handover_dates
       }.not_to(change { record.reload.updated_at })
     end
 
     it 'does not emit an audit event' do
-      recaluclate_handover_dates
+      recalculate_handover_dates
       expect(handover_change_event).not_to have_received(:publish)
     end
 
     it 'does not emit an event to NDelius' do
-      recaluclate_handover_dates
+      recalculate_handover_dates
       expect(ndelius_event).not_to have_received(:publish)
     end
   end
@@ -68,7 +68,7 @@ describe RecalculateHandoverDateJob do
     it 'updates the record with the new details' do
       record = CalculatedHandoverDate.find_by(nomis_offender_id: offender.nomis_offender_id)
 
-      expect { recaluclate_handover_dates }.to \
+      expect { recalculate_handover_dates }.to \
         change { [record.reload.responsibility, record.reason, record.last_calculated_at] }
         .from([CalculatedHandoverDate::CUSTODY_ONLY, 'determinate', nil])
         .to([CalculatedHandoverDate::CUSTODY_WITH_COM, 'determinate_short', be_within(1.second).of(Time.zone.now)])
@@ -102,7 +102,7 @@ describe RecalculateHandoverDateJob do
           }
         }
       )
-      recaluclate_handover_dates
+      recalculate_handover_dates
     end
   end
 
@@ -117,7 +117,7 @@ describe RecalculateHandoverDateJob do
 
       it 'emits an event to nDelius to inform it of a new handover date' do
         expect(ndelius_event).to receive(:publish).with(job: 'recalculate_handover_date')
-        recaluclate_handover_dates
+        recalculate_handover_dates
       end
     end
 
@@ -125,7 +125,7 @@ describe RecalculateHandoverDateJob do
       before { the_case_information_is manual_entry: true }
 
       it 'does not emit an event to nDelius' do
-        recaluclate_handover_dates
+        recalculate_handover_dates
         expect(ndelius_event).not_to have_received(:publish)
       end
     end
@@ -141,7 +141,7 @@ describe RecalculateHandoverDateJob do
       before { the_case_information_is com_email: 'com@email.com', com_name: 'COM User' }
 
       it 'does not send an email to the community requesting a supporting COM' do
-        recaluclate_handover_dates
+        recalculate_handover_dates
         expect(request_supporting_com_email).not_to have_received(:deliver_later)
       end
     end
@@ -150,7 +150,7 @@ describe RecalculateHandoverDateJob do
       before { the_case_information_is local_delivery_unit: nil }
 
       it 'does not send an email to the community requesting a supporting COM' do
-        recaluclate_handover_dates
+        recalculate_handover_dates
         expect(request_supporting_com_email).not_to have_received(:deliver_later)
       end
     end
@@ -159,7 +159,7 @@ describe RecalculateHandoverDateJob do
       before { the_case_information_is com_email: nil, com_name: nil, local_delivery_unit: build(:local_delivery_unit, email_address: 'ldu@email.com') }
 
       it 'sends an email to the community to request a supporting COM' do
-        recaluclate_handover_dates
+        recalculate_handover_dates
         expect(request_supporting_com_email).to have_received(:deliver_later)
       end
     end
@@ -179,7 +179,7 @@ describe RecalculateHandoverDateJob do
       before { the_case_information_is local_delivery_unit: nil }
 
       it 'does not the assign COM email' do
-        recaluclate_handover_dates
+        recalculate_handover_dates
         expect(assign_com_email).not_to have_received(:deliver_later)
       end
     end
@@ -188,7 +188,7 @@ describe RecalculateHandoverDateJob do
       before { the_case_information_is com_email: 'com@email.com', com_name: 'COM User' }
 
       it 'does not the assign COM email' do
-        recaluclate_handover_dates
+        recalculate_handover_dates
         expect(assign_com_email).not_to have_received(:deliver_later)
       end
     end
@@ -197,7 +197,7 @@ describe RecalculateHandoverDateJob do
       before { create(:email_history, :immediate_community_allocation, nomis_offender_id: offender.nomis_offender_id) }
 
       it 'does not the assign COM email' do
-        recaluclate_handover_dates
+        recalculate_handover_dates
         expect(assign_com_email).not_to have_received(:deliver_later)
       end
     end
@@ -206,7 +206,7 @@ describe RecalculateHandoverDateJob do
       before { the_case_information_is com_email: nil, com_name: nil, local_delivery_unit: build(:local_delivery_unit, email_address: 'ldu@email.com') }
 
       it 'sends the assign COM email' do
-        recaluclate_handover_dates
+        recalculate_handover_dates
         expect(assign_com_email).to have_received(:deliver_later)
       end
     end
@@ -216,21 +216,39 @@ describe RecalculateHandoverDateJob do
     before { allow(offender).to receive(:inside_omic_policy?) }
 
     it 'does not send any emails' do
-      recaluclate_handover_dates
+      recalculate_handover_dates
       expect(request_supporting_com_email).not_to have_received(:deliver_later)
       expect(assign_com_email).not_to have_received(:deliver_later)
     end
 
     it 'does not emit any events' do
-      recaluclate_handover_dates
+      recalculate_handover_dates
       expect(ndelius_event).not_to have_received(:publish)
       expect(handover_change_event).not_to have_received(:publish)
     end
 
     it 'does not change any records' do
-      expect { recaluclate_handover_dates }.not_to(
+      expect { recalculate_handover_dates }.not_to(
         change { CalculatedHandoverDate.find_by(nomis_offender_id: offender.nomis_offender_id)&.updated_at }
       )
+    end
+  end
+
+  context 'when offender details are valid but case info is unusable for COM assignment' do
+    it 'does not send an assign COM email if case info is nil' do
+      described_class.new.send(
+        :assign_com_email, db_offender: double, nomis_offender: double, case_info: nil
+      )
+
+      expect(assign_com_email).not_to have_received(:deliver_later)
+    end
+
+    it 'does not send an assign COM email if case info CRN is blank' do
+      described_class.new.send(
+        :assign_com_email, db_offender: double, nomis_offender: double, case_info: double(crn: nil)
+      )
+
+      expect(assign_com_email).not_to have_received(:deliver_later)
     end
   end
 
@@ -247,7 +265,7 @@ describe RecalculateHandoverDateJob do
     CaseInformation.find_by(nomis_offender_id: offender.nomis_offender_id).update!(args)
   end
 
-  def recaluclate_handover_dates
+  def recalculate_handover_dates
     described_class.new.perform(offender.nomis_offender_id)
   end
 
