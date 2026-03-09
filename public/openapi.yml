@@ -76,8 +76,6 @@ components:
                 - overrideDetail
                 - message
                 - suitabilityDetail
-                - primaryPomLastName
-                - secondaryPomLastName
                 - event
                 - eventTrigger
                 - primaryPomAllocatedAt
@@ -101,12 +99,6 @@ components:
                     type: string
                     nullable: true
                   suitabilityDetail:
-                    type: string
-                    nullable: true
-                  primaryPomLastName:
-                    type: string
-                    nullable: true
-                  secondaryPomLastName:
                     type: string
                     nullable: true
                   event:

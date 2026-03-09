@@ -195,14 +195,6 @@ RSpec.describe SarOffenderDataService do
             expect(presented_allocation.keys).not_to include('secondaryPomName')
           end
 
-          it 'returns the primary POM last name' do
-            expect(presented_allocation['primaryPomLastName']).to eq('OLD_NAME')
-          end
-
-          it 'returns the secondary POM last name' do
-            expect(presented_allocation['secondaryPomLastName']).to eq('SEC_SURNAME')
-          end
-
           it 'humanizes event and event_trigger' do
             expect(presented_allocation['event']).to eq('Allocate primary POM')
             expect(presented_allocation['eventTrigger']).to eq('User')

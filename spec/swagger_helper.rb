@@ -84,8 +84,6 @@ RSpec.configure do |config|
                         overrideDetail
                         message
                         suitabilityDetail
-                        primaryPomLastName
-                        secondaryPomLastName
                         event
                         eventTrigger
                         primaryPomAllocatedAt
@@ -100,8 +98,6 @@ RSpec.configure do |config|
                         overrideDetail: { type: :string, nullable: true },
                         message: { type: :string, nullable: true },
                         suitabilityDetail: { type: :string, nullable: true },
-                        primaryPomLastName: { type: :string, nullable: true },
-                        secondaryPomLastName: { type: :string, nullable: true },
                         event: { type: :string, nullable: true },
                         eventTrigger: { type: :string, nullable: true },
                         primaryPomAllocatedAt: { type: :string, nullable: true },
