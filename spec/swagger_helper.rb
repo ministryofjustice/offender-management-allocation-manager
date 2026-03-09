@@ -62,7 +62,6 @@ RSpec.configure do |config|
                 type: :object,
                 required: %w[
                   nomsNumber
-                  auditEvents
                   calculatedEarlyAllocationStatus
                   calculatedHandoverDate
                   caseInformation
@@ -104,25 +103,6 @@ RSpec.configure do |config|
                         recommendedPomType: { type: :string, nullable: true },
                         createdAt: { type: :string },
                         updatedAt: { type: :string },
-                      }
-                    }
-                  },
-                  auditEvents: {
-                    type: :array,
-                    items: {
-                      type: :object,
-                      required: %w[
-                        tags
-                        systemEvent
-                        createdAt
-                      ],
-                      properties: {
-                        tags: {
-                          type: :array,
-                          items: { type: :string },
-                        },
-                        systemEvent: { type: :boolean, nullable: true },
-                        createdAt: { type: :string },
                       }
                     }
                   },

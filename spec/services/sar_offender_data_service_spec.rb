@@ -20,7 +20,6 @@ RSpec.describe SarOffenderDataService do
     context 'with matching offender record' do
       before do
         create_historic(:offender, nomis_offender_id, offset: 7.days)
-        create_historic_list(:audit_event, nomis_offender_id)
         create_historic(:calculated_early_allocation_status, nomis_offender_id)
         create_historic(:calculated_handover_date, nomis_offender_id, reason: 'immigration_case', responsibility: 'CustodyWithCom')
         create_historic(:case_information, nomis_offender_id, local_delivery_unit: build(:local_delivery_unit, name: 'Leeds'))
@@ -59,7 +58,6 @@ RSpec.describe SarOffenderDataService do
 
         it 'returns all has_many data' do
           expect(result[:allocationHistory].size).to eq(HISTORY_SIZE)
-          expect(result[:auditEvents].size).to eq(HISTORY_SIZE + 1) # +1 as `let!(:allocation)` adds an extra audit record
           expect(result[:earlyAllocations].size).to eq(HISTORY_SIZE)
           expect(result[:offenderEmailSent].size).to eq(HISTORY_SIZE)
         end
@@ -170,7 +168,6 @@ RSpec.describe SarOffenderDataService do
         # Return     ..................x..x..x.........
         describe 'event-based records (all are has_many)' do
           %i[
-            auditEvents
             offenderEmailSent
             earlyAllocations
           ].each do |key|
@@ -244,14 +241,6 @@ RSpec.describe SarOffenderDataService do
 
           it 'returns the responsibility string' do
             expect(calculated_handover_date['responsibility']).to eq('POM')
-          end
-        end
-
-        context 'with audit event' do
-          let(:audit_event) { result[:auditEvents].last }
-
-          it 'omits some attributes' do
-            expect(audit_event.keys).not_to include('data')
           end
         end
 
