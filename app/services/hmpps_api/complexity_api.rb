@@ -15,12 +15,12 @@ module HmppsApi
 
       def save(offender_no, level:, username:, reason:)
         route = "/complexity-of-need/offender-no/#{offender_no}"
-        client.post route, { level: level, sourceUser: username, notes: reason }, cache: false
+        client.post route, { level: level, sourceUser: username, notes: reason }
       end
 
       def get_complexities(offender_nos)
         route = '/complexity-of-need/multiple/offender-no'
-        result = client.post route, offender_nos, cache: false
+        result = client.post route, offender_nos
         result.map { |complexity| [complexity.fetch('offenderNo'), complexity.fetch('level')] }.to_h
       end
 
@@ -41,13 +41,11 @@ module HmppsApi
       end
 
       def inactivate(offender_no)
-        route = "/complexity-of-need/offender-no/#{offender_no}/inactivate"
-
-        begin
-          client.put route, { cache: false }
-        rescue Faraday::ResourceNotFound
-          nil
-        end
+        client.put(
+          "/complexity-of-need/offender-no/#{offender_no}/inactivate", {}
+        )
+      rescue Faraday::ResourceNotFound
+        nil
       end
 
     private

@@ -104,6 +104,40 @@ describe HmppsApi::Client do
       end
     end
 
+    def perform_cached_request(http_method, route, request_body = nil)
+      case http_method
+      when :get
+        client.get(route, cache: true)
+      when :post
+        client.post(route, request_body, cache: true)
+      when :put
+        client.put(route, request_body)
+      else
+        raise ArgumentError, "Unsupported method: #{http_method}"
+      end
+    end
+
+    shared_examples 'does not cache empty-like response' do
+      before do
+        WebMock.reset!
+        WebMock.stub_request(http_method, stub_url)
+               .to_return(status: empty_status, body: empty_body, headers: empty_headers)
+      end
+
+      it 'does not cache the response' do
+        3.times do
+          if expect_parse_error
+            expect { perform_cached_request(http_method, route, request_body) }
+              .to raise_error(JSON::ParserError)
+          else
+            perform_cached_request(http_method, route, request_body)
+          end
+        end
+
+        expect(a_request(http_method, stub_url)).to have_been_made.times(3)
+      end
+    end
+
     describe '#get' do
       let(:response) do
         client.get(route)
@@ -144,6 +178,26 @@ describe HmppsApi::Client do
             5.times { client.get(route, cache: true) }
             expect(a_request(:get, stub_url)).to have_been_made.once
           end
+
+          it 'logs when serving a cached response' do
+            allow(Rails.logger).to receive(:info)
+
+            2.times { client.get(route, cache: true) }
+
+            expect(Rails.logger).to have_received(:info)
+              .with(include('method=GET,route=/api/some/endpoint,event=cache_hit'))
+              .once
+          end
+
+          it 'logs a cache miss before writing to cache' do
+            allow(Rails.logger).to receive(:info)
+
+            client.get(route, cache: true)
+
+            expect(Rails.logger).to have_received(:info)
+              .with(include('method=GET,route=/api/some/endpoint,event=cache_miss'))
+              .once
+          end
         end
 
         context 'with cache: false' do
@@ -151,6 +205,49 @@ describe HmppsApi::Client do
             5.times { client.get(route, cache: false) }
             expect(a_request(:get, stub_url)).to have_been_made.times(5)
           end
+
+          it 'logs when cache is disabled' do
+            allow(Rails.logger).to receive(:info)
+
+            client.get(route, cache: false)
+
+            expect(Rails.logger).to have_received(:info)
+              .with(include('method=GET,route=/api/some/endpoint,event=cache_disabled'))
+              .once
+          end
+        end
+
+        context 'when the response is 204' do
+          let(:http_method) { :get }
+          let(:empty_status) { 204 }
+          let(:empty_body) { '' }
+          let(:empty_headers) { {} }
+          let(:expect_parse_error) { false }
+          let(:request_body) { nil }
+
+          include_examples 'does not cache empty-like response'
+        end
+
+        context 'when the response JSON is empty' do
+          let(:http_method) { :get }
+          let(:empty_status) { 200 }
+          let(:empty_body) { '[]' }
+          let(:empty_headers) { { 'Content-Type' => 'application/json' } }
+          let(:expect_parse_error) { false }
+          let(:request_body) { nil }
+
+          include_examples 'does not cache empty-like response'
+        end
+
+        context 'when the response body is blank non-JSON' do
+          let(:http_method) { :get }
+          let(:empty_status) { 200 }
+          let(:empty_body) { " \n\t" }
+          let(:empty_headers) { { 'Content-Type' => 'text/plain' } }
+          let(:expect_parse_error) { true }
+          let(:request_body) { nil }
+
+          include_examples 'does not cache empty-like response'
         end
       end
     end
@@ -206,6 +303,26 @@ describe HmppsApi::Client do
             5.times { client.post(route, request_body, cache: true) }
             expect(a_request(:post, stub_url)).to have_been_made.once
           end
+
+          it 'logs when serving a cached response' do
+            allow(Rails.logger).to receive(:info)
+
+            2.times { client.post(route, request_body, cache: true) }
+
+            expect(Rails.logger).to have_received(:info)
+              .with(include('method=POST,route=/api/some/endpoint,event=cache_hit'))
+              .once
+          end
+
+          it 'logs a cache miss before writing to cache' do
+            allow(Rails.logger).to receive(:info)
+
+            client.post(route, request_body, cache: true)
+
+            expect(Rails.logger).to have_received(:info)
+              .with(include('method=POST,route=/api/some/endpoint,event=cache_miss'))
+              .once
+          end
         end
 
         context 'with cache: false' do
@@ -213,6 +330,46 @@ describe HmppsApi::Client do
             5.times { client.post(route, request_body, cache: false) }
             expect(a_request(:post, stub_url)).to have_been_made.times(5)
           end
+
+          it 'logs when cache is disabled' do
+            allow(Rails.logger).to receive(:info)
+
+            client.post(route, request_body, cache: false)
+
+            expect(Rails.logger).to have_received(:info)
+              .with(include('method=POST,route=/api/some/endpoint,event=cache_disabled'))
+              .once
+          end
+        end
+
+        context 'when the response is 204' do
+          let(:http_method) { :post }
+          let(:empty_status) { 204 }
+          let(:empty_body) { '' }
+          let(:empty_headers) { {} }
+          let(:expect_parse_error) { true }
+
+          include_examples 'does not cache empty-like response'
+        end
+
+        context 'when the response JSON is empty' do
+          let(:http_method) { :post }
+          let(:empty_status) { 200 }
+          let(:empty_body) { '{}' }
+          let(:empty_headers) { { 'Content-Type' => 'application/json' } }
+          let(:expect_parse_error) { false }
+
+          include_examples 'does not cache empty-like response'
+        end
+
+        context 'when the response body is blank non-JSON' do
+          let(:http_method) { :post }
+          let(:empty_status) { 200 }
+          let(:empty_body) { " \n\t" }
+          let(:empty_headers) { { 'Content-Type' => 'text/plain' } }
+          let(:expect_parse_error) { true }
+
+          include_examples 'does not cache empty-like response'
         end
       end
     end
@@ -247,6 +404,43 @@ describe HmppsApi::Client do
       end
 
       include_examples 'handles JSON response'
+
+      describe 'request caching' do
+        let(:memory_store) { ActiveSupport::Cache.lookup_store(:memory_store) }
+
+        before do
+          allow(Rails).to receive(:cache).and_return(memory_store)
+          Rails.cache.clear
+          WebMock.reset_executed_requests!
+        end
+
+        context 'with a non-empty response' do
+          it 'does not cache responses' do
+            3.times { client.put(route, request_body) }
+            expect(a_request(:put, stub_url)).to have_been_made.times(3)
+          end
+        end
+
+        context 'with an empty response' do
+          let(:http_method) { :put }
+          let(:empty_status) { 200 }
+          let(:empty_body) { '{}' }
+          let(:empty_headers) { { 'Content-Type' => 'application/json' } }
+          let(:expect_parse_error) { false }
+
+          include_examples 'does not cache empty-like response'
+        end
+
+        context 'with a blank non-JSON response' do
+          let(:http_method) { :put }
+          let(:empty_status) { 200 }
+          let(:empty_body) { " \n\t" }
+          let(:empty_headers) { { 'Content-Type' => 'text/plain' } }
+          let(:expect_parse_error) { true }
+
+          include_examples 'does not cache empty-like response'
+        end
+      end
     end
 
     describe '#delete' do
@@ -397,6 +591,84 @@ describe HmppsApi::Client do
       # Next request should hit the API again
       client.get(route)
       expect(a_request(:get, stub_url)).to have_been_made.twice
+    end
+  end
+
+  describe '#cacheable_response?' do
+    subject(:cacheable_response) { client.send(:cacheable_response?, response) }
+
+    shared_examples 'is cacheable' do
+      it { is_expected.to be(true) }
+    end
+
+    shared_examples 'is not cacheable' do
+      it { is_expected.to be(false) }
+    end
+
+    context 'when status is 204' do
+      let(:response) do
+        instance_double(Faraday::Response,
+                        status: 204,
+                        body: '{"key":"value"}',
+                        headers: { 'content-type' => 'application/json' })
+      end
+
+      include_examples 'is not cacheable'
+    end
+
+    context 'when body is blank whitespace' do
+      let(:response) do
+        instance_double(Faraday::Response,
+                        status: 200,
+                        body: " \n\t",
+                        headers: { 'content-type' => 'text/plain' })
+      end
+
+      include_examples 'is not cacheable'
+    end
+
+    context 'when JSON body is an empty object' do
+      let(:response) do
+        instance_double(Faraday::Response,
+                        status: 200,
+                        body: '{}',
+                        headers: { 'content-type' => 'application/json' })
+      end
+
+      include_examples 'is not cacheable'
+    end
+
+    context 'when JSON body is an empty array' do
+      let(:response) do
+        instance_double(Faraday::Response,
+                        status: 200,
+                        body: '[]',
+                        headers: { 'content-type' => 'application/json' })
+      end
+
+      include_examples 'is not cacheable'
+    end
+
+    context 'when JSON body is non-empty' do
+      let(:response) do
+        instance_double(Faraday::Response,
+                        status: 200,
+                        body: '{"key":"value"}',
+                        headers: { 'content-type' => 'application/json' })
+      end
+
+      include_examples 'is cacheable'
+    end
+
+    context 'when non-JSON body is non-empty' do
+      let(:response) do
+        instance_double(Faraday::Response,
+                        status: 200,
+                        body: 'ok',
+                        headers: { 'content-type' => 'text/plain' })
+      end
+
+      include_examples 'is cacheable'
     end
   end
 end
