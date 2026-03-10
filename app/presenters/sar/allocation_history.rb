@@ -14,7 +14,7 @@ module Sar
       end
 
       def humanized_attributes
-        [:event, :event_trigger]
+        [:event, :event_trigger, :recommended_pom_type]
       end
 
       def additional_methods

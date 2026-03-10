@@ -25,7 +25,6 @@ private
       caseInformation: by_offender_id(CaseInformation, :state).first,
       earlyAllocations: by_offender_id(EarlyAllocation, :event),
       handoverProgressChecklist: by_offender_id(HandoverProgressChecklist, :state).first,
-      offenderEmailSent: by_offender_id(OffenderEmailSent, :event),
       responsibility: by_offender_id(Responsibility, :state).first,
     }
   end
