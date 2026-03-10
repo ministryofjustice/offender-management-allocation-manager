@@ -36,7 +36,8 @@ RSpec.describe SarOffenderDataService do
       let!(:allocation) do
         create(
           :allocation_history, :override, prison: 'LEI', nomis_offender_id: nomis_offender_id,
-                                          primary_pom_name: 'OLD_NAME, MOIC', secondary_pom_name: 'SEC_SURNAME, POM'
+                                          primary_pom_name: 'OLD_NAME, MOIC', secondary_pom_name: 'SEC_SURNAME, POM',
+                                          recommended_pom_type: 'prison'
         )
       end
 
@@ -59,7 +60,6 @@ RSpec.describe SarOffenderDataService do
         it 'returns all has_many data' do
           expect(result[:allocationHistory].size).to eq(HISTORY_SIZE)
           expect(result[:earlyAllocations].size).to eq(HISTORY_SIZE)
-          expect(result[:offenderEmailSent].size).to eq(HISTORY_SIZE)
         end
 
         it 'returns all has_one data' do
@@ -168,7 +168,6 @@ RSpec.describe SarOffenderDataService do
         # Return     ..................x..x..x.........
         describe 'event-based records (all are has_many)' do
           %i[
-            offenderEmailSent
             earlyAllocations
           ].each do |key|
             it "returns records within the range for #{key}" do
@@ -192,9 +191,10 @@ RSpec.describe SarOffenderDataService do
             expect(presented_allocation.keys).not_to include('secondaryPomName')
           end
 
-          it 'humanizes event and event_trigger' do
+          it 'humanizes certain attributes' do
             expect(presented_allocation['event']).to eq('Allocate primary POM')
             expect(presented_allocation['eventTrigger']).to eq('User')
+            expect(presented_allocation['recommendedPomType']).to eq('Prison POM')
           end
 
           it 'humanizes override reasons' do
@@ -249,14 +249,6 @@ RSpec.describe SarOffenderDataService do
 
           it 'humanizes outcome' do
             expect(early_allocation['outcome']).to eq('Eligible')
-          end
-        end
-
-        context 'with offender email sent' do
-          let(:offender_email_sent) { result[:offenderEmailSent].last }
-
-          it 'humanizes offender email type' do
-            expect(offender_email_sent['offenderEmailType']).to eq('Handover date')
           end
         end
 

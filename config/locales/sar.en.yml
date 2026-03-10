@@ -12,3 +12,6 @@ en:
       deallocate_primary_pom: Deallocate primary POM
       deallocate_secondary_pom: Deallocate secondary POM
       deallocate_released_offender: Deallocate released offender
+    recommended_pom_type:
+      prison: Prison POM
+      probation: Probation POM

@@ -24,6 +24,7 @@ components:
       example: G0862VO
     Status:
       type: object
+      additionalProperties: false
       properties:
         status:
           type: string
@@ -36,6 +37,7 @@ components:
       - status
       - userMessage
       type: object
+      additionalProperties: false
       properties:
         developerMessage:
           type: string
@@ -45,21 +47,290 @@ components:
           type: integer
         userMessage:
           type: string
+    SarAllocationHistoryItem:
+      type: object
+      additionalProperties: false
+      required:
+      - allocatedAtRosh
+      - allocatedAtTier
+      - createdAt
+      - event
+      - eventTrigger
+      - message
+      - overrideDetail
+      - overrideReasons
+      - primaryPomAllocatedAt
+      - prison
+      - recommendedPomType
+      - suitabilityDetail
+      - updatedAt
+      properties:
+        allocatedAtRosh:
+          type: string
+          nullable: true
+        allocatedAtTier:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        event:
+          type: string
+          nullable: true
+        eventTrigger:
+          type: string
+          nullable: true
+        message:
+          type: string
+          nullable: true
+        overrideDetail:
+          type: string
+          nullable: true
+        overrideReasons:
+          type: string
+          nullable: true
+        primaryPomAllocatedAt:
+          type: string
+          nullable: true
+        prison:
+          type: string
+          nullable: true
+        recommendedPomType:
+          type: string
+          nullable: true
+        suitabilityDetail:
+          type: string
+          nullable: true
+        updatedAt:
+          type: string
+    SarCalculatedEarlyAllocationStatus:
+      type: object
+      nullable: true
+      additionalProperties: false
+      required:
+      - eligible
+      - createdAt
+      - updatedAt
+      properties:
+        eligible:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    SarCalculatedHandoverDate:
+      type: object
+      nullable: true
+      additionalProperties: false
+      required:
+      - startDate
+      - handoverDate
+      - responsibility
+      - lastCalculatedAt
+      - reason
+      - createdAt
+      - updatedAt
+      properties:
+        startDate:
+          type: string
+          nullable: true
+        handoverDate:
+          type: string
+          nullable: true
+        responsibility:
+          type: string
+        lastCalculatedAt:
+          type: string
+          nullable: true
+        reason:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    SarCaseInformation:
+      type: object
+      nullable: true
+      additionalProperties: false
+      required:
+      - tier
+      - mappaLevel
+      - manualEntry
+      - probationService
+      - teamName
+      - localDeliveryUnit
+      - activeVlo
+      - enhancedResourcing
+      - roshLevel
+      - createdAt
+      - updatedAt
+      properties:
+        tier:
+          type: string
+          nullable: true
+        mappaLevel:
+          type: integer
+          nullable: true
+        manualEntry:
+          type: boolean
+        probationService:
+          type: string
+          nullable: true
+        teamName:
+          type: string
+          nullable: true
+        localDeliveryUnit:
+          type: string
+          nullable: true
+        activeVlo:
+          type: boolean
+        enhancedResourcing:
+          type: boolean
+          nullable: true
+        roshLevel:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    SarEarlyAllocationItem:
+      type: object
+      additionalProperties: false
+      required:
+      - oasysRiskAssessmentDate
+      - convictedUnderTerrorisomAct2000
+      - highProfile
+      - seriousCrimePreventionOrder
+      - mappaLevel3
+      - cppcCase
+      - highRiskOfSeriousHarm
+      - mappaLevel2
+      - pathfinderProcess
+      - otherReason
+      - extremismSeparation
+      - dueForReleaseInLessThan24months
+      - approved
+      - reason
+      - communityDecision
+      - prison
+      - createdWithinReferralWindow
+      - outcome
+      - createdAt
+      - updatedAt
+      properties:
+        oasysRiskAssessmentDate:
+          type: string
+        convictedUnderTerrorisomAct2000:
+          type: boolean
+        highProfile:
+          type: boolean
+        seriousCrimePreventionOrder:
+          type: boolean
+        mappaLevel3:
+          type: boolean
+        cppcCase:
+          type: boolean
+        highRiskOfSeriousHarm:
+          type: boolean
+          nullable: true
+        mappaLevel2:
+          type: boolean
+          nullable: true
+        pathfinderProcess:
+          type: boolean
+          nullable: true
+        otherReason:
+          type: boolean
+          nullable: true
+        extremismSeparation:
+          type: boolean
+          nullable: true
+        dueForReleaseInLessThan24months:
+          type: boolean
+          nullable: true
+        approved:
+          type: boolean
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        communityDecision:
+          type: boolean
+          nullable: true
+        prison:
+          type: string
+          nullable: true
+        createdWithinReferralWindow:
+          type: boolean
+        outcome:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    SarHandoverProgressChecklist:
+      type: object
+      nullable: true
+      additionalProperties: false
+      required:
+      - reviewedOasys
+      - contactedCom
+      - attendedHandoverMeeting
+      - sentHandoverReport
+      - createdAt
+      - updatedAt
+      properties:
+        reviewedOasys:
+          type: boolean
+        contactedCom:
+          type: boolean
+        attendedHandoverMeeting:
+          type: boolean
+        sentHandoverReport:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    SarResponsibility:
+      type: object
+      nullable: true
+      additionalProperties: false
+      required:
+      - reason
+      - reasonText
+      - value
+      - createdAt
+      - updatedAt
+      properties:
+        reason:
+          type: string
+        reasonText:
+          type: string
+          nullable: true
+        value:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
     SarOffenderData:
       required:
       - content
       type: object
+      additionalProperties: false
       properties:
         content:
           type: object
+          additionalProperties: false
           required:
           - nomsNumber
+          - allocationHistory
           - calculatedEarlyAllocationStatus
           - calculatedHandoverDate
           - caseInformation
           - earlyAllocations
           - handoverProgressChecklist
-          - offenderEmailSent
           - responsibility
           properties:
             nomsNumber:
@@ -67,274 +338,21 @@ components:
             allocationHistory:
               type: array
               items:
-                type: object
-                required:
-                - prison
-                - allocatedAtTier
-                - overrideReasons
-                - overrideDetail
-                - message
-                - suitabilityDetail
-                - event
-                - eventTrigger
-                - primaryPomAllocatedAt
-                - recommendedPomType
-                - createdAt
-                - updatedAt
-                properties:
-                  prison:
-                    type: string
-                    nullable: true
-                  allocatedAtTier:
-                    type: string
-                    nullable: true
-                  overrideReasons:
-                    type: string
-                    nullable: true
-                  overrideDetail:
-                    type: string
-                    nullable: true
-                  message:
-                    type: string
-                    nullable: true
-                  suitabilityDetail:
-                    type: string
-                    nullable: true
-                  event:
-                    type: string
-                    nullable: true
-                  eventTrigger:
-                    type: string
-                    nullable: true
-                  primaryPomAllocatedAt:
-                    type: string
-                    nullable: true
-                  recommendedPomType:
-                    type: string
-                    nullable: true
-                  createdAt:
-                    type: string
-                  updatedAt:
-                    type: string
+                "$ref": "#/components/schemas/SarAllocationHistoryItem"
             calculatedEarlyAllocationStatus:
-              type: object
-              nullable: true
-              required:
-              - eligible
-              - createdAt
-              - updatedAt
-              properties:
-                eligible:
-                  type: boolean
-                createdAt:
-                  type: string
-                updatedAt:
-                  type: string
+              "$ref": "#/components/schemas/SarCalculatedEarlyAllocationStatus"
             calculatedHandoverDate:
-              type: object
-              nullable: true
-              required:
-              - startDate
-              - handoverDate
-              - responsibility
-              - lastCalculatedAt
-              - reason
-              - createdAt
-              - updatedAt
-              properties:
-                startDate:
-                  type: string
-                  nullable: true
-                handoverDate:
-                  type: string
-                  nullable: true
-                responsibility:
-                  type: string
-                lastCalculatedAt:
-                  type: string
-                  nullable: true
-                reason:
-                  type: string
-                createdAt:
-                  type: string
-                updatedAt:
-                  type: string
+              "$ref": "#/components/schemas/SarCalculatedHandoverDate"
             caseInformation:
-              type: object
-              nullable: true
-              required:
-              - tier
-              - mappaLevel
-              - manualEntry
-              - probationService
-              - teamName
-              - localDeliveryUnit
-              - activeVlo
-              - enhancedResourcing
-              - createdAt
-              - updatedAt
-              properties:
-                tier:
-                  type: string
-                  nullable: true
-                mappaLevel:
-                  type: integer
-                  nullable: true
-                manualEntry:
-                  type: boolean
-                probationService:
-                  type: string
-                  nullable: true
-                teamName:
-                  type: string
-                  nullable: true
-                localDeliveryUnit:
-                  type: string
-                  nullable: true
-                activeVlo:
-                  type: boolean
-                enhancedResourcing:
-                  type: boolean
-                  nullable: true
-                createdAt:
-                  type: string
-                updatedAt:
-                  type: string
+              "$ref": "#/components/schemas/SarCaseInformation"
             earlyAllocations:
               type: array
               items:
-                type: object
-                required:
-                - oasysRiskAssessmentDate
-                - convictedUnderTerrorisomAct2000
-                - highProfile
-                - seriousCrimePreventionOrder
-                - mappaLevel3
-                - cppcCase
-                - highRiskOfSeriousHarm
-                - mappaLevel2
-                - pathfinderProcess
-                - otherReason
-                - extremismSeparation
-                - dueForReleaseInLessThan24months
-                - approved
-                - reason
-                - communityDecision
-                - prison
-                - createdWithinReferralWindow
-                - outcome
-                - createdAt
-                - updatedAt
-                properties:
-                  oasysRiskAssessmentDate:
-                    type: string
-                  convictedUnderTerrorisomAct2000:
-                    type: boolean
-                  highProfile:
-                    type: boolean
-                  seriousCrimePreventionOrder:
-                    type: boolean
-                  mappaLevel3:
-                    type: boolean
-                  cppcCase:
-                    type: boolean
-                  highRiskOfSeriousHarm:
-                    type: boolean
-                    nullable: true
-                  mappaLevel2:
-                    type: boolean
-                    nullable: true
-                  pathfinderProcess:
-                    type: boolean
-                    nullable: true
-                  otherReason:
-                    type: boolean
-                    nullable: true
-                  extremismSeparation:
-                    type: boolean
-                    nullable: true
-                  dueForReleaseInLessThan24months:
-                    type: boolean
-                    nullable: true
-                  approved:
-                    type: boolean
-                    nullable: true
-                  reason:
-                    type: string
-                    nullable: true
-                  communityDecision:
-                    type: boolean
-                    nullable: true
-                  prison:
-                    type: string
-                    nullable: true
-                  createdWithinReferralWindow:
-                    type: boolean
-                  outcome:
-                    type: string
-                  createdAt:
-                    type: string
-                  updatedAt:
-                    type: string
+                "$ref": "#/components/schemas/SarEarlyAllocationItem"
             handoverProgressChecklist:
-              type: object
-              nullable: true
-              required:
-              - reviewedOasys
-              - contactedCom
-              - attendedHandoverMeeting
-              - sentHandoverReport
-              - createdAt
-              - updatedAt
-              properties:
-                reviewedOasys:
-                  type: boolean
-                contactedCom:
-                  type: boolean
-                attendedHandoverMeeting:
-                  type: boolean
-                sentHandoverReport:
-                  type: boolean
-                createdAt:
-                  type: string
-                updatedAt:
-                  type: string
-            offenderEmailSent:
-              type: array
-              items:
-                type: object
-                required:
-                - offenderEmailType
-                - createdAt
-                - updatedAt
-                properties:
-                  offenderEmailType:
-                    type: string
-                  createdAt:
-                    type: string
-                  updatedAt:
-                    type: string
+              "$ref": "#/components/schemas/SarHandoverProgressChecklist"
             responsibility:
-              type: object
-              nullable: true
-              required:
-              - reason
-              - reasonText
-              - value
-              - createdAt
-              - updatedAt
-              properties:
-                reason:
-                  type: string
-                reasonText:
-                  type: string
-                  nullable: true
-                value:
-                  type: string
-                createdAt:
-                  type: string
-                updatedAt:
-                  type: string
+              "$ref": "#/components/schemas/SarResponsibility"
 paths:
   "/api/allocation/{nomsNumber}":
     get:
