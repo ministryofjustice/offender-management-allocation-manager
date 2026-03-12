@@ -21,30 +21,19 @@ spec:
         app: offender-management-jobs-processor
     spec:
       serviceAccountName: {{ index .Values "generic-service" "serviceAccountName" }}
+      terminationGracePeriodSeconds: 25
       containers:
       - name: worker
         image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
         imagePullPolicy: Always
         securityContext:
           {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
-        command: ["./sidekiq.sh", "start"]
+        command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
           {{- include "moic-helpers.envs" . | nindent 8 }}
-        readinessProbe:
-          exec:
-            command: ["./sidekiq.sh", "probe"]
-          initialDelaySeconds: 30
-          periodSeconds: 60
-          timeoutSeconds: 5
-        livenessProbe:
-          exec:
-            command: ["./sidekiq.sh", "probe"]
-          initialDelaySeconds: 45
-          periodSeconds: 60
-          timeoutSeconds: 5
         lifecycle:
           preStop:
             exec:
-              command: ["./sidekiq.sh", "stop"]
+              command: ["sh", "-c", "kill -TSTP 1 && sleep 10"]
         resources:
           limits:
             memory: 2Gi

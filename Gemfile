@@ -69,7 +69,7 @@ gem 'veracode'
 
 group :development, :test do
   gem 'brakeman', '~> 6.0'
-  gem 'byebug', platforms: %i[mri mingw x64_mingw]
+  gem 'debug'
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
   gem 'parallel_tests'
@@ -110,5 +110,3 @@ group :development do
   gem 'rack-mini-profiler'
   gem 'spring-watcher-listen', '~> 2.1.0'
 end
-
-gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]

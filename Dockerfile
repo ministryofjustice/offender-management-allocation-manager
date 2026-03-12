@@ -1,102 +1,73 @@
-FROM ruby:3.4.5-slim-bookworm
+FROM ruby:3.4.9-alpine3.23 AS base
 
-# Incremenent to bust Docker layer cache
+# Increment to bust Docker layer cache
 ENV DOCKER_CACHE_BUSTER=1
 
-ARG BUILD_NUMBER
-ARG GIT_REF
-ARG GIT_BRANCH
-
-RUN mkdir -p /home/appuser && \
-  useradd appuser -u 1001 --user-group --home /home/appuser && \
-  chown -R appuser:appuser /home/appuser
-
-RUN \
-  set -ex \
-  && mkdir -p /etc/apt/keyrings \
-  && apt-get update \
-  && apt-get full-upgrade -y --no-install-recommends \
-  && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends locales \
-  && sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen \
-  && dpkg-reconfigure --frontend=noninteractive locales \
-  && update-locale LANG=en_GB.UTF-8 \
-  && apt-get clean
-
 ENV \
-  LANG=en_GB.UTF-8 \
-  LANGUAGE=en_GB.UTF-8 \
-  LC_ALL=en_GB.UTF-8
+  LANG=C.UTF-8 \
+  LC_ALL=C.UTF-8 \
+  TZ=Europe/London \
+  BUNDLE_DEPLOYMENT=1 \
+  BUNDLE_WITHOUT=development:test \
+  BUNDLE_PATH=/app/vendor/bundle
 
 WORKDIR /app
 
-RUN \
-  set -ex \
-  && apt-get install \
-    -y \
-    --no-install-recommends \
-    curl \
-    build-essential \
-    libpq-dev \
-    libyaml-dev \
-    postgresql-client \
-    libjemalloc-dev \
-    unzip \
+FROM base AS builder
+
+# Build-only dependencies required for native gems.
+RUN apk add --no-cache \
+    build-base \
     ca-certificates \
-  && ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime \
-  && gem install bundler -v 2.6.7 --no-document \
-  && apt-get clean
+    nodejs \
+    postgresql-dev \
+    tzdata \
+    yaml-dev \
+    yarn \
+  && apk upgrade --no-cache zlib
 
-RUN mkdir /home/appuser/.postgresql && \
-  curl https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
-    > /home/appuser/.postgresql/root.crt
+RUN mkdir -p /tmp/rds-cert \
+  && wget -qO /tmp/rds-cert/root.crt https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
 
-# Install official AWS CLI
-RUN \
-  set -ex \
-  && ARCH=$(dpkg --print-architecture) \
-  && if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then \
-       AWS_CLI_URL='https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip'; \
-     else \
-       AWS_CLI_URL='https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip'; \
-     fi \
-  && touch /tmp/without-this-curl-does-not-write-to-tmp-for-some-reason \
-  && curl -s "$AWS_CLI_URL" -o /tmp/awscliv2.zip \
-  && unzip -qd /tmp/awscliv2 /tmp/awscliv2.zip \
-  && /tmp/awscliv2/aws/install
+COPY Gemfile* .ruby-version ./
+RUN bundle config set deployment 'true' \
+  && bundle install --jobs 4 --retry 3
 
-# Install Node.js and Yarn
-RUN set -ex ; \
-    apt-get update \
-    && apt-get install -y --no-install-recommends gnupg \
-    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | \
-        gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | \
-        tee /etc/apt/sources.list.d/nodesource_nodejs20.list \
-    && apt-get update \
-    && apt-get install -y nodejs \
-    && apt-get purge -y --auto-remove gnupg \
-    && apt-get clean \
-    && npm --global install yarn
-
-# Highly cachable layers. These statements are rarely expected to invalidate the cache.
-
-# Install Ruby and Node dependencies
-COPY Gemfile Gemfile.lock .ruby-version package.json ./
-RUN yarn install \
-    && bundle config set --local without 'development test' \
-    && bundle install --jobs 2 --retry 3
-
-# Non-cacheable layers. Everything below here is expected to change with every commit
-
-ENV BUILD_NUMBER=${BUILD_NUMBER}
-ENV GIT_REF=${GIT_REF}
-ENV GIT_BRANCH=${GIT_BRANCH}
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 
 COPY . /app
 
-RUN chown -R appuser:appuser /app
+RUN SECRET_KEY_BASE=key RAILS_ENV=production bundle exec rails assets:precompile --trace
+
+FROM base AS runtime
+
+RUN apk add --no-cache \
+  ca-certificates \
+  libcurl \
+  postgresql-libs \
+  tzdata \
+  && apk upgrade --no-cache zlib
+
+RUN addgroup -S appgroup -g 1001 \
+  && adduser -S appuser -u 1001 -G appgroup -h /home/appuser
+
+RUN mkdir -p /home/appuser/.postgresql
+
+COPY --from=builder --chown=appuser:appgroup /app/vendor/bundle /app/vendor/bundle
+COPY --from=builder --chown=appuser:appgroup /app/public /app/public
+COPY --from=builder --chown=appuser:appgroup /tmp/rds-cert/root.crt /home/appuser/.postgresql/root.crt
+COPY --chown=appuser:appgroup . /app
+
+RUN mkdir -p /app/log /app/tmp \
+  && chown -R appuser:appgroup /app/log /app/tmp /home/appuser
+
+ARG BUILD_NUMBER
+ARG GIT_BRANCH
+ARG GIT_REF
+
+ENV BUILD_NUMBER=${BUILD_NUMBER} \
+  GIT_BRANCH=${GIT_BRANCH} \
+  GIT_REF=${GIT_REF}
 
 USER 1001
-
-RUN RAILS_ENV=production SECRET_KEY_BASE=key \
-    rails assets:precompile --trace

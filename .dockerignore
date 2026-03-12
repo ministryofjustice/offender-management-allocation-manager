@@ -1,16 +1,21 @@
-Brewfile
+AGENTS.md
 README.md
 .env*
+.DS_Store
 
-/log
-/tmp
-/node_modules
-/spec
-/.git
+log/
+tmp/
+node_modules/
+spec/
+.git/
 
 helm_deploy/
 coverage/
 vendor/bundle/
 .bundle/
-.idea
-.github
+.idea/
+.github/
+docs/
+public/assets/
+dump.rdb
+Dockerfile.quick

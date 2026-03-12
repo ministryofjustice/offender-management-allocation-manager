@@ -136,7 +136,6 @@ generic-service:
     RAILS_SERVE_STATIC_FILES: on
     PROMETHEUS_METRICS: "on" # do not remove quotes!
     PROMETHEUS_EXPORTER_HOST: offender-management-prometheus-exporter
-    LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
