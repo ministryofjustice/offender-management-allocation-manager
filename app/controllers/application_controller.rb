@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
   def authenticate_user
     identity = sso_identity
 
-    if identity.absent?
+    if identity.nil? || identity.absent?
       store_original_path_and_redirect
       return
     end
@@ -36,7 +36,7 @@ class ApplicationController < ActionController::Base
   end
 
   def ensure_admin_user
-    unless sso_identity.current_user_is_admin?
+    unless sso_identity&.current_user_is_admin?
       redirect_to '/401'
     end
   end
@@ -53,13 +53,16 @@ class ApplicationController < ActionController::Base
 
   def dps_header_footer
     return { 'status' => 'fallback' } if params[:fallback_header_footer].present?
-    return { 'status' => 'fallback' } if sso_identity.absent? || sso_identity.session_expired?
+
+    identity = sso_identity
+    return { 'status' => 'fallback' } if identity.nil? || identity.absent? || identity.session_expired?
+
     return @dps_header_footer if @dps_header_footer
 
     begin
       @dps_header_footer ||= {
-        'header' => HmppsApi::DpsFrontendComponentsApi.header(sso_identity.token),
-        'footer' => HmppsApi::DpsFrontendComponentsApi.footer(sso_identity.token),
+        'header' => HmppsApi::DpsFrontendComponentsApi.header(identity.token),
+        'footer' => HmppsApi::DpsFrontendComponentsApi.footer(identity.token),
         'status' => 'ok',
       }
     rescue StandardError => e
