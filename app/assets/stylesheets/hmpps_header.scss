@@ -71,6 +71,15 @@
         fill: govuk-colour('black');
       }
     }
+
+    &__sub-text {
+      @include govuk-font(16);
+      display: none;
+
+      @include govuk-media-query($from: tablet) {
+        display: block;
+      }
+    }
   }
 
   &__navigation {
@@ -90,7 +99,6 @@
       @include govuk-font(19);
       margin-bottom: govuk-spacing(1);
       text-align: right;
-      color: govuk-colour('white');
 
       @include govuk-media-query($from: tablet) {
         @include govuk-responsive-margin(4, 'right');

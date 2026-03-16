@@ -26,9 +26,9 @@
         </a>
       </div>
 
-      <% if current_user.present? %>
-        <nav aria-label="Account navigation">
-          <ul class="fallback-dps-header__navigation">
+      <nav aria-label="Account navigation">
+        <ul class="fallback-dps-header__navigation">
+          <% if current_user.present? %>
             <li class="fallback-dps-header__navigation__item">
               <span data-qa="header-user-name"><%= current_user %></span>
             </li>
@@ -36,9 +36,9 @@
               <%= link_to 'Sign out', signout_path, data: { qa: 'header-sign-out' },
                           class: 'fallback-dps-header__link fallback-dps-header__link--no-underline fallback-dps-header__sign-out' %>
             </li>
-          </ul>
-        </nav>
-      <% end %>
+          <% end %>
+        </ul>
+      </nav>
     </div>
   </header>
 <% end %>

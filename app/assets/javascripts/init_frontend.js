@@ -26,6 +26,10 @@ document.addEventListener('turbolinks:before-cache', function() {
   });
 });
 
+function hasDpsHeader() {
+  return document.querySelector('.connect-dps-common-header, .cdps-header');
+}
+
 function initFrontend(options) {
   if (frontendInitialised) {
     return;
@@ -44,7 +48,7 @@ function initFrontend(options) {
   // The DPS header script registers initHeader via DOMContentLoaded,
   // which never re-fires on Turbolinks navigation. Dispatching a synthetic
   // DOMContentLoaded re-runs it against the fresh DOM on every navigation.
-  if (options && options.dispatchDomContentLoaded && document.querySelector('.connect-dps-common-header')) {
+  if (options && options.dispatchDomContentLoaded && hasDpsHeader()) {
     document.dispatchEvent(new Event('DOMContentLoaded'));
   }
 }
