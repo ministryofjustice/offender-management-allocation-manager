@@ -36,8 +36,6 @@ gem 'turbolinks', '~> 5'
 gem 'terser' # javascript compressor
 gem 'typhoeus'
 gem 'redis'
-gem 'fast_underscore', require: false
-gem 'rubyzip', '< 3'
 gem 'turnout'
 gem 'kaminari' # pagination
 gem 'ostruct'
