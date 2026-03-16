@@ -13,12 +13,20 @@ class ApplicationController < ActionController::Base
                 :default_prison_code
 
   def authenticate_user
-    if sso_identity.absent? || sso_identity.session_expired?
-      session[:redirect_path] = request.original_fullpath
-      redirect_to '/auth/hmpps_sso'
-    else
-      redirect_to '/401' unless sso_identity.allowed?
+    identity = sso_identity
+
+    if identity.absent?
+      store_original_path_and_redirect
+      return
     end
+
+    if identity.session_expired?
+      session.delete(:sso_data)
+      store_original_path_and_redirect
+      return
+    end
+
+    redirect_to '/401' unless identity.allowed?
   end
 
   def ensure_spo_user
@@ -45,6 +53,7 @@ class ApplicationController < ActionController::Base
 
   def dps_header_footer
     return { 'status' => 'fallback' } if params[:fallback_header_footer].present?
+    return { 'status' => 'fallback' } if sso_identity.absent? || sso_identity.session_expired?
     return @dps_header_footer if @dps_header_footer
 
     begin
@@ -62,6 +71,11 @@ class ApplicationController < ActionController::Base
   end
 
 private
+
+  def store_original_path_and_redirect
+    session[:redirect_path] = request.original_fullpath
+    redirect_to '/auth/hmpps_sso'
+  end
 
   def sso_identity
     @sso_identity ||= SsoIdentity.new session

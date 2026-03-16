@@ -306,12 +306,17 @@ GEM
       rack (>= 1.2, < 4)
       snaky_hash (~> 2.0, >= 2.0.3)
       version_gem (~> 1.1, >= 1.1.9)
-    omniauth (1.9.2)
+    omniauth (2.1.4)
       hashie (>= 3.4.6)
-      rack (>= 1.6.2, < 3)
-    omniauth-oauth2 (1.7.3)
-      oauth2 (>= 1.4, < 3)
-      omniauth (>= 1.9, < 3)
+      logger
+      rack (>= 2.2.3)
+      rack-protection
+    omniauth-oauth2 (1.9.0)
+      oauth2 (>= 2.0.2, < 3)
+      omniauth (~> 2.0)
+    omniauth-rails_csrf_protection (2.0.1)
+      actionpack (>= 4.2)
+      omniauth (~> 2.0)
     ostruct (0.6.3)
     paper_trail (17.0.0)
       activerecord (>= 7.1)
@@ -355,6 +360,9 @@ GEM
       rack (>= 0.4)
     rack-mini-profiler (4.0.1)
       rack (>= 1.2.0)
+    rack-protection (3.2.0)
+      base64 (>= 0.1.0)
+      rack (~> 2.2, >= 2.2.4)
     rack-session (1.0.2)
       rack (< 3)
     rack-test (2.2.0)
@@ -625,8 +633,9 @@ DEPENDENCIES
   lograge
   logstash-event
   logstash-logger
-  omniauth (~> 1.9.2)
+  omniauth (~> 2.1.4)
   omniauth-oauth2
+  omniauth-rails_csrf_protection
   ostruct
   paper_trail (~> 17.0)
   pg
