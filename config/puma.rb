@@ -13,7 +13,7 @@ pidfile ENV.fetch('PIDFILE', '/tmp/server.pid')
 # instrumentation will need to be changed
 #
 if ENV['PROMETHEUS_METRICS']&.strip == 'on'
-  on_booted do
+  after_booted do
     require 'prometheus_exporter/instrumentation'
     require 'prometheus_exporter/client'
 

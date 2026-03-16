@@ -9,6 +9,8 @@ plugins:
   - rubocop-rails
 
 AllCops:
+  TargetRubyVersion: 4.0
+
   # Exclude anything that isn't really part of our code.
   # rails_helper is excluded because it's full of solecisms, but it's mostly
   # generated code and copy-and-pasted snippets from READMEs.

@@ -39,7 +39,7 @@
 - Local AWS/event testing uses Localstack and the SNS/SQS setup documented in `README.md`; the important env vars are `LOCALSTACK_URL`, `DOMAIN_EVENTS_TOPIC_ARN`, and `DOMAIN_EVENTS_SQS_QUEUE_NAME`.
 - For Delius/LDU work, `bundle exec rake import:local_delivery_units:dry_run` previews the Mailbox Register sync and `bundle exec rake import:local_delivery_units:process` persists it (`lib/tasks/import_local_delivery_units.rake`).
 - Main test command is `bundle exec rspec`. Feature specs expect Firefox + geckodriver. Tests run jobs inline, block external HTTP with WebMock, stub DPS header/footer by default, and commonly stub event publication unless metadata opts back in; check `spec/rails_helper.rb` for useful metadata hooks like `:queueing`, `:enable_allocation_change_publish`, `:skip_dps_header_footer_stubbing`, and `:skip_active_caseload_check_stubbing`.
-- To match team workflow, install git hooks with `make setup`; the pre-commit hook runs GOV.UK RuboCop only on modified Ruby/Rake files (`config/git-hooks/pre-commit`).
+- For local linting, prefer `bin/rubocop` over `bundle exec rubocop`; the wrapper uses RuboCop server mode to reduce repeated startup time.
 - API docs are generated with rswag; see request/API specs under `spec/api` and browse locally at `/api-docs`.
 
 ## Documentation and writing style
