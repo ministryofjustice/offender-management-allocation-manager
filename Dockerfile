@@ -1,4 +1,4 @@
-FROM ruby:3.4.9-alpine3.23 AS base
+FROM ruby:4.0.1-alpine3.23 AS base
 
 # Increment to bust Docker layer cache
 ENV DOCKER_CACHE_BUSTER=1

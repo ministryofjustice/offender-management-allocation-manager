@@ -2,6 +2,9 @@ sso_client_secret = Rails.configuration.hmpps_oauth_client_secret
 sso_client_id = Rails.configuration.hmpps_oauth_client_id
 sso_host = Rails.configuration.nomis_oauth_host
 
+OmniAuth.config.allowed_request_methods = %i[get post]
+OmniAuth.config.silence_get_warning = true
+
 unless sso_client_secret && sso_client_id && sso_host
   $stdout.puts '[WARN] HMPPS_OAUTH_CLIENT_ID, HMPPS_OAUTH_CLIENT_SECRET or NOMIS_OAUTH_HOST not configured'
 end

@@ -13,12 +13,20 @@ class ApplicationController < ActionController::Base
                 :default_prison_code
 
   def authenticate_user
-    if sso_identity.absent? || sso_identity.session_expired?
-      session[:redirect_path] = request.original_fullpath
-      redirect_to '/auth/hmpps_sso'
-    else
-      redirect_to '/401' unless sso_identity.allowed?
+    identity = sso_identity
+
+    if identity.nil? || identity.absent?
+      store_original_path_and_redirect
+      return
     end
+
+    if identity.session_expired?
+      session.delete(:sso_data)
+      store_original_path_and_redirect
+      return
+    end
+
+    redirect_to '/401' unless identity.allowed?
   end
 
   def ensure_spo_user
@@ -28,7 +36,7 @@ class ApplicationController < ActionController::Base
   end
 
   def ensure_admin_user
-    unless sso_identity.current_user_is_admin?
+    unless sso_identity&.current_user_is_admin?
       redirect_to '/401'
     end
   end
@@ -45,12 +53,16 @@ class ApplicationController < ActionController::Base
 
   def dps_header_footer
     return { 'status' => 'fallback' } if params[:fallback_header_footer].present?
+
+    identity = sso_identity
+    return { 'status' => 'fallback' } if identity.nil? || identity.absent? || identity.session_expired?
+
     return @dps_header_footer if @dps_header_footer
 
     begin
       @dps_header_footer ||= {
-        'header' => HmppsApi::DpsFrontendComponentsApi.header(sso_identity.token),
-        'footer' => HmppsApi::DpsFrontendComponentsApi.footer(sso_identity.token),
+        'header' => HmppsApi::DpsFrontendComponentsApi.header(identity.token),
+        'footer' => HmppsApi::DpsFrontendComponentsApi.footer(identity.token),
         'status' => 'ok',
       }
     rescue StandardError => e
@@ -62,6 +74,11 @@ class ApplicationController < ActionController::Base
   end
 
 private
+
+  def store_original_path_and_redirect
+    session[:redirect_path] = request.original_fullpath
+    redirect_to '/auth/hmpps_sso'
+  end
 
   def sso_identity
     @sso_identity ||= SsoIdentity.new session

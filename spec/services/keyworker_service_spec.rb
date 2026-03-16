@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rspec'
+require 'rails_helper'
 
 RSpec.describe KeyworkerService do
   describe '.get_keyworker' do
