@@ -28,33 +28,44 @@ cronjobs:
   process_movements:
     enabled: true
     schedule: 45 6 * * 1-5
+    command: bundle exec rake movements:process
   recalculate_handover_dates:
     enabled: true
     schedule: 0 7 * * 1-5
+    command: bundle exec rake recalculate_handover_dates
   persist_omic_eligibility:
     enabled: true
     schedule: 15 7 * * 1-5
+    command: bundle exec rake persist_omic_eligibility
   community_api_import:
     enabled: true
     schedule: 30 7 * * 1-5
+    command: bundle exec rake community_api:import
   deactivate_unsentenced_cnls:
     enabled: true
     schedule: 45 7 * * 1-5
+    command: bundle exec rake deactivate_unsentenced_cnls:process
   parole_data_import:
     enabled: true
     schedule: 0 8 * * *
+    command: bundle exec rake parole:import
   mailbox_register_import:
     enabled: true
     schedule: 0 9 * * 1-5
+    command: bundle exec rake import:local_delivery_units:process
   # Below cronjobs are currently only enabled in production
   early_allocation_suitability_email:
     enabled: false
+    command: bundle exec rake early_allocation_suitability_email:process
   handover_email:
     enabled: false
+    command: bundle exec rake cronjob:handover_email
   handover_chase_email:
     enabled: false
+    command: bundle exec rake handover_chase_emails:process
   handover_reminder_email:
     enabled: false
+    command: bundle exec rake handover:send_all_handover_reminders
 
 cronjob_resources:
   limits:
