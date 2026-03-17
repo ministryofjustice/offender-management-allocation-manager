@@ -1,0 +1,6 @@
+{{- range $key, $cronjob := .Values.cronjobs }}
+{{- if $cronjob.enabled }}
+---
+{{ include "moic-helpers.cronjob" (dict "root" $ "key" $key "cronjob" $cronjob) }}
+{{- end }}
+{{- end }}

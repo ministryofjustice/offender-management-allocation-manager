@@ -18,7 +18,7 @@ spec:
       containers:
       - name: rails-db-migration
         image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
-        imagePullPolicy: Always
+        imagePullPolicy: {{ include "moic-helpers.image_pull_policy" . }}
         securityContext:
           {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
         command: ['sh', '-c', 'bundle exec rails db:migrate && bundle exec rake import:prison']

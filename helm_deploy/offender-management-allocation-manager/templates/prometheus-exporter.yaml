@@ -25,7 +25,7 @@ spec:
       containers:
       - name: {{ $appName }}
         image: {{ with index .Values "generic-service" }}{{ .image.repository }}:{{ .image.tag }}{{ end }}
-        imagePullPolicy: Always
+        imagePullPolicy: {{ include "moic-helpers.image_pull_policy" . }}
         securityContext:
           {{- with index .Values "generic-service" }}{{ toYaml .securityContext | nindent 10 }}{{ end }}
         command: ['sh', '-c', 'bundle exec prometheus_exporter --bind 0.0.0.0']
