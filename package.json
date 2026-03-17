@@ -4,7 +4,7 @@
   "dependencies": {
     "@ministryofjustice/frontend": "9.0.0",
     "govuk-frontend": "6.1.0",
-    "sass": "^1.97.3"
+    "sass": "^1.98.0"
   },
   "description": "This README would normally document whatever steps are necessary to get the application up and running.",
   "version": "1.0.0",
