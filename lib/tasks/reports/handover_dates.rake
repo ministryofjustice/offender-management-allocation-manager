@@ -11,6 +11,13 @@ namespace :reports do
     def log(msg)
       Rails.logger.warn("#{Time.current.strftime('%Y-%m-%d %H:%M:%S.%3N')} [HandoversReport] #{msg}")
     end
+
+    def handover_type(offender)
+      enhanced_resourcing = offender.case_information.try(:enhanced_resourcing)
+      return 'missing' if enhanced_resourcing.nil?
+
+      enhanced_resourcing ? 'enhanced' : 'standard'
+    end
     # rubocop:enable Rake/MethodDefinitionInTask
 
     $stdout.sync = true
@@ -23,19 +30,22 @@ namespace :reports do
     prisons_range = ENV.fetch('PRISONS_RANGE', '0').split('..').map(&:to_i)
     prisons_range = Range.new(prisons_range[0], prisons_range[1])
 
+    # Format for dates: 2026-02-16
+    from_date = ENV.fetch('DATE_FROM', 1.year.ago.to_date.to_s).to_date.at_beginning_of_day
+    to_date = ENV.fetch('DATE_TO', Date.current.end_of_day.to_date.to_s).to_date.end_of_day
+
     log 'Report started'
     log "NOTE: Using range: #{prisons_range}"
+    log "Date range from #{from_date} to #{to_date}."
 
     total = 0
 
     timeframe = [
-      'handover_date >= ? AND handover_date <= ?',
-      1.year.ago.at_beginning_of_day,
-      Date.current.end_of_day
+      'handover_date >= ? AND handover_date <= ?', from_date, to_date
     ].freeze
 
     CSV.open(ENV.fetch('FILENAME', 'handovers.csv'), 'wb') do |csv|
-      csv << %w[prison nomis_offender_id ldu_code ldu_name handover_date CRD PED TED]
+      csv << %w[prison nomis_offender_id ldu_code ldu_name handover_date CRD PED TED handover_type]
 
       Prison.active.order(code: :asc)[prisons_range].each do |prison|
         log ">> Obtaining handovers for #{prison.name} (#{prison.code})"
@@ -60,6 +70,7 @@ namespace :reports do
             offender.conditional_release_date, # CRD
             offender.parole_eligibility_date,  # PED
             offender.tariff_date,              # TED
+            handover_type(offender),
           ]
 
           total += 1
