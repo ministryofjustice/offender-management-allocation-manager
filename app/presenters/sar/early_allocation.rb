@@ -4,7 +4,7 @@ module Sar
   class EarlyAllocation < BaseSarPresenter
     class << self
       def omitted_attributes
-        [:created_by_firstname, :created_by_lastname, :updated_by_firstname, :updated_by_lastname]
+        [:created_by_firstname, :updated_by_firstname]
       end
 
       def humanized_attributes
