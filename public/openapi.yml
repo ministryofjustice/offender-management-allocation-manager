@@ -54,6 +54,7 @@ components:
       - allocatedAtRosh
       - allocatedAtTier
       - createdAt
+      - createdByLastname
       - event
       - eventTrigger
       - message
@@ -73,6 +74,9 @@ components:
           nullable: true
         createdAt:
           type: string
+        createdByLastname:
+          type: string
+          nullable: true
         event:
           type: string
           nullable: true
@@ -217,6 +221,8 @@ components:
       - outcome
       - createdAt
       - updatedAt
+      - createdByLastname
+      - updatedByLastname
       properties:
         oasysRiskAssessmentDate:
           type: string
@@ -268,6 +274,12 @@ components:
           type: string
         updatedAt:
           type: string
+        createdByLastname:
+          type: string
+          nullable: true
+        updatedByLastname:
+          type: string
+          nullable: true
     SarHandoverProgressChecklist:
       type: object
       nullable: true

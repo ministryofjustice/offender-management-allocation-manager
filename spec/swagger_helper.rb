@@ -63,6 +63,7 @@ RSpec.configure do |config|
               allocatedAtRosh
               allocatedAtTier
               createdAt
+              createdByLastname
               event
               eventTrigger
               message
@@ -78,6 +79,7 @@ RSpec.configure do |config|
               allocatedAtRosh: { type: :string, nullable: true },
               allocatedAtTier: { type: :string, nullable: true },
               createdAt: { type: :string },
+              createdByLastname: { type: :string, nullable: true },
               event: { type: :string, nullable: true },
               eventTrigger: { type: :string, nullable: true },
               message: { type: :string, nullable: true },
@@ -183,6 +185,8 @@ RSpec.configure do |config|
               outcome
               createdAt
               updatedAt
+              createdByLastname
+              updatedByLastname
             ],
             properties: {
               oasysRiskAssessmentDate: { type: :string },
@@ -205,6 +209,8 @@ RSpec.configure do |config|
               outcome: { type: :string },
               createdAt: { type: :string },
               updatedAt: { type: :string },
+              createdByLastname: { type: :string, nullable: true },
+              updatedByLastname: { type: :string, nullable: true },
             }
           },
           SarHandoverProgressChecklist: {

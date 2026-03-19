@@ -18,8 +18,13 @@ module Sar
       end
 
       def additional_methods
-        [:override_reasons]
+        [:created_by_lastname, :override_reasons]
       end
+    end
+
+    # FORENAME SURNAME
+    def created_by_lastname
+      created_by_name.to_s.split.last
     end
 
     def override_reasons

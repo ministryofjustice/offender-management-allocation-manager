@@ -37,7 +37,7 @@ RSpec.describe SarOffenderDataService do
         create(
           :allocation_history, :override, prison: 'LEI', nomis_offender_id: nomis_offender_id,
                                           primary_pom_name: 'OLD_NAME, MOIC', secondary_pom_name: 'SEC_SURNAME, POM',
-                                          recommended_pom_type: 'prison'
+                                          recommended_pom_type: 'prison', created_by_name: 'JOHN DOE'
         )
       end
 
@@ -189,6 +189,7 @@ RSpec.describe SarOffenderDataService do
             expect(presented_allocation.keys).not_to include('primaryPomName')
             expect(presented_allocation.keys).not_to include('secondaryPomNomisId')
             expect(presented_allocation.keys).not_to include('secondaryPomName')
+            expect(presented_allocation.keys).not_to include('createdByName')
           end
 
           it 'humanizes certain attributes' do
@@ -199,6 +200,10 @@ RSpec.describe SarOffenderDataService do
 
           it 'humanizes override reasons' do
             expect(presented_allocation['overrideReasons']).to eq('Suitability')
+          end
+
+          it 'returns the creator last name' do
+            expect(presented_allocation['createdByLastname']).to eq('DOE')
           end
 
           it 'returns nil attributes' do
@@ -246,6 +251,11 @@ RSpec.describe SarOffenderDataService do
 
         context 'with early allocation' do
           let(:early_allocation) { result[:earlyAllocations].last }
+
+          it 'omits some attributes' do
+            expect(early_allocation.keys).not_to include('createdByFirstname')
+            expect(early_allocation.keys).not_to include('updatedByFirstname')
+          end
 
           it 'humanizes outcome' do
             expect(early_allocation['outcome']).to eq('Eligible')
