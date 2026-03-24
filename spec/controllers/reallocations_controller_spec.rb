@@ -58,7 +58,31 @@ RSpec.describe ReallocationsController, type: :controller do
         %w[ascending none none none none none none none]
       )
       expect(response_body).to include(new_pom.full_name_ordered)
+      expect(response_body).to include('Select POMs')
       expect(response_body).to include('Compare workloads')
+      expect(response_body).to include('Unavailable POMs')
+    end
+  end
+
+  describe '#compare_poms' do
+    subject(:perform_request) do
+      get :compare_poms,
+          params: {
+            prison_id: prison.code,
+            nomis_staff_id: old_pom.staffId,
+            pom_ids: [new_pom.staffId]
+          }
+    end
+
+    it 'renders the shared comparison rows and reallocation-specific action' do
+      perform_request
+
+      expect(response).to be_successful
+      expect(response.body).to include('Case mix by role')
+      expect(response.body).to include('Case mix by tier')
+      expect(response.body).to include('Current workload')
+      expect(response.body).to include('Select this POM')
+      expect(response.body).not_to include('current-pom')
     end
   end
 

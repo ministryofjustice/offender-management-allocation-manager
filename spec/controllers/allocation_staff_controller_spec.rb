@@ -26,6 +26,39 @@ RSpec.describe AllocationStaffController, type: :controller do
       stub_sso_data(prison_code)
     end
 
+    describe '#compare_poms' do
+      render_views
+
+      let!(:allocation) do
+        create(:allocation_history,
+               prison: prison_code,
+               nomis_offender_id: offender_no,
+               primary_pom_nomis_id: poms.first.staff_id,
+               primary_pom_name: poms.first.full_name)
+      end
+
+      before do
+        stub_offenders_for_prison(prison_code, [offender])
+      end
+
+      it 'renders the shared comparison rows and allocation-specific actions' do
+        get :compare_poms,
+            params: {
+              prison_id: prison_code,
+              prisoner_id: offender_no,
+              pom_ids: [poms.first.staff_id, poms.last.staff_id]
+            }
+
+        expect(response).to be_successful
+        expect(response.body).to include('Case mix by role')
+        expect(response.body).to include('Case mix by tier')
+        expect(response.body).to include('Current workload')
+        expect(response.body).to include('Keep allocation')
+        expect(response.body).to include('Allocate')
+        expect(response.body).to include('current-pom')
+      end
+    end
+
     describe '#index' do
       let(:alice) { poms.first }
 
@@ -63,6 +96,12 @@ RSpec.describe AllocationStaffController, type: :controller do
                    no_tier: pom.allocations.count { |a| a.tier == 'N/A' },
                    total_cases: pom.allocations.count)
               .to eq(tier_a: 5, tier_b: 4, tier_c: 3, tier_d: 2, no_tier: 1, total_cases: 15)
+          end
+
+          it 'renders the shared compare selection copy' do
+            expect(response.body).to include('Select POMs')
+            expect(response.body).to include('Compare workloads')
+            expect(response.body).to include('Unavailable POMs')
           end
 
           it 'has a nil allocation' do

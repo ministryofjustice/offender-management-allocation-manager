@@ -63,8 +63,9 @@
   <div class="govuk-warning-text">
     <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
     <p class="govuk-warning-text__text">
-    <span class="govuk-visually-hidden">Warning</span>
-    The following POMs have been allocated to this case most recently:
+      <span class="govuk-visually-hidden">Warning</span>
+      The following POMs have been allocated to this case most recently:
+    </p>
     <div class="govuk-!-margin-left-5">
       <ul class="govuk-list govuk-list--bullet">
         <% @recent_pom_history.each do |term| %>
@@ -209,34 +210,4 @@ for example if a particular POM has worked with <%= @prisoner.first_name.capital
   </div>
 <% end %><!-- /form -->
 
-<div class="govuk-accordion" data-module="govuk-accordion">
-  <% accordion_body = capture do %>
-    <table class="govuk-table">
-      <thead class="govuk-table__head">
-      <tr class="govuk-table__row">
-        <th class="govuk-table__header">POM</th>
-        <th class="govuk-table__header">Status</th>
-        <th class="govuk-table__header">POM level</th>
-        <th class="govuk-table__header"><span class="pull-right">Total cases</span></th>
-      </tr>
-      </thead>
-      <tbody class="govuk-table__body">
-      <% (@prison_poms + @probation_poms).reject(&:active?).each do |pom| %>
-        <tr class="govuk-table__row">
-          <td class="govuk-table__cell"><%= pom.first_name %> <%= pom.last_name %></td>
-          <td class="govuk-table__cell"><%= full_status(pom) %></td>
-          <td class="govuk-table__cell"><%= full_grade(pom) %></td>
-          <td class="govuk-table__cell"><span class="govuk-!-font-weight-bold pull-right"><%= pom.allocations.count %></span></td>
-        </tr>
-      <% end %>
-      </tbody>
-    </table>
-  <% end %>
-
-  <%= render 'shared/accordion_section',
-             id: 'accordion',
-             title: "Unavailable POMs",
-             body: I18n.t!('.poms_unavailable', scope: 'allocation_staff',
-                           count: (@prison_poms + @probation_poms).reject(&:active?).count),
-             content: accordion_body %>
-</div>
+<%= render 'shared/unavailable_poms', poms: @prison_poms + @probation_poms %>
