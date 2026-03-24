@@ -52,5 +52,10 @@ RSpec.describe PomHelper do
       pom = build(:pom, staffId: 2005,  status: 'unavailable')
       expect(status(pom)).to eq('unavailable')
     end
+
+    it "does not rename 'deleted' status" do
+      pom = build(:pom, staffId: 2005,  status: 'deleted')
+      expect(status(pom)).to eq('deleted')
+    end
   end
 end

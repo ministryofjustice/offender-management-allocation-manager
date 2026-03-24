@@ -30,7 +30,7 @@ describe PrisonOffenderManagerService do
 
     it "can get a list of POMs" do
       expect(subject).to be_a(Enumerable)
-      expect(subject.count { |pom| pom.status == 'active' }).to eq(1)
+      expect(subject.count(&:active?)).to eq(1)
       expect(po_staff.probation_officer?).to eq(true)
     end
   end

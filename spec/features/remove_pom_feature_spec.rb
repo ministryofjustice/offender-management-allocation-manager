@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 feature "remove a POM no longer present in NOMIS" do
+  let(:limbo_bulk_reallocation_enabled) { true }
   let!(:prison) { Prison.find_by(code: "LEI") || create(:prison, code: "LEI") }
   let(:spo) { build(:pom) }
   let(:probation_poms) do
@@ -13,23 +14,20 @@ feature "remove a POM no longer present in NOMIS" do
   end
 
   before do
+    allow(FeatureFlags.instance).to receive(:config).and_return(
+      {
+        limbo_bulk_reallocation: {
+          test: limbo_bulk_reallocation_enabled,
+        }
+      }.with_indifferent_access
+    )
+
     stub_pom(spo)
     stub_signin_spo(spo, [prison.code])
     stub_poms(prison.code, probation_poms)
   end
 
-  context 'when there are no POMs with cases in limbo' do
-    before do
-      # Goes to the Manage your staff page
-      visit prison_poms_path(prison_id: prison.code)
-    end
-
-    it 'does not show the attention needed tab' do
-      expect(page).not_to have_css('a.govuk-tabs__tab', text: 'Attention needed')
-    end
-  end
-
-  context 'when there are POMs with primary cases in limbo' do
+  shared_context 'with a removed pom with cases in limbo' do
     let(:removed_pom_staff_id) { 123_456 }
     let(:removed_pom) { build(:pom, staffId: removed_pom_staff_id, firstName: 'JOHN', lastName: 'DOE') }
     let(:offenders_in_prison) { build_list(:nomis_offender, 1, prisonId: prison.code) }
@@ -57,37 +55,96 @@ feature "remove a POM no longer present in NOMIS" do
       # Goes to the Manage your staff page
       visit prison_poms_path(prison_id: prison.code)
     end
+  end
 
+  shared_examples 'without an attention needed tab' do
+    it 'does not show the attention needed tab' do
+      visit prison_poms_path(prison_id: prison.code)
+
+      expect(page).not_to have_css('a.govuk-tabs__tab', text: 'Attention needed')
+    end
+  end
+
+  shared_examples 'with an attention needed tab' do
     it 'shows the attention needed tab' do
       expect(page).to have_css('a.govuk-tabs__tab', text: 'Attention needed')
       expect(page).to have_css('#attention-needed-badge', text: '1')
     end
+  end
 
-    it 'shows the removed POMs with details' do
-      click_link 'Attention needed'
-      expect(page).to have_css('h2.govuk-heading-l', text: 'Attention needed')
+  context 'when limbo bulk reallocation is enabled' do
+    let(:limbo_bulk_reallocation_enabled) { true }
 
-      within('section#attention_needed') do
-        expect(page).to have_css('td.govuk-table__cell[aria-label="POM"]', text: 'John Doe')
-        expect(page).to have_css('td.govuk-table__cell[aria-label="Last case allocated"]', text: '22 June 2025')
-        expect(page).to have_css('td.govuk-table__cell[aria-label="Total cases"]', text: '1')
-        expect(page).to have_css('td.govuk-table__cell[aria-label="Action"]', text: 'Remove POM')
-      end
+    context 'when there are no POMs with cases in limbo' do
+      include_examples 'without an attention needed tab'
     end
 
-    it 'removes the POM' do
-      within('section#attention_needed') do
-        click_button 'Remove POM'
+    context 'when there are POMs with primary cases in limbo' do
+      include_context 'with a removed pom with cases in limbo'
+      include_examples 'with an attention needed tab'
+
+      it 'shows the updated attention needed copy and reallocation action' do
+        click_link 'Attention needed'
+
+        within('section#attention_needed') do
+          expect(page).to have_text("These staff members' cases need reallocating so they can be removed from this service.")
+          expect(page).to have_css('td.govuk-table__cell[aria-label="POM"]', text: 'John Doe')
+          expect(page).to have_css('td.govuk-table__cell[aria-label="Last case allocated"]', text: '22 June 2025')
+          expect(page).to have_css('td.govuk-table__cell[aria-label="Total cases"]', text: '1')
+          expect(page).to have_link('Reallocate cases', href: confirm_removal_prison_pom_path(prison.code, removed_pom_staff_id, from: :attention_needed))
+          expect(page).not_to have_button('Remove POM')
+        end
       end
 
-      expect(page).to have_css('.moj-banner--success',
-                               text: 'John Doe removed. If necessary, their cases have been moved to the allocations list.')
+      it 'takes the user to the confirmation page' do
+        within('section#attention_needed') do
+          click_link 'Reallocate cases'
+        end
 
-      expect(page).to have_link('the allocations list',
-                                href: unallocated_prison_prisoners_path(prison))
+        expect(page).to have_css('h1.govuk-heading-l', text: 'Confirm John Doe can be removed from this service')
+        expect(page).to have_link('Continue', href: reallocate_prison_pom_path(prison.code, removed_pom_staff_id))
+      end
+    end
+  end
 
-      pom_details = PomDetail.find_by(prison_code: prison.code, nomis_staff_id: removed_pom_staff_id)
-      expect(pom_details).to be_nil
+  context 'when limbo bulk reallocation is disabled' do
+    let(:limbo_bulk_reallocation_enabled) { false }
+
+    context 'when there are no POMs with cases in limbo' do
+      include_examples 'without an attention needed tab'
+    end
+
+    context 'when there are POMs with primary cases in limbo' do
+      include_context 'with a removed pom with cases in limbo'
+      include_examples 'with an attention needed tab'
+
+      it 'shows the legacy attention needed copy and remove action' do
+        click_link 'Attention needed'
+
+        within('section#attention_needed') do
+          expect(page).to have_text('These people are no longer recorded as POMs on NOMIS or Digital Prison Services. You must remove them from this service and then reallocate their cases.')
+          expect(page).to have_css('td.govuk-table__cell[aria-label="POM"]', text: 'John Doe')
+          expect(page).to have_css('td.govuk-table__cell[aria-label="Last case allocated"]', text: '22 June 2025')
+          expect(page).to have_css('td.govuk-table__cell[aria-label="Total cases"]', text: '1')
+          expect(page).to have_css('td.govuk-table__cell[aria-label="Action"]', text: 'Remove POM')
+          expect(page).not_to have_link('Reallocate cases')
+        end
+      end
+
+      it 'removes the POM' do
+        within('section#attention_needed') do
+          click_button 'Remove POM'
+        end
+
+        expect(page).to have_css('.moj-banner--success',
+                                 text: 'John Doe removed. If necessary, their cases have been moved to the allocations list.')
+
+        expect(page).to have_link('the allocations list',
+                                  href: unallocated_prison_prisoners_path(prison))
+
+        pom_details = PomDetail.find_by(prison_code: prison.code, nomis_staff_id: removed_pom_staff_id)
+        expect(pom_details).to be_nil
+      end
     end
   end
 end

@@ -7,7 +7,7 @@ class StaffMember
   attr_reader :staff_id, :prison
 
   delegate :position_description, :probation_officer?, :prison_officer?, to: :pom, allow_nil: true
-  delegate :working_pattern, :status, :active?, :unavailable?, :inactive?, to: :@pom_detail
+  delegate :working_pattern, :status, :active?, :unavailable?, :inactive?, :deleted?, to: :@pom_detail
 
   def initialize(prison, staff_id, pom_detail = default_pom_detail(prison, staff_id))
     @prison = prison
@@ -36,6 +36,10 @@ class StaffMember
 
   def email_address
     staff_detail&.email_address
+  end
+
+  def in_limbo?
+    deleted? || !has_pom_role?
   end
 
   def has_pom_role?

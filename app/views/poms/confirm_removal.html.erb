@@ -1,0 +1,26 @@
+<% content_for :title, 'Confirm POM removal – Digital Prison Services' %>
+
+<%= link_to 'Back', prison_poms_path(anchor: 'attention_needed!top'),
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds govuk-body-l">
+    <h1 class="govuk-heading-l">
+      Confirm <%= @pom.full_name_or_staff_id %> can be removed from this service
+    </h1>
+
+    <p class="govuk-body">
+      <%= @pom.full_name_or_staff_id %> is no longer recorded as a POM on NOMIS or Digital Prison Services, but is still
+      registered on this service.
+    </p>
+
+    <p class="govuk-body govuk-!-margin-bottom-6">
+      Choose continue to confirm they can be removed from this service once their cases have been reallocated.
+    </p>
+
+    <div class="govuk-button-group">
+      <%= link_to 'Continue', reallocate_prison_pom_path(@prison.code, @pom.staff_id), role: 'button', class: 'govuk-button' %>
+      <%= link_to 'Cancel', prison_poms_path(anchor: 'attention_needed!top'), class: 'govuk-link' %>
+    </div>
+  </div>
+</div>

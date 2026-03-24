@@ -1,0 +1,18 @@
+<% content_for :title, "There is a problem – Digital Prison Services" %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds govuk-body-l">
+    <h1 class="govuk-heading-l">Sorry, there is a problem with the POM cases service</h1>
+
+    <p>Try again later.</p>
+    <p>If this problem continues, contact the helpdesk by calling <%= SERVICE_DESK_NUMBER %> or
+      #<%= SERVICE_DESK_EXTENSION %> from inside an establishment.</p>
+
+    <p>Go to <%= link_to 'POM cases dashboard', prison_dashboard_index_path %></p>
+  </div>
+</div>
+
+<script>
+  // Make error details available to Google Tag Manager
+  dataLayer.push({ "event": "error_page", "error_page_type": "Reallocations error" });
+</script>

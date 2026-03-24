@@ -1,0 +1,72 @@
+<% content_for :title, "Choose a POM – Digital Prison Services" %>
+
+<%= link_to 'Back', reallocate_prison_pom_path,
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <% if flash[:alert] %>
+      <div id="pom-selection-error">
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+          <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+          <div class="govuk-error-summary__body">
+            <ul class="govuk-list govuk-error-summary__list">
+              <li>
+                <a href="#pom-select-<%= @available_poms.first.staff_id %>"><%= flash[:alert] %></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%= render partial: 'header_actions', locals: { title: 'Choose a POM to reallocate cases to', pom: @pom } %>
+
+    <div class="govuk-inset-text">
+      You can reallocate cases to a single POM in bulk and then repeat until no cases remain.
+    </div>
+  </div>
+
+  <div class="govuk-grid-column-full">
+    <%= form_tag(check_compare_list_prison_reallocation_path, method: :put) do %>
+      <%= render 'poms_table' %>
+
+      <div style="overflow: hidden">
+        <input id="search-button" type="submit" class="govuk-button govuk-button--secondary pull-right" value="Compare workloads"/>
+      </div>
+    <% end %>
+
+    <div class="govuk-accordion" data-module="govuk-accordion">
+      <% accordion_body = capture do %>
+        <table class="govuk-table">
+          <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th class="govuk-table__header">POM</th>
+            <th class="govuk-table__header">Status</th>
+            <th class="govuk-table__header">POM level</th>
+            <th class="govuk-table__header"><span class="pull-right">Total cases</span></th>
+          </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+          <% (@prison_poms + @probation_poms).reject(&:active?).each do |pom| %>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><%= pom.first_name %> <%= pom.last_name %></td>
+              <td class="govuk-table__cell"><%= full_status(pom) %></td>
+              <td class="govuk-table__cell"><%= full_grade(pom) %></td>
+              <td class="govuk-table__cell">
+                <span class="govuk-!-font-weight-bold pull-right"><%= pom.allocations.count %></span></td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      <% end %>
+
+      <%= render 'shared/accordion_section',
+                 id: 'accordion',
+                 title: "Unavailable POMs",
+                 body: I18n.t!('.poms_unavailable', scope: 'allocation_staff',
+                               count: (@prison_poms + @probation_poms).reject(&:active?).count),
+                 content: accordion_body %>
+    </div>
+  </div>
+</div>

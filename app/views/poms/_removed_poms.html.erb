@@ -20,9 +20,15 @@
           <%= pom.primary_allocations_count %>
         </td>
         <td aria-label="Action" class="govuk-table__cell">
-          <%= form_for(:remove_pom, url: prison_pom_path(@prison.code, pom.staff_id), method: :delete) do |f| %>
-            <%= hidden_field_tag :from, :attention_needed %>
-            <%= f.button 'Remove POM', type: 'submit', class: 'app-button--link govuk-link govuk-!-font-size-19' %>
+          <% if FeatureFlags.limbo_bulk_reallocation.enabled? %>
+            <%= link_to 'Reallocate cases',
+                        confirm_removal_prison_pom_path(@prison.code, pom.staff_id, from: :attention_needed),
+                        class: 'govuk-link govuk-!-font-size-19' %>
+          <% else %>
+            <%= form_for(:remove_pom, url: prison_pom_path(@prison.code, pom.staff_id), method: :delete) do |f| %>
+              <%= hidden_field_tag :from, :attention_needed %>
+              <%= f.button 'Remove POM', type: 'submit', class: 'app-button--link govuk-link govuk-!-font-size-19' %>
+            <% end %>
           <% end %>
         </td>
       </tr>
