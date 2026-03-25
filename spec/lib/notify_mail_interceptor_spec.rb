@@ -4,7 +4,8 @@ describe NotifyMailInterceptor do
   let(:message) { Mail::Message.new }
 
   before do
-    stub_const('ENV', ENV.merge!('ENV_NAME' => env_name))
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with('ENV_NAME').and_return(env_name)
     described_class.delivering_email(message)
   end
 

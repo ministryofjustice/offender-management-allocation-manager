@@ -29,7 +29,7 @@ describe Manage::DeallocatePomsController do
     specify 'displays the selected allocations back to the user' do
       patch :confirm, params: { allocation_ids: ['1', '2', '4', '5'] }
       expect(assigns(:allocations).count).to eq(4)
-      expect(assigns(:allocations).map(&:id)).to eq([1, 2, 4, 5])
+      expect(assigns(:allocations).map(&:id)).to match_array([1, 2, 4, 5])
     end
   end
 

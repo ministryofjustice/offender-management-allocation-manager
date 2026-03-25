@@ -16,13 +16,14 @@ RSpec.describe HmppsApi::PrisonTimeline, type: :model do
       build(:movement, :transfer, movementDate: today, toAgency: unknown_code),
     ])
   end
-  let(:tomorrow) { Time.zone.today + 1.day }
-  let(:today) { Time.zone.today }
-  let(:last_fortnight) { Time.zone.today - 14.days }
-  let(:two_weeks_ago) { Time.zone.now - 14.days }
-  let(:last_week) { Time.zone.today - 7.days }
-  let(:three_days_ago) { Time.zone.today - 3.days }
-  let(:one_month_ago) { Time.zone.today - 1.month }
+
+  let(:today) { Date.new(2024, 3, 15) }
+  let(:tomorrow) { today + 1.day }
+  let(:last_fortnight) { today - 14.days }
+  let(:two_weeks_ago) { last_fortnight.in_time_zone + 12.hours }
+  let(:last_week) { today - 7.days }
+  let(:three_days_ago) { today - 3.days }
+  let(:one_month_ago) { today - 1.month }
 
   context 'when today' do
     subject do
