@@ -113,4 +113,94 @@ RSpec.describe PomsController, type: :controller do
                                                                 "N/A"])
     end
   end
+
+  describe 'GET #confirm_removal' do
+    let(:removed_staff_id) { 123_987 }
+
+    before do
+      create(:pom_detail, :inactive, prison_code: prison.code, nomis_staff_id: removed_staff_id)
+      stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{removed_staff_id}")
+        .to_return(body: { staffId: removed_staff_id, lastName: 'Example', firstName: 'Mateo' }.to_json)
+    end
+
+    it 'renders an intermediate confirmation page before deletion' do
+      get :confirm_removal, params: { prison_id: prison.code, nomis_staff_id: removed_staff_id, from: 'attention_needed' }
+
+      expect(response).to be_successful
+      expect(response.body).to include('Confirm Mateo Example can be removed from this service')
+      expect(response.body).to include('Choose continue to confirm they can be removed from this service once their cases have been reallocated.')
+      expect(response.body).to include(prison_pom_path(prison.code, removed_staff_id))
+    end
+  end
+
+  describe 'GET #index' do
+    let(:removed_staff_id) { 123_888 }
+    let(:removed_offender) { build(:nomis_offender) }
+    let(:limbo_bulk_reallocation_enabled) { true }
+
+    before do
+      allow(FeatureFlags.instance).to receive(:config).and_return(
+        {
+          limbo_bulk_reallocation: {
+            test: limbo_bulk_reallocation_enabled,
+          }
+        }.with_indifferent_access
+      )
+
+      create(:pom_detail, :inactive, prison_code: prison.code, nomis_staff_id: removed_staff_id)
+      create(:case_information, offender: build(:offender, nomis_offender_id: removed_offender.fetch(:prisonerNumber)))
+      create(:allocation_history,
+             nomis_offender_id: removed_offender.fetch(:prisonerNumber),
+             primary_pom_nomis_id: removed_staff_id,
+             prison: prison.code)
+
+      stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{removed_staff_id}")
+        .to_return(body: { staffId: removed_staff_id, lastName: 'Example', firstName: 'Mateo' }.to_json)
+      stub_offenders_for_prison(prison.code, [removed_offender])
+    end
+
+    context 'when limbo bulk reallocation is enabled' do
+      let(:limbo_bulk_reallocation_enabled) { true }
+
+      it 'links removed poms to the confirmation page' do
+        get :index, params: { prison_id: prison.code }
+
+        expect(response).to be_successful
+        expect(response.body).to include('Reallocate cases')
+        expect(response.body).to include(confirm_removal_prison_pom_path(prison.code, removed_staff_id, from: 'attention_needed'))
+      end
+    end
+
+    context 'when limbo bulk reallocation is disabled' do
+      let(:limbo_bulk_reallocation_enabled) { false }
+
+      it 'renders the legacy remove action' do
+        get :index, params: { prison_id: prison.code }
+
+        expect(response).to be_successful
+        expect(response.body).to include('Remove POM')
+        expect(response.body).to include(prison_pom_path(prison.code, removed_staff_id))
+        expect(response.body).not_to include(confirm_removal_prison_pom_path(prison.code, removed_staff_id, from: 'attention_needed'))
+      end
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    let(:removed_staff_id) { 123_654 }
+
+    before do
+      create(:pom_detail, :inactive, prison_code: prison.code, nomis_staff_id: removed_staff_id)
+      stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{removed_staff_id}")
+        .to_return(body: { staffId: removed_staff_id, lastName: 'Example', firstName: 'Mateo' }.to_json)
+      allow(NomisUserRolesService).to receive(:remove_pom).with(prison, removed_staff_id).and_return(true)
+    end
+
+    it 'removes the pom and redirects back to the attention needed tab' do
+      delete :destroy, params: { prison_id: prison.code, nomis_staff_id: removed_staff_id, from: 'attention_needed' }
+
+      expect(NomisUserRolesService).to have_received(:remove_pom).with(prison, removed_staff_id)
+      expect(response).to redirect_to(prison_poms_path(anchor: 'attention_needed!top'))
+      expect(flash[:notice]).to eq('Mateo Example removed. If necessary, their cases have been moved to @unallocated_link@.')
+    end
+  end
 end

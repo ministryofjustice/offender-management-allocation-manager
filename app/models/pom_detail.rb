@@ -5,7 +5,12 @@ class PomDetail < ApplicationRecord
 
   FULL_TIME_HOURS_PER_WEEK = 37.5
 
-  enum :status, { active: 'active', unavailable: 'unavailable', inactive: 'inactive' }, validate: true
+  enum :status, {
+    active: 'active',
+    unavailable: 'unavailable',
+    inactive: 'inactive',
+    deleted: 'deleted',
+  }, validate: true
 
   validates :nomis_staff_id, presence: true, uniqueness: { scope: :prison_code }
   validates :working_pattern, presence: {

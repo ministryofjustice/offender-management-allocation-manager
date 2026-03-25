@@ -1,0 +1,28 @@
+<% content_for :title, "Compare POMs – Digital Prison Services" %>
+
+<%= link_to 'Back', prison_reallocation_path,
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <%= render partial: 'header_actions', locals: { title: 'Compare workloads', pom: @pom } %>
+  </div>
+</div>
+
+<div id="compare-table">
+  <%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: @poms } do |pom| %>
+    <h2 class="govuk-cookie-banner__heading govuk-heading-m govuk-!-margin-bottom-0"><%= full_name_ordered(pom) %></h2>
+
+    <p><%= format_working_pattern(pom.working_pattern) %></p>
+
+    <div class="govuk-warning-text govuk-!-margin-bottom-0"></div>
+  <% end %>
+
+  <%= render 'shared/pom_comparison/comparison_metrics',
+             poms: @poms,
+             prison: @prison %>
+
+  <%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: @poms } do |pom| %>
+    <%= link_to 'Select this POM', caseload_prison_reallocation_path(new_pom: pom.staff_id), class: 'govuk-button' %>
+  <% end %>
+</div>

@@ -1,0 +1,37 @@
+<% content_for :title, "Choose cases to reallocate – Digital Prison Services" %>
+
+<%= render 'layouts/notice', notice: flash[:notice] %>
+
+<%= link_to 'Back', prison_reallocation_path,
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <%= render partial: 'header_actions',
+               locals: { title: 'Choose cases to reallocate', pom: @pom, new_pom: @new_pom } %>
+  </div>
+
+  <div class="govuk-grid-column-full govuk-!-margin-top-6">
+    <%= form_tag(selected_cases_prison_reallocation_path, method: :post, data: { reallocation_case_selection: true }) do %>
+      <%= hidden_field_tag :new_pom, @new_pom.staff_id %>
+
+      <%= render 'caseload_table', collection: @allocations %>
+
+      <div class="govuk-form-group govuk-!-margin-top-6 govuk-!-margin-bottom-6 reallocation-cases-table__select-all">
+        <fieldset class="govuk-fieldset">
+          <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+            <div class="govuk-checkboxes__item">
+              <%= check_box_tag :select_all_cases, '1', false, id: 'nomis-offender-ids-all',
+                                class: 'govuk-checkboxes__input', data: { reallocation_select_all: true } %>
+              <%= label_tag 'nomis-offender-ids-all',
+                            "Select all cases (#{@allocations.size})",
+                            class: 'govuk-label govuk-checkboxes__label govuk-!-font-weight-bold' %>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <%= submit_tag 'Continue', class: 'govuk-button', data: { module: 'govuk-button', reallocation_continue_button: true } %>
+    <% end %>
+  </div>
+</div>

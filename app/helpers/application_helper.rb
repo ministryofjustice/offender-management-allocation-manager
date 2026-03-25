@@ -17,21 +17,21 @@ module ApplicationHelper
     time.strftime('%-d %b %Y %H:%M')
   end
 
-  def pom_level(level, titleize: true)
+  def pom_level(level, titleize: true, fallback: 'N/A')
     {
       'PO' => 'probation POM',
       'PRO' => 'prison POM',
-      'STAFF' => 'N/A',
+      'STAFF' => fallback,
     }.fetch(level).tap do |str|
       return titleize ? str.upcase_first : str
     end
   end
 
-  def pom_level_long(level)
+  def pom_level_long(level, fallback: 'N/A')
     {
       'PO' => 'Probation Officer POM',
       'PRO' => 'Prison Officer POM',
-      'STAFF' => 'N/A'
+      'STAFF' => fallback
     }[level]
   end
 

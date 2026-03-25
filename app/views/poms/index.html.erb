@@ -77,10 +77,16 @@
   <% if @removed_poms.any? %>
   <section class="govuk-tabs__panel" id="attention_needed">
     <h2 class="govuk-heading-l">Attention needed</h2>
-    <p>
-      These people are no longer recorded as POMs on NOMIS or Digital Prison Services.<br/>
-      You must remove them from this service and then reallocate their cases.
-    </p>
+    <% if FeatureFlags.limbo_bulk_reallocation.enabled? %>
+      <p>
+        These staff members' cases need reallocating so they can be removed from this service.
+      </p>
+    <% else %>
+      <p>
+        These people are no longer recorded as POMs on NOMIS or Digital Prison Services.<br/>
+        You must remove them from this service and then reallocate their cases.
+      </p>
+    <% end %>
     <%= render "removed_poms", poms: @removed_poms %>
   </section>
   <% end %>

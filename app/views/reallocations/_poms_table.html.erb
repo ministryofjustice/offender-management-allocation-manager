@@ -1,0 +1,84 @@
+<table id="available-poms" class="govuk-table" data-module="moj-sortable-table">
+  <thead class="govuk-table__head">
+    <tr>
+      <th class="govuk-table__header" scope="col" aria-sort="ascending" style="width: 200px;">
+        POM
+      </th>
+      <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;">
+        POM type
+      </th>
+      <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 140px;">
+        Working pattern
+      </th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">
+        Allocations in last 7 days
+      </th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">
+        Supporting cases
+      </th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">
+        Responsible cases
+      </th>
+      <th class="govuk-table__header govuk-table__header--numeric" scope="col" aria-sort="none">
+        Co-working cases
+      </th>
+      <th scope="col" class="govuk-table__header govuk-table__header--numeric" aria-sort="none">
+        Total cases
+      </th>
+      <th scope="col" class="govuk-table__header">
+        <div class="govuk-form-group govuk-!-margin-bottom-0<%= flash[:alert] ? ' govuk-form-group--error' : '' %>">
+          <fieldset class="govuk-fieldset">
+            <p class="govuk-!-font-weight-bold<%= flash[:alert] ? ' govuk-error-message' : '' %>">
+              Select POMs<br>to compare workloads
+            </p>
+          </fieldset>
+        </div>
+      </th>
+    </tr>
+  </thead>
+
+  <tbody class="govuk-table__body">
+    <% @available_poms.each do |pom| %>
+      <tr class="govuk-table__row recommended_pom_row_1" id="pom-<%= pom.staff_id %>">
+        <td aria-label="POM name" class="govuk-table__cell pom_name" data-sort-value="<%= pom.full_name_ordered %>">
+          <%= link_to pom.full_name_ordered, caseload_prison_reallocation_path(new_pom: pom.staff_id),
+                      class: 'govuk-link--no-visited-state' %>
+        </td>
+        <td aria-label="POM role" class="govuk-table__cell">
+          <%= pom.probation_officer? ? 'Probation' : 'Prison' %> POM
+        </td>
+        <td aria-label="Working pattern" class="govuk-table__cell">
+          <%= format_working_pattern(pom.working_pattern) %>
+        </td>
+        <td aria-label="Recent allocations" class="govuk-table__cell govuk-table__cell--numeric">
+          <%= pom.new_allocations_count %>
+        </td>
+        <td aria-label="Total supporting" class="govuk-table__cell govuk-table__cell--numeric">
+          <%= pom.supporting_allocations_count %>
+        </td>
+        <td aria-label="Total responsible" class="govuk-table__cell govuk-table__cell--numeric">
+          <%= pom.responsible_allocations_count %>
+        </td>
+        <td aria-label="Total co-working" class="govuk-table__cell govuk-table__cell--numeric">
+          <%= pom.coworking_allocations_count %>
+        </td>
+        <td aria-label="Total allocations" class="govuk-table__cell govuk-table__cell--numeric govuk-!-font-weight-bold">
+          <%= pom.total_allocations_count %>
+        </td>
+
+        <td aria-label="Compare" class="govuk-table__cell reallocation-poms-table__compare-cell">
+          <div class="govuk-form-group govuk-!-margin-bottom-0<%= flash[:alert] ? ' govuk-form-group--error' : '' %>">
+            <fieldset class="govuk-fieldset">
+              <div class="govuk-checkboxes__item govuk-checkboxes--small reallocation-poms-table__compare-checkbox" data-module="govuk-checkboxes">
+                <div class="govuk-checkboxes__item">
+                  <input class="govuk-checkboxes__input" id="pom-select-<%= pom.staff_id %>" name="pom_ids[]" type="checkbox" value="<%= pom.staff_id %>">
+                  <label class="govuk-label govuk-checkboxes__label" for="pom-select-<%= pom.staff_id %>"></label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

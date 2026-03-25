@@ -1,0 +1,42 @@
+<% unavailable_poms = poms.reject(&:active?) %>
+
+<div class="govuk-accordion" data-module="govuk-accordion" id="unavailable-poms-accordion">
+  <div class="govuk-accordion__section">
+    <div class="govuk-accordion__section-header">
+      <h2 class="govuk-accordion__section-heading">
+        <span class="govuk-accordion__section-button" id="unavailable-poms-accordion-heading">
+          <%= t('shared.unavailable_poms.title') %>
+          <span class="govuk-caption-m">
+            <%= t('shared.unavailable_poms.body', count: unavailable_poms.count) %>
+          </span>
+        </span>
+      </h2>
+    </div>
+    <div id="unavailable-poms-accordion-content" class="govuk-accordion__section-content">
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header"><%= t('shared.unavailable_poms.headers.pom') %></th>
+          <th class="govuk-table__header"><%= t('shared.unavailable_poms.headers.status') %></th>
+          <th class="govuk-table__header"><%= t('shared.unavailable_poms.headers.level') %></th>
+          <th class="govuk-table__header">
+            <span class="pull-right"><%= t('shared.unavailable_poms.headers.total_cases') %></span>
+          </th>
+        </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+        <% unavailable_poms.each do |pom| %>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><%= pom.first_name %> <%= pom.last_name %></td>
+            <td class="govuk-table__cell"><%= full_status(pom) %></td>
+            <td class="govuk-table__cell"><%= grade(pom) %></td>
+            <td class="govuk-table__cell">
+              <span class="govuk-!-font-weight-bold pull-right"><%= pom.allocations.count %></span>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

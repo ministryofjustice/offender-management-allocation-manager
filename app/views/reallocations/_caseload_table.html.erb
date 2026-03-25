@@ -1,0 +1,92 @@
+<table id="reallocation-cases" class="govuk-table" data-module="moj-sortable-table">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header reallocation-cases-table__select-column" scope="col">
+        Select case
+      </th>
+      <th class="govuk-table__header" scope="col" aria-sort="ascending">
+        Case
+      </th>
+      <th class="govuk-table__header" scope="col" aria-sort="none">
+        Recommended POM type
+      </th>
+      <th class="govuk-table__header" scope="col" aria-sort="none">
+        POM role needed
+      </th>
+      <th class="govuk-table__header" scope="col" aria-sort="none">
+        Location
+      </th>
+      <% if @prison.womens? %>
+      <th class="govuk-table__header" scope="col" aria-sort="none">
+        Complexity level
+      </th>
+      <% end %>
+      <th class="govuk-table__header" scope="col" aria-sort="none">
+        Earliest release date
+      </th>
+      <th class="govuk-table__header" scope="col" aria-sort="none">
+        Tier
+      </th>
+      <th class="govuk-table__header" scope="col" aria-sort="none">
+        Additional information
+      </th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <% collection.each_with_index do |allocation, allocation_counter| %>
+      <tr class="govuk-table__row offender_row_<%= allocation_counter %>">
+        <td aria-label="Select case" class="govuk-table__cell govuk-!-padding-top-2 reallocation-cases-table__select-cell reallocation-cases-table__select-column">
+          <fieldset class="govuk-fieldset">
+            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+              <div class="govuk-checkboxes__item reallocation-cases-table__select-checkbox">
+                <%= check_box_tag 'nomis_offender_ids[]', allocation.nomis_offender_id, false,
+                                  id: "case-#{allocation.nomis_offender_id}",
+                                  class: 'govuk-checkboxes__input', data: { reallocation_case_checkbox: true } %>
+                <%= label_tag "case-#{allocation.nomis_offender_id}", '', class: 'govuk-label govuk-checkboxes__label' %>
+              </div>
+            </div>
+          </fieldset>
+        </td>
+        <td aria-label="Case" class="govuk-table__cell" data-sort-value="<%= allocation.full_name %>">
+          <span class="prisoner-name">
+            <%= link_to allocation.full_name,
+                        prison_prisoner_allocation_path(@prison.code, prisoner_id: allocation.nomis_offender_id),
+                        class: 'govuk-link' %>
+          </span>
+          <br/>
+          <span class='govuk-hint govuk-!-margin-bottom-0'>
+            <%= allocation.nomis_offender_id %>
+          </span>
+        </td>
+        <td aria-label="Recommended POM type" class="govuk-table__cell">
+          <%= allocation.recommended_pom_type == RecommendationService::PRISON_POM ? 'Prison POM' : 'Probation POM' %>
+        </td>
+        <td aria-label="POM role needed" class="govuk-table__cell">
+          <%= pom_responsibility_label(allocation) %>
+        </td>
+        <td aria-label="Location" class="govuk-table__cell">
+          <%= prisoner_location(allocation, location_only: true) %>
+        </td>
+        <% if @prison.womens? %>
+          <td aria-label="Complexity Level" class="govuk-table__cell">
+            <%= allocation.complexity_level&.titleize %>
+          </td>
+        <% end %>
+        <td aria-label="Earliest release date" class="govuk-table__cell"
+            data-sort-value="<%= allocation.earliest_release&.dig(:date)&.strftime('%Y-%m-%d') || '9999-12-31' %>">
+          <% if allocation.earliest_release.present? %>
+            <%= allocation.earliest_release[:type] %>: <%= format_date(allocation.earliest_release[:date], replacement: 'Unknown') %>
+          <% else %>
+            Unknown
+          <% end %>
+        </td>
+        <td aria-label="Tier" class="govuk-table__cell tier">
+          <strong><%= allocation.tier %></strong>
+        </td>
+        <td aria-label="Additional information" class="govuk-table__cell">
+          <%= simple_format(allocation.additional_information.join("\n"), {}, wrapper_tag: nil) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

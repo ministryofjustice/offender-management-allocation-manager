@@ -53,6 +53,7 @@ RSpec.describe ApplicationHelper do
     let(:po) { 'PO' }
     let(:pom) { 'PRO' }
     let(:staff) { 'STAFF' }
+    let(:fallback) { 'Support staff' }
 
     it 'returns long Probation Officer' do
       expect(pom_level_long(po)).to eq('Probation Officer POM')
@@ -62,8 +63,8 @@ RSpec.describe ApplicationHelper do
       expect(pom_level_long(pom)).to eq('Prison Officer POM')
     end
 
-    it 'returns long Staff member' do
-      expect(pom_level_long(staff)).to eq('N/A')
+    it 'returns the supplied fallback for staff members' do
+      expect(pom_level_long(staff, fallback: fallback)).to eq(fallback)
     end
   end
 
@@ -76,8 +77,8 @@ RSpec.describe ApplicationHelper do
       expect(pom_level('PRO')).to eq('Prison POM')
     end
 
-    it 'shows staff fallback label' do
-      expect(pom_level('STAFF')).to eq('N/A')
+    it 'shows the supplied staff fallback label' do
+      expect(pom_level('STAFF', fallback: 'Support staff')).to eq('Support staff')
     end
 
     context 'with titleize: false' do
@@ -89,8 +90,8 @@ RSpec.describe ApplicationHelper do
         expect(pom_level('PRO', titleize: false)).to eq('prison POM')
       end
 
-      it 'shows staff fallback label with no changes' do
-        expect(pom_level('STAFF', titleize: false)).to eq('N/A')
+      it 'shows a custom staff fallback label with no changes' do
+        expect(pom_level('STAFF', titleize: false, fallback: 'support staff')).to eq('support staff')
       end
     end
   end
