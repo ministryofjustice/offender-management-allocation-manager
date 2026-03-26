@@ -13,7 +13,9 @@ RSpec.describe "allocation_staff/index", type: :view do
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
   let(:prison) { create(:prison) }
   let(:pom) { build(:pom) }
-  let(:page) { Nokogiri::HTML(rendered) }
+  let(:page) { Capybara.string(rendered) }
+  let(:poms) { [pom] }
+  let(:recent_pom_history) { [] }
 
   before do
     stub_poms(prison.code, poms)
@@ -30,9 +32,21 @@ RSpec.describe "allocation_staff/index", type: :view do
     render
   end
 
-  context 'with 1 previous pom' do
-    let(:poms) { [pom] }
+  it 'renders the allocation-specific wrapper around the shared POM selection table' do
+    expect(page).to have_text('Choose a POM')
+    expect(page).to have_css('#available-poms[data-module="moj-sortable-table"]')
+    expect(page).to have_text('Select POMs')
+    expect(page).to have_css('input[value="Compare workloads"]')
 
+    poms.each do |available_pom|
+      expect(page).to have_link(
+        StaffMember.new(prison, available_pom.staff_id).full_name_ordered,
+        href: new_prison_prisoner_staff_build_allocation_path(prison.code, offender.offender_no, available_pom.staff_id)
+      )
+    end
+  end
+
+  context 'with 1 previous pom' do
     let(:recent_pom_history) do
       [{ name: 'FRED', started_at: Time.zone.now, ended_at: Time.zone.now }]
     end

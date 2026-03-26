@@ -9,28 +9,68 @@ RSpec.describe "prisoners/review_case_details", type: :view do
     stub_template 'shared/_rosh.html.erb' => ''
   end
 
-  let(:page) { Nokogiri::HTML(rendered) }
+  let(:page) { Capybara.string(rendered) }
+  let(:sentence_and_offence_table) { page.find('#accordion-default-content-1 table.govuk-table') }
+  let(:handover_table) { page.find('#accordion-default-content-2 table.govuk-table') }
+  let(:contacts_table) { page.all('table.govuk-table').last }
+  let(:vlo_row) { contacts_table.find('tr', text: 'Victim liaison officer (VLO)') }
+  let(:vlo_cells) { vlo_row.all('td') }
   let(:case_info) { build(:case_information) }
   let(:prison) { build(:prison) }
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
   let(:api_offender) { build(:hmpps_api_offender, category: build(:offender_category, :cat_a)) }
 
+  describe 'Sentence and offence section' do
+    before { render }
+
+    it 'renders the ordinary rows as two visible columns using colspan on the value cell' do
+      rows_by_label = sentence_and_offence_table.all('tr').index_by { |row| row.all('td, th').first.text.squish }
+
+      ['Main offence', 'Sentence start date'].each do |label|
+        row = rows_by_label.fetch(label)
+
+        expect(row).to have_css('td', count: 2)
+        expect(row).to have_css('td[colspan="2"]', count: 1)
+      end
+    end
+  end
+
+  describe 'Handover section' do
+    before { render }
+
+    it 'renders the ordinary rows as two visible columns using colspan on the value cell' do
+      rows_by_label = handover_table.all('tr').index_by { |row| row.all('td, th').first.text.squish }
+
+      ['LDU', 'LDU email', 'COM', 'COM email'].each do |label|
+        row = rows_by_label.fetch(label)
+
+        expect(row).to have_css('td', count: 2)
+        expect(row).to have_css('td[colspan="2"]', count: 1)
+      end
+    end
+  end
+
   describe 'VLO section' do
     context 'with no VLO in nDelius' do
       it 'has a stand-alone link to create a VLO' do
         render
-        expect(page).to have_css('td.govuk-\!-width-one-third a', text: 'Add new VLO contact')
+        expect(vlo_cells[1]).to have_link('Add new VLO contact')
+        expect(vlo_cells[2]).not_to have_link('Add new VLO contact')
       end
 
       context 'with no VLO in MPC' do
         before { render }
 
         it 'displays no VLOs' do
-          expect(page).not_to have_css('td.govuk-\!-width-one-third .vlo-details')
+          expect(vlo_row).not_to have_css('.vlo-details')
         end
 
         it 'indicates no VLOs added' do
-          expect(page).to have_css('td.govuk-\!-width-one-third', text: 'No VLO details added')
+          expect(vlo_cells[1]).to have_text('No VLO details added')
+        end
+
+        it 'renders the VLO row with separate details and actions cells' do
+          expect(vlo_row).to have_css('td', count: 3)
         end
       end
 
@@ -41,11 +81,19 @@ RSpec.describe "prisoners/review_case_details", type: :view do
         end
 
         it 'displays the VLO' do
-          expect(page).to have_css('td.govuk-\!-width-one-third .vlo-details')
+          expect(vlo_row).to have_css('.vlo-details')
         end
 
         it 'does not indicate no VLOs added' do
-          expect(page).not_to have_css('td.govuk-\!-width-one-third', text: 'No VLO details added')
+          expect(vlo_row).not_to have_css('td', text: 'No VLO details added')
+        end
+
+        it 'shows the management links in a separate actions cell' do
+          expect(vlo_row).to have_css('td', count: 3)
+          expect(vlo_cells[1]).to have_link('Add new VLO contact')
+          expect(vlo_cells[2]).not_to have_link('Add new VLO contact')
+          expect(vlo_cells[2]).to have_link('Change details')
+          expect(vlo_cells[2]).to have_link('Remove contact')
         end
       end
     end
@@ -57,15 +105,15 @@ RSpec.describe "prisoners/review_case_details", type: :view do
         before { render }
 
         it 'displays no VLOs' do
-          expect(page).not_to have_css('td.govuk-\!-width-one-third .vlo-details')
+          expect(vlo_row).not_to have_css('.vlo-details')
         end
 
         it 'has a message containing a link to create a VLO' do
-          expect(page).to have_css('td.govuk-\!-width-two-thirds a', text: 'add it to this service')
+          expect(vlo_row).to have_css('td[colspan="2"] a', text: 'add it to this service')
         end
 
         it 'has no stand-alone link to create a VLO' do
-          expect(page).not_to have_css('td.govuk-\!-width-one-third a', text: 'Add new VLO contact')
+          expect(vlo_row).not_to have_css('a', text: 'Add new VLO contact')
         end
       end
 
@@ -76,15 +124,16 @@ RSpec.describe "prisoners/review_case_details", type: :view do
         end
 
         it 'displays the VLO' do
-          expect(page).to have_css('td.govuk-\!-width-one-third .vlo-details')
+          expect(vlo_row).to have_css('.vlo-details')
         end
 
         it 'has no message containing a link to create a VLO' do
-          expect(page).not_to have_css('td.govuk-\!-width-two-thirds a', text: 'add it to this service')
+          expect(vlo_row).not_to have_css('a', text: 'add it to this service')
         end
 
         it 'has a stand-alone link to create a VLO' do
-          expect(page).to have_css('td.govuk-\!-width-one-third a', text: 'Add new VLO contact')
+          expect(vlo_cells[1]).to have_link('Add new VLO contact')
+          expect(vlo_cells[2]).not_to have_link('Add new VLO contact')
         end
       end
     end

@@ -58,6 +58,8 @@ RSpec.describe ReallocationsController, type: :controller do
         %w[ascending none none none none none none none]
       )
       expect(response_body).to include(new_pom.full_name_ordered)
+      expect(page.at_css("a[href='#{caseload_prison_reallocation_path(prison.code, old_pom.staffId, new_pom: new_pom.staffId)}']").text)
+        .to eq(new_pom.full_name_ordered)
       expect(response_body).to include('Select POMs')
       expect(response_body).to include('Compare workloads')
       expect(response_body).to include('Unavailable POMs')

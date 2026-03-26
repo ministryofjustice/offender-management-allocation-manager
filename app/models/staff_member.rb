@@ -60,7 +60,10 @@ class StaffMember
 
   def allocations
     @allocations ||= begin
-      alloc_hash = prison.allocations_for_pom(staff_id).index_by(&:nomis_offender_id)
+      alloc_hash = prison.allocations_for_pom(staff_id)
+        .reject { |a| a.primary_pom_allocated_at.nil? } # guard against old records not having this date
+        .index_by(&:nomis_offender_id)
+
       return [] if alloc_hash.empty?
 
       prison.allocated.select { |a| alloc_hash.key?(a.offender_no) }.map do |offender|

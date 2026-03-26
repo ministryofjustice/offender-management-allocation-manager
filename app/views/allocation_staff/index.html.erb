@@ -4,19 +4,9 @@
 <% if @prisoner.needs_a_com? %>
   <%= render partial: 'shared/notifications/offender_needs_a_com', locals: { offender: @prisoner } %>
 <% end %>
+
 <% if flash[:alert] %>
-  <div id="pom-selection-error">
-    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-      <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
-      <div class="govuk-error-summary__body">
-        <ul class="govuk-list govuk-error-summary__list">
-          <li>
-            <a href="#pom-select-<%= @available_poms.first.staff_id %>"><%= flash[:alert] %></a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
+  <%= render 'shared/pom_selection_error_summary', available_poms: @available_poms, message: flash[:alert] %>
 <% end %>
 
 <div class="govuk-grid-row">
@@ -27,14 +17,14 @@
           <% if @current_pom %>
             <% if @coworking %>
               <% content_for :title, "Allocate a co-working POM – Digital Prison Services" %>
-              Allocate a co-working POM to <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>
+              Allocate a co-working POM to <%= @prisoner.full_name_ordered %>
             <% else %>
               <% content_for :title, "Reallocate a POM – Digital Prison Services" %>
-              Reallocate a POM to <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>
+              Reallocate a POM to <%= @prisoner.full_name_ordered %>
             <% end %>
           <% else %>
             <% content_for :title, "Allocate a POM – Digital Prison Services" %>
-            Allocate a POM to <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>
+            Allocate a POM to <%= @prisoner.full_name_ordered %>
           <% end %>
         </h1>
         <% if @current_pom %>
@@ -90,124 +80,13 @@
 for example if a particular POM has worked with <%= @prisoner.first_name.capitalize %> before.</p>
 
 <%= form_tag(prison_prisoner_check_compare_list_path(@prison, @prisoner.offender_no, coworking: @coworking), method: :put) do %>
-  <table id="available-poms" class="govuk-table">
-    <thead class="govuk-table__head">
-      <tr>
-        <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;" <%= sort_aria('last_name') %>>
-          <a href="<%= sort_link('last_name') %>">
-            POM
-          </a>
-          <%= sort_arrow('last_name') %>
-        </th>
-        <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;" <%= sort_aria('position') %>>
-          <a href="<%= sort_link('position') %>">
-            POM type
-          </a>
-          <%= sort_arrow('position') %>
-        </th>
-        <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 140px;" <%= sort_aria('working_pattern') %>>
-          <a href="<%= sort_link('working_pattern') %>">
-            Working pattern
-          </a>
-          <%= sort_arrow('working_pattern') %>
-        </th>
-        <th class="govuk-table__header govuk-table__header--numeric" scope="col" <%= sort_aria('new_allocations_count') %>>
-          <a href="<%= sort_link('new_allocations_count') %>">
-            Allocations in last 7 days
-          </a>
-          <%= sort_arrow('new_allocations_count') %>
-        </th>
-        <th class="govuk-table__header govuk-table__header--numeric" scope="col" <%= sort_aria('supporting_allocations_count') %>>
-          <a href="<%= sort_link('supporting_allocations_count') %>">
-            Supporting cases
-          </a>
-          <%= sort_arrow('supporting_allocations_count') %>
-        </th>
-        <th class="govuk-table__header govuk-table__header--numeric" scope="col" <%= sort_aria('responsible_allocations_count') %>>
-          <a href="<%= sort_link('responsible_allocations_count') %>">
-            Responsible cases
-          </a>
-          <%= sort_arrow('responsible_allocations_count') %>
-        </th>
-        <th class="govuk-table__header govuk-table__header--numeric" scope="col" <%= sort_aria('coworking_allocations_count') %>>
-          <a href="<%= sort_link('coworking_allocations_count') %>">
-            Co-working cases
-          </a>
-          <%= sort_arrow('coworking_allocations_count') %>
-        </th>
-        <th scope="col" class="govuk-table__header govuk-table__header--numeric" <%= sort_aria('total_allocations_count') %>>
-          <a href="<%= sort_link('total_allocations_count') %>">
-            Total cases
-          </a>
-          <%= sort_arrow('total_allocations_count') %>
-        </th>
-        <th class="govuk-table__header" scope="col" style="width: 80px; padding-left: 20px;">Action</th>
-        <th class="govuk-table__header">
-          <div class="govuk-form-group govuk-!-margin-bottom-0<%= flash[:alert] ? ' govuk-form-group--error' : '' %>">
-            <fieldset class="govuk-fieldset">
-              <p class="govuk-!-font-weight-bold<%= flash[:alert] ? ' govuk-error-message' : '' %>">
-                Select POMs<br>to compare workloads
-              </p>
-            </fieldset>
-          </div>
-        </th>
-      </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-
-      <% @available_poms.each do |pom| %>
-        <tr class="govuk-table__row recommended_pom_row_1" id="pom-<%= pom.staff_id %>">
-          <td aria-label="POM name" class="govuk-table__cell pom_name">
-            <%= pom.first_name %> <%= pom.last_name %>
-            <% if @current_pom&.staff_id == pom.staff_id %>
-              <br>
-              <span class="govuk-!-font-weight-bold"><%= @coworking ? 'Primary POM' : 'Currently allocated' %></span>
-            <% elsif @previous_poms.map(&:staff_id).include? pom.staff_id %>
-              <br>
-              <span class="govuk-!-font-weight-bold">Previously allocated</span>
-            <% end %>
-          </td>
-
-          <td aria-label="POM role" class="govuk-table__cell">
-            <%= highlight_conditionally('notice', 'recommended', -> { @prisoner.recommended_pom_type == pom.position }) do %>
-              <%= pom.probation_officer? ? 'Probation' : 'Prison' %> POM
-            <% end %>
-          </td>
-
-          <td aria-label="Working pattern" class="govuk-table__cell"><%= format_working_pattern(pom.working_pattern) %></td>
-          <td aria-label="Recent allocations" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.new_allocations_count %></td>
-          <td aria-label="Total supporting" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.supporting_allocations_count %></td>
-          <td aria-label="Total responsible" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.responsible_allocations_count %></td>
-          <td aria-label="Total co-working" class="govuk-table__cell govuk-table__cell--numeric"><%= pom.coworking_allocations_count %></td>
-          <td aria-label="Total allocations" class="govuk-table__cell govuk-table__cell--numeric govuk-!-font-weight-bold"><%= pom.total_allocations_count %></td>
-
-          <td aria-label="Action" class="govuk-table__cell" style="width: 80px; padding-left: 20px;">
-            <% if @coworking %>
-              <%= link_to 'Allocate', prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @current_pom.staff_id, pom.staff_id) %>
-            <% else %>
-              <%= link_to 'Allocate', new_prison_prisoner_staff_build_allocation_path(@prison.code, @prisoner.offender_no, pom.staff_id) %>
-            <% end %>
-          </td>
-
-          <td aria-label="Compare" class="govuk-table__cell govuk-!-padding-top-0">
-            <div class="govuk-form-group govuk-!-margin-bottom-0<%= flash[:alert] ? ' govuk-form-group--error' : '' %>">
-              <fieldset class="govuk-fieldset">
-                <div class="govuk-checkboxes__item govuk-checkboxes--small">
-                  <input class="govuk-checkboxes__input" id="pom-select-<%= pom.staff_id %>" name="pom_ids[]" type="checkbox" value="<%= pom.staff_id %>">
-                  <label class="govuk-label govuk-checkboxes__label" for="pom-select-<%= pom.staff_id %>"></label>
-                </div>
-              </fieldset>
-            </div>
-          </td>
-        </tr>
-      <% end %>
-
-    </tbody>
-  </table>
-
-  <div style="overflow: hidden">
-    <input id="search-button" type="submit" class="govuk-button govuk-button--secondary pull-right" value="Compare workloads"/>
-  </div>
-<% end %><!-- /form -->
+  <%= render 'shared/pom_selection_table',
+             journey: :allocation,
+             available_poms: @available_poms,
+             recommended_pom_type: @prisoner.recommended_pom_type,
+             current_pom_id: @current_pom&.staff_id,
+             previous_pom_ids: @previous_poms.map(&:staff_id),
+             coworking: @coworking %>
+<% end %>
 
 <%= render 'shared/unavailable_poms', poms: @prison_poms + @probation_poms %>

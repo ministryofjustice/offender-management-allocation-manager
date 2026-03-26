@@ -18,7 +18,7 @@ class ReallocationsController < AllocationStaffController
   # But many methods from the parent are still valid and used here.
 
   def index
-    @available_poms = active_poms
+    @available_poms = active_poms.sort_by(&:full_name_ordered)
   end
 
   def check_compare_list
@@ -54,8 +54,8 @@ private
   def load_pom
     @pom = StaffMember.new(@prison, params[:nomis_staff_id])
 
-    if @pom.active? || @pom.unavailable?
-      raise "not a valid POM! Prison #{@prison.code} - #{@pom.staff_id}"
+    unless @pom.inactive? || @pom.in_limbo?
+      raise "error: not an inactive POM! Prison #{@prison.code} - #{@pom.staff_id}"
     end
   end
 
@@ -63,7 +63,7 @@ private
     @new_pom = StaffMember.new(@prison, params.fetch(:new_pom))
 
     unless @new_pom.active? && @new_pom.has_pom_role?
-      raise "not a valid POM! Prison #{@prison.code} - #{@new_pom.staff_id}"
+      raise "error: not an active POM! Prison #{@prison.code} - #{@new_pom.staff_id}"
     end
   end
 

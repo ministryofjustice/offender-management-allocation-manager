@@ -231,6 +231,87 @@ describe AllocationService do
         { started_at: '2023-02-16T12:13', ended_at: nil, name: 'DUCKETT', email: nil },
       ])
     end
+
+    context 'when the current primary POM is deallocated without a replacement' do
+      let(:case_histories) do
+        [
+          double(CaseHistory, created_at: '2024-01-10T09:00', primary_pom_name: 'SMITH, JANE', primary_pom_email: 'smith@example.com', secondary_pom_name: nil, event: 'allocate_primary_pom'),
+          double(CaseHistory, created_at: '2024-02-11T10:30', primary_pom_name: nil, secondary_pom_name: nil, event: 'deallocate_primary_pom')
+        ]
+      end
+
+      it 'closes the open term at the deallocation time' do
+        expect(terms).to eq([
+          { started_at: '2024-01-10T09:00', ended_at: '2024-02-11T10:30', name: 'SMITH, JANE', email: 'smith@example.com' }
+        ])
+      end
+    end
+
+    context 'when the same POM is allocated again after a deallocation' do
+      let(:case_histories) do
+        [
+          double(CaseHistory, created_at: '2024-01-10T09:00', primary_pom_name: 'SMITH, JANE', primary_pom_email: 'smith@example.com', secondary_pom_name: nil, event: 'allocate_primary_pom'),
+          double(CaseHistory, created_at: '2024-02-11T10:30', primary_pom_name: nil, secondary_pom_name: nil, event: 'deallocate_primary_pom'),
+          double(CaseHistory, created_at: '2024-03-12T11:45', primary_pom_name: 'SMITH, JANE', primary_pom_email: 'smith@example.com', secondary_pom_name: nil, event: 'allocate_primary_pom'),
+          double(CaseHistory, created_at: '2024-04-13T12:00', primary_pom_name: nil, secondary_pom_name: nil, event: 'deallocate_released_offender')
+        ]
+      end
+
+      it 'creates a new term rather than merging across the gap' do
+        expect(terms).to eq([
+          { started_at: '2024-01-10T09:00', ended_at: '2024-02-11T10:30', name: 'SMITH, JANE', email: 'smith@example.com' },
+          { started_at: '2024-03-12T11:45', ended_at: '2024-04-13T12:00', name: 'SMITH, JANE', email: 'smith@example.com' }
+        ])
+      end
+    end
+  end
+
+  describe '.recent_pom_history' do
+    subject(:recent_pom_history) { described_class.recent_pom_history(allocation) }
+
+    let(:john_oldest_term) do
+      { name: 'SMITH, JOHN', email: 'john@example.com', started_at: 5.days.ago, ended_at: 4.days.ago }
+    end
+    let(:mary_term) do
+      { name: 'JONES, MARY', email: 'mary@example.com', started_at: 4.days.ago, ended_at: 3.days.ago }
+    end
+    let(:john_middle_term) do
+      { name: 'SMITH, JOHN', email: 'john@example.com', started_at: 3.days.ago, ended_at: 2.days.ago }
+    end
+    let(:john_most_recent_term) do
+      { name: 'SMITH, JOHN', email: 'john@example.com', started_at: 2.days.ago, ended_at: 1.day.ago }
+    end
+    let(:peter_term) do
+      { name: 'BROWN, PETER', email: 'peter@example.com', started_at: 6.days.ago, ended_at: 5.days.ago }
+    end
+    let(:current_open_term) do
+      { name: 'BLOGGS, JOE', email: 'joe@example.com', started_at: 12.hours.ago, ended_at: nil }
+    end
+    let(:allocation) { instance_double(AllocationHistory) }
+
+    before do
+      allow(described_class).to receive(:pom_terms).and_call_original
+      allow(described_class).to receive(:pom_terms).with(allocation).and_return([
+        peter_term,
+        john_oldest_term,
+        mary_term,
+        john_middle_term,
+        john_most_recent_term,
+        current_open_term
+      ])
+    end
+
+    it 'returns the most recent completed terms, removing consecutive duplicate POMs' do
+      expect(recent_pom_history).to eq([
+        john_most_recent_term,
+        mary_term,
+        john_oldest_term
+      ])
+    end
+
+    it 'returns an empty array when there is no allocation' do
+      expect(described_class.recent_pom_history(nil)).to eq([])
+    end
   end
 
   describe '.previous_pom_name' do
