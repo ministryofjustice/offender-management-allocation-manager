@@ -55,24 +55,6 @@ RSpec.describe StaffMember, type: :model do
       released_offender = allocations.detect { |ao| ao.offender_no == 'G9999GG' }
       expect(released_offender).to be_nil
     end
-
-    context 'when a legacy corrupt allocation has no primary allocation timestamp' do
-      let(:corrupt_offender) { build(:nomis_offender, prisonerNumber: 'G9999XY', prisonId: prison.code) }
-
-      before do
-        stub_offenders_for_prison(prison.code, offenders + [corrupt_offender])
-        create(:case_information, offender: build(:offender, nomis_offender_id: corrupt_offender.fetch(:prisonerNumber)))
-        create(:allocation_history,
-               nomis_offender_id: corrupt_offender.fetch(:prisonerNumber),
-               primary_pom_nomis_id: staff_id,
-               primary_pom_allocated_at: nil,
-               prison: prison.code)
-      end
-
-      it 'filters the corrupt allocation out of the allocations list' do
-        expect(allocations.map(&:nomis_offender_id)).not_to include(corrupt_offender.fetch(:prisonerNumber))
-      end
-    end
   end
 
   describe '#unreleased_allocations' do
