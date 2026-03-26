@@ -18,6 +18,7 @@
 %>
 
 <table id="available-poms" class="govuk-table" data-module="moj-sortable-table">
+  <caption class="govuk-visually-hidden">Available POMs to allocate</caption>
   <thead class="govuk-table__head">
     <tr>
       <th class="govuk-table__header" scope="col" aria-sort="ascending" style="width: 200px;">
@@ -58,17 +59,18 @@
 
   <tbody class="govuk-table__body">
     <% available_poms.each do |pom| %>
-      <% pom_type_label = pom.probation_officer? ? 'Probation POM' : 'Prison POM' %>
       <tr class="govuk-table__row" id="pom-<%= pom.staff_id %>">
         <td aria-label="POM name" class="govuk-table__cell pom_name" data-sort-value="<%= pom.full_name_ordered %>">
-          <%= link_to pom.full_name_ordered, pom_name_path.call(pom), class: 'govuk-link--no-visited-state' %>
+          <%= link_to pom.full_name_ordered, pom_name_path.call(pom),
+                      class: 'govuk-link--no-visited-state',
+                      aria: { label: "Allocate to #{pom.full_name_ordered}" } %>
           <% if previous_pom_ids.include?(pom.staff_id) %>
             <br/><span class="govuk-!-font-weight-bold">Previously allocated</span>
           <% end %>
         </td>
-        <td aria-label="POM role" class="govuk-table__cell" data-sort-value="<%= pom_type_label %>">
+        <td aria-label="POM role" class="govuk-table__cell" data-sort-value="<%= grade(pom) %>">
           <%= highlight_conditionally('notice', 'recommended', -> { recommended_pom_type == pom.position }) do %>
-            <%= pom_type_label %>
+            <%= grade(pom) %>
           <% end %>
         </td>
         <td aria-label="Working pattern" class="govuk-table__cell" data-sort-value="<%= pom.working_pattern %>">
@@ -95,7 +97,9 @@
               <div class="govuk-checkboxes__item govuk-checkboxes--small pom-selection-table__compare-checkbox" data-module="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
                   <input class="govuk-checkboxes__input" id="pom-select-<%= pom.staff_id %>" name="pom_ids[]" type="checkbox" value="<%= pom.staff_id %>">
-                  <label class="govuk-label govuk-checkboxes__label" for="pom-select-<%= pom.staff_id %>"></label>
+                  <label class="govuk-label govuk-checkboxes__label" for="pom-select-<%= pom.staff_id %>">
+                    <span class="govuk-visually-hidden">Compare workload for <%= pom.full_name_ordered %></span>
+                  </label>
                 </div>
               </div>
             </fieldset>
