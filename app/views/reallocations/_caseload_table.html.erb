@@ -1,4 +1,5 @@
 <table id="reallocation-cases" class="govuk-table" data-module="moj-sortable-table">
+  <caption class="govuk-visually-hidden">Remaining cases to reallocate</caption>
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
       <th class="govuk-table__header reallocation-cases-table__select-column" scope="col">
@@ -42,7 +43,9 @@
                 <%= check_box_tag 'nomis_offender_ids[]', allocation.nomis_offender_id, false,
                                   id: "case-#{allocation.nomis_offender_id}",
                                   class: 'govuk-checkboxes__input', data: { reallocation_case_checkbox: true } %>
-                <%= label_tag "case-#{allocation.nomis_offender_id}", '', class: 'govuk-label govuk-checkboxes__label' %>
+                <%= label_tag "case-#{allocation.nomis_offender_id}", '', class: 'govuk-label govuk-checkboxes__label' do %>
+                  <span class="govuk-visually-hidden">Select <%= allocation.full_name %> to reallocate</span>
+                <% end %>
               </div>
             </div>
           </fieldset>
@@ -51,7 +54,8 @@
           <span class="prisoner-name">
             <%= link_to allocation.full_name,
                         prison_prisoner_allocation_path(@prison.code, prisoner_id: allocation.nomis_offender_id),
-                        class: 'govuk-link' %>
+                        class: 'govuk-link govuk-link--no-visited-state',
+                        aria: { label: "Allocation information for #{allocation.full_name}" } %>
           </span>
           <br/>
           <span class='govuk-hint govuk-!-margin-bottom-0'>

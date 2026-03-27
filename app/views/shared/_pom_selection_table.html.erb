@@ -6,7 +6,7 @@
 <%
   pom_name_path = lambda do |pom|
     if journey == :reallocation
-      caseload_prison_reallocation_path(new_pom: pom.staff_id)
+      caseload_prison_reallocation_path(@prison.code, @pom.staff_id, pom.staff_id)
     else
       if coworking
         prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, current_pom_id, pom.staff_id)
@@ -62,7 +62,7 @@
       <tr class="govuk-table__row" id="pom-<%= pom.staff_id %>">
         <td aria-label="POM name" class="govuk-table__cell pom_name" data-sort-value="<%= pom.full_name_ordered %>">
           <%= link_to pom.full_name_ordered, pom_name_path.call(pom),
-                      class: 'govuk-link--no-visited-state',
+                      class: 'govuk-link govuk-link--no-visited-state',
                       aria: { label: "Allocate to #{pom.full_name_ordered}" } %>
           <% if previous_pom_ids.include?(pom.staff_id) %>
             <br/><span class="govuk-!-font-weight-bold">Previously allocated</span>

@@ -52,7 +52,7 @@ RSpec.describe 'reallocations/index', type: :view do
     available_poms.each do |available_pom|
       expect(page).to have_link(
         available_pom.full_name_ordered,
-        href: caseload_prison_reallocation_path(prison.code, source_pom.staff_id, new_pom: available_pom.staff_id)
+        href: caseload_prison_reallocation_path(prison.code, source_pom.staff_id, available_pom.staff_id)
       )
     end
   end

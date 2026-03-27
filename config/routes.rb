@@ -65,8 +65,8 @@ Rails.application.routes.draw do
         get :check_compare_list, to: 'reallocations#index'
         put :check_compare_list
         get :compare_poms
-        get :caseload
-        post :selected_cases
+        get 'caseload/:new_pom', action: :caseload, as: :caseload
+        post 'selected_cases/:new_pom', action: :selected_cases, as: :selected_cases
         get :error
       end
     end
