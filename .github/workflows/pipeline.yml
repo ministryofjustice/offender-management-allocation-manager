@@ -63,13 +63,13 @@ jobs:
         options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Setup Ruby and install gems
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@3ff19f5e2baf30647122352b96108b1fbe250c64 # v1
         with:
           bundler-cache: true
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: 20
           cache: yarn
@@ -78,9 +78,7 @@ jobs:
       - name: Precompile assets
         run: bin/rails assets:precompile
       - name: Setup firefox
-        uses: browser-actions/setup-firefox@v1
-      - name: Setup geckodriver
-        uses: browser-actions/setup-geckodriver@latest
+        uses: browser-actions/setup-firefox@fcf821c621167805dd63a29662bd7cb5676c81a8 # v1.7.1
       - name: Run brakeman
         run: bundle exec brakeman
       - name: Run rubocop
@@ -136,14 +134,14 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Initialise database
         run: |
           export PGPASSWORD=schemaspy && \
           dropdb -U schemaspy -h localhost --if-exists mpc_schemaspy && \
           createdb -U schemaspy -h localhost mpc_schemaspy && \
           psql -U schemaspy -h localhost -d mpc_schemaspy < db/structure.sql
-      - uses: ministryofjustice/hmpps-github-actions/.github/actions/database_schema_report@v2 # WORKFLOW_VERSION
+      - uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/database_schema_report@f52dbae537425d92f2216c4a2d9e0e44e603abb1 # v1
         with:
           database_name: mpc_schemaspy
           user: schemaspy

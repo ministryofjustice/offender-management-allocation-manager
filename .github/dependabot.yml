@@ -13,3 +13,10 @@ updates:
       interval: daily
     # Disable version updates, but leave security updates
     open-pull-requests-limit: 0
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: daily
+    # Disable version updates, but leave security updates
+    open-pull-requests-limit: 0
