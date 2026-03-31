@@ -12,9 +12,8 @@
   </div>
 
   <div class="govuk-grid-column-full govuk-!-margin-top-6">
-    <%= form_tag(selected_cases_prison_reallocation_path, method: :post, data: { reallocation_case_selection: true }) do %>
-      <%= hidden_field_tag :new_pom, @new_pom.staff_id %>
-
+    <%= form_tag(selected_cases_prison_reallocation_path(@prison.code, @pom.staff_id, @new_pom.staff_id),
+                 method: :post, data: { reallocation_case_selection: true }) do %>
       <%= render 'caseload_table', collection: @allocations %>
 
       <div class="govuk-form-group govuk-!-margin-top-6 govuk-!-margin-bottom-6 reallocation-cases-table__select-all">

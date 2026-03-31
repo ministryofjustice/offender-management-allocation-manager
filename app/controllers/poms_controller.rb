@@ -65,7 +65,7 @@ class PomsController < PrisonStaffApplicationController
   end
 
   def reallocate
-    if @pom.active? || @pom.unavailable?
+    unless @pom.inactive? || @pom.in_limbo?
       # TODO: maybe design a nicer informational page?
       redirect_to prison_pom_path, notice: 'Only inactive POMs are eligible for bulk case reallocation.'
     end

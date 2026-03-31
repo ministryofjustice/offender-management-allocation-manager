@@ -83,6 +83,9 @@ RSpec.describe AllocationStaffController, type: :controller do
 
         context 'when tier D' do
           let(:tier) { 'D' }
+          let(:response_body) { response.body }
+          let(:page) { Nokogiri::HTML(response_body) }
+          let(:sortable_headers) { page.css('#available-poms thead th[aria-sort]') }
 
           render_views
 
@@ -104,12 +107,46 @@ RSpec.describe AllocationStaffController, type: :controller do
             expect(response.body).to include('Unavailable POMs')
           end
 
+          it 'renders the shared client-side sortable POM table' do
+            expect(response_body).to include('data-module="moj-sortable-table"')
+            expect(page.css('#available-poms thead th a')).to be_empty
+            expect(sortable_headers.map { |header| header['aria-sort'] }).to eq(
+              %w[ascending none none none none none none none]
+            )
+            expect(response_body).to include(alice.full_name_ordered)
+            expect(page.at_css("a[href='#{new_prison_prisoner_staff_build_allocation_path(prison_code, offender_no, alice.staff_id)}']").text)
+              .to eq(alice.full_name_ordered)
+          end
+
           it 'has a nil allocation' do
             expect(assigns(:allocation)).to be_nil
           end
 
           it 'serves prison POMs' do
             expect(assigns(:prison_poms).map(&:first_name)).to match_array(poms.first(2).map(&:firstName))
+          end
+        end
+
+        context 'when choosing a co-working POM' do
+          render_views
+          let(:tier) { 'B' }
+
+          before do
+            create(:allocation_history,
+                   prison: prison_code,
+                   nomis_offender_id: offender_no,
+                   primary_pom_nomis_id: poms.last.staff_id,
+                   primary_pom_name: poms.last.full_name)
+
+            get :index, params: { prison_id: prison_code, prisoner_id: offender_no, coworking: 'true' }
+          end
+
+          it 'links each POM name to the co-working confirmation page' do
+            page = Nokogiri::HTML(response.body)
+
+            expect(response).to be_successful
+            expect(page.at_css("a[href='#{prison_confirm_coworking_allocation_path(prison_code, offender_no, poms.last.staff_id, poms.first.staff_id)}']").text)
+              .to eq(poms.first.full_name_ordered)
           end
         end
 
@@ -141,6 +178,23 @@ RSpec.describe AllocationStaffController, type: :controller do
             get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
             expect(response).to be_successful
             expect(assigns(:previous_poms).map(&:staff_id)).to eq [poms.last.staff_id]
+          end
+        end
+
+        context 'when recent POM history is available' do
+          let(:recent_pom_history) do
+            [{ name: 'SMITH, JOHN', email: 'john@example.com', started_at: 1.day.ago, ended_at: 12.hours.ago }]
+          end
+
+          before do
+            allow(AllocationService).to receive(:recent_pom_history).with(allocation).and_return(recent_pom_history)
+          end
+
+          it 'assigns the recent POM history from the service' do
+            get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
+
+            expect(response).to be_successful
+            expect(assigns(:recent_pom_history)).to eq(recent_pom_history)
           end
         end
       end

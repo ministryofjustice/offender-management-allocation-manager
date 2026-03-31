@@ -23,6 +23,6 @@
              prison: @prison %>
 
   <%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: @poms } do |pom| %>
-    <%= link_to 'Select this POM', caseload_prison_reallocation_path(new_pom: pom.staff_id), class: 'govuk-button' %>
+    <%= link_to 'Select this POM', caseload_prison_reallocation_path(@prison.code, @pom.staff_id, pom.staff_id), class: 'govuk-button' %>
   <% end %>
 </div>

@@ -3,7 +3,7 @@
 class ReallocationsController < AllocationStaffController
   skip_before_action :load_prisoner_via_prisoner_id
 
-  before_action :load_pom
+  before_action :load_pom, except: %i[error]
   before_action :load_new_pom, only: %i[caseload selected_cases]
 
   rescue_from StandardError do |e|
@@ -18,7 +18,7 @@ class ReallocationsController < AllocationStaffController
   # But many methods from the parent are still valid and used here.
 
   def index
-    @available_poms = active_poms
+    @available_poms = active_poms.sort_by(&:full_name_ordered)
   end
 
   def check_compare_list
@@ -42,7 +42,7 @@ class ReallocationsController < AllocationStaffController
     end
 
     redirect_to(
-      caseload_prison_reallocation_path(new_pom: @new_pom.staff_id),
+      caseload_prison_reallocation_path(@prison.code, @pom.staff_id, @new_pom.staff_id),
       notice: 'Selected cases received. Bulk reallocation is not implemented yet.'
     )
   end
@@ -54,17 +54,13 @@ private
   def load_pom
     @pom = StaffMember.new(@prison, params[:nomis_staff_id])
 
-    if @pom.active? || @pom.unavailable?
-      raise "not a valid POM! Prison #{@prison.code} - #{@pom.staff_id}"
-    end
+    redirect_to error_prison_reallocation_path(@prison.code, @pom.staff_id) unless @pom.inactive? || @pom.in_limbo?
   end
 
   def load_new_pom
     @new_pom = StaffMember.new(@prison, params.fetch(:new_pom))
 
-    unless @new_pom.active? && @new_pom.has_pom_role?
-      raise "not a valid POM! Prison #{@prison.code} - #{@new_pom.staff_id}"
-    end
+    redirect_to error_prison_reallocation_path(@prison.code, @pom.staff_id) unless @new_pom.active? && @new_pom.has_pom_role?
   end
 
   def check_compare_success_route

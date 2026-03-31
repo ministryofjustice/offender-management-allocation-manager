@@ -58,9 +58,23 @@ RSpec.describe ReallocationsController, type: :controller do
         %w[ascending none none none none none none none]
       )
       expect(response_body).to include(new_pom.full_name_ordered)
+      expect(page.at_css("a[href='#{caseload_prison_reallocation_path(prison.code, old_pom.staffId, new_pom.staffId)}']").text)
+        .to eq(new_pom.full_name_ordered)
       expect(response_body).to include('Select POMs')
       expect(response_body).to include('Compare workloads')
       expect(response_body).to include('Unavailable POMs')
+    end
+
+    context 'when the source POM is not inactive or in limbo' do
+      before do
+        PomDetail.find_by!(prison_code: prison.code, nomis_staff_id: old_pom.staffId).update!(status: 'active')
+      end
+
+      it 'redirects to the error page' do
+        perform_request
+
+        expect(response).to redirect_to(error_prison_reallocation_path(prison.code, old_pom.staffId))
+      end
     end
   end
 
@@ -119,6 +133,18 @@ RSpec.describe ReallocationsController, type: :controller do
       expect(response_body).to include('Recommended POM')
       expect(response_body).to include('Additional')
     end
+
+    context 'when the destination POM is not active' do
+      before do
+        PomDetail.find_by!(prison_code: prison.code, nomis_staff_id: new_pom.staffId).update!(status: 'inactive')
+      end
+
+      it 'redirects to the error page' do
+        perform_request
+
+        expect(response).to redirect_to(error_prison_reallocation_path(prison.code, old_pom.staffId))
+      end
+    end
   end
 
   describe '#selected_cases' do
@@ -147,7 +173,7 @@ RSpec.describe ReallocationsController, type: :controller do
 
       it 'redirects back with a placeholder notice' do
         post :selected_cases, params: params
-        expect(response).to redirect_to(caseload_prison_reallocation_path(prison, old_pom.staffId, new_pom: new_pom.staffId))
+        expect(response).to redirect_to(caseload_prison_reallocation_path(prison, old_pom.staffId, new_pom.staffId))
       end
     end
   end

@@ -18,7 +18,7 @@ describe 'HOMD allocates cases to POMS' do
   end
 
   specify 'HOMD allocates the recommended POM to a case' do
-    when_i_allocate_recommended_pom 'Probation Pom', to_case: "Offender, Allocatable"
+    when_i_allocate_recommended_pom poms.first.full_name_ordered, to_case: "Offender, Allocatable"
 
     visit unallocated_prison_prisoners_path(prison)
     expect(page).not_to have_content('Offender, Allocatable')
@@ -28,7 +28,9 @@ describe 'HOMD allocates cases to POMS' do
   end
 
   specify 'HOMD overrides the recommendation and allocates a different type of POM to a case' do
-    when_i_override_recommendation_and_allocate 'Prison Pom', to_case: "Offender, Allocatable", with_override_reason: 'This POM has worked with the prisoner before'
+    when_i_override_recommendation_and_allocate poms.last.full_name_ordered,
+                                                to_case: "Offender, Allocatable",
+                                                with_override_reason: 'This POM has worked with the prisoner before'
 
     visit unallocated_prison_prisoners_path(prison)
     expect(page).not_to have_content('Offender, Allocatable')
@@ -55,17 +57,17 @@ describe 'HOMD allocates cases to POMS' do
 
     expect(page).to have_content('Compare POMs for Allocatable Offender')
 
-    # as we are comparing 2 POMs, the left POM will be even numbers, right will be odd numbers
+    # The shared sortable table starts by sorting on POM name, so submitted compare rows follow that order.
     workload_data_points = all('.pom-data').map(&:text)
-    expect(workload_data_points[0]).to include('Probation Pom')
-    expect(workload_data_points[2]).to include('Responsible: 0 Supporting: 1 Co-working: 0')
-    expect(workload_data_points[4]).to include('Tier A: 0 Tier B: 0 Tier C: 1 Tier D: 0 Tier N/A: 0')
-    expect(workload_data_points[6]).to include("Current workload\n1\nallocation in last 7 days")
+    expect(workload_data_points[0]).to include('Prison Pom')
+    expect(workload_data_points[2]).to include('Responsible: 1 Supporting: 1 Co-working: 0')
+    expect(workload_data_points[4]).to include('Tier A: 1 Tier B: 1 Tier C: 0 Tier D: 0 Tier N/A: 0')
+    expect(workload_data_points[6]).to include("Current workload\n2\nallocations in last 7 days")
 
-    expect(workload_data_points[1]).to include('Prison Pom')
-    expect(workload_data_points[3]).to include('Responsible: 1 Supporting: 1 Co-working: 0')
-    expect(workload_data_points[5]).to include('Tier A: 1 Tier B: 1 Tier C: 0 Tier D: 0 Tier N/A: 0')
-    expect(workload_data_points[7]).to include("Current workload\n2\nallocations in last 7 days")
+    expect(workload_data_points[1]).to include('Probation Pom')
+    expect(workload_data_points[3]).to include('Responsible: 0 Supporting: 1 Co-working: 0')
+    expect(workload_data_points[5]).to include('Tier A: 0 Tier B: 0 Tier C: 1 Tier D: 0 Tier N/A: 0')
+    expect(workload_data_points[7]).to include("Current workload\n1\nallocation in last 7 days")
   end
 
   specify 'HOMD reallocates an allocated case' do
@@ -75,7 +77,7 @@ describe 'HOMD allocates cases to POMS' do
     click_on 'Offender, Allocatable'
     within('tr', text: 'POM Prison Pom') { click_on 'Reallocate' }
     click_on 'Choose POM', match: :first
-    within('tr', text: 'Probation Pom') { click_on 'Allocate' }
+    click_link poms.first.full_name_ordered
     click_on 'Complete allocation'
 
     visit prison_show_pom_tab_path(prison, 1234, 'caseload')
@@ -111,7 +113,7 @@ describe 'HOMD allocates cases to POMS' do
 
     within('tr', text: 'G1234AB') { click_on to_case }
     click_on 'Choose POM', match: :first
-    within('tr', text: pom_name) { click_on 'Allocate' }
+    click_link pom_name
 
     yield if block_given?
 

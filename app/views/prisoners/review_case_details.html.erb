@@ -186,14 +186,14 @@
           full Digital Prison Services profile
         </a>
       </li>
-      <% if AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no) %>
+      <% if @allocation.present? %>
         <li>
           <%= link_to('allocation history', history_prison_prisoner_allocation_path(@prison, @prisoner.offender_no), class: 'govuk-link govuk-link--no-visited-state') %>
         </li>
       <% end %>
     </ul>
 
-    <!-- Accordians -->
+    <!-- Accordions -->
     <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-<%= (rand * 1000000).floor %>">
       <div class="govuk-accordion__section ">
         <div class="govuk-accordion__section-header">
@@ -215,70 +215,60 @@
             <tbody class="govuk-table__body">
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Main offence</td>
-                <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.main_offence %></td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= @prisoner.main_offence %></td>
               </tr>
               <% if @prisoner.sentence_start_date.present? %>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Sentence start date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.sentence_start_date) %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= format_date(@prisoner.sentence_start_date) %></td>
                 </tr>
               <% end %>
               <% if @prisoner.conditional_release_date.present? %>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Conditional release date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.conditional_release_date) %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= format_date(@prisoner.conditional_release_date) %></td>
                 </tr>
               <% end %>
               <% if @prisoner.automatic_release_date.present? %>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Automatic release date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.automatic_release_date) %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= format_date(@prisoner.automatic_release_date) %></td>
                 </tr>
               <% end %>
               <% if @prisoner.parole_eligibility_date.present? %>
                 <tr class="govuk-table__row">
-                  <td class="govuk-table__cell govuk-!-width-one-third">Parole eligability date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.parole_eligibility_date) %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  <td class="govuk-table__cell govuk-!-width-one-third">Parole eligibility date</td>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= format_date(@prisoner.parole_eligibility_date) %></td>
                 </tr>
               <% end %>
               <% if @prisoner.home_detention_curfew_actual_date.present? %>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Home detention curfew actual date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.home_detention_curfew_actual_date) %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= format_date(@prisoner.home_detention_curfew_actual_date) %></td>
                 </tr>
               <% end %>
               <% if @prisoner.tariff_date.present? %>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Tariff expiry date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.tariff_date) %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= format_date(@prisoner.tariff_date) %></td>
                 </tr>
               <% end %>
               <% if @prisoner.target_hearing_date.present? %>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Target hearing date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.target_hearing_date) %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= format_date(@prisoner.target_hearing_date) %></td>
                 </tr>
               <% end %>
               <% if @prisoner.post_recall_release_date.present? %>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Post recall release date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.post_recall_release_date) %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= format_date(@prisoner.post_recall_release_date) %></td>
                 </tr>
               <% end %>
               <% if @prisoner.licence_expiry_date.present? %>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Sentence/licence end date</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= format_date(@prisoner.licence_expiry_date) %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= format_date(@prisoner.licence_expiry_date) %></td>
                 </tr>
               <% end %>
             </tbody>
@@ -305,35 +295,31 @@
             <tbody class="govuk-table__body">
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">LDU</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">
+                <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2">
                   <%= probation_field(@prisoner, :ldu_name) || "Unknown" %>
                 </td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">LDU email</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">
+                <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2">
                   <% if probation_field(@prisoner, :ldu_email_address).present? %>
                     <%= mail_to(@prisoner.ldu_email_address, @prisoner.ldu_email_address) %>
                   <% else %>
                     Unknown
                   <% end %>
                 </td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">COM</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">
+                <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2">
                   <%= probation_field(@prisoner, :allocated_com_name) || "Unknown" %>
                 </td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">COM email</td>
-                <td class="govuk-table__cell govuk-!-width-one-third">
+                <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2">
                   <%= probation_field(@prisoner, :allocated_com_email) || "Unknown" %>
                 </td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
               </tr>
             </tbody>
           </table>
@@ -360,55 +346,50 @@
               <% if @prev_pom_details.present? %>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Previous POM</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third">
+                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2">
                     <%= render partial: 'case_history/allocation/pom_term', locals: { term: @prev_pom_details } %>
                   </td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
                 </tr>
 
                 <% if @prev_pom_details[:email].present? %>
                   <tr class="govuk-table__row">
                     <td class="govuk-table__cell govuk-!-width-one-third">Previous POM email</td>
-                    <td class="govuk-table__cell govuk-!-width-one-third"><%= @prev_pom_details[:email] %></td>
-                    <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                    <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= @prev_pom_details[:email] %></td>
                   </tr>
                 <% end %>
               <% end %>
 
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Co-working POM</td>
-                <td class="govuk-table__cell govuk-!-width-one-third"><%= @secondary_pom_name || 'None allocated' %></td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= @secondary_pom_name || 'None allocated' %></td>
               </tr>
 
               <% if @secondary_pom_name.present? %>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Co-working POM email</td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"><%= @secondary_pom_email %></td>
-                  <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= @secondary_pom_email %></td>
                 </tr>
               <% end %>
 
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Key worker</td>
-                <td class="govuk-table__cell govuk-!-width-one-third"><%= @keyworker.full_name %></td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
+                <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= @keyworker.full_name %></td>
               </tr>
 
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Victim liaison officer (VLO)
                   <br>
-                  <span class="govuk-tag govuk-tag--red" style="margin-top: 5px;">Non-Disclosable</span>
+                  <span class="govuk-tag govuk-tag--red govuk-!-margin-top-2">Non-Disclosable</span>
                 </td>
 
                 <% if @prisoner.active_vlo? && @prisoner.victim_liaison_officers.none? %>
-                  <td class="govuk-table__cell govuk-!-width-two-thirds">
+                  <td class="govuk-table__cell govuk-!-width-one-third" colspan="2">
                     <%= render 'shared/vlo_warning', prison_code: @prison.code, offender_no: @prisoner.offender_no %>
                   </td>
                 <% elsif @prisoner.victim_liaison_officers.none? %>
                   <td class="govuk-table__cell govuk-!-width-one-third">
                     No VLO details added
-                    <div class="govuk-!-margin-top-6">
+                    <div class="govuk-!-margin-top-2">
                       <%= link_to 'Add new VLO contact',
                                   new_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no),
                                   class: 'govuk-link' %>
@@ -418,9 +399,12 @@
                 <% else %>
                   <td class="govuk-table__cell govuk-!-width-one-third">
                     <% @prisoner.victim_liaison_officers.each do |vlo| %>
-                      <p class="vlo-details"><%= vlo.full_name_ordered %> -<br/><%= vlo.email %></p>
+                      <div class="govuk-!-margin-bottom-3 vlo-details">
+                        <%= vlo.full_name_ordered %><br/>
+                        <%= vlo.email %>
+                      </div>
                     <% end %>
-                    <div class="govuk-!-margin-top-6">
+                    <div class="govuk-!-margin-top-2">
                       <%= link_to 'Add new VLO contact',
                                   new_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no),
                                   class: 'govuk-link' %>
@@ -428,11 +412,11 @@
                   </td>
                   <td class="govuk-table__cell govuk-!-width-one-third">
                     <% @prisoner.victim_liaison_officers.each do |vlo| %>
-                      <p>
+                      <div class="govuk-!-margin-bottom-3">
                         <%= link_to 'Change details', edit_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no, vlo) %>
                         <br/>
                         <%= link_to 'Remove contact', delete_prison_prisoner_victim_liaison_officer_path(@prison.code, @prisoner.offender_no, vlo) %>
-                      </p>
+                      </div>
                     <% end %>
                   </td>
                 <% end %>
@@ -442,7 +426,7 @@
         </div>
       </div>
     </div>
-    <!-- /Accordians -->
+    <!-- /Accordions -->
     <!-- /More info -->
 
     <%= render partial: 'choose_pom_button', locals: { coworking: @coworking, prison: @prison, offender_no: @prisoner.offender_no } %>

@@ -61,7 +61,7 @@ feature "womens allocation journey" do
     scenario 'accepting recommendation' do
       within "tr#pom-#{probation_pom2.staffId}" do
         # allocate to the second person in the list
-        click_link 'Allocate'
+        click_link probation_pom2.full_name_ordered
       end
 
       fill_in 'allocation-form-message-field', with: message_text
@@ -89,7 +89,7 @@ feature "womens allocation journey" do
     scenario 'rejecting recommendation' do
       # Choose the one non-recommended POM
       within "tr#pom-#{prison_pom.staffId}" do
-        click_link 'Allocate'
+        click_link prison_pom.full_name_ordered
       end
 
       # Try to just hit 'Continue' - it should bounce with a nice error
@@ -158,7 +158,7 @@ feature "womens allocation journey" do
       click_link 'Choose a POM to allocate to now'
 
       within "tr#pom-#{prison_pom.staffId}" do
-        click_link 'Allocate'
+        click_link prison_pom.full_name_ordered
       end
 
       fill_in 'allocation-form-message-field', with: message_text

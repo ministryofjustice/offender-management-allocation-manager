@@ -12,25 +12,18 @@ module Sorting
     case_owner
     com_allocation_days_overdue
     complexity_level_number
-    coworking_allocations_count
     earliest_release_date
     formatted_pom_name
     handover_date
     last_name
     location
-    new_allocations_count
     next_parole_date
     offender_last_name
     offender_name
     pom_responsibility
-    position
     primary_pom_allocated_at
-    responsible_allocations_count
     staff_member_full_name_ordered
-    supporting_allocations_count
     tier
-    total_allocations_count
-    working_pattern
   ].freeze
 
   def sort_collection(items, default_sort:, default_direction: :asc)

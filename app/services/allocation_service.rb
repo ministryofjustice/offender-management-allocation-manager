@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AllocationService
+  MAX_RECENT_POM_HISTORY = 3
+
   def self.allocate_secondary(
     nomis_offender_id:,
     secondary_pom_nomis_id:,
@@ -84,16 +86,35 @@ class AllocationService
   end
 
   def self.pom_terms(allocation)
-    allowed_events = %w[allocate_primary_pom reallocate_primary_pom]
+    term_start_events = %w[allocate_primary_pom reallocate_primary_pom]
+    term_end_events = %w[deallocate_primary_pom deallocate_released_offender]
 
     [].tap do |terms|
-      history(allocation).select { |h| allowed_events.include?(h.event) }.sort_by(&:created_at).each do |hist|
-        next if terms.any? && hist.primary_pom_name == terms.last[:name]
+      history(allocation).sort_by(&:created_at).each do |hist|
+        if term_end_events.include?(hist.event)
+          terms.last[:ended_at] = hist.created_at if terms.any? && terms.last[:ended_at].nil?
+          next
+        end
 
-        terms.last[:ended_at] = hist.created_at if terms.any?
+        next unless term_start_events.include?(hist.event)
+        next if terms.any? && terms.last[:ended_at].nil? && hist.primary_pom_name == terms.last[:name]
+
+        terms.last[:ended_at] = hist.created_at if terms.any? && terms.last[:ended_at].nil?
         terms << { name: hist.primary_pom_name, started_at: hist.created_at, ended_at: nil, email: hist.primary_pom_email }
       end
     end
+  end
+
+  def self.recent_pom_history(allocation, limit: MAX_RECENT_POM_HISTORY)
+    completed_terms = pom_terms(allocation).select { |term| term[:ended_at].present? }.reverse
+
+    recent_terms = completed_terms.each_with_object([]) do |term, unique_recent_terms|
+      next if unique_recent_terms.last&.fetch(:email, nil) == term[:email]
+
+      unique_recent_terms << term
+    end
+
+    recent_terms.first(limit)
   end
 
   def self.previous_pom_name(prison, nomis_offender_id)

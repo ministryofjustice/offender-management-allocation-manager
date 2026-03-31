@@ -5,9 +5,14 @@ feature "get poms list", flaky: true do
 
   # NOMIS Staff ID of the POM called "Moic Pom"
   let(:moic_pom_id) { 485_926 }
+  let(:active_probation_pom) { build(:pom, :probation_officer, staffId: 485_925, firstName: 'Probation', lastName: 'Pom') }
+  let(:moic_pom) { build(:pom, :prison_officer, staffId: moic_pom_id, firstName: 'Moic', lastName: 'Pom') }
+  let(:inactive_pom) { build(:pom, :prison_officer, staffId: 485_927, firstName: 'Inactive', lastName: 'Pom') }
 
   before do
     signin_spo_user
+    create(:pom_detail, :inactive, prison_code: 'LEI', nomis_staff_id: inactive_pom.staff_id)
+    stub_poms('LEI', [active_probation_pom, moic_pom, inactive_pom])
   end
 
   it "shows the page" do
@@ -26,10 +31,8 @@ feature "get poms list", flaky: true do
   it "handles missing sentence data" do
     visit prison_prisoner_staff_index_path('LEI', offender_missing_sentence_case_info.nomis_offender_id)
 
-    within '#recommended_poms' do
-      within row_containing 'Moic Pom' do
-        click_link 'Allocate'
-      end
+    within "#pom-#{moic_pom_id}" do
+      first('a').click
     end
 
     expect(page).to have_css('h1', text: "Check allocation details for Aianilan Albina")
