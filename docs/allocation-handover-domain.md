@@ -53,6 +53,8 @@ Responsibility describes **who is the lead** for a prisoner's case at any given 
 
 ### In plain English
 
+**POM responsible only** — the prisoner is in custody and their release is far enough away that no handover planning has started. The POM fully owns the case and the COM is not yet involved.
+
 **POM responsible + COM supporting** — the prisoner is still in custody and not yet close to release. The POM owns the case: they lead the sentence plan, manage risk, and are the primary point of contact. The COM is involved but in a supporting role, typically preparing for the upcoming handover.
 
 **COM responsible + POM supporting** — the prisoner is approaching release and the handover has happened. The COM now owns the case and leads community reintegration planning. The POM stays on but in a supporting role, providing context and continuity during the transition.
