@@ -228,6 +228,10 @@ Mark specs as flaky by adding the `flaky: true` flag to them.
 
 ## Further documentation
 
+### Domain concepts
+
+- [Allocation, Responsibility, and Handover](docs/allocation-handover-domain.md) — explains POM/COM roles, the three responsibility states, how handover dates are calculated, and which domain events are published.
+
 ### Architectural Context
 
 [![auto-updating container diagram](https://static.structurizr.com/workspace/56937/diagrams/manage-POM-cases-container.png)](https://structurizr.com/share/56937/diagrams#manage-POM-cases-container)

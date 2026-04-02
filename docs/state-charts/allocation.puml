@@ -22,11 +22,14 @@ SPOMState -> NoAllocationState : Transfer
 SPOMState -> BothPOMState : Allocate PPOM
 
 BothPOMState -> BothPOMState: Reallocate PPOM
+BothPOMState -> BothPOMState: Reallocate SPOM
 
 PPOMState -> NoAllocationState: Release
 PPOMState -> NoAllocationState: Transfer
+PPOMState -> NoAllocationState: Legal status changed
 
 BothPOMState -> NoAllocationState: Release
 BothPOMState -> NoAllocationState: Transfer
+BothPOMState -> NoAllocationState: Legal status changed
 
 @enduml
