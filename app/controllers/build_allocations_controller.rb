@@ -71,7 +71,7 @@ class BuildAllocationsController < PrisonsApplicationController
           recommended_pom_type: (RecommendationService.recommended_pom_type(@prisoner) == RecommendationService::PRISON_POM) ? 'prison' : 'probation',
           prison: active_prison_id,
           message: allocation_params[:message],
-          override_reasons: override.override_reasons,
+          override_reasons: override.override_reasons.presence,
           suitability_detail: override.suitability_detail,
           override_detail: override.more_detail,
         }
@@ -88,7 +88,6 @@ class BuildAllocationsController < PrisonsApplicationController
         session.delete :female_allocation_override
         session[:latest_allocation_details][:additional_notes] = allocation_params[:message]
       end
-        override_reasons: override.override_reasons.presence,
 
       redirect_to (event(history) == :allocate_primary_pom) ? unallocated_prison_prisoners_path : allocated_prison_prisoners_path
     end
