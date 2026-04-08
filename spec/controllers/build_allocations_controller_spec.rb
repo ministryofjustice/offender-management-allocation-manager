@@ -130,12 +130,12 @@ RSpec.describe BuildAllocationsController, type: :controller do
       end
 
       it 'sends the correct emails' do
-        expect(EmailService).to have_received(:send_email).with(
-          message: notes,
-          allocation: anything,
-          pom_nomis_id: pom.staffId,
-          further_info: further_info,
-        )
+        expect(EmailService).to have_received(:send_email) do |args|
+          expect(args[:message]).to eq(notes)
+          expect(args[:allocation]).to be_present
+          expect(args[:pom_nomis_id]).to eq(pom.staffId)
+          expect(args[:further_info]).to eq(stored_further_info)
+        end
       end
 
       it 'stores no message in flash notice' do
@@ -143,7 +143,10 @@ RSpec.describe BuildAllocationsController, type: :controller do
       end
 
       it 'adds additional notes to stored allocation details' do
-        expect(session[:latest_allocation_details]).to include(additional_notes: notes)
+        expect(session[:latest_allocation_details]).to include(
+          prisoner_number: offender_no,
+          additional_notes: notes
+        )
       end
 
       it 'redirects to Make allocations' do
