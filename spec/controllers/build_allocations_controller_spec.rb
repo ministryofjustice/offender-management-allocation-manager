@@ -21,6 +21,8 @@ RSpec.describe BuildAllocationsController, type: :controller do
   describe '#show' do
     context 'when allocating' do
       before do
+        session[:latest_allocation_details] = { prisoner_number: 'STALE123' }
+
         get :show, params: {
           "prison_id" => prison.code,
           "prisoner_id" => offender_no,
@@ -33,9 +35,9 @@ RSpec.describe BuildAllocationsController, type: :controller do
         expect(response.code).to eq('200')
       end
 
-      it 'stores offender details' do
-        expect(session).to have_key(:latest_allocation_details)
-        expect(session[:latest_allocation_details]).to include(prisoner_number: offender_no)
+      it 'stores offender details in an instance variable only' do
+        expect(assigns(:latest_allocation_details)).to include(prisoner_number: offender_no)
+        expect(session).not_to have_key(:latest_allocation_details)
       end
     end
 
@@ -65,34 +67,29 @@ RSpec.describe BuildAllocationsController, type: :controller do
       end
 
       context 'with a different POM' do
-        let(:pom_nomis_id) { pom.staffId + 123 }
+        let(:pom_nomis_id) { poms.last.staffId }
 
         it 'returns success' do
           expect(response.code).to eq('200')
         end
 
-        it 'stores offender details' do
-          expect(session).to have_key(:latest_allocation_details)
-          expect(session[:latest_allocation_details]).to include(prisoner_number: offender_no)
+        it 'stores offender details in an instance variable only' do
+          expect(assigns(:latest_allocation_details)).to include(prisoner_number: offender_no)
+          expect(session).not_to have_key(:latest_allocation_details)
         end
       end
     end
   end
 
   describe '#update' do
-    # Tried making this a let but the `put :update` added
-    # :additional_notes to it. The code adds this to the session as
-    # part of the update, so it may be due to some odd interaction
-    # between rspec and sessions. It's a mystery. Using a method rather
-    # than a let gets round this issue.
-    def further_info
-      {
-        last_oasys_completed: '23-Jul-2009',
-        handover_start_date: '12-Aug-2010',
-        handover_completion_date: '13-Sep-2011',
-        com_name: 'Billy Smart',
-        com_email: 'billy@smart.com'
-      }
+    def stored_further_info
+      session[:latest_allocation_details].slice(
+        :last_oasys_completed,
+        :handover_start_date,
+        :handover_completion_date,
+        :com_name,
+        :com_email
+      )
     end
 
     let(:notes) { 'A note' }
@@ -193,8 +190,6 @@ RSpec.describe BuildAllocationsController, type: :controller do
 
       context 'with a different POM' do
         before do
-          session[:latest_allocation_details] = further_info
-
           stub_user('user', pom.staffId)
           allow(AllocationService).to receive(:create_or_update).and_call_original
 
@@ -210,12 +205,12 @@ RSpec.describe BuildAllocationsController, type: :controller do
         let(:pom_nomis_id) { poms.last.staffId }
 
         it 'sends the correct emails' do
-          expect(EmailService).to have_received(:send_email).with(
-            message: notes,
-            allocation: anything,
-            pom_nomis_id: pom.staffId,
-            further_info: further_info,
-          )
+          expect(EmailService).to have_received(:send_email) do |args|
+            expect(args[:message]).to eq(notes)
+            expect(args[:allocation]).to be_present
+            expect(args[:pom_nomis_id]).to eq(pom.staffId)
+            expect(args[:further_info]).to eq(stored_further_info)
+          end
         end
 
         it 'stores no message in flash notice' do
@@ -223,7 +218,11 @@ RSpec.describe BuildAllocationsController, type: :controller do
         end
 
         it 'adds additional notes to stored allocation details' do
-          expect(session[:latest_allocation_details]).to include(additional_notes: notes)
+          expect(session[:latest_allocation_details]).to include(
+            prisoner_number: offender_no,
+            prev_pom_name: 'Bob Billings',
+            additional_notes: notes
+          )
         end
 
         it 'redirects to See allocations' do

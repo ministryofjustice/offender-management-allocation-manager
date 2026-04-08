@@ -28,11 +28,25 @@ protected
   # This is the data for the quite lengthy allocation summary message that appears
   # on the confirm page and as a success message after allocation.
   #
-  # No good storing the redered HTML in flash as it will blow the max cookie
+  # No good storing the rendered HTML in flash as it will blow the max cookie
   # size. Instead we just store the locals in the session, which gets rendered
   # via a partial if @latest_allocation_details is present.
   def retrieve_latest_allocation_details
     @latest_allocation_details = session[:latest_allocation_details]&.with_indifferent_access
+    session.delete(:latest_allocation_details)
+  end
+
+  def build_latest_allocation_details(offender:, pom:, co_working_pom: nil, prev_pom_name: nil)
+    helpers.format_allocation(
+      offender:, pom:, view_context:, co_working_pom:, prev_pom_name:
+    )
+  end
+
+  def store_latest_allocation_details!(details, additional_notes: nil)
+    session[:latest_allocation_details] = details.merge(additional_notes:)
+  end
+
+  def clear_latest_allocation_details!
     session.delete(:latest_allocation_details)
   end
 
