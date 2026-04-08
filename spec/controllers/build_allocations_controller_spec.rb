@@ -18,7 +18,51 @@ RSpec.describe BuildAllocationsController, type: :controller do
     allow(EmailService).to receive(:send_email)
   end
 
+  describe '#new' do
+    context 'when the selected POM is no longer eligible' do
+      before do
+        create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no,
+                                    primary_pom_nomis_id: pom.staffId)
+
+        get :new, params: {
+          prison_id: prison.code,
+          prisoner_id: offender_no,
+          staff_id: pom.staffId
+        }
+      end
+
+      it 'redirects back to choose a POM with an alert' do
+        expect(response).to redirect_to(prison_prisoner_staff_index_path(prison.code, offender_no))
+        expect(flash[:alert]).to eq('Choose a POM from the available list to allocate this case.')
+      end
+    end
+  end
+
   describe '#show' do
+    context 'when the selected POM is no longer eligible' do
+      before do
+        create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no,
+                                    primary_pom_nomis_id: pom.staffId,
+                                    secondary_pom_nomis_id: poms.last.staffId)
+
+        get :show, params: {
+          prison_id: prison.code,
+          prisoner_id: offender_no,
+          staff_id: poms.last.staffId,
+          id: 'allocate'
+        }
+      end
+
+      it 'redirects back to choose a POM with an alert' do
+        expect(response).to redirect_to(prison_prisoner_staff_index_path(prison.code, offender_no))
+        expect(flash[:alert]).to eq('Choose a POM from the available list to allocate this case.')
+      end
+
+      it 'does not store offender details' do
+        expect(session).not_to have_key(:latest_allocation_details)
+      end
+    end
+
     context 'when allocating' do
       before do
         session[:latest_allocation_details] = { prisoner_number: 'STALE123' }
@@ -57,8 +101,9 @@ RSpec.describe BuildAllocationsController, type: :controller do
       context 'with the same POM' do
         let(:pom_nomis_id) { pom.staffId }
 
-        it 'returns success' do
-          expect(response.code).to eq('200')
+        it 'redirects back to choose a POM with an alert' do
+          expect(response).to redirect_to(prison_prisoner_staff_index_path(prison.code, offender_no))
+          expect(flash[:alert]).to eq('Choose a POM from the available list to allocate this case.')
         end
 
         it 'does not store offender details' do
@@ -163,6 +208,8 @@ RSpec.describe BuildAllocationsController, type: :controller do
       context 'with the same POM' do
         before do
           allow(AllocationService).to receive(:create_or_update).and_return(nil)
+          session[:latest_allocation_details] = { prisoner_number: 'STALE123' }
+          session[:allocation_override] = { override_reasons: ['x'] }
 
           put :update, params: {
             prison_id: prison.code,
@@ -178,16 +225,15 @@ RSpec.describe BuildAllocationsController, type: :controller do
           expect(AllocationService).not_to have_received(:create_or_update)
         end
 
-        it 'stores message in flash notice' do
-          expect(flash[:notice]).to match(/allocated to/)
+        it 'redirects back to choose a POM with an alert' do
+          expect(response).to redirect_to(prison_prisoner_staff_index_path(prison.code, offender_no))
+          expect(flash[:alert]).to eq('Choose a POM from the available list to allocate this case.')
+          expect(flash[:notice]).to be_nil
         end
 
-        it 'does not store offender details' do
+        it 'clears wizard state and does not store offender details' do
           expect(session).not_to have_key(:latest_allocation_details)
-        end
-
-        it 'redirects to See allocations' do
-          expect(response).to redirect_to(allocated_prison_prisoners_path)
+          expect(session).not_to have_key(:allocation_override)
         end
       end
 

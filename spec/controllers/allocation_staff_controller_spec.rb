@@ -41,7 +41,7 @@ RSpec.describe AllocationStaffController, type: :controller do
         stub_offenders_for_prison(prison_code, [offender])
       end
 
-      it 'renders the shared comparison rows and allocation-specific actions' do
+      it 'redirects back when the submitted compare list includes the current POM' do
         get :compare_poms,
             params: {
               prison_id: prison_code,
@@ -49,13 +49,23 @@ RSpec.describe AllocationStaffController, type: :controller do
               pom_ids: [poms.first.staff_id, poms.last.staff_id]
             }
 
+        expect(response).to redirect_to(prison_prisoner_staff_index_path(prison_code, offender_no, coworking: false))
+        expect(flash[:alert]).to eq('Choose POMs from the available list to compare workloads')
+      end
+
+      it 'renders the shared comparison rows and allocation-specific actions for available POMs' do
+        get :compare_poms,
+            params: {
+              prison_id: prison_code,
+              prisoner_id: offender_no,
+              pom_ids: [poms.second.staff_id, poms.last.staff_id]
+            }
+
         expect(response).to be_successful
         expect(response.body).to include('Case mix by role')
         expect(response.body).to include('Case mix by tier')
         expect(response.body).to include('Current workload')
-        expect(response.body).to include('Keep allocation')
         expect(response.body).to include('Allocate')
-        expect(response.body).to include('current-pom')
       end
     end
 
@@ -171,7 +181,7 @@ RSpec.describe AllocationStaffController, type: :controller do
 
         context 'when deallocated' do
           before do
-            AllocationHistory.last.deallocate_offender_after_release
+            allocation.deallocate_offender_after_release
           end
 
           it 'retrieves old POMs' do
@@ -241,22 +251,26 @@ RSpec.describe AllocationStaffController, type: :controller do
     end
 
     describe '#check_compare_list' do
-      before do
+      subject(:perform_request) do
         put :check_compare_list, params: { prison_id: prison_code, prisoner_id: offender_no, pom_ids: pom_ids }
       end
 
       context 'with correct number of POMs selected' do
-        let(:pom_ids) { [1, 2] }
+        let(:pom_ids) { [poms.first.staff_id, poms.second.staff_id] }
 
         it 'sends no error message' do
+          perform_request
+
           expect(flash[:alert]).to eq(nil)
         end
       end
 
       context 'with too many POMs selected' do
-        let(:pom_ids) { [1, 2, 3, 4, 5] }
+        let(:pom_ids) { [*poms.map(&:staff_id), 9999] }
 
         it 'sends error message' do
+          perform_request
+
           expect(flash[:alert]).to eq('You can only choose up to 4 POMs to compare workloads')
         end
       end
@@ -265,7 +279,35 @@ RSpec.describe AllocationStaffController, type: :controller do
         let(:pom_ids) { [] }
 
         it 'sends error message' do
+          perform_request
+
           expect(flash[:alert]).to eq('Choose someone to allocate to or compare workloads')
+        end
+      end
+
+      context 'when the compare list includes the current POM' do
+        let!(:allocation) do
+          create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.first.staff_id)
+        end
+        let(:pom_ids) { [poms.first.staff_id, poms.last.staff_id] }
+
+        it 'sends error message' do
+          perform_request
+
+          expect(flash[:alert]).to eq('Choose POMs from the available list to compare workloads')
+        end
+      end
+
+      context 'when the compare list includes invalid values alongside valid POM ids' do
+        let(:pom_ids) { [poms.first.staff_id.to_s, '', 'not-a-number'] }
+
+        it 'redirects using only the sanitised POM ids' do
+          perform_request
+
+          expect(response).to redirect_to(
+            prison_prisoner_compare_poms_path(prison_code, offender_no, pom_ids: [poms.first.staff_id], coworking: false)
+          )
+          expect(flash[:alert]).to be_nil
         end
       end
     end

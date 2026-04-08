@@ -1,18 +1,16 @@
-<% current_pom_id = local_assigns.fetch(:current_pom_id, nil) %>
-
-<%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms:, current_pom_id: } do |pom| %>
+<%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: } do |pom| %>
   <h3 class="govuk-heading-s">Case mix by role</h3>
   <%= case_mix_bar_by_role(pom.allocations, preserve_space_if_none: true) %>
   <%= case_mix_vertical_by_role(pom.allocations) %>
 <% end %>
 
-<%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms:, current_pom_id: } do |pom| %>
+<%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: } do |pom| %>
   <h3 class="govuk-heading-s">Case mix by tier</h3>
   <%= case_mix_bar_by_tiers(pom.allocations, preserve_space_if_none: true) %>
   <%= case_mix_vertical_by_tiers(pom.allocations) %>
 <% end %>
 
-<%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms:, current_pom_id: } do |pom| %>
+<%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: } do |pom| %>
   <h3 class="govuk-heading-s">Current workload</h3>
 
   <% recent_count = pom.allocations.count { |allocation| allocation.primary_pom_allocated_at.to_date >= 7.days.ago } %>
@@ -25,7 +23,7 @@
   </div>
 <% end %>
 
-<%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms:, current_pom_id: } do |pom| %>
+<%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: } do |pom| %>
   <% handover_count = handover_cases_view_for_pom(pom).upcoming.count %>
   <div class="card--caseload card-total">
     <span class="card__heading--large"><%= handover_count %></span>
@@ -33,7 +31,7 @@
   </div>
 <% end %>
 
-<%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms:, current_pom_id: } do |pom| %>
+<%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: } do |pom| %>
   <% high_complexity_count = pom.allocations.count(&:high_complexity?) %>
   <% if prison.womens? %>
     <div class="card--caseload card-total">

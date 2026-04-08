@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AllocationStaffController < PrisonsApplicationController
+  include AllocationPomEligibility
+
   MAX_COMPARISON_SIZE = 4
 
   before_action :ensure_spo_user
@@ -19,20 +21,16 @@ class AllocationStaffController < PrisonsApplicationController
     @recent_pom_history = AllocationService.recent_pom_history(allocation)
     @coworking = coworking?
 
-    # As primary POM and coworker POM must be different, we filter out
-    # ineligible POMs based on currently allocated staff
-    filtered_poms = active_poms.reject do |pom|
-      [@current_pom&.staff_id, @current_coworker&.staff_id].include?(pom.staff_id)
-    end
-
-    @available_poms = filtered_poms.sort_by(&:full_name_ordered)
+    @available_poms = available_poms.sort_by(&:full_name_ordered)
   end
 
   def check_compare_list
-    if params[:pom_ids].nil?
+    if selected_compare_pom_ids.empty?
       error_message = 'Choose someone to allocate to or compare workloads'
-    elsif params[:pom_ids].size > MAX_COMPARISON_SIZE
+    elsif selected_compare_pom_ids.size > MAX_COMPARISON_SIZE
       error_message = 'You can only choose up to 4 POMs to compare workloads'
+    elsif compare_selection_contains_unavailable_poms?
+      error_message = 'Choose POMs from the available list to compare workloads'
     end
 
     if error_message
@@ -43,25 +41,24 @@ class AllocationStaffController < PrisonsApplicationController
   end
 
   def compare_poms
-    @coworking = coworking?
+    pom_ids = selected_compare_pom_ids
 
-    if allocation
-      @current_pom_id = allocation.primary_pom_nomis_id
+    if compare_selection_contains_unavailable_poms?
+      redirect_to(check_compare_error_route, alert: 'Choose POMs from the available list to compare workloads') and return
+    end
+
+    if params[:prisoner_id].present? && allocation
+      @primary_pom_id = allocation.primary_pom_nomis_id
       @previous_pom_ids = allocation.previously_allocated_poms
 
-      # Make current and previous POMs appear first
-      ordered_pom_ids = params[:pom_ids].sort_by do |id|
-        if id.to_i == @current_pom_id
-          0
-        elsif @previous_pom_ids.include?(id.to_i)
-          1
-        else
-          2
-        end
+      # Make previous POMs appear first.
+      ordered_pom_ids = pom_ids.sort_by do |id|
+        @previous_pom_ids.include?(id) ? 0 : 1
       end
     end
 
-    @poms = (ordered_pom_ids || params[:pom_ids]).map { |staff_id| StaffMember.new(@prison, staff_id) }
+    @coworking = coworking?
+    @poms = (ordered_pom_ids || pom_ids).map { StaffMember.new(@prison, it) }
   end
 
 private
@@ -76,6 +73,24 @@ private
 
   def active_poms
     @prison_poms.select(&:active?) + @probation_poms.select(&:active?)
+  end
+
+  def selected_compare_pom_ids
+    Array(params[:pom_ids]).filter_map { Integer(it, exception: false) }
+  end
+
+  def available_compare_pom_ids
+    available_poms.map(&:staff_id)
+  end
+
+  # As primary POM and coworker POM must be different, we filter out
+  # ineligible POMs based on currently allocated staff.
+  def available_poms
+    eligible_allocation_poms(active_poms, allocation)
+  end
+
+  def compare_selection_contains_unavailable_poms?
+    (selected_compare_pom_ids - available_compare_pom_ids).any?
   end
 
   def load_pom_types
@@ -94,7 +109,7 @@ private
 
   def check_compare_success_route
     prison_prisoner_compare_poms_path(
-      @prison, @prisoner.offender_no, pom_ids: params[:pom_ids], coworking: coworking?
+      @prison, @prisoner.offender_no, pom_ids: selected_compare_pom_ids, coworking: coworking?
     )
   end
 
