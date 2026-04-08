@@ -74,18 +74,18 @@ RSpec.describe OffenderHelper do
   end
 
   describe '#recommended_pom_type_label' do
-    it "returns 'Prison officer' if RecommendService is PRISON_POM" do
+    it "returns 'Prison' if RecommendService is PRISON_POM" do
       allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PRISON_POM)
       offender = OpenStruct.new(immigration_case?: true, nps_case?: false, responsibility: nil)
 
-      expect(helper.recommended_pom_type_label(offender)).to eq('Prison officer')
+      expect(helper.recommended_pom_type_label(offender)).to eq('Prison')
     end
 
-    it "returns 'Probation officer' if RecommendService is PROBATION_POM" do
+    it "returns 'Probation' if RecommendService is PROBATION_POM" do
       allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PROBATION_POM)
       offender = OpenStruct.new(immigration_case?: false, nps_case?: true, tier: 'A', responsibility: nil)
 
-      expect(helper.recommended_pom_type_label(offender)).to eq('Probation officer')
+      expect(helper.recommended_pom_type_label(offender)).to eq('Probation')
     end
   end
 
@@ -96,7 +96,7 @@ RSpec.describe OffenderHelper do
       let(:offender) { OpenStruct.new(immigration_case?: true, nps_case?: false) }
 
       it "can get for a prison owned offender" do
-        expect(helper.complex_reason_label(offender)).to eq('Prisoner assessed as not suitable for a prison officer POM')
+        expect(helper.complex_reason_label(offender)).to eq('Assessed as not suitable for a prison POM')
       end
     end
 
@@ -107,24 +107,8 @@ RSpec.describe OffenderHelper do
       end
 
       it "can get for a probation owned offender" do
-        expect(helper.complex_reason_label(offender)).to eq('Prisoner assessed as suitable for a prison officer POM despite tiering calculation')
+        expect(helper.complex_reason_label(offender)).to eq('Assessed as suitable for a prison POM despite tiering calculation')
       end
-    end
-  end
-
-  describe '#non_recommended_pom_type_label' do
-    it "returns 'Probation officer' when RecommendationService is PRISON_POM" do
-      allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PRISON_POM)
-      subject = OpenStruct.new(immigration_case?: false, nps_case?: false, responsibility: nil)
-
-      expect(helper.non_recommended_pom_type_label(subject)).to eq('Probation officer')
-    end
-
-    it "returns 'Prison officer' when RecommendationServicce is PROBATION_POM" do
-      allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PROBATION_POM)
-      subject = OpenStruct.new(immigration_case?: false, nps_case?: false, responsibility: nil)
-
-      expect(helper.non_recommended_pom_type_label(subject)).to eq('Prison officer')
     end
   end
 

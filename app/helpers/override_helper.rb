@@ -42,11 +42,11 @@ private
 
   def suitability_detail(allocation)
     if allocation.recommended_pom_type.present?
-      tag.p(" - Prisoner assessed as suitable for a #{allocation.recommended_pom_type}
+      tag.p(" - Assessed as suitable for a #{allocation.recommended_pom_type}
         POM despite tiering calculation", class: 'govuk-body govuk-!-margin-bottom-1') +
       tag.p(allocation.suitability_detail, class: 'govuk-body govuk-!-margin-bottom-1')
     else
-      tag.p(' - Prisoner assessed as suitable for recommended POM despite tiering
+      tag.p(' - Assessed as suitable for recommended POM despite tiering
         calculation', class: 'govuk-body govuk-!-margin-bottom-1')
       tag.p(allocation.suitability_detail, class: 'govuk-body govuk-!-margin-bottom-1')
     end

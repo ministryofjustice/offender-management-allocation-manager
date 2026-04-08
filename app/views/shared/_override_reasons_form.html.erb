@@ -1,0 +1,17 @@
+<%= form.govuk_check_boxes_fieldset :override_reasons, multiple: false, legend: nil,
+                                    hint: { text: 'Choose all that apply' } do %>
+  <%= form.govuk_check_box :override_reasons, 'suitability', link_errors: true,
+                           label: { text: complex_reason_label(offender) } do %>
+    <%= form.govuk_text_area :suitability_detail, link_errors: true, rows: 2,
+                             label: { text: 'Enter reason' } %>
+  <% end %>
+  <%= form.govuk_check_box :override_reasons, 'no_staff',
+                           label: { text: "No available #{recommended_pom_type_label(offender).downcase} POMs" } %>
+  <%= form.govuk_check_box :override_reasons, 'continuity',
+                           label: { text: "#{pom.full_name_ordered} has worked with #{offender.full_name_ordered} before" } %>
+  <%= form.govuk_check_box :override_reasons, 'other',
+                           label: { text: 'Other reason' } do %>
+    <%= form.govuk_text_area :more_detail, link_errors: true, rows: 2,
+                             label: { text: 'Enter reason' } %>
+  <% end %>
+<% end %>
