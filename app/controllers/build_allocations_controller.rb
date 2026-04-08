@@ -3,6 +3,7 @@
 class BuildAllocationsController < PrisonsApplicationController
   before_action :ensure_spo_user
   before_action :load_prisoner
+  before_action :load_pom
   before_action :set_referrer
 
   include Wicked::Wizard
@@ -109,6 +110,10 @@ private
 
   def load_prisoner
     @prisoner = OffenderService.get_offender(nomis_offender_id_from_url)
+  end
+
+  def load_pom
+    @pom = StaffMember.new(@prison, staff_id)
   end
 
   def nomis_offender_id_from_url
