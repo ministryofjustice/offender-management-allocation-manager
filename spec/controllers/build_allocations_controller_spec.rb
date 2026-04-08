@@ -97,10 +97,30 @@ RSpec.describe BuildAllocationsController, type: :controller do
 
     let(:notes) { 'A note' }
 
+    context 'when submitting the override step without any reasons selected' do
+      before do
+        put :update, params: {
+          prison_id: prison.code,
+          prisoner_id: offender_no,
+          staff_id: pom.staffId,
+          id: 'override',
+          override_form: {
+            override_reasons: [''],
+            more_detail: '',
+            suitability_detail: ''
+          }
+        }
+      end
+
+      it 're-renders the override step successfully' do
+        expect(response).to have_http_status(:ok)
+        expect(assigns(:pom)).to be_present
+        expect(assigns(:override).errors[:override_reasons]).to include('Select one or more reasons for not accepting the recommendation')
+      end
+    end
+
     context 'when allocating' do
       before do
-        session[:latest_allocation_details] = further_info
-
         stub_user('user', pom.staffId)
 
         put :update, params: {
@@ -176,6 +196,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
           session[:latest_allocation_details] = further_info
 
           stub_user('user', pom.staffId)
+          allow(AllocationService).to receive(:create_or_update).and_call_original
 
           put :update, params: {
             allocation_form: { message: notes },
@@ -207,6 +228,12 @@ RSpec.describe BuildAllocationsController, type: :controller do
 
         it 'redirects to See allocations' do
           expect(response).to redirect_to(allocated_prison_prisoners_path)
+        end
+
+        it 'stores nil override reasons when no override was provided' do
+          expect(AllocationService).to have_received(:create_or_update) do |attributes, _further_info|
+            expect(attributes[:override_reasons]).to be_nil
+          end
         end
       end
     end
