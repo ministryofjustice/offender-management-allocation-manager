@@ -257,7 +257,7 @@ feature 'Case History' do
                  "Tier: #{history1.allocated_at_tier}",
                  "Prison POM allocated instead of recommended Probation POM",
                  "Reason(s):",
-                 "- Prisoner assessed as suitable for a probation POM despite tiering calculation",
+                 "- Assessed as suitable for a probation POM despite tiering calculation",
                  "Too high risk"
                ].join("\n")
               ],
@@ -363,7 +363,7 @@ feature 'Case History' do
                  "Tier: #{history6.allocated_at_tier}\n",
                  "Prison POM allocated instead of recommended Probation POM\n",
                  "Reason(s):\n",
-                 "- Prisoner assessed as suitable for a probation POM despite tiering calculation\n",
+                 "- Assessed as suitable for a probation POM despite tiering calculation\n",
                  "Too high risk"
                ].join],
               ['.moj-timeline__date', "#{formatted_date_for(history6)} by #{history6.created_by_name.titleize}"],

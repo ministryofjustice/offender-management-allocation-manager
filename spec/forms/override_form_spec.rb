@@ -1,4 +1,16 @@
 describe OverrideForm do
+  it 'preserves override reasons as an array' do
+    override = described_class.new(override_reasons: ['other'])
+
+    expect(override.override_reasons).to eq(['other'])
+  end
+
+  it 'rehydrates override reasons stored as a JSON array string' do
+    override = described_class.new(override_reasons: '["other"]')
+
+    expect(override.override_reasons).to eq(['other'])
+  end
+
   it 'a reason for overriding must be given' do
     override = described_class.new(override_reasons: nil)
     expect(override).not_to be_valid

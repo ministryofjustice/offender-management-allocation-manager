@@ -30,7 +30,7 @@ describe 'HOMD allocates cases to POMS' do
   specify 'HOMD overrides the recommendation and allocates a different type of POM to a case' do
     when_i_override_recommendation_and_allocate poms.last.full_name_ordered,
                                                 to_case: "Offender, Allocatable",
-                                                with_override_reason: 'This POM has worked with the prisoner before'
+                                                with_override_reason: :continuity
 
     visit unallocated_prison_prisoners_path(prison)
     expect(page).not_to have_content('Offender, Allocatable')
@@ -122,7 +122,7 @@ describe 'HOMD allocates cases to POMS' do
 
   def when_i_override_recommendation_and_allocate(pom_name, to_case:, with_override_reason:)
     when_i_allocate_recommended_pom(pom_name, to_case:) do
-      check with_override_reason
+      find("input[type='checkbox'][value='#{with_override_reason}']", visible: :all).check
       click_on 'Continue'
     end
   end
