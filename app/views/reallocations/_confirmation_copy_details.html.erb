@@ -1,0 +1,14 @@
+<div id="bulk-reallocation-text-to-copy">
+  <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+    <% selected_cases.each do |selected_case| %>
+      <li><%= selected_case.fetch(:full_name) %> (<%= selected_case.fetch(:nomis_offender_id) %>)</li>
+    <% end %>
+  </ul>
+
+  <% if message.present? %>
+    <p class="govuk-body govuk-!-margin-bottom-6">
+      <strong>Additional notes:</strong> <%= message %>
+    </p>
+  <% end %>
+</div>
+

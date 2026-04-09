@@ -2,46 +2,25 @@
 
 require 'rails_helper'
 
-RSpec.describe ReallocationsController, type: :controller do
+RSpec.describe Reallocations::SelectionController, type: :controller do
   render_views
 
-  let(:prison) { create(:prison) }
-  let(:old_pom) { build(:pom, :prison_officer, staffId: 10_001, firstName: 'Old', lastName: 'Pom') }
-  let(:new_pom) { build(:pom, :probation_officer, staffId: 10_002, firstName: 'New', lastName: 'Pom') }
-  let(:poms) { [old_pom, new_pom] }
-  let(:offender) do
-    build(
-      :nomis_offender,
-      :inside_omic_policy,
-      prisonId: prison.code,
-      prisonerNumber: 'G1234AA',
-      firstName: 'Alice',
-      lastName: 'Zephyr',
-      sentence: attributes_for(:sentence_detail,
-                               conditionalReleaseDate: '2028-04-01',
-                               releaseDate: '2029-04-01')
-    )
+  include_context 'with reallocation controller defaults'
+
+  let(:route_params) do
+    {
+      prison_id: prison.code,
+      nomis_staff_id: old_pom.staffId
+    }
   end
-  let(:offender_no) { offender.fetch(:prisonerNumber) }
 
-  before do
-    stub_poms(prison.code, poms)
-    stub_signed_in_spo_pom(prison.code, 99_999, 'spo-user')
-    stub_offenders_for_prison(prison.code, [offender])
-
-    create(:pom_detail, :inactive, prison_code: prison.code, nomis_staff_id: old_pom.staffId)
-    create(:pom_detail, :active, prison_code: prison.code, nomis_staff_id: new_pom.staffId)
-    create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), tier: 'A')
-    create(:allocation_history,
-           prison: prison.code,
-           nomis_offender_id: offender_no,
-           primary_pom_nomis_id: old_pom.staffId,
-           primary_pom_name: old_pom.full_name)
+  let(:target_pom_route_params) do
+    route_params.merge(new_pom: new_pom.staffId)
   end
 
   describe '#index' do
     subject(:perform_request) do
-      get :index, params: { prison_id: prison.code, nomis_staff_id: old_pom.staffId }
+      get :index, params: route_params
     end
 
     let(:response_body) { response.body }
@@ -80,13 +59,10 @@ RSpec.describe ReallocationsController, type: :controller do
 
   describe '#compare_poms' do
     subject(:perform_request) do
-      get :compare_poms,
-          params: {
-            prison_id: prison.code,
-            nomis_staff_id: old_pom.staffId,
-            pom_ids: [new_pom.staffId]
-          }
+      get :compare_poms, params: route_params.merge(pom_ids:)
     end
+
+    let(:pom_ids) { [new_pom.staffId] }
 
     it 'renders the shared comparison rows and reallocation-specific action' do
       perform_request
@@ -98,11 +74,38 @@ RSpec.describe ReallocationsController, type: :controller do
       expect(response.body).to include('Select this POM')
       expect(response.body).not_to include('current-pom')
     end
+
+    context 'when the submitted compare list includes an unavailable POM' do
+      let(:extra_pom) { build(:pom, :prison_officer, staffId: 10_003, firstName: 'Extra', lastName: 'Pom') }
+
+      before do
+        stub_poms(prison.code, [old_pom, new_pom, extra_pom])
+        create(:pom_detail, :inactive, prison_code: prison.code, nomis_staff_id: extra_pom.staffId)
+      end
+
+      it 'redirects back with an alert' do
+        get :compare_poms, params: route_params.merge(pom_ids: [extra_pom.staffId])
+
+        expect(response).to redirect_to(prison_reallocation_path(prison.code, old_pom.staffId))
+        expect(flash[:alert]).to eq('Choose POMs from the available list to compare workloads')
+      end
+    end
+  end
+
+  describe '#check_compare_list' do
+    let(:pom_ids) { [new_pom.staffId] }
+
+    it 'accepts valid compare selections without requiring prisoner_id' do
+      put :check_compare_list, params: route_params.merge(pom_ids:)
+
+      expect(response).to redirect_to(compare_poms_prison_reallocation_path(prison.code, old_pom.staffId, pom_ids:))
+      expect(flash[:alert]).to be_nil
+    end
   end
 
   describe '#caseload' do
     subject(:perform_request) do
-      get :caseload, params: { prison_id: prison.code, nomis_staff_id: old_pom.staffId, new_pom: new_pom.staffId }
+      get :caseload, params: target_pom_route_params
     end
 
     let(:response_body) { response.body }
@@ -145,35 +148,79 @@ RSpec.describe ReallocationsController, type: :controller do
         expect(response).to redirect_to(error_prison_reallocation_path(prison.code, old_pom.staffId))
       end
     end
+
+    context "when reallocating cases in the women's estate" do
+      let(:prison) { create(:womens_prison) }
+      let(:offenders_in_prison) { [offender, missing_complexity_offender] }
+      let(:missing_complexity_offender) do
+        build(
+          :nomis_offender,
+          :inside_omic_policy,
+          prisonId: prison.code,
+          prisonerNumber: 'G9999ZZ',
+          firstName: 'Casey',
+          lastName: 'NoComplexity',
+          complexityLevel: nil,
+          sentence: attributes_for(:sentence_detail,
+                                   conditionalReleaseDate: '2028-06-01',
+                                   releaseDate: '2029-06-01')
+        )
+      end
+
+      before do
+        create_reallocation_case(missing_complexity_offender.fetch(:prisonerNumber), tier: 'B')
+      end
+
+      it 'shows the complexity column and only includes allocatable cases' do
+        perform_request
+
+        expect(response).to be_successful
+        expect(assigns(:allocations).map(&:nomis_offender_id)).to eq([offender_no])
+        expect(response.body).to include('Complexity level')
+        expect(response.body).to include('Medium')
+        expect(response.body).not_to include(missing_complexity_offender.fetch(:prisonerNumber))
+      end
+    end
   end
 
-  describe '#selected_cases' do
+  describe '#create' do
     let(:params) do
-      {
-        prison_id: prison.code,
-        nomis_staff_id: old_pom.staffId,
-        new_pom: new_pom.staffId,
-        nomis_offender_ids: nomis_offender_ids
-      }
+      target_pom_route_params.merge(nomis_offender_ids: nomis_offender_ids)
     end
 
     context 'when no cases are selected' do
       let(:nomis_offender_ids) { [] }
 
-      it 'returns an unprocessable entity response' do
-        post :selected_cases, params: params
+      it 'redirects back to the caseload with an alert' do
+        post :create, params: params
 
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(flash[:alert]).to be_nil
+        expect(response).to redirect_to(caseload_prison_reallocation_path(prison, old_pom.staffId, new_pom.staffId))
+        expect(flash[:alert]).to eq('Choose at least one case to reallocate.')
       end
     end
 
     context 'when cases are selected' do
       let(:nomis_offender_ids) { [offender_no] }
 
-      it 'redirects back with a placeholder notice' do
-        post :selected_cases, params: params
-        expect(response).to redirect_to(caseload_prison_reallocation_path(prison, old_pom.staffId, new_pom.staffId))
+      it 'redirects to the confirmation step when no overrides are needed' do
+        post :create, params: params
+
+        expect(response).to redirect_to(summary_prison_reallocation_path(prison, old_pom.staffId, new_pom.staffId))
+      end
+    end
+
+    context 'when a selected case needs an override' do
+      let(:offenders_in_prison) { [offender, override_offender] }
+      let(:nomis_offender_ids) { [override_offender_no] }
+
+      before do
+        create_reallocation_case(override_offender_no, tier: 'C')
+      end
+
+      it 'redirects to the first override step' do
+        post :create, params: params
+
+        expect(response).to redirect_to(override_prison_reallocation_path(prison, old_pom.staffId, new_pom.staffId, override_offender_no))
       end
     end
   end
