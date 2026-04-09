@@ -196,6 +196,7 @@ components:
           nullable: true
         roshStartDate:
           type: string
+          format: date
           nullable: true
         createdAt:
           type: string
