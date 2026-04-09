@@ -181,6 +181,8 @@ describe OffenderService, type: :feature do
     let(:manager_surname) { 'Beckker' }
     let(:manager_email) { 'borris@beckker.me' }
     let(:mappa_level) { 0 }
+    let(:rosh_level) { 'HIGH' }
+    let(:rosh_start_date) { '2026-03-14' }
 
     let(:probation_record) do
       {
@@ -206,7 +208,11 @@ describe OffenderService, type: :feature do
           email: manager_email
         },
         mappaLevel: mappa_level,
-        vloAssigned: true
+        vloAssigned: true,
+        rosh: {
+          level: rosh_level,
+          startDate: rosh_start_date
+        }
       }
     end
 
@@ -246,12 +252,24 @@ describe OffenderService, type: :feature do
             email: manager_email
           },
           mappa_level: mappa_level,
-          vlo_assigned: true
+          vlo_assigned: true,
+          rosh: {
+            level: rosh_level,
+            start_date: rosh_start_date
+          }
         }
       end
 
       it 'returns expected hash' do
         expect(result).to eq(expected_hash)
+      end
+
+      context 'when rosh details are missing' do
+        before { probation_record.delete(:rosh) }
+
+        it 'returns nil rosh values' do
+          expect(result[:rosh]).to eq(level: nil, start_date: nil)
+        end
       end
     end
   end

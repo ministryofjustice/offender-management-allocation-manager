@@ -165,6 +165,7 @@ components:
       - activeVlo
       - enhancedResourcing
       - roshLevel
+      - roshStartDate
       - createdAt
       - updatedAt
       properties:
@@ -192,6 +193,10 @@ components:
           nullable: true
         roshLevel:
           type: string
+          nullable: true
+        roshStartDate:
+          type: string
+          format: date
           nullable: true
         createdAt:
           type: string

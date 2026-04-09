@@ -40,7 +40,8 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
       com_name: "#{com_surname}, #{com_forename}",
       com_email: com_email,
       tier: "A",
-      rosh_level: nil, # TODO: not fetching rosh yet
+      rosh_level: nil,
+      rosh_start_date: nil,
     }
   end
 
@@ -104,7 +105,7 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
             'enhanced_resourcing' => nil,
             'local_delivery_unit_id' => nil
           },
-          'after' => new_case_information_attributes.except(:rosh_level).stringify_keys
+          'after' => new_case_information_attributes.except(:rosh_level, :rosh_start_date).stringify_keys
         }
       end
     end
@@ -264,11 +265,11 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
     end
 
     include_examples 'audit event' do
-      let(:attrs_not_changing) { %w[id created_at updated_at active_vlo nomis_offender_id tier rosh_level] }
+      let(:attrs_not_changing) { %w[id created_at updated_at active_vlo nomis_offender_id tier rosh_level rosh_start_date] }
       let(:expected_data) do
         {
           'before' => c1.attributes.except(*attrs_not_changing),
-          'after' => new_case_information_attributes.except(:nomis_offender_id, :tier, :rosh_level).stringify_keys
+          'after' => new_case_information_attributes.except(:nomis_offender_id, :tier, :rosh_level, :rosh_start_date).stringify_keys
         }
       end
     end

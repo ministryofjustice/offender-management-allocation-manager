@@ -82,7 +82,11 @@ class OffenderService
           email: result.dig(:manager, :email)
         },
         mappa_level: result[:mappaLevel],
-        vlo_assigned: result[:vloAssigned]
+        vlo_assigned: result[:vloAssigned],
+        rosh: {
+          level: result.dig(:rosh, :level),
+          start_date: result.dig(:rosh, :startDate),
+        }
       }
     rescue Faraday::ResourceNotFound
       nil
