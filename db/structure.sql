@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -214,7 +215,8 @@ CREATE TABLE public.case_information (
     com_email character varying,
     active_vlo boolean DEFAULT false,
     enhanced_resourcing boolean,
-    rosh_level character varying
+    rosh_level character varying,
+    rosh_start_date date
 );
 
 
@@ -1344,6 +1346,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260409113634'),
 ('20260217152514'),
 ('20260213115546'),
 ('20260206120702'),
