@@ -14,47 +14,33 @@
 </div>
 
 <div id="compare-table">
-  <%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: @poms, current_pom_id: @current_pom_id } do |pom| %>
+  <%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: @poms } do |pom| %>
     <h2 class="govuk-cookie-banner__heading govuk-heading-m govuk-!-margin-bottom-0"><%= full_name_ordered(pom) %></h2>
 
     <p><%= format_working_pattern(pom.working_pattern) %></p>
 
-    <% if @current_pom_id == pom.staff_id || @previous_pom_ids&.include?(pom.staff_id) %>
+    <% if @previous_pom_ids&.include?(pom.staff_id) %>
       <div class="govuk-warning-text govuk-!-margin-bottom-0">
         <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
         <p class="govuk-warning-text__text">
           <span class="govuk-visually-hidden">Warning</span>
-          <% if @current_pom_id == pom.staff_id %>
-            <%= @coworking ? 'Primary POM' : 'Currently allocated' %>
-          <% else %>
-            Previously allocated
-          <% end %>
+          Previously allocated
         </p>
       </div>
-    <% else %>
-      <div class="govuk-warning-text govuk-!-margin-bottom-0"></div>
     <% end %>
   <% end %>
 
   <%= render 'shared/pom_comparison/comparison_metrics',
              poms: @poms,
-             prison: @prison,
-             current_pom_id: @current_pom_id %>
+             prison: @prison %>
 
-  <%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: @poms, current_pom_id: @current_pom_id } do |pom| %>
+  <%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: @poms } do |pom| %>
     <% if @coworking %>
-      <% if @current_pom_id == pom.staff_id %>
-        <button disabled="disabled" aria-disabled="true" class="govuk-button" data-module="govuk-button">
-          Allocate co-working POM
-        </button>
-      <% else %>
-        <%= link_to 'Allocate co-working POM',
-                    prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @current_pom_id, pom.staff_id),
-                    class: 'govuk-button' %>
-      <% end %>
+      <%= link_to 'Allocate co-working POM',
+                  prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @primary_pom_id, pom.staff_id),
+                  class: 'govuk-button' %>
     <% else %>
-      <% button_text = @current_pom_id == pom.staff_id ? 'Keep allocation' : 'Allocate' %>
-      <%= link_to button_text,
+      <%= link_to 'Allocate',
                   new_prison_prisoner_staff_build_allocation_path(@prison.code, @prisoner.offender_no, pom.staff_id),
                   class: 'govuk-button' %>
     <% end %>

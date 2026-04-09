@@ -20,24 +20,23 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
   end
 
   context 'when there is an existing invalid co-worker' do
-    before do
-      stub_user('user', primary_pom.staffId)
-
+    let(:user) { build(:pom) }
+    let(:secondary_pom) { build(:pom) }
+    let!(:allocation) do
       create(:allocation_history, prison: prison,
                                   nomis_offender_id: offender_no,
                                   primary_pom_nomis_id: primary_pom.staffId,
                                   secondary_pom_nomis_id: secondary_pom.staffId)
-
-      session[:latest_allocation_details] = {}
     end
 
-    let(:user) { build(:pom) }
-    let(:secondary_pom) { build(:pom) }
+    before do
+      stub_user('user', primary_pom.staffId)
+    end
 
     it 'allocates' do
       post :create, params: { prison_id: prison, coworking_allocations: { nomis_offender_id: offender_no, nomis_staff_id: new_secondary_pom.staffId } }
       expect(response).to redirect_to(allocated_prison_prisoners_path(prison))
-      expect(AllocationHistory.find_by(nomis_offender_id: offender_no).secondary_pom_nomis_id).to eq(new_secondary_pom.staffId)
+      expect(allocation.reload.secondary_pom_nomis_id).to eq(new_secondary_pom.staffId)
     end
 
     it 'passes message and stores additional notes' do
@@ -54,15 +53,25 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
       post :create, params: { prison_id: prison, coworking_allocations: { nomis_offender_id: offender_no, nomis_staff_id: new_secondary_pom.staffId, message: message } }
 
       expect(session[:latest_allocation_details][:additional_notes]).to eq(message)
+      expect(session[:latest_allocation_details]).to include(prisoner_number: offender_no)
     end
   end
 
   describe '#confirm' do
+    let!(:allocation) do
+      create(:allocation_history,
+             prison: prison,
+             nomis_offender_id: offender_no,
+             primary_pom_nomis_id: primary_pom.staffId)
+    end
+
     before do
+      session[:latest_allocation_details] = { prisoner_number: 'STALE123' }
+
       get :confirm, params: {
         "prison_id" => prison,
         "nomis_offender_id" => offender_no,
-        "primary_pom_id" => primary_pom.staffId,
+        "primary_pom_id" => new_secondary_pom.staffId,
         "secondary_pom_id" => new_secondary_pom.staffId
       }
     end
@@ -71,13 +80,16 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
       expect(response.code).to eq('200')
     end
 
-    it 'stores offender details' do
-      expect(session).to have_key(:latest_allocation_details)
-      expect(session[:latest_allocation_details]).to include(prisoner_number: offender_no)
+    it 'does not leave offender details in the session' do
+      expect(session).not_to have_key(:latest_allocation_details)
     end
 
     it 'stores allocation details in instance variable' do
       expect(assigns(:latest_allocation_details)).to include(prisoner_number: offender_no)
+    end
+
+    it 'uses the persisted primary POM rather than the submitted primary_pom_id' do
+      expect(assigns(:primary_pom).staff_id).to eq(allocation.primary_pom_nomis_id)
     end
   end
 

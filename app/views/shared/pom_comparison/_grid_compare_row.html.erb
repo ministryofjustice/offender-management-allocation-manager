@@ -1,8 +1,6 @@
-<% current_pom_id = local_assigns.fetch(:current_pom_id, nil) %>
-
 <div class="govuk-grid-row">
   <% poms.each do |pom| %>
-    <div class="govuk-grid-column-one-quarter pom-data <%= current_pom_id == pom.staff_id ? 'current-pom' : '' %>">
+    <div class="govuk-grid-column-one-quarter pom-data">
       <%= yield pom %>
     </div>
   <% end %>

@@ -52,7 +52,8 @@ module PomHelper
     {
       active: 'Active: available for new allocations',
       inactive: 'Inactive',
-      unavailable: 'Unavailable for new allocations'
+      unavailable: 'Unavailable for new allocations',
+      deleted: 'No longer recorded as a POM at this prison',
     }.fetch(pom.status.downcase.to_sym)
   end
 

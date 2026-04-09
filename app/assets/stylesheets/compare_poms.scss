@@ -17,25 +17,9 @@
     }
   }
 
-  .current-pom {
-    background-color: govuk-colour("white");
-    border-left: 1px solid govuk-colour("black");
-    border-right: 1px solid govuk-colour("black");
-  }
-
   .govuk-grid-row:first-child {
-    .current-pom {
-      border-top: 1px solid govuk-colour("black") !important;
-    }
-
     .pom-data {
       border-top: 1px solid govuk-colour("white");
-    }
-  }
-
-  .govuk-grid-row:last-child {
-    .current-pom {
-      border-bottom: 1px solid govuk-colour("black");
     }
   }
 }

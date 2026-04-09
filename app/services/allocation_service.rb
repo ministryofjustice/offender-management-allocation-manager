@@ -31,7 +31,7 @@ class AllocationService
                                       pom_nomis_id: secondary_pom_nomis_id, pom_firstname: coworking_pom.first_name)
   end
 
-  def self.create_or_update(params, further_info = {})
+  def self.create_or_update(params, further_info = {}, notify: true)
     primary_pom = HmppsApi::NomisUserRolesApi.staff_details(params[:primary_pom_nomis_id])
     created_by_user = HmppsApi::NomisUserRolesApi.user_details(params[:created_by_username])
 
@@ -54,10 +54,12 @@ class AllocationService
       alloc_version.update!(params_copy)
     end
 
-    EmailService.send_email(allocation: alloc_version,
-                            message: params[:message],
-                            pom_nomis_id: params[:primary_pom_nomis_id],
-                            further_info: further_info)
+    if notify
+      EmailService.send_email(allocation: alloc_version,
+                              message: params[:message],
+                              pom_nomis_id: params[:primary_pom_nomis_id],
+                              further_info: further_info)
+    end
 
     alloc_version
   end

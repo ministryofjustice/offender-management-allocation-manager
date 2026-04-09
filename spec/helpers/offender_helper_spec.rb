@@ -120,12 +120,24 @@ RSpec.describe OffenderHelper do
     let(:api_offender) { build(:hmpps_api_offender) }
     let(:pom) { double('StaffMember') }
     let(:notes) { 'a note' }
-    let(:view_context) { double('view_context', full_name_ordered: '', unreverse_name: '', format_date: '') }
+    let(:view_context) do
+      double('view_context').tap do |context|
+        allow(context).to receive(:full_name_ordered).and_return('')
+        allow(context).to receive(:unreverse_name).and_return('')
+        allow(context).to receive(:format_date) { |date| date&.strftime('%d %b %Y') }
+      end
+    end
     let(:last_oasys_completed) { Time.zone.today }
+    let(:handover_start_date) { Date.new(2027, 1, 1) }
 
     before do
       allow(helper).to receive(:last_oasys_completed).and_return(last_oasys_completed)
       allow(offender).to receive(:active_alert_labels).and_return(%w[bish bosh bash])
+      allow(offender).to receive(:handover_start_date).and_return(handover_start_date)
+    end
+
+    it 'includes the handover start date' do
+      expect(subject[:handover_start_date]).to eq('01 Jan 2027')
     end
 
     context 'when no last completed OASys' do
@@ -143,6 +155,14 @@ RSpec.describe OffenderHelper do
 
       it 'displays "Unknown"' do
         expect(subject[:handover_completion_date]).to eq('Unknown')
+      end
+    end
+
+    context 'when no handover start date' do
+      let(:handover_start_date) { nil }
+
+      it 'displays "Unknown"' do
+        expect(subject[:handover_start_date]).to eq('Unknown')
       end
     end
 
