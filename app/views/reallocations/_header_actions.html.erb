@@ -1,6 +1,6 @@
 <div class="moj-page-header-actions">
   <div class="moj-page-header-actions__title">
-    <h1 class="govuk-heading-l"><%= title %></h1>
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-1"><%= title %></h1>
 
     <span class="govuk-caption-l">
       Reallocating from: <%= pom_level(pom.position, titleize: false, fallback: '') %> <%= pom.full_name_ordered %>
@@ -12,8 +12,10 @@
     </span>
     <% end %>
 
-    <span class="govuk-caption-l">
-      Cases remaining: <%= pom.primary_allocations_count %>
-    </span>
+    <% unless defined?(hide_cases_remaining) %>
+      <span class="govuk-caption-l">
+        Cases remaining: <%= defined?(cases_remaining) ? cases_remaining : pom.primary_allocations_count %>
+      </span>
+    <% end %>
   </div>
 </div>

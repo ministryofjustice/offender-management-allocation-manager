@@ -1,0 +1,66 @@
+<% content_for :title, 'Cases reallocated – Digital Prison Services' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-panel govuk-panel--confirmation govuk-!-margin-bottom-6">
+      <h1 class="govuk-panel__title">
+        Cases reallocated
+      </h1>
+    </div>
+
+    <h2 class="govuk-heading-m">Reallocation details</h2>
+
+    <p class="govuk-body">
+      You have reallocated <%= pluralize(@selected_cases.size, 'case') %> from
+      <%= pom_level(@pom.position, titleize: false) %> <%= @pom.full_name_ordered %> to
+      <%= pom_level(@new_pom.position, titleize: false) %> <%= @new_pom.full_name_ordered %>.
+    </p>
+
+    <h2 class="govuk-heading-m">Update sent</h2>
+
+    <% if @new_pom.email_address.present? %>
+      <p class="govuk-body">
+        We have emailed <%= @new_pom.full_name_ordered %> about the new allocations.
+      </p>
+    <% else %>
+      <p class="govuk-body">
+        No email was sent because <%= @new_pom.full_name_ordered %> does not have a registered email address in NOMIS.
+      </p>
+    <% end %>
+
+    <details class="govuk-details govuk-!-margin-bottom-6" data-module="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+          You can copy information about this allocation to paste into an email to someone else
+        </span>
+      </summary>
+
+      <div class="govuk-details__text">
+        <%= render partial: 'confirmation_copy_details', locals: { selected_cases: @selected_cases, message: @message } %>
+
+        <button onclick="copyToClipboard('bulk-reallocation-text-to-copy')" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">
+          Copy this information
+        </button>
+      </div>
+    </details>
+
+    <h2 class="govuk-heading-m">What next</h2>
+
+    <% if @remaining_cases_count.positive? %>
+      <p class="govuk-body">
+        <%= @pom.full_name_ordered %> has <%= pluralize(@remaining_cases_count, 'case') %> left to reallocate.
+      </p>
+
+      <div class="govuk-button-group">
+        <%= link_to 'Reallocate cases now', prison_reallocation_path, class: 'govuk-button' %>
+        <%= link_to 'Back to staff list', prison_poms_path(@prison.code, anchor: 'attention_needed!top'), class: 'govuk-button govuk-button--secondary' %>
+      </div>
+    <% else %>
+      <p class="govuk-body">
+        <%= @pom.full_name_ordered %> has no more cases and has been removed from this service.
+      </p>
+
+      <%= link_to 'Back to staff list', prison_poms_path(@prison.code, anchor: 'attention_needed!top'), class: 'govuk-button' %>
+    <% end %>
+  </div>
+</div>

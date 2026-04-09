@@ -1,0 +1,47 @@
+<% content_for :title, "Confirm reallocation – Digital Prison Services" %>
+
+<%= link_to 'Back', @back_path,
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <%= form_for(@allocation,
+                 url: complete_prison_reallocation_path(@prison.code, @pom.staff_id, @new_pom.staff_id),
+                 builder: GOVUKDesignSystemFormBuilder::FormBuilder,
+                 method: :put) do |form| %>
+      <% if @allocation.errors.any? %>
+        <%= form.govuk_error_summary %>
+      <% end %>
+
+      <%= render partial: 'header_actions',
+                 locals: {
+                   title: "Confirm reallocation of #{pluralize(@selected_cases.size, 'case')}",
+                   pom: @pom,
+                   new_pom: @new_pom,
+                   cases_remaining: @cases_remaining
+                 } %>
+
+      <p class="govuk-body">
+        We will send the information below to <strong><%= @new_pom.email_address %></strong>
+      </p>
+
+      <div class="govuk-inset-text">
+        <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+          <% @selected_cases.each do |selected_case| %>
+            <li><%= selected_case.full_name %> (<%= selected_case.nomis_offender_id %>)</li>
+          <% end %>
+        </ul>
+
+        <%= form.govuk_text_area :message,
+                                 label: { text: 'Add a note to the email (optional)', size: 's' },
+                                 rows: 3, class: 'govuk-!-margin-bottom-0' %>
+      </div>
+
+      <div class="govuk-button-group">
+        <%= form.submit 'Complete allocation', class: 'govuk-button', data: { module: 'govuk-button' } %>
+        <%= link_to 'Cancel', caseload_prison_reallocation_path(@prison.code, @pom.staff_id, @new_pom.staff_id),
+                    class: 'govuk-link govuk-link--no-visited-state' %>
+      </div>
+    <% end %>
+  </div>
+</div>

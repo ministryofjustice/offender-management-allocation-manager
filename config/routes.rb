@@ -61,13 +61,21 @@ Rails.application.routes.draw do
     # Bulk reallocation
     resources :reallocations, only: [], param: :nomis_staff_id do
       member do
-        get '/' => 'reallocations#index'
-        get :check_compare_list, to: 'reallocations#index'
-        put :check_compare_list
-        get :compare_poms
-        get 'caseload/:new_pom', action: :caseload, as: :caseload
-        post 'selected_cases/:new_pom', action: :selected_cases, as: :selected_cases
-        get :error
+        # select/compare poms and cases to reallocate
+        get '/', to: 'reallocations/selection#index'
+        get :check_compare_list, to: 'reallocations/selection#index'
+        put :check_compare_list, to: 'reallocations/selection#check_compare_list'
+        get :compare_poms, to: 'reallocations/selection#compare_poms'
+        get :error, to: 'reallocations/selection#error'
+        get 'caseload/:new_pom', to: 'reallocations/selection#caseload', as: :caseload
+        post 'caseload/:new_pom', to: 'reallocations/selection#create'
+
+        # actual reallocation operation, including overrides
+        get 'override/:new_pom/:nomis_offender_id', to: 'reallocations/journey#override', as: :override
+        put 'override/:new_pom/:nomis_offender_id', to: 'reallocations/journey#update_override', as: :update_override
+        get 'summary/:new_pom', to: 'reallocations/journey#summary', as: :summary
+        put 'summary/:new_pom', to: 'reallocations/journey#complete', as: :complete
+        get 'confirmation/:new_pom', to: 'reallocations/journey#confirmation', as: :confirmation
       end
     end
 

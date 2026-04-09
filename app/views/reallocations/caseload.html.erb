@@ -7,12 +7,26 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
+    <% if flash[:alert] %>
+      <div class="govuk-error-summary govuk-!-margin-bottom-6" aria-labelledby="reallocation-error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+        <h2 id="reallocation-error-summary-title" class="govuk-error-summary__title">
+          There is a problem
+        </h2>
+
+        <div class="govuk-error-summary__body">
+          <ul class="govuk-list govuk-error-summary__list">
+            <li><%= flash[:alert] %></li>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+
     <%= render partial: 'header_actions',
                locals: { title: 'Choose cases to reallocate', pom: @pom, new_pom: @new_pom } %>
   </div>
 
   <div class="govuk-grid-column-full govuk-!-margin-top-6">
-    <%= form_tag(selected_cases_prison_reallocation_path(@prison.code, @pom.staff_id, @new_pom.staff_id),
+    <%= form_tag(caseload_prison_reallocation_path(@prison.code, @pom.staff_id, @new_pom.staff_id),
                  method: :post, data: { reallocation_case_selection: true }) do %>
       <%= render 'caseload_table', collection: @allocations %>
 

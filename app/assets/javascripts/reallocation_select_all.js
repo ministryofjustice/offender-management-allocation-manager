@@ -4,11 +4,9 @@ document.addEventListener('turbolinks:load', function() {
     const checkboxes = Array.from(form.querySelectorAll('[data-reallocation-case-checkbox]'));
     const continueButton = form.querySelector('[data-reallocation-continue-button]');
 
-    if (form.dataset.reallocationCaseSelectionInitialised === 'true' || !selectAll || checkboxes.length === 0) {
+    if (!selectAll || checkboxes.length === 0) {
       return;
     }
-
-    form.dataset.reallocationCaseSelectionInitialised = 'true';
 
     function syncSelectionState() {
       const allChecked = checkboxes.every(function(checkbox) { return checkbox.checked; });

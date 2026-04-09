@@ -1,0 +1,35 @@
+<% content_for :title, "Why are you allocating to this POM? – Digital Prison Services" %>
+
+<%= link_to 'Back', @back_path,
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <%= form_for(@override,
+                 url: override_prison_reallocation_path(@prison.code, @pom.staff_id, @new_pom.staff_id, @override_case.nomis_offender_id),
+                 builder: GOVUKDesignSystemFormBuilder::FormBuilder,
+                 method: :put) do |form| %>
+      <%= form.govuk_error_summary %>
+
+      <%= render partial: 'header_actions',
+                 locals: {
+                   title: "Why are you allocating a #{pom_level(@new_pom.position, titleize: false)} to #{@override_case.full_name_ordered} (#{@override_case.nomis_offender_id})?",
+                   pom: @pom,
+                   new_pom: @new_pom,
+                   hide_cases_remaining: true
+                 } %>
+
+      <%= render 'shared/override_reasons_form', form: form, offender: @override_prisoner, pom: @new_pom %>
+
+      <div class="govuk-button-group">
+        <%= form.submit 'Continue', class: 'govuk-button', data: { module: 'govuk-button' } %>
+        <%= button_tag 'Allocate to someone else',
+                       type: 'submit',
+                       name: :allocate_to_someone_else,
+                       value: '1',
+                       class: 'govuk-button govuk-button--secondary',
+                       data: { module: 'govuk-button' } %>
+      </div>
+    <% end %>
+  </div>
+</div>
