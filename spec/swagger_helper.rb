@@ -144,6 +144,7 @@ RSpec.configure do |config|
               activeVlo
               enhancedResourcing
               roshLevel
+              roshStartDate
               createdAt
               updatedAt
             ],
@@ -157,6 +158,7 @@ RSpec.configure do |config|
               activeVlo: { type: :boolean },
               enhancedResourcing: { type: :boolean, nullable: true },
               roshLevel: { type: :string, nullable: true },
+              roshStartDate: { type: :string, nullable: true },
               createdAt: { type: :string },
               updatedAt: { type: :string },
             }
