@@ -29,7 +29,8 @@ module AuthHelper
       }.to_json)
   end
 
-  def stub_sso_data(prison, username: 'user', staff_id: 754_732, roles: [SsoIdentity::SPO_ROLE], email: '754732@example.com')
+  def stub_sso_data(prison, username: 'user', staff_id: 754_732, roles: [SsoIdentity::SPO_ROLE], email: '754732@example.com',
+                    active_caseload: prison, caseloads: [prison], token: USER_ACCESS_TOKEN)
     allow(HmppsApi::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
 
     stub_pom(
@@ -40,11 +41,11 @@ module AuthHelper
       session[:sso_data] = {
         'expiry' => Time.zone.now + 1.day,
         'roles' => roles,
-        'active_caseload' => prison,
-        'caseloads' => [prison],
+        'active_caseload' => active_caseload,
+        'caseloads' => caseloads,
         'username' => username,
         'staff_id' => staff_id,
-        'token' => USER_ACCESS_TOKEN,
+        'token' => token,
       }
     end
   end

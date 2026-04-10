@@ -5,8 +5,8 @@
 class PrisonsApplicationController < ApplicationController
   include Sorting
 
-  before_action :authenticate_user, :check_prison_access, :load_staff_member, :service_notifications, :load_roles,
-                :check_active_caseload
+  before_action :authenticate_user, :check_active_caseload, :check_prison_access,
+                :load_staff_member, :load_roles, :service_notifications
 
 protected
 
@@ -95,10 +95,14 @@ private
     prison_id = params[:prison_id]
     return if prison_id.blank?
 
-    if default_prison_code != prison_id
-      flash[:notice] = t('views.navigation.enforce_active_caseload', name: Prison.find_by_code(default_prison_code).name)
-      session.delete(:sso_data)
-      redirect_to prison_dashboard_index_path(prison_id: default_prison_code)
-    end
+    # Do not rely only on `default_prison_code` from the session here.
+    # When a user switches active caseload outside this app, the session can be stale
+    # until we force a refresh, so we must compare against a live upstream value.
+    active_caseload_id = dps_header_footer.dig('meta', 'activeCaseLoad', 'caseLoadId') || default_prison_code
+    return if active_caseload_id.blank? || active_caseload_id == prison_id
+
+    flash[:notice] = t('views.navigation.enforce_active_caseload', name: Prison.find_by_code(active_caseload_id).name)
+    session.delete(:sso_data)
+    redirect_to prison_dashboard_index_path(prison_id: active_caseload_id)
   end
 end
