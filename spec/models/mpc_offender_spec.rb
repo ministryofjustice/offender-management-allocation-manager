@@ -257,7 +257,6 @@ RSpec.describe MpcOffender, type: :model do
         earliest_release_for_handover
         latest_temp_movement_date
         release_date
-        date_of_birth
         main_offence
         days_awaiting_allocation
         working_days_since_entering_this_prison
@@ -266,12 +265,7 @@ RSpec.describe MpcOffender, type: :model do
         complexity_level
         category_code
         category_active_since
-        first_name
-        last_name
-        full_name_ordered
-        full_name
         inside_omic_policy?
-        offender_no
         prison_id
         restricted_patient?
         crn

@@ -81,12 +81,6 @@ module OffenderHelper
     offenders.count { |a| a.tier == 'D' }
   end
 
-  # :nocov: new case mix bar doesn't include tier N/A cases :-(
-  def no_tier_case_count(offenders)
-    offenders.count { |a| a.tier == 'N/A' }
-  end
-  # :nocov:
-
   def probation_field(offender, field)
     offender.public_send field if offender.probation_record.present?
   end

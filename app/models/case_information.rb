@@ -3,6 +3,10 @@
 class CaseInformation < ApplicationRecord
   self.table_name = 'case_information'
 
+  MAPPA_LEVELS = [0, 1, 2, 3].freeze
+  TIER_LEVELS = %w[A B C D].freeze
+  ROSH_LEVELS = %w[LOW MEDIUM HIGH VERY_HIGH].freeze
+
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :case_information
@@ -13,9 +17,8 @@ class CaseInformation < ApplicationRecord
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  # Don't think this is as simple as allowing nil. In the specific case of Scot/NI
-  # prisoners it makes sense to have N/A (as this is genuine) but not otherwise
-  validates :tier, inclusion: { in: %w[A B C D N/A], message: 'Select the prisoner’s tier' }
+  validates :tier, inclusion: { in: TIER_LEVELS, message: 'Select the prisoner’s tier' }
+  validates :rosh_level, inclusion: { in: ROSH_LEVELS, allow_nil: true }
 
   validates :enhanced_resourcing,
             inclusion: { in: [true, false], message: 'Select the handover type for this case' },
@@ -23,7 +26,7 @@ class CaseInformation < ApplicationRecord
 
   # nil means MAPPA level is completely unknown.
   # 0 means MAPPA level is known to be not relevant for offender
-  validates :mappa_level, inclusion: { in: [0, 1, 2, 3], allow_nil: true }
+  validates :mappa_level, inclusion: { in: MAPPA_LEVELS, allow_nil: true }
 
   scope :without_com, -> { where(com_name: nil) }
 

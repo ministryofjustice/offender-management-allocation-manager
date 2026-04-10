@@ -86,15 +86,27 @@ private
   def self.release_offender(offender_no, from_agency)
     Rails.logger.info("[MOVEMENT] Processing release for #{offender_no}")
 
-    CaseInformation.where(nomis_offender_id: offender_no).destroy_all
-
     alloc = AllocationHistory.active.find_by(nomis_offender_id: offender_no)
     alloc.deallocate_offender_after_release if alloc
+
+    destroy_case_information(offender_no)
 
     HmppsApi::ComplexityApi.inactivate(offender_no) if PrisonService.womens_prison?(from_agency)
   end
 
 private
+
+  def self.destroy_case_information(offender_no)
+    case_information = CaseInformation.find_by(nomis_offender_id: offender_no)
+    return unless case_information
+
+    # Preserve destroy callbacks and PaperTrail history for case information.
+    # Use a savepoint if an outer transaction exists so a failed destroy rolls
+    # back cleanly rather than leaving that wider transaction unusable.
+    CaseInformation.transaction(requires_new: true) do
+      case_information.destroy!
+    end
+  end
 
   def self.hospital_agencies
     @hospital_agencies ||= HmppsApi::PrisonApi::AgenciesApi.agency_ids_by_type(

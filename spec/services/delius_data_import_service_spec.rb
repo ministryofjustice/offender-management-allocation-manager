@@ -13,6 +13,8 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
   let(:com_surname) { 'Aardvark' }
   let(:com_email) { 'arnie@aardvark.me' }
   let(:tier) { 'A_2' }
+  let(:rosh_level) { 'HIGH' }
+  let(:rosh_start_date) { Date.new(2026, 3, 14) }
 
   let(:mock_probation_record) do
     build :probation_record, offender_no: nomis_offender_id,
@@ -21,6 +23,8 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
                              team_description: team_name,
                              ldu_code: ldu.code,
                              ldu_description: ldu.name,
+                             rosh_level: rosh_level,
+                             rosh_start_date: rosh_start_date,
                              com_forename: com_forename,
                              com_surname: com_surname,
                              com_email: com_email
@@ -40,9 +44,13 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
       com_name: "#{com_surname}, #{com_forename}",
       com_email: com_email,
       tier: "A",
-      rosh_level: nil,
-      rosh_start_date: nil,
+      rosh_level: rosh_level,
+      rosh_start_date: rosh_start_date,
     }
+  end
+
+  let(:audit_case_information_attributes) do
+    new_case_information_attributes.merge(rosh_start_date: rosh_start_date&.to_s).stringify_keys
   end
 
   before do
@@ -103,11 +111,25 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
             'nomis_offender_id' => nil,
             'probation_service' => nil,
             'enhanced_resourcing' => nil,
-            'local_delivery_unit_id' => nil
+            'local_delivery_unit_id' => nil,
+            'rosh_level' => nil,
+            'rosh_start_date' => nil
           },
-          'after' => new_case_information_attributes.except(:rosh_level, :rosh_start_date).stringify_keys
+          'after' => audit_case_information_attributes
         }
       end
+    end
+  end
+
+  context 'when rosh details are missing' do
+    let(:rosh_level) { nil }
+    let(:rosh_start_date) { nil }
+
+    it 'stores nil rosh values' do
+      service.process(nomis_offender_id)
+
+      expect(case_info.reload.rosh_level).to be_nil
+      expect(case_info.rosh_start_date).to be_nil
     end
   end
 
@@ -265,11 +287,11 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
     end
 
     include_examples 'audit event' do
-      let(:attrs_not_changing) { %w[id created_at updated_at active_vlo nomis_offender_id tier rosh_level rosh_start_date] }
+      let(:attrs_not_changing) { %w[id created_at updated_at active_vlo nomis_offender_id tier] }
       let(:expected_data) do
         {
           'before' => c1.attributes.except(*attrs_not_changing),
-          'after' => new_case_information_attributes.except(:nomis_offender_id, :tier, :rosh_level, :rosh_start_date).stringify_keys
+          'after' => audit_case_information_attributes.except('nomis_offender_id', 'tier')
         }
       end
     end
