@@ -2,22 +2,26 @@
 # but it seems prudent to test the actual API responses at most once and stub them everywhere else
 feature 'DPS standard header and footer:', :aggregate_failures, :skip_dps_header_footer_stubbing do
   let(:api_host) { Rails.configuration.dps_frontend_components_api_host }
-  let(:header_endpoint) { "#{api_host}/header" }
-  let(:footer_endpoint) { "#{api_host}/footer" }
+  let(:components_endpoint) { "#{api_host}/components" }
 
-  let(:header_body) do
+  let(:components_body) do
     {
-      html: '<header class="connect-dps-common-header govuk-!-display-none-print" role="banner">...</header>',
-      css: ['https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/stylesheets/header.css'],
-      javascript: ['https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/js/header.js']
-    }.to_json
-  end
-
-  let(:footer_body) do
-    {
-      html: '<footer class="connect-dps-common-footer govuk-!-display-none-print" role="contentinfo">...</footer>',
-      css: ['https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/stylesheets/footer.css'],
-      javascript: []
+      header: {
+        html: '<header class="connect-dps-common-header govuk-!-display-none-print" role="banner">...</header>',
+        css: ['https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/stylesheets/header.css'],
+        javascript: ['https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/js/header.js']
+      },
+      footer: {
+        html: '<footer class="connect-dps-common-footer govuk-!-display-none-print" role="contentinfo">...</footer>',
+        css: ['https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/stylesheets/footer.css'],
+        javascript: []
+      },
+      meta: {
+        activeCaseLoad: {
+          caseLoadId: 'LEI',
+          description: 'Leeds (HMP)',
+        },
+      },
     }.to_json
   end
 
@@ -31,16 +35,15 @@ feature 'DPS standard header and footer:', :aggregate_failures, :skip_dps_header
   end
 
   before :each, :mock_api_error do
-    stub_request(:get, header_endpoint).to_return(status: 503)
-    stub_request(:get, footer_endpoint).to_return(status: 503)
+    stub_request(:get, "#{components_endpoint}?component=header&component=footer").to_return(status: 503)
   end
 
   before :each, :mock_api_success do
-    stub_request(:get, header_endpoint).to_return(status: 200, body: header_body)
-    stub_request(:get, footer_endpoint).to_return(status: 200, body: footer_body)
+    stub_request(:get, "#{components_endpoint}?component=header&component=footer")
+      .to_return(status: 200, body: components_body)
   end
 
-  scenario 'standard DPS header is used', :mock_api_success do
+  it 'uses the standard DPS header', :mock_api_success do
     signin_pom_user
     visit '/'
 
@@ -49,14 +52,14 @@ feature 'DPS standard header and footer:', :aggregate_failures, :skip_dps_header
     expect(page).to have_css('script[src="https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/js/header.js"]', visible: :all)
   end
 
-  scenario 'fallback DPS header is used when DPS components API is not available', :mock_api_error do
+  it 'uses the fallback DPS header when the DPS components API is not available', :mock_api_error do
     signin_pom_user
     visit '/'
 
     expect(page).to have_css('header.fallback-dps-header')
   end
 
-  scenario 'standard DPS footer is used', :mock_api_success do
+  it 'uses the standard DPS footer', :mock_api_success do
     signin_pom_user
     visit '/'
 
@@ -64,7 +67,7 @@ feature 'DPS standard header and footer:', :aggregate_failures, :skip_dps_header
     expect(page).to have_css('link[rel=stylesheet][href="https://frontend-components-dev.hmpps.service.justice.gov.uk/assets/stylesheets/footer.css"]', visible: :all)
   end
 
-  scenario 'fallback DPS footer is used when DPS components API is not available', :mock_api_error do
+  it 'uses the fallback DPS footer when the DPS components API is not available', :mock_api_error do
     signin_pom_user
     visit '/'
 

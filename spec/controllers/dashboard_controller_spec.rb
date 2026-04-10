@@ -21,6 +21,24 @@ RSpec.describe DashboardController, type: :controller do
   end
 
   describe '#index' do
+    context 'when the live active caseload differs from the prison in the URL', skip_active_caseload_check_stubbing: true do
+      let(:prison) { create(:prison, code: 'RSI').code }
+
+      before do
+        create(:prison, code: 'LEI')
+        stub_sso_data('RSI', caseloads: %w[LEI RSI])
+        stub_dps_header_footer
+      end
+
+      it 'redirects to the live active caseload prison dashboard' do
+        get :index, params: { prison_id: prison }
+
+        expect(response).to redirect_to(prison_dashboard_index_path(prison_id: 'LEI'))
+        expect(flash[:notice]).to eq(I18n.t('views.navigation.enforce_active_caseload', name: 'Leeds (HMP)'))
+        expect(session[:sso_data]).to be_nil
+      end
+    end
+
     context 'when logged in as POM' do
       render_views
 

@@ -43,12 +43,23 @@ module FeaturesHelper
     OmniAuth.config.add_mock(:hmpps_sso, hmpps_sso_response)
   end
 
-  def stub_dps_header_footer
-    allow_any_instance_of(SsoIdentity).to receive(:token).and_return('fake-user-access-token')
-    allow(HmppsApi::DpsFrontendComponentsApi).to receive_messages(
-      header: { 'html' => '<header>', 'css' => [], 'javascript' => [] },
-      footer: { 'html' => '<footer>', 'css' => [], 'javascript' => [] },
-    )
+  def stub_dps_header_footer(token: 'fake-user-access-token', header: {}, footer: {}, active_case_load_id: 'LEI', active_case_load_description: 'Leeds (HMP)', meta: {})
+    allow_any_instance_of(SsoIdentity).to receive(:token).and_return(token)
+
+    payload = {
+      'header' => { 'html' => '<header>', 'css' => [], 'javascript' => [] }.merge(header),
+      'footer' => { 'html' => '<footer>', 'css' => [], 'javascript' => [] }.merge(footer),
+      'meta' => {
+        'activeCaseLoad' => {
+          'caseLoadId' => active_case_load_id,
+          'description' => active_case_load_description,
+        },
+      },
+    }
+
+    payload['meta'] = payload['meta'].deep_merge(meta)
+
+    allow(HmppsApi::DpsFrontendComponentsApi).to receive(:components).with(token, any_args).and_return(payload)
   end
 
   def stub_active_caseload_check

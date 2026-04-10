@@ -60,11 +60,7 @@ class ApplicationController < ActionController::Base
     return @dps_header_footer if @dps_header_footer
 
     begin
-      @dps_header_footer ||= {
-        'header' => HmppsApi::DpsFrontendComponentsApi.header(identity.token),
-        'footer' => HmppsApi::DpsFrontendComponentsApi.footer(identity.token),
-        'status' => 'ok',
-      }
+      @dps_header_footer ||= HmppsApi::DpsFrontendComponentsApi.components(identity.token).merge('status' => 'ok')
     rescue StandardError => e
       logger.error "event=dps_header_footer_retrieval_error|#{e.message}"
       @dps_header_footer ||= { 'status' => 'fallback' }
