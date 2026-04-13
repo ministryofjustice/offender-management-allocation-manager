@@ -6,7 +6,7 @@ class Handover::HandoverEmail
       OffenderEmailSent.find_by(offender_email_type: handover_email_type,
                                 nomis_offender_id: nomis_offender_id,
                                 staff_member_id: staff_member_id).present?
-      return
+      return false
     end
 
     mailer = HandoverMailer.with(**mailer_args.merge(nomis_offender_id: nomis_offender_id))
@@ -18,5 +18,7 @@ class Handover::HandoverEmail
                                 staff_member_id: staff_member_id)
       deliver_now ? mailer.deliver_now : mailer.deliver_later
     end
+
+    true
   end
 end
