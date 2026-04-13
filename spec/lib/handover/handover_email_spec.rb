@@ -16,8 +16,12 @@ RSpec.describe Handover::HandoverEmail do
 
   describe "::deliver_if_deliverable" do
     describe "when not opted out and not already sent" do
-      before do
+      let(:result) do
         described_class.deliver_if_deliverable(handover_email_type, nomis_offender_id, pom_id, **default_args)
+      end
+
+      before do
+        result
       end
 
       it "sends the email" do
@@ -32,14 +36,22 @@ RSpec.describe Handover::HandoverEmail do
                                                                   staff_member_id: pom_id,
                                                                   offender_email_type: handover_email_type)
       end
+
+      it 'returns true' do
+        expect(result).to be(true)
+      end
     end
 
     describe "when opted out" do
+      let(:result) do
+        described_class.deliver_if_deliverable(handover_email_type, nomis_offender_id, pom_id, **default_args)
+      end
+
       before do
         allow(OffenderEmailOptOut).to receive(:find_by).with(staff_member_id: pom_id,
                                                              offender_email_type: handover_email_type)
                                                        .and_return([anything])
-        described_class.deliver_if_deliverable(handover_email_type, nomis_offender_id, pom_id, **default_args)
+        result
       end
 
       it "does not send the email" do
@@ -49,15 +61,23 @@ RSpec.describe Handover::HandoverEmail do
       it "does not create sent record" do
         expect(OffenderEmailSent).not_to have_received(:create!)
       end
+
+      it 'returns false' do
+        expect(result).to be(false)
+      end
     end
 
     describe "when already sent" do
+      let(:result) do
+        described_class.deliver_if_deliverable(handover_email_type, nomis_offender_id, pom_id, **default_args)
+      end
+
       before do
         allow(OffenderEmailSent).to receive(:find_by).with(nomis_offender_id: nomis_offender_id,
                                                            staff_member_id: pom_id,
                                                            offender_email_type: handover_email_type)
                                                        .and_return([anything])
-        described_class.deliver_if_deliverable(handover_email_type, nomis_offender_id, pom_id, **default_args)
+        result
       end
 
       it "does not send the email" do
@@ -66,6 +86,10 @@ RSpec.describe Handover::HandoverEmail do
 
       it "does not create sent record" do
         expect(OffenderEmailSent).not_to have_received(:create!)
+      end
+
+      it 'returns false' do
+        expect(result).to be(false)
       end
     end
 

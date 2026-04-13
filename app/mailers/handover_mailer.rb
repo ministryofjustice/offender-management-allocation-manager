@@ -1,5 +1,18 @@
 class HandoverMailer < ApplicationMailer
+  class InvalidRecipientEmailError < ArgumentError; end
+
   set_mailer_tag 'handover_reminder'
+
+  def self.with(params = nil, **kwargs)
+    mail_params = params.respond_to?(:to_h) ? params.to_h : {}
+    mail_params = mail_params.merge(kwargs) if kwargs.any?
+
+    if mail_params[:email].blank?
+      raise InvalidRecipientEmailError, 'Missing recipient email'
+    end
+
+    super(mail_params)
+  end
 
   def upcoming_handover_window
     set_template('7114ad9e-e71a-4424-a884-bcc72bd1a569')

@@ -1,10 +1,17 @@
 class Handover::HandoverEmailBatchRun
+  RETRYABLE_BATCH_ERRORS = [
+    HandoverMailer::InvalidRecipientEmailError,
+    ActiveJob::EnqueueError,
+    ActiveRecord::ConnectionTimeoutError,
+    ActiveRecord::Deadlocked,
+  ].freeze
+
   class << self
     def send_one_upcoming_handover_window(offender, deliver_now: false, for_date: Time.zone.now.to_date)
       chd = CalculatedHandoverDate.find_by(nomis_offender_id: offender.offender_no)
       return unless chd&.handover_date && chd.handover_date == for_date + DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION
 
-      Handover::HandoverEmail.deliver_if_deliverable(
+      sent = Handover::HandoverEmail.deliver_if_deliverable(
         :upcoming_handover_window,
         offender.offender_no,
         offender.staff_member.staff_id,
@@ -16,6 +23,8 @@ class Handover::HandoverEmailBatchRun
         release_date: format_date(offender.earliest_release_for_handover&.date),
         deliver_now: deliver_now,
       )
+      return unless sent
+
       Rails.logger.info("event=handover_email_delivered,nomis_offender_id=#{offender.offender_no},email=upcoming_handover_window,for_date=#{for_date.iso8601}")
     end
 
@@ -23,7 +32,7 @@ class Handover::HandoverEmailBatchRun
       chd = CalculatedHandoverDate.find_by(nomis_offender_id: offender.offender_no)
       return unless chd&.handover_date && chd.handover_date == for_date && offender.has_com?
 
-      Handover::HandoverEmail.deliver_if_deliverable(
+      sent = Handover::HandoverEmail.deliver_if_deliverable(
         :handover_date,
         offender.offender_no,
         offender.staff_member.staff_id,
@@ -36,6 +45,8 @@ class Handover::HandoverEmailBatchRun
         enhanced_handover: offender.enhanced_handover?,
         deliver_now: deliver_now,
       )
+      return unless sent
+
       Rails.logger.info("event=handover_email_delivered,nomis_offender_id=#{offender.offender_no},email=handover_date,for_date=#{for_date.iso8601}")
     end
 
@@ -43,7 +54,7 @@ class Handover::HandoverEmailBatchRun
       chd = CalculatedHandoverDate.find_by(nomis_offender_id: offender.offender_no)
       return unless chd&.handover_date && chd.handover_date == for_date - 14.days && !offender.has_com?
 
-      Handover::HandoverEmail.deliver_if_deliverable(
+      sent = Handover::HandoverEmail.deliver_if_deliverable(
         :com_allocation_overdue,
         offender.offender_no,
         offender.staff_member.staff_id,
@@ -56,6 +67,8 @@ class Handover::HandoverEmailBatchRun
         enhanced_handover: offender.enhanced_handover?,
         deliver_now: deliver_now,
       )
+      return unless sent
+
       Rails.logger.info("event=handover_email_delivered,nomis_offender_id=#{offender.offender_no},email=com_allocation_overdue,for_date=#{for_date.iso8601}")
     end
 
@@ -87,9 +100,9 @@ class Handover::HandoverEmailBatchRun
     def with_error_handling(nomis_offender_id, email_type)
       yield
     rescue StandardError => e
-      raise unless Rails.env.production?
+      Rails.logger.error("event=handover_email_batch_run_error,email=#{email_type},nomis_offender_id=#{nomis_offender_id}|#{e.message}")
 
-      Rails.logger.error("event=handover_email_batch_run_error,email=#{email_type},nomis_offender_id=#{nomis_offender_id}|#{e.inspect},#{e.backtrace.join(',')}")
+      raise if RETRYABLE_BATCH_ERRORS.any? { |error_class| e.is_a?(error_class) }
     end
   end
 end
