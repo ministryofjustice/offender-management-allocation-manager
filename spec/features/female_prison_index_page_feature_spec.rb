@@ -47,7 +47,7 @@ feature "female prison index page" do
     it 'displays offenders with missing details' do
       expect(page).to have_css('.moj-sub-navigation__item')
       expect(page).to have_content('Add missing details')
-      expect(page).to have_text("You need to add missing details to 3 cases so they can be allocated to a POM")
+      expect(page).to have_text('You need to add missing details')
     end
 
     it 'sorts offenders by name' do

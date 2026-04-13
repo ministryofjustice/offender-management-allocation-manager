@@ -1,42 +1,49 @@
-<% content_for :title, "Update complexity of need level – Digital Prison Services" %>
+<% content_for :title, t('.title') %>
+
+<%= link_to 'Back',
+            @return_path,
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <%= back_link %>
-
     <%= form_for(@complexity,
                  url: url_path,
                  method: :put,
                  builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |form| %>
       <%= form.govuk_error_summary %>
+      <%= hidden_field_tag('from', @source_page) %>
 
-      <h1 class="govuk-heading-l">
-        Update complexity of need level
-      </h1>
-      <p>Complexity of need level can change during a sentence.</p>
-      <p>See guidance on <%= link_to "how to manually assess a person's complexity of need", asset_path("docs/complexity-of-need/assessment-guidance.pdf", skip_pipeline: true),
-                                     target: "_blank"%>. Download the manual <%= link_to "assessment form", asset_path("docs/complexity-of-need/assessment-template.pdf", skip_pipeline: true), target: "_blank"%></a>.</p>
+      <%= render 'case_information/heading',
+                 heading: t('.heading', name: @prisoner.full_name_ordered),
+                 show_delius_info: false %>
 
+      <p class="govuk-body"><%= t('.intro.primary') %></p>
+      <p class="govuk-body govuk-!-margin-bottom-7">
+        See guidance on <%= link_to "how to manually assess a person’s complexity of need", asset_path("docs/complexity-of-need/assessment-guidance.pdf", skip_pipeline: true), target: "_blank" %>.
+        Download the manual <%= link_to "assessment form", asset_path("docs/complexity-of-need/assessment-template.pdf", skip_pipeline: true), target: "_blank" %>.
+      </p>
 
       <%= form.govuk_collection_radio_buttons(
             :level,
-            [OpenStruct.new(name:'High', value: 'high'),
-             OpenStruct.new(name: 'Medium', value: 'medium' ),
+            [OpenStruct.new(name: 'High', value: 'high'),
+             OpenStruct.new(name: 'Medium', value: 'medium'),
              OpenStruct.new(name: 'Low', value: 'low')],
             :value,
             :name,
-            legend: { text: 'Select the new complexity of need level
-    ', size: 's' }
+            legend: { text: t('.level.legend'), size: 's' }
           ) %>
 
-      <%=form.govuk_text_area(
-           :reason, rows: 3,
-           label: { text: 'Provide the reason(s) for this change', size: 's' },
-           hint: {text: 'You must justify why you are changing the complexity of need level – include any key dates and details.'}
-         ) %>
+      <%= form.govuk_text_area(
+            :reason,
+            rows: 3,
+            label: { text: t('.reason.label'), size: 's' },
+            hint: { text: t('.reason.hint') }
+          ) %>
 
-      <%= form.submit "Update", id: 'update',  role: "button", draggable: "false", class: "govuk-button" %>
+      <div class="govuk-button-group">
+        <%= form.submit t('.update'), id: 'update', role: "button", draggable: "false",
+                        class: "govuk-button", data: { module: 'govuk-button' } %>
+      </div>
     <% end %>
   </div>
-  <%= render 'shared/prisoner_info_sidebar', prisoner: @prisoner %>
 </div>

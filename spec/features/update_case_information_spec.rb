@@ -22,15 +22,13 @@ RSpec.feature "Update case information", type: :feature do
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
     end
 
-    it 'returns to the Allocate a POM page' do
+    it 'returns to review case details after updating from review case details' do
       visit prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no)
 
-      # This takes you to the change case information edit page
-      within(:css, "tr#tier") do
+      within('tr#tier') do
         click_link('Change')
       end
 
-      # This returns you back from where you came (Allocation information page)
       click_on('Update')
 
       expect(page).to have_current_path(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
@@ -43,39 +41,42 @@ RSpec.feature "Update case information", type: :feature do
       create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
     end
 
-    it 'returns to the prisoner Allocation information page' do
-      visit prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no)
+    it 'returns to allocation information after updating from allocation information' do
+      visit prison_prisoner_allocation_path(prison_id: prison.code, prisoner_id: offender_no)
 
-      # This takes you to the change case information edit page
-      within(:css, "tr#tier") do
+      within('td#tier') do
         click_link('Change')
       end
 
-      # This returns you back from where you came (Allocation information page)
       click_on('Update')
 
-      expect(page).to have_current_path(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
+      expect(page).to have_current_path(prison_prisoner_allocation_path(prison_id: prison.code, prisoner_id: offender_no))
     end
   end
 
-  context 'when reallocating a POM on an existing allocation' do
+  context 'when the update is invalid' do
     before do
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: pom.staff_id,  prison: prison.code)
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
+      create(:case_information,
+             offender: build(:offender, nomis_offender_id: offender_no),
+             tier: 'B',
+             enhanced_resourcing: nil)
     end
 
-    it 'returns to the Reallocate POM page' do
-      visit prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no)
+    it 'keeps the allocation-information back link after a validation error' do
+      visit prison_prisoner_allocation_path(prison_id: prison.code, prisoner_id: offender_no)
 
-      # To take you to the change case information edit page
-      within(:css, "tr#tier") do
+      within('td#tier') do
         click_link('Change')
       end
 
-      # This returns you back from where you came (Reallocate Pom page)
       click_on('Update')
 
-      expect(page).to have_current_path(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
+      expect(page).to have_content('There is a problem')
+
+      click_link('Back')
+
+      expect(page).to have_current_path(prison_prisoner_allocation_path(prison_id: prison.code, prisoner_id: offender_no))
     end
   end
 end

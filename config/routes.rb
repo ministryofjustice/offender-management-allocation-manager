@@ -80,16 +80,11 @@ Rails.application.routes.draw do
     end
 
     resources :prisoners, only: [:show] do
-      constraints ->(request) { !PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id)) } do
-        get 'new_missing_info' => 'case_information#new'
-      end
+      resource :case_information, only: %i[new create edit update], controller: 'case_information'
 
       constraints ->(request) { PrisonService.womens_prison?(request.path_parameters.fetch(:prison_id)) } do
-        get 'new_missing_info' => 'female_missing_infos#new'
-        resource :female_missing_info, only: [:show, :update]
+        resource :female_missing_info, only: [:new, :update]
       end
-
-      resource :female_missing_info, only: [:new, :show, :update]
 
       get 'review_case_details'
 
@@ -118,8 +113,6 @@ Rails.application.routes.draw do
       resource :early_allocation, only: [:edit, :update], as: :latest_early_allocation
 
       resource :complexity_level, only: [:edit, :update]
-
-      resource :complexity_level_allocation, only: [:edit, :update]
 
       resources :victim_liaison_officers, only: [:new, :edit, :create, :update, :destroy] do
         member do
@@ -158,9 +151,6 @@ Rails.application.routes.draw do
       get('confirm_coworking_removal' => 'coworking#confirm_removal', as: 'confirm_removal')
     end
     get('/coworking/confirm/:nomis_offender_id/:primary_pom_id/:secondary_pom_id' => 'coworking#confirm', as: 'confirm_coworking_allocation')
-
-    resources :case_information, only: %i[new create edit update show], param: :prisoner_id, controller: 'case_information',
-                                 path_names: { new: 'new/:prisoner_id' }
 
     resources :poms, only: %i[index show edit update destroy], param: :nomis_staff_id do
       member do

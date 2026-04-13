@@ -1,13 +1,15 @@
-<% content_for :title, "Case information – Digital Prison Services" %>
+<% content_for :title, t('.title') %>
 
-<%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
+<%= link_to "Back", @back_path,
+            class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
-<h1 class="govuk-heading-xl govuk-!-margin-top-4 govuk-!-margin-bottom-4">Case information</h1>
-<h2 class="govuk-heading-m"><%= @prisoner.full_name %> - <%= @prisoner.offender_no %></h2>
-<p class="govuk-!-margin-bottom-8">You can find this information in NDelius.</p>
-
-<%= render :partial => "form", :locals => {
-      :action => prison_case_information_path(@prison.code),
-      :method => :put,
-      :buttons => [{class:'' , text: 'Update'}]
-} %>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <%= render partial: "form", locals: {
+          heading: t('.heading', name: @prisoner.full_name_ordered),
+          action: prison_prisoner_case_information_path(@prison.code, @prisoner.offender_no),
+          method: :put,
+          buttons: [{class:'' , text: 'Update'}]
+    } %>
+  </div>
+</div>
