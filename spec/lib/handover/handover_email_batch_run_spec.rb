@@ -188,8 +188,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
     end
   end
 
-  describe 'production error handling' do
-    let(:production_env) { ActiveSupport::StringInquirer.new('production') }
+  describe 'error handling' do
     let(:retryable_error_classes) do
       [
         HandoverMailer::InvalidRecipientEmailError,
@@ -214,7 +213,6 @@ RSpec.describe Handover::HandoverEmailBatchRun do
     end
 
     before do
-      allow(Rails).to receive(:env).and_return(production_env)
       o = FactoryBot.create :offender, id: offender.offender_no
       FactoryBot.create :calculated_handover_date, offender: o, handover_date: today + DEFAULT_UPCOMING_HANDOVER_WINDOW_DURATION
       allow(AllocatedOffender).to receive(:all).and_return([offender])
@@ -237,7 +235,7 @@ RSpec.describe Handover::HandoverEmailBatchRun do
         .exactly(retryable_error_classes.size).times
     end
 
-    it 'logs and continues for unrelated errors in production' do
+    it 'logs and continues for unrelated errors' do
       allow(Handover::HandoverEmail).to receive(:deliver_if_deliverable).and_raise(StandardError, 'boom')
       allow(Rails.logger).to receive(:error)
 
