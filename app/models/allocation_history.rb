@@ -203,7 +203,7 @@ private
       offender_name: offender.full_name,
       nomis_offender_id: nomis_offender_id,
       prison_name: Prison.find(prison).name,
-      url: Rails.application.routes.url_helpers.prison_staff_caseload_url(prison, primary_pom_nomis_id)
+      url: Rails.application.routes.url_helpers.prison_staff_caseload_url(prison, primary_pom.staff_id)
     }
 
     update!(
@@ -222,7 +222,7 @@ private
     else
       Rails.logger.error 'event=deallocate_offender_blank_email,' \
                          "nomis_offender_id=#{nomis_offender_id}," \
-                         "primary_pom_nomis_id=#{primary_pom_nomis_id}," \
+                         "primary_pom_nomis_id=#{primary_pom.staff_id}," \
                          "event_trigger=#{event_trigger}|" \
                          'Attempted to schedule an email send but the primary POM email address is blank'
     end

@@ -24,7 +24,7 @@ class MpcOffender
   def responsibility_override? = @offender.responsibility.present?
 
   private def responsibility
-    # Take user-overridden responsbility if it exists
+    # Take user-overridden responsibility if it exists
     # otherwise most common to use the pre-calculated one
     # or calculate now if neither are present - could be a brand new case
     @responsibility ||=
@@ -123,7 +123,6 @@ class MpcOffender
     @active_allocation ||= AllocationHistory.active_allocations_for_prison(prison.code).find_by(nomis_offender_id: offender_no)
   end
 
-  # TODO: this seems to only exist in attributes_to_archive
   def case_owner
     if pom_responsible?
       'Custody'
@@ -252,8 +251,9 @@ class MpcOffender
   #
 
   delegate :tier,
-           :rosh_level,
            :mappa_level,
+           :rosh_level,
+           :rosh_start_date,
            to: :case_information
 
   def mappa_details = OffenderService.get_mappa_details(crn)
@@ -422,7 +422,6 @@ class MpcOffender
       earliest_release_for_handover
       latest_temp_movement_date
       release_date
-      date_of_birth
       main_offence
       days_awaiting_allocation
       working_days_since_entering_this_prison
@@ -431,12 +430,7 @@ class MpcOffender
       complexity_level
       category_code
       category_active_since
-      first_name
-      last_name
-      full_name_ordered
-      full_name
       inside_omic_policy?
-      offender_no
       prison_id
       restricted_patient?
       crn

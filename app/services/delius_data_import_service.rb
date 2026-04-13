@@ -161,8 +161,10 @@ private
         team_name: probation_record.dig(:manager, :team, :description),
         enhanced_resourcing: enhanced_resourcing(probation_record.fetch(:resourcing)),
         probation_service: ldu_record&.country || 'England',
+        active_vlo: probation_record.fetch(:vlo_assigned),
         mappa_level: probation_record.fetch(:mappa_level),
-        active_vlo: probation_record.fetch(:vlo_assigned)
+        rosh_level: probation_record.dig(:rosh, :level),
+        rosh_start_date: probation_record.dig(:rosh, :start_date),
       )
     end
   end

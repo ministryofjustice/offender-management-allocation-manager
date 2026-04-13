@@ -5,7 +5,7 @@ describe CaseInformation do
     subject { build(:case_information) }
 
     it 'allows 0, 1, 2, 3 and nil' do
-      [0, 1, 2, 3, nil].each do |level|
+      (described_class::MAPPA_LEVELS + [nil]).each do |level|
         subject.mappa_level = level
         expect(subject).to be_valid
       end
@@ -17,12 +17,40 @@ describe CaseInformation do
     end
   end
 
+  context 'with rosh level' do
+    subject { build(:case_information) }
+
+    it 'allows LOW, MEDIUM, HIGH, VERY_HIGH and nil' do
+      (described_class::ROSH_LEVELS + [nil]).each do |level|
+        subject.rosh_level = level
+        expect(subject).to be_valid
+      end
+    end
+
+    it 'does not allow unexpected values' do
+      subject.rosh_level = 'UNKNOWN'
+
+      expect(subject).not_to be_valid
+    end
+  end
+
   context 'with basic factory' do
     subject do
       build(:case_information)
     end
 
     it { is_expected.to be_valid }
+  end
+
+  context 'with unsupported tier' do
+    subject do
+      build(:case_information, tier: 'N/A')
+    end
+
+    it 'is not valid' do
+      expect(subject).not_to be_valid
+      expect(subject.errors.messages).to eq(tier: ['Select the prisoner’s tier'])
+    end
   end
 
   context 'with missing tier' do

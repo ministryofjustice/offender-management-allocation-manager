@@ -80,8 +80,6 @@ RSpec.describe AllocationStaffController, type: :controller do
               create(:allocation_history, prison: prison_code, nomis_offender_id: info.nomis_offender_id, primary_pom_nomis_id: alice.staffId)
             end
           end
-          info = create(:case_information, tier: 'N/A')
-          create(:allocation_history, prison: prison_code, nomis_offender_id: info.nomis_offender_id, primary_pom_nomis_id: alice.staffId)
 
           offenders = CaseInformation.all.map { |ci| build(:nomis_offender, prisonerNumber: ci.nomis_offender_id) }
           stub_offenders_for_prison(prison_code, offenders, [attributes_for(:movement)])
@@ -106,9 +104,8 @@ RSpec.describe AllocationStaffController, type: :controller do
                    tier_b: pom.allocations.count { |a| a.tier == 'B' },
                    tier_c: pom.allocations.count { |a| a.tier == 'C' },
                    tier_d: pom.allocations.count { |a| a.tier == 'D' },
-                   no_tier: pom.allocations.count { |a| a.tier == 'N/A' },
                    total_cases: pom.allocations.count)
-              .to eq(tier_a: 5, tier_b: 4, tier_c: 3, tier_d: 2, no_tier: 1, total_cases: 15)
+              .to eq(tier_a: 5, tier_b: 4, tier_c: 3, tier_d: 2, total_cases: 14)
           end
 
           it 'renders the shared compare selection copy' do

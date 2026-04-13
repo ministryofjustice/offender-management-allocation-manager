@@ -15,7 +15,7 @@ feature "womens allocation journey" do
   let(:inactive_prison_pom) { build(:pom, :prison_officer) }
   let(:prison_pom) { build(:pom, :prison_officer) }
   let(:message_text) { Faker::Lorem.sentence }
-  let(:tiers) { ['A', 'B', 'C', 'D', 'N/A'].cycle.take(offenders.size) }
+  let(:tiers) { CaseInformation::TIER_LEVELS.cycle.take(offenders.size) }
 
   before do
     create(:pom_detail, :inactive, prison_code: prison.code, nomis_staff_id: inactive_prison_pom.staff_id)

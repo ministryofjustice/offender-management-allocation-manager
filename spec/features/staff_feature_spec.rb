@@ -240,7 +240,7 @@ feature "staff pages" do
         create(:allocation_history, nomis_offender_id: offenders_in_prison[index][:prisonerNumber], primary_pom_nomis_id: poms.first.staffId, prison: female_prison)
       end
 
-      %w[D N/A].each_with_index do |tier, index|
+      %w[C D].each_with_index do |tier, index|
         create(:case_information, tier: tier, offender: build(:offender, nomis_offender_id: offenders_in_prison[index + 4][:prisonerNumber]), enhanced_resourcing: true)
         create(:allocation_history, nomis_offender_id: offenders_in_prison[index + 4][:prisonerNumber], primary_pom_nomis_id: poms.last.staffId, prison: female_prison)
       end
@@ -276,8 +276,8 @@ feature "staff pages" do
 
       within pom_row do
         within ".case-mix-bar" do
+          expect(page).to have_css(".case-mix__tier_c", text: '1')
           expect(page).to have_css(".case-mix__tier_d", text: '1')
-          expect(page).to have_css(".case-mix__tier_na", text: '1')
         end
         expect(page).to have_css('td[aria-label="High complexity cases"]', text: '0')
         expect(page).to have_css('td[aria-label="Total cases"]', text: '2')

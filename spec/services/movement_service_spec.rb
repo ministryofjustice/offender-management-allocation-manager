@@ -176,6 +176,14 @@ describe MovementService, type: :feature do
           expect(updated_allocation.event_trigger).to eq 'offender_released'
           expect(updated_allocation.prison).to eq 'LEI'
         end
+
+        it 'deallocates before destroying case information so destroy failures do not block the release update' do
+          allow_any_instance_of(CaseInformation).to receive(:destroy!).and_raise(ActiveRecord::StatementInvalid, 'boom')
+
+          expect { processed }.to raise_error(ActiveRecord::StatementInvalid, 'boom')
+          expect(updated_allocation.reload.event_trigger).to eq 'offender_released'
+          expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).not_to be_empty
+        end
       end
 
       context 'and from a female prison' do

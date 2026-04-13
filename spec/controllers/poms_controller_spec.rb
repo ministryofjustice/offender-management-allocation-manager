@@ -8,7 +8,6 @@ RSpec.describe PomsController, type: :controller do
   let(:b_offenders) { build_list(:nomis_offender, 4) }
   let(:c_offenders) { build_list(:nomis_offender, 3) }
   let(:d_offenders) { build_list(:nomis_offender, 1) }
-  let(:na_offenders) { build_list(:nomis_offender, 5) }
 
   before do
     stub_sso_data(prison.code)
@@ -30,7 +29,6 @@ RSpec.describe PomsController, type: :controller do
       'B': b_offenders,
       'C': c_offenders,
       'D': d_offenders,
-      'N/A': na_offenders
     }.each do |tier, offenders|
       offenders.map { |o| o.fetch(:prisonerNumber) }.each do |offender_no|
         create(:case_information, tier: tier.to_s, offender: build(:offender, nomis_offender_id: offender_no))
@@ -50,7 +48,7 @@ RSpec.describe PomsController, type: :controller do
       stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{active_staff_id}")
         .to_return(body: { staffId: active_staff_id, lastName: 'LastName', firstName: 'FirstName' }.to_json)
 
-      offenders = a_offenders + b_offenders + c_offenders + d_offenders + na_offenders
+      offenders = a_offenders + b_offenders + c_offenders + d_offenders
 
       stub_offenders_for_prison(prison.code, offenders)
     end
@@ -72,7 +70,6 @@ RSpec.describe PomsController, type: :controller do
           tier_b: pom.allocations.count { |a| a.tier == 'B' },
           tier_c: pom.allocations.count { |a| a.tier == 'C' },
           tier_d: pom.allocations.count { |a| a.tier == 'D' },
-          no_tier: pom.allocations.count { |a| a.tier == 'N/A' },
           total_cases: pom.allocations.count
         }
       end
@@ -82,14 +79,12 @@ RSpec.describe PomsController, type: :controller do
                                                  tier_b: 4,
                                                  tier_c: 3,
                                                  tier_d: 1,
-                                                 no_tier: 5,
-                                                 total_cases: 15 },
+                                                 total_cases: 10 },
                                                { staff_id: unavailable_staff_id,
                                                  tier_a: 0,
                                                  tier_b: 0,
                                                  tier_c: 0,
                                                  tier_d: 0,
-                                                 no_tier: 0,
                                                  total_cases: 0 }]
     end
 
@@ -105,12 +100,7 @@ RSpec.describe PomsController, type: :controller do
                                                                 "C",
                                                                 "C",
                                                                 "C",
-                                                                "D",
-                                                                "N/A",
-                                                                "N/A",
-                                                                "N/A",
-                                                                "N/A",
-                                                                "N/A"])
+                                                                "D"])
     end
   end
 

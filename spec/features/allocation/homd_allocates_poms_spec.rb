@@ -61,12 +61,12 @@ describe 'HOMD allocates cases to POMS' do
     workload_data_points = all('.pom-data').map(&:text)
     expect(workload_data_points[0]).to include('Prison Pom')
     expect(workload_data_points[2]).to include('Responsible: 1 Supporting: 1 Co-working: 0')
-    expect(workload_data_points[4]).to include('Tier A: 1 Tier B: 1 Tier C: 0 Tier D: 0 Tier N/A: 0')
+    expect(workload_data_points[4]).to include('Tier A: 1 Tier B: 1 Tier C: 0 Tier D: 0')
     expect(workload_data_points[6]).to include("Current workload\n2\nallocations in last 7 days")
 
     expect(workload_data_points[1]).to include('Probation Pom')
     expect(workload_data_points[3]).to include('Responsible: 0 Supporting: 1 Co-working: 0')
-    expect(workload_data_points[5]).to include('Tier A: 0 Tier B: 0 Tier C: 1 Tier D: 0 Tier N/A: 0')
+    expect(workload_data_points[5]).to include('Tier A: 0 Tier B: 0 Tier C: 1 Tier D: 0')
     expect(workload_data_points[7]).to include("Current workload\n1\nallocation in last 7 days")
   end
 
