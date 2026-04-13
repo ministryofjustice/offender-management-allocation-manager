@@ -22,6 +22,14 @@ RSpec.describe ComplexityLevelsController, type: :controller do
       expect(response).to be_successful
       expect(assigns(:complexity).level).to eq('medium')
     end
+
+    it 'sets the return path to review case details when requested from there' do
+      get :edit, params: { prison_id: womens_prison.code, prisoner_id: offender_no, from: 'review_case' }
+
+      expect(assigns(:return_path)).to eq(
+        prison_prisoner_review_case_details_path(prison_id: womens_prison.code, prisoner_id: offender_no)
+      )
+    end
   end
 
   describe '#update' do
@@ -58,6 +66,19 @@ RSpec.describe ComplexityLevelsController, type: :controller do
       it 'saves the complexity level and redirects to the prisoner profile page' do
         post :update,  params: { complexity: { level: 'medium', reason: 'Just because' }, prison_id: womens_prison.code, prisoner_id: offender_no }
         expect(response).to redirect_to(prison_prisoner_allocation_path(womens_prison.code, offender_no))
+      end
+
+      it 'redirects to review case details when requested from there' do
+        post :update, params: {
+          complexity: { level: 'medium', reason: 'Just because' },
+          prison_id: womens_prison.code,
+          prisoner_id: offender_no,
+          from: 'review_case'
+        }
+
+        expect(response).to redirect_to(
+          prison_prisoner_review_case_details_path(prison_id: womens_prison.code, prisoner_id: offender_no)
+        )
       end
     end
   end

@@ -16,6 +16,8 @@ feature 'complexity level feature' do
     stub_signin_spo(spo, [womens_prison.code])
     stub_poms(womens_prison.code, [pom, spo])
     stub_keyworker(offender_no)
+    stub_community_offender(offender_no, build(:community_data))
+    allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return(RoshSummary.missing)
   end
 
   context 'when on allocation information page' do
@@ -29,9 +31,7 @@ feature 'complexity level feature' do
       expect(page).to have_css('#complexity-level', text: 'High')
       expect(page).to have_css('#complexity-badge', text: 'High complexity')
 
-      within(:css, "td#complexity-level") do
-        click_link('Change')
-      end
+      find('td#complexity-level').click_link('Change')
 
       # Taken to the edit page to update the complexity level
       expect(page).to have_text 'Update complexity of need level'
@@ -69,9 +69,7 @@ feature 'complexity level feature' do
 
     it 'can click back link to return to the prisoner profile page' do
       visit prison_prisoner_allocation_path(prisoner_id: offender_no, prison_id: womens_prison.code)
-      within(:css, "td#complexity-level") do
-        click_link('Change')
-      end
+      find('td#complexity-level').click_link('Change')
 
       # Taken to the edit page to update the complexity level
       expect(page).to have_text 'Update complexity of need level'
@@ -79,58 +77,61 @@ feature 'complexity level feature' do
       click_link('Back')
       expect(page).to have_current_path(prison_prisoner_allocation_path(prisoner_id: offender_no, prison_id: womens_prison.code))
     end
+
+    it 'returns straight to allocation information when the level stays the same' do
+      expect(HmppsApi::ComplexityApi).to receive(:save).with(offender_no, level: 'high', username: "MOIC_POM", reason: 'No change needed')
+
+      visit prison_prisoner_allocation_path(womens_prison.code, offender_no)
+
+      find('tr#complexity-level-row').click_link('Change')
+
+      fill_in('complexity[reason]', with: 'No change needed')
+      click_on('Update')
+
+      expect(page).to have_current_path(prison_prisoner_allocation_path(womens_prison.code, offender_no))
+      expect(page).to have_no_css('#complexity-level-update')
+      expect(page).to have_css('#complexity-level-row', text: 'High')
+    end
   end
 
-  context 'when on the new allocation page' do
-    context 'when changing the complexity level' do
-      it 'can click back link to return to the new allocation page' do
-        visit prison_prisoner_allocation_path(womens_prison.code, offender_no)
+  context 'when on review case details' do
+    it 'can click the complexity change link and return there after updating' do
+      expect(HmppsApi::ComplexityApi).to receive(:save).with(offender_no, level: 'low', username: "MOIC_POM", reason: 'bla bla bla')
 
-        within(:css, "tr#complexity-level-row") do
-          click_link('Change')
-        end
+      visit prison_prisoner_review_case_details_path(prison_id: womens_prison.code, prisoner_id: offender_no)
 
-        expect(page).to have_text 'Update complexity of need level'
+      find('tr', text: 'Complexity of need level').click_link('Change')
 
-        click_link('Back')
-        expect(page).to have_current_path(prison_prisoner_allocation_path(womens_prison.code, offender_no))
-      end
+      expect(page).to have_text 'Update complexity of need level'
 
-      it 'can update the complexity level' do
-        expect(HmppsApi::ComplexityApi).to receive(:save).with(offender_no, level: 'low', username: "MOIC_POM", reason: 'bla bla bla')
+      find('label[for=complexity-level-low-field]').click
+      fill_in('complexity[reason]', with: 'bla bla bla')
 
-        visit prison_prisoner_allocation_path(womens_prison.code, offender_no)
+      click_on('Update')
 
-        within(:css, "tr#complexity-level-row") do
-          click_link('Change')
-        end
-
-        # The radio buttons should have the current complexity level checked
-        high_radio_button = find('#complexity-level-high-field', visible: false)
-        expect(high_radio_button).to be_checked
-
-        # Updated level radio button checked
-        find('label[for=complexity-level-low-field]').click
-        # Text area left blank to demonstrate errors
-        click_on('Update')
-
-        # Shows errors
-        expect(page).to have_css('.govuk-error-message')
-        expect(page).to have_text('Enter the reason why the level has changed')
-
-        # Happy path - Textarea Filled in and complexity updated from high to low
-        fill_in('complexity[reason]', with: 'bla bla bla')
-
-        # Change the API response to reflect the newly updated level
-        stub_request(:get, "#{Rails.configuration.complexity_api_host}/v1/complexity-of-need/offender-no/#{offender_no}")
+      stub_request(:get, "#{Rails.configuration.complexity_api_host}/v1/complexity-of-need/offender-no/#{offender_no}")
         .to_return(body: { level: 'low' }.to_json)
 
-        click_on('Update')
+      click_on('Return to prisoner page')
 
-        expect(page).to have_current_path(prison_prisoner_allocation_path(womens_prison.code, offender_no))
-        expect(page).to have_css('#complexity-level-row', text: 'Low')
-        expect(page).to have_css('#complexity-badge', text: 'Low complexity')
-      end
+      expect(page).to have_current_path(prison_prisoner_review_case_details_path(prison_id: womens_prison.code, prisoner_id: offender_no), ignore_query: true)
+      expect(page).to have_css('tr', text: 'Complexity of need level')
+      expect(page).to have_text('Low')
+    end
+
+    it 'keeps the review case details back link after a validation error' do
+      visit prison_prisoner_review_case_details_path(prison_id: womens_prison.code, prisoner_id: offender_no)
+
+      find('tr', text: 'Complexity of need level').click_link('Change')
+
+      find('label[for=complexity-level-low-field]').click
+      click_on('Update')
+
+      expect(page).to have_text('Enter the reason why the level has changed')
+
+      click_link('Back')
+
+      expect(page).to have_current_path(prison_prisoner_review_case_details_path(prison_id: womens_prison.code, prisoner_id: offender_no), ignore_query: true)
     end
   end
 end

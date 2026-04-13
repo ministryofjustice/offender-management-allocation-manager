@@ -1,0 +1,17 @@
+<div class="moj-page-header-actions">
+  <div class="moj-page-header-actions__title">
+    <h1 class="govuk-heading-l"><%= heading %></h1>
+
+    <span class="govuk-caption-l">
+      <%= t('case_information.shared.prison_number', prison_number: @prisoner.offender_no) %>
+    </span>
+    <span class="govuk-caption-l govuk-!-margin-bottom-3">
+      <%= t('case_information.shared.date_of_birth', date_of_birth: format_date(@prisoner.date_of_birth), age: @prisoner.age) %>
+    </span>
+  </div>
+</div>
+
+<% if local_assigns.fetch(:show_delius_info, true) %>
+  <p class="govuk-body"><%= t('case_information.shared.intro.primary') %></p>
+  <p class="govuk-body govuk-!-margin-bottom-7"><%= t('case_information.shared.intro.secondary') %></p>
+<% end %>
