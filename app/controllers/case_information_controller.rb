@@ -51,6 +51,7 @@ private
 
   def set_prisoner
     @prisoner = OffenderService.get_offender(prisoner_id)
+    redirect_to('/404') if @prisoner.nil?
   end
 
   def set_case_info_or_redirect
