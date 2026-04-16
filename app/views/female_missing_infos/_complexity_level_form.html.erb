@@ -1,18 +1,18 @@
-<h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Add complexity of need level</h1>
-
-<p class="govuk-body">
-  This information can be found within 'NOMIS MIS reporting'. In the folder '085 - OASys & BCS' click on 'Female Complexity Report'.
-</p>
-<p class="govuk-body">
-  If the individual is not listed in the report you will need to complete a manual assessment.
-  See guidance on <%= link_to "how to manually assess a person's complexity of need",asset_path("docs/complexity-of-need/assessment-guidance.pdf", skip_pipeline: true), target: "_blank"%>. Download the manual <%= link_to "assessment form",  asset_path("docs/complexity-of-need/assessment-template.pdf",  skip_pipeline: true), target: "_blank"%>.
-</p>
-
 <%= form_for(@missing_info,
-             url: wizard_path,
+             url: prison_prisoner_female_missing_info_path(@prison.code, @prisoner.offender_no, sort: params[:sort], page: params[:page]),
              method: :put,
              builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |form| %>
   <%= form.govuk_error_summary %>
+
+  <%= render 'case_information/heading',
+             heading: "Add complexity of need level for #{@prisoner.full_name_ordered}",
+             show_delius_info: false %>
+
+  <p class="govuk-body govuk-!-margin-bottom-7">
+    Go to NOMIS MIS reporting and open the folder 085 – OASys &amp; BCS. Select Female Complexity Report.
+    If no level is recorded, complete a manual assessment using this <%= link_to "assessment form", asset_path("docs/complexity-of-need/assessment-template.pdf", skip_pipeline: true), target: "_blank" %>.
+    You can find more information in this <%= link_to "guidance", asset_path("docs/complexity-of-need/assessment-guidance.pdf", skip_pipeline: true), target: "_blank" %>.
+  </p>
 
   <%= form.govuk_collection_radio_buttons(
           :complexity_level,
@@ -23,9 +23,12 @@
           :name,
           legend: nil
       ) %>
-  <%= form.submit "Update", role: "button", draggable: "false", class: "govuk-button" %>
-  <% if @secondary_button %>
-    <%= form.submit "Save and Allocate", role: "button", draggable: "false", class: "govuk-button govuk-button--secondary govuk-!-margin-left-4" %>
-  <% end %>
-<% end %>
 
+  <div class="govuk-button-group">
+    <%= form.submit @next_step_required ? "Save and continue" : "Save and allocate",
+                    role: "button",
+                    draggable: "false",
+                    class: "govuk-button",
+                    data: { module: 'govuk-button' } %>
+  </div>
+<% end %>

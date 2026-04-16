@@ -49,7 +49,7 @@ describe CaseInformation do
 
     it 'is not valid' do
       expect(subject).not_to be_valid
-      expect(subject.errors.messages).to eq(tier: ['Select the prisoner’s tier'])
+      expect(subject.errors.messages).to eq(tier: ['Select tier'])
     end
   end
 
@@ -60,7 +60,7 @@ describe CaseInformation do
 
     it 'gives the correct message' do
       expect(subject).not_to be_valid
-      expect(subject.errors.messages).to eq(tier: ['Select the prisoner’s tier'])
+      expect(subject.errors.messages).to eq(tier: ['Select tier'])
     end
   end
 

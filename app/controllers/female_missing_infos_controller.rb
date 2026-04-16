@@ -1,99 +1,76 @@
 # frozen_string_literal: true
 
 class FemaleMissingInfosController < PrisonsApplicationController
-  include Wicked::Wizard
-
-  before_action :load_missing_info, except: :new
-
-  steps :complexity_level, :delius_information
+  before_action :ensure_womens_prison
+  before_action :load_prisoner
+  before_action :load_missing_info
 
   def new
-    # Create blank records and store them in the session to begin the journey
-    save_to_session complexity_session_key, ComplexityForm.new(nomis_offender_id: params.fetch(:prisoner_id))
-    save_to_session case_info_session_key, CaseInformation.new(nomis_offender_id: params.fetch(:prisoner_id), manual_entry: true)
+    return redirect_to next_step_path if @prisoner.complexity_level.present?
 
-    if HmppsApi::ComplexityApi.get_complexity(params.fetch(:prisoner_id))
-      redirect_to wizard_path :delius_information
-    else
-      redirect_to wizard_path(steps.first)
-    end
-  end
-
-  def show
-    @secondary_button = (step == :delius_information) || (step == :complexity_level && has_case_information?)
-    render_wizard
+    set_next_step_required
+    render :complexity_level
   end
 
   def update
     @missing_info.assign_attributes(step_params)
-    save_session
+    set_next_step_required
 
     if @missing_info.valid?
-      if step == :complexity_level
-        HmppsApi::ComplexityApi.save @missing_info.nomis_offender_id, level: @missing_info.complexity_level, username: current_user, reason: nil
-        if has_case_information?
-          complete_journey
-        else
-          redirect_to next_wizard_path
-        end
+      HmppsApi::ComplexityApi.save(
+        @missing_info.nomis_offender_id, level: @missing_info.complexity_level, username: current_user, reason: nil
+      )
+
+      if @next_step_required
+        session[complexity_saved_session_key] = true
+        redirect_to next_step_path
       else
-        @missing_info.save!
-        complete_journey
+        redirect_to prison_prisoner_review_case_details_path(prison_id: active_prison_id, prisoner_id: @missing_info.nomis_offender_id)
       end
     else
-      render_wizard
+      render :complexity_level
     end
   end
 
 private
 
   def has_case_information?
-    CaseInformation.find_by nomis_offender_id: @missing_info.nomis_offender_id
+    @has_case_information ||= CaseInformation.exists?(nomis_offender_id: @missing_info.nomis_offender_id)
   end
 
-  def complete_journey
-    session.delete case_info_session_key
-    session.delete complexity_session_key
-    if params.fetch(:commit) == 'Update'
-      redirect_to missing_information_prison_prisoners_path(@prison.code)
-    else
-      redirect_to prison_prisoner_staff_index_path(active_prison_id,  @missing_info.nomis_offender_id)
-    end
+  def next_step_path
+    new_prison_prisoner_case_information_path(active_prison_id, @missing_info.nomis_offender_id, sort: params[:sort], page: params[:page])
   end
 
-  def save_session
-    if step == :complexity_level
-      save_to_session(complexity_session_key, @missing_info)
-    else
-      save_to_session(case_info_session_key, @missing_info)
-    end
+  def load_prisoner
+    @prisoner = OffenderService.get_offender(prisoner_id)
+    redirect_to('/404') if @prisoner.nil?
   end
 
   def load_missing_info
-    @prisoner = OffenderService.get_offender params.fetch(:prisoner_id)
+    @missing_info = ComplexityForm.new(
+      nomis_offender_id: prisoner_id,
+      complexity_level: @prisoner.complexity_level
+    )
+  end
 
-    # Initialise a new model object using the attributes stored in the session
-    @missing_info = if step == :complexity_level
-                      ComplexityForm.new(session[complexity_session_key])
-                    else
-                      prisoner = Offender.find_by! nomis_offender_id: params.fetch(:prisoner_id)
-                      prisoner.build_case_information(session[case_info_session_key].merge(manual_entry: true))
-                    end
+  def prisoner_id
+    params.require(:prisoner_id)
   end
 
   def step_params
-    if step == :complexity_level
-      params.fetch(:complexity_form, {}).permit(:complexity_level)
-    else
-      params.fetch(:case_information, {}).permit(:enhanced_resourcing, :tier)
-    end
+    params.fetch(:complexity_form, {}).permit(:complexity_level)
   end
 
-  def complexity_session_key
-    "complexity_#{params.fetch(:prisoner_id)}"
+  def ensure_womens_prison
+    redirect_to('/404') unless PrisonService.womens_prison?(active_prison_id)
   end
 
-  def case_info_session_key
-    "case_info_#{params.fetch(:prisoner_id)}"
+  def complexity_saved_session_key
+    "female_missing_info_complexity_saved_#{prisoner_id}"
+  end
+
+  def set_next_step_required
+    @next_step_required = !has_case_information?
   end
 end

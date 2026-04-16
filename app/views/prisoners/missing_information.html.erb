@@ -1,5 +1,68 @@
-<% if @prison.womens? %>
-<%= render 'female_missing_information' %>
-<% else %>
-<%= render 'male_missing_information' %>
-<% end %>
+<% content_for :title, "Add missing details – Digital Prison Services" %>
+
+<h1 class="govuk-heading-xl">Allocations</h1>
+
+<div class="govuk-!-margin-bottom-4">
+  <%= render "search/search_box" %>
+</div>
+
+<%= render(partial: 'shared/summary_subnav',
+           locals: {
+             active: :missing_information,
+             unallocated_count: @unallocated.count,
+             missing_info_count: @missing_info.count,
+             allocated_count: @allocated.count
+           }) %>
+
+<h2 class="govuk-heading-l govuk-!-margin-bottom-4">Add missing details</h2>
+<p class="govuk-!-margin-bottom-8">
+  You need to add missing details to <%= @missing_info.count %> cases so they can be allocated to a POM.
+</p>
+
+<section id="awaiting-information">
+  <%= render partial: 'shared/pagination', locals: { data: @offenders } %>
+
+  <table class="govuk-table responsive tablesorter">
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header" scope="col" <%= sort_aria('last_name') %>>
+        <a href="<%= sort_link('last_name') %>">
+          Case
+        </a>
+        <%= sort_arrow('last_name') %>
+      </th>
+      <th class="govuk-table__header" scope="col" <%= sort_aria('days_awaiting_allocation') %>>
+        <a href="<%= sort_link('days_awaiting_allocation') %>">
+          Days waiting for allocation
+        </a>
+        <%= sort_arrow('days_awaiting_allocation') %>
+      </th>
+      <th class="govuk-table__header" scope="col">Action</th>
+    </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    <% @offenders.each_with_index do |offender, i| %>
+      <tr class="govuk-table__row offender_row_<%= i %>">
+        <td aria-label="Prisoner full name" class="govuk-table__cell ">
+          <%= offender.full_name %>
+          <br/>
+          <span class='govuk-hint govuk-!-margin-bottom-0'>
+            <%= offender.offender_no %>
+          </span>
+        </td>
+        <td aria-label="Waiting" class="govuk-table__cell">
+          <%= offender.days_awaiting_allocation.presence ? "#{offender.days_awaiting_allocation} days" : 'N/A' %>
+        </td>
+        <td aria-label="Action" class="govuk-table__cell" id="<%= "edit_#{offender.offender_no}" %>">
+          <%= link_to "Add missing details",
+                      new_prison_prisoner_case_information_path(
+                        @prison.code, offender.offender_no, sort: params[:sort], page: params[:page] || 1
+                      ) %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+
+  <%= render partial: 'shared/pagination', locals: { data: @offenders } %>
+</section>

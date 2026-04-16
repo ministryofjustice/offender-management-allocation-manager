@@ -17,11 +17,11 @@ class CaseInformation < ApplicationRecord
   validates :manual_entry, inclusion: { in: [true, false], allow_nil: false }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  validates :tier, inclusion: { in: TIER_LEVELS, message: 'Select the prisoner’s tier' }
+  validates :tier, inclusion: { in: TIER_LEVELS, message: 'Select tier' }
   validates :rosh_level, inclusion: { in: ROSH_LEVELS, allow_nil: true }
 
   validates :enhanced_resourcing,
-            inclusion: { in: [true, false], message: 'Select the handover type for this case' },
+            inclusion: { in: [true, false], message: 'Select case allocation decision' },
             on: :manual_entry
 
   # nil means MAPPA level is completely unknown.

@@ -63,7 +63,7 @@ en:
           format: "%{message}"
           attributes:
             complexity_level:
-              blank: You must choose a complexity level
+              blank: Select complexity of need
         responsibility:
           format: "%{message}"
           attributes:
@@ -216,12 +216,37 @@ en:
       success_notice: 'You have successfully updated your email preferences.'
 
   case_information:
+    shared:
+      prison_number: 'Prison number: %{prison_number}'
+      date_of_birth: 'Date of birth: %{date_of_birth} (%{age})'
+      intro:
+        primary: 'This information ensures the service recommends the correct POM type and knows which kind of handover this person needs.'
+        secondary: 'When information from NDelius becomes available, it will replace what you enter here.'
+    new:
+      title: 'Add missing details – Digital Prison Services'
+      heading: 'Add missing details for %{name}'
+    edit:
+      title: 'Update missing details – Digital Prison Services'
+      heading: 'Update missing details for %{name}'
     form:
+      tier:
+        legend: "What is this person’s tier?"
       resourcing:
         labels:
           enhanced: 'Retained/Enhanced Resourcing'
           standard: 'Allocated/Standard Resourcing'
-        legend: 'What case allocation decision has been made for this prisoner?'
-        hint: |
-          You can find this on NDelius by opening someone’s most recent event and then choosing case allocation
-          from the menu on the left. This determines what kind of handover this prisoner needs.
+        legend: 'What case allocation decision has been made for this person?'
+        hint: 'Find this on NDelius by opening their most recent event and then choosing case allocation from the menu on the left.'
+
+  complexity_levels:
+    form:
+      title: 'Update complexity of need level – Digital Prison Services'
+      heading: 'Update complexity of need level for %{name}'
+      update: 'Update'
+      intro:
+        primary: 'Complexity of need level can change during a sentence.'
+      level:
+        legend: 'Select the new complexity of need level'
+      reason:
+        label: 'Provide the reason(s) for this change'
+        hint: 'You must justify why you are changing the complexity of need level – include any key dates and details.'
