@@ -35,7 +35,7 @@ class FemaleMissingInfosController < PrisonsApplicationController
 private
 
   def has_case_information?
-    @has_case_information ||= CaseInformation.exists?(nomis_offender_id: @missing_info.nomis_offender_id)
+    !!CaseInformation.find_by(nomis_offender_id: @missing_info.nomis_offender_id)&.complete_for_allocation?
   end
 
   def next_step_path

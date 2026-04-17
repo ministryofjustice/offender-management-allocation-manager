@@ -74,7 +74,7 @@ class Prison < ApplicationRecord
   end
 
   def offender_allocatable?(offender)
-    offender.case_information.present? && (womens? ? offender.complexity_level.present? : true)
+    offender.case_information&.complete_for_allocation? && (womens? ? offender.complexity_level.present? : true)
   end
 
   def offender_allocated?(offender)

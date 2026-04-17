@@ -15,10 +15,16 @@ RSpec.describe "prisoners/review_case_details", type: :view do
   let(:contacts_table) { page.all('table.govuk-table').last }
   let(:vlo_row) { contacts_table.find('tr', text: 'Victim liaison officer (VLO)') }
   let(:vlo_cells) { vlo_row.all('td') }
-  let(:case_info) { build(:case_information) }
+  let(:at_a_glance_summary) { page.all('dl.govuk-summary-list').first }
+  let(:case_info) { build(:case_information, rosh_level: 'HIGH') }
   let(:prison) { build(:prison) }
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
   let(:api_offender) { build(:hmpps_api_offender, category: build(:offender_category, :cat_a)) }
+  let(:rosh_level_feature_enabled) { true }
+
+  before do
+    stub_rosh_level_feature(enabled: rosh_level_feature_enabled)
+  end
 
   describe 'Sentence and offence section' do
     before { render }
@@ -31,6 +37,33 @@ RSpec.describe "prisoners/review_case_details", type: :view do
 
         expect(row).to have_css('td', count: 2)
         expect(row).to have_css('td[colspan="2"]', count: 1)
+      end
+    end
+  end
+
+  describe 'At a glance section' do
+    before { render }
+
+    it 'shows the rosh row' do
+      row = at_a_glance_summary.find('#rosh-row')
+
+      expect(row).to have_text('ROSH')
+      expect(row).to have_text('High')
+    end
+
+    it 'shows the rosh change link when the feature flag is enabled and the case information is editable' do
+      row = at_a_glance_summary.find('#rosh-row')
+
+      expect(row).to have_link('Change', href: edit_prison_prisoner_case_information_path(prison, offender.offender_no, from: :review_case))
+    end
+
+    context 'when the rosh feature flag is disabled' do
+      let(:rosh_level_feature_enabled) { false }
+
+      it 'does not show the rosh change link' do
+        row = at_a_glance_summary.find('#rosh-row')
+
+        expect(row).not_to have_link('Change', href: edit_prison_prisoner_case_information_path(prison, offender.offender_no, from: :review_case))
       end
     end
   end

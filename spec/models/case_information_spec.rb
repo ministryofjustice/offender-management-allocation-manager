@@ -1,5 +1,10 @@
 describe CaseInformation do
   let(:case_info) { create(:case_information) }
+  let(:rosh_level_feature_enabled) { true }
+
+  before do
+    stub_rosh_level_feature(enabled: rosh_level_feature_enabled)
+  end
 
   context 'with mappa level' do
     subject { build(:case_information) }
@@ -31,6 +36,30 @@ describe CaseInformation do
       subject.rosh_level = 'UNKNOWN'
 
       expect(subject).not_to be_valid
+    end
+
+    it 'requires a rosh level for manual entry' do
+      subject.rosh_level = nil
+
+      expect(subject.valid?(:manual_entry)).to be(false)
+      expect(subject.errors.messages).to include(rosh_level: ['Select ROSH'])
+    end
+
+    context 'when the rosh feature flag is disabled' do
+      let(:rosh_level_feature_enabled) { false }
+
+      it 'does not require a rosh level for manual entry' do
+        subject.rosh_level = nil
+
+        expect(subject.valid?(:manual_entry)).to be(true)
+      end
+    end
+
+    it 'treats a blank rosh level as missing for manual entry' do
+      subject.rosh_level = ''
+
+      expect(subject.valid?(:manual_entry)).to be(false)
+      expect(subject.errors.messages).to include(rosh_level: ['Select ROSH'])
     end
   end
 
@@ -101,16 +130,42 @@ describe CaseInformation do
 
     context 'when manually entering values from the missing details form' do
       it 'can be true' do
-        expect(build(:case_information, enhanced_resourcing: true).valid?(:manual_entry)).to be(true)
+        expect(build(:case_information, enhanced_resourcing: true, rosh_level: 'HIGH').valid?(:manual_entry)).to be(true)
       end
 
       it 'can be false' do
-        expect(build(:case_information, enhanced_resourcing: false).valid?(:manual_entry)).to be(true)
+        expect(build(:case_information, enhanced_resourcing: false, rosh_level: 'HIGH').valid?(:manual_entry)).to be(true)
       end
 
       it 'cannot be nil' do
-        expect(build(:case_information, enhanced_resourcing: nil).valid?(:manual_entry)).to be(false)
+        expect(build(:case_information, enhanced_resourcing: nil, rosh_level: 'HIGH').valid?(:manual_entry)).to be(false)
       end
+    end
+  end
+
+  describe '#complete_for_allocation?' do
+    it 'is true when tier and rosh level are present' do
+      expect(build(:case_information, tier: 'A', rosh_level: 'HIGH', enhanced_resourcing: false).complete_for_allocation?).to be(true)
+    end
+
+    it 'is true when enhanced resourcing is missing' do
+      expect(build(:case_information, tier: 'A', rosh_level: 'HIGH', enhanced_resourcing: nil).complete_for_allocation?).to be(true)
+    end
+
+    it 'is false when rosh level is missing' do
+      expect(build(:case_information, rosh_level: nil).complete_for_allocation?).to be(false)
+    end
+
+    context 'when the rosh feature flag is disabled' do
+      let(:rosh_level_feature_enabled) { false }
+
+      it 'is true when rosh level is missing' do
+        expect(build(:case_information, tier: 'A', rosh_level: nil).complete_for_allocation?).to be(true)
+      end
+    end
+
+    it 'is false when tier is missing' do
+      expect(build(:case_information, tier: nil, rosh_level: 'HIGH').complete_for_allocation?).to be(false)
     end
   end
 end

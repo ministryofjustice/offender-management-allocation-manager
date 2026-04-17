@@ -143,7 +143,7 @@ RSpec.describe Prison do
         instance_double MpcOffender, "mpc_offender-#{nomis_offender_id}", offender_no: nomis_offender_id,
                                                                           nomis_offender_id:,
                                                                           inside_omic_policy?: true,
-                                                                          case_information: double,
+                                                                          case_information: double(complete_for_allocation?: true),
                                                                           released?: false
       end
     end

@@ -16,7 +16,7 @@ RSpec.describe PrisonersController, type: :controller do
 
         create(:case_information, offender: build(:offender, nomis_offender_id: allocated_offender_one.fetch(:prisonerNumber)))
         create(:allocation_history, nomis_offender_id: allocated_offender_one.fetch(:prisonerNumber), prison: prison.code)
-        create(:case_information, offender: build(:offender, nomis_offender_id: allocated_offender_two.fetch(:prisonerNumber)))
+        create(:case_information, :without_rosh, offender: build(:offender, nomis_offender_id: allocated_offender_two.fetch(:prisonerNumber)))
         create(:allocation_history, nomis_offender_id: allocated_offender_two.fetch(:prisonerNumber), prison: prison.code)
       end
 

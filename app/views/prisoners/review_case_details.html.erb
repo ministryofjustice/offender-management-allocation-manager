@@ -45,125 +45,94 @@
       </div>
       <div class="govuk-notification-banner__content">
         <p class="govuk-notification-banner__heading"></p>
-        <p class="govuk-!-margin-bottom-0">
+        <p>
           <span class="govuk-tag govuk-tag--blue"><%= sentence_type_label(@prisoner) %></span>
           <%= vlo_tag(@prisoner) %>
         </p>
 
-        <table class="govuk-table">
-          <caption class="govuk-table__caption govuk-table__caption--m"></caption>
-          <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-              <th scope="col" class="govuk-table__header"></th>
-              <th scope="col" class="govuk-table__header"></th>
-              <th scope="col" class="govuk-table__header"></th>
-            </tr>
-          </thead>
-          <tbody class="govuk-table__body">
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Main offence</th>
-              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.main_offence %></td>
-              <td class="govuk-table__cell govuk-!-width-one-third"></td>
-            </tr>
-            <tr class="govuk-table__row" id="tier">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Tier</th>
-              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.tier.presence || 'No tier found' %></td>
-              <td class="govuk-table__cell govuk-!-width-one-third">
-                <%= link_to('Change', edit_prison_prisoner_case_information_path(@prison, @prisoner.offender_no, from: :review_case), class: 'govuk-link govuk-link--no-visited-state') if @prisoner.manual_entry? %>
-              </td>
-            </tr>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Category</th>
-              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.category_code.presence || 'No category found
-' %></td>
-              <td class="govuk-table__cell govuk-!-width-one-third"></td>
-            </tr>
-            <% if @prison.womens? %>
-              <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header govuk-!-width-one-third">Complexity of need level</th>
-                <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.complexity_level&.capitalize %></td>
-                <td class="govuk-table__cell govuk-!-width-one-third">
-                  <%= link_to 'Change', edit_prison_prisoner_complexity_level_path(@prison.code, @prisoner.offender_no, from: :review_case), class: 'govuk-link govuk-link--no-visited-state' %>
-                </td>
-              </tr>
-            <% end %>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Sentence start date</th>
-              <td class="govuk-table__cell govuk-!-width-one-third">
-                <%= format_date(@prisoner.sentence_start_date, replacement: 'N/A') %>
-              </td>
-              <td class="govuk-table__cell govuk-!-width-one-third"></td>
-            </tr>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Earliest release date</th>
-              <td class="govuk-table__cell govuk-!-width-one-third"><%= format_earliest_release_date(@prisoner.earliest_release) %></td>
-              <td class="govuk-table__cell govuk-!-width-one-third"></td>
-            </tr>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Handover type</th>
-              <td class="govuk-table__cell govuk-!-width-one-third">
-                <%= handover_type_label(@prisoner) %>
-              </td>
-              <td class="govuk-table__cell govuk-!-width-one-third">
-                <%= link_to 'Change', edit_prison_prisoner_case_information_path(@prison.code, @prisoner.offender_no, from: :review_case), class: 'govuk-link govuk-link--no-visited-state' if @prisoner.manual_entry? %>
-              </td>
-            </tr>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Location</th>
-              <td class="govuk-table__cell govuk-!-width-one-third"><%= @prisoner.location %></td>
-              <td class="govuk-table__cell govuk-!-width-one-third"></td>
-            </tr>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM role needed</th>
-              <td class="govuk-table__cell govuk-!-width-one-third"><%= pom_responsibility_label(@prisoner) %></td>
-              <td class="govuk-table__cell govuk-!-width-one-third"></td>
-            </tr>
-            <% if @pom.present? %>
-              <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM</th>
-                <td class="govuk-table__cell govuk-!-width-one-third"><%= @pom.full_name_ordered %></td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
-              </tr>
-              <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM email</th>
-                <td class="govuk-table__cell govuk-!-width-one-third"><%= @pom.email_address %></td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
-              </tr>
-              <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header govuk-!-width-one-third">POM role</th>
-                <td class="govuk-table__cell govuk-!-width-one-third"><%= @pom.position_description %></td>
-                <td class="govuk-table__cell govuk-!-width-one-third"></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+            <dt class="govuk-summary-list__key">Main offence</dt>
+            <dd class="govuk-summary-list__value"><%= @prisoner.main_offence %></dd>
+          </div>
+          <div class="govuk-summary-list__row" id="tier">
+            <dt class="govuk-summary-list__key">Tier</dt>
+            <dd class="govuk-summary-list__value"><%= @prisoner.tier.presence || 'No tier found' %></dd>
+            <dd class="govuk-summary-list__actions">
+              <%= link_to('Change', edit_prison_prisoner_case_information_path(@prison, @prisoner.offender_no, from: :review_case), class: 'govuk-link govuk-link--no-visited-state') if @prisoner.manual_entry? %>
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+            <dt class="govuk-summary-list__key">Category</dt>
+            <dd class="govuk-summary-list__value"><%= @prisoner.category_code.presence || 'No category found' %></dd>
+          </div>
+          <div class="govuk-summary-list__row" id="rosh-row">
+            <dt class="govuk-summary-list__key">ROSH</dt>
+            <dd class="govuk-summary-list__value"><%= @prisoner.rosh_level.present? ? @prisoner.rosh_level.humanize : 'No ROSH found' %></dd>
+            <dd class="govuk-summary-list__actions">
+              <%= link_to('Change', edit_prison_prisoner_case_information_path(@prison, @prisoner.offender_no, from: :review_case),
+                          class: 'govuk-link govuk-link--no-visited-state') if @prisoner.manual_entry? && FeatureFlags.rosh_level.enabled? %>
+            </dd>
+          </div>
+          <% if @prison.womens? %>
+            <div class="govuk-summary-list__row" id="complexity-level-row">
+              <dt class="govuk-summary-list__key">Complexity of need level</dt>
+              <dd class="govuk-summary-list__value"><%= @prisoner.complexity_level&.capitalize %></dd>
+              <dd class="govuk-summary-list__actions">
+                <%= link_to 'Change', edit_prison_prisoner_complexity_level_path(@prison.code, @prisoner.offender_no, from: :review_case), class: 'govuk-link govuk-link--no-visited-state' %>
+              </dd>
+            </div>
+          <% end %>
+          <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+            <dt class="govuk-summary-list__key">Sentence start date</dt>
+            <dd class="govuk-summary-list__value"><%= format_date(@prisoner.sentence_start_date, replacement: 'N/A') %></dd>
+          </div>
+          <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+            <dt class="govuk-summary-list__key">Earliest release date</dt>
+            <dd class="govuk-summary-list__value"><%= format_earliest_release_date(@prisoner.earliest_release) %></dd>
+          </div>
+          <div class="govuk-summary-list__row" id="service-provider-row">
+            <dt class="govuk-summary-list__key">Handover type</dt>
+            <dd class="govuk-summary-list__value"><%= handover_type_label(@prisoner) %></dd>
+            <dd class="govuk-summary-list__actions">
+              <%= link_to 'Change', edit_prison_prisoner_case_information_path(@prison.code, @prisoner.offender_no, from: :review_case), class: 'govuk-link govuk-link--no-visited-state' if @prisoner.manual_entry? %>
+            </dd>
+          </div>
+          <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+            <dt class="govuk-summary-list__key">Location</dt>
+            <dd class="govuk-summary-list__value"><%= @prisoner.location %></dd>
+          </div>
+          <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+            <dt class="govuk-summary-list__key">POM role needed</dt>
+            <dd class="govuk-summary-list__value"><%= pom_responsibility_label(@prisoner) %></dd>
+          </div>
+          <% if @pom.present? %>
+            <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+              <dt class="govuk-summary-list__key">POM</dt>
+              <dd class="govuk-summary-list__value"><%= @pom.full_name_ordered %></dd>
+            </div>
+            <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+              <dt class="govuk-summary-list__key">POM email</dt>
+              <dd class="govuk-summary-list__value"><%= @pom.email_address %></dd>
+            </div>
+            <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+              <dt class="govuk-summary-list__key">POM role</dt>
+              <dd class="govuk-summary-list__value"><%= @pom.position_description %></dd>
+            </div>
+          <% end %>
+        </dl>
 
-        <table class="govuk-table">
-          <caption class="govuk-table__caption govuk-table__caption--m">Key dates</caption>
-          <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-              <th scope="col" class="govuk-table__header"></th>
-              <th scope="col" class="govuk-table__header"></th>
-              <th scope="col" class="govuk-table__header"></th>
-            </tr>
-          </thead>
-          <tbody class="govuk-table__body">
-            <tr class="govuk-table__row">
-            </tr>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">Last OASys completed</th>
-              <td class="govuk-table__cell govuk-!-width-one-third">
-                <%= render 'oasys_assessment', assessment: @oasys_assessment %>
-              </td>
-              <td class="govuk-table__cell"></td>
-            </tr>
-            <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header govuk-!-width-one-third">COM responsible</th>
-              <td class="govuk-table__cell"><%= format_date(@prisoner.responsibility_handover_date, replacement: 'Unknown') %></td>
-              <td class="govuk-table__cell"></td>
-            </tr>
-          </tbody>
-        </table>
+        <h3 class="govuk-heading-m govuk-!-margin-top-7 govuk-!-margin-bottom-4">Key dates</h3>
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+            <dt class="govuk-summary-list__key">Last OASys completed</dt>
+            <dd class="govuk-summary-list__value"><%= render 'oasys_assessment', assessment: @oasys_assessment %></dd>
+          </div>
+          <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+            <dt class="govuk-summary-list__key">COM responsible</dt>
+            <dd class="govuk-summary-list__value"><%= format_date(@prisoner.responsibility_handover_date, replacement: 'Unknown') %></dd>
+          </div>
+        </dl>
 
         <% if @coworking %>
           <%= link_to 'Choose a co-working POM to allocate to now', prison_prisoner_staff_index_path(@prison, @prisoner.offender_no, coworking: true) %>

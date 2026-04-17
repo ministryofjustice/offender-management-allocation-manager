@@ -48,10 +48,11 @@ feature "womens missing info journey" do
         click_button 'Save'
         within '.govuk-error-summary' do
           expect(page).to have_content('Select tier')
+          expect(page).to have_content('Select ROSH')
           expect(page).to have_content('Select case allocation decision')
         end
 
-        fill_in_case_information(resourcing: 'false', tier: 'B')
+        fill_in_case_information(resourcing: 'false', tier: 'B', rosh_level: 'MEDIUM')
         click_button 'Save'
         wait_for { page.current_path == missing_information_prison_prisoners_path(prison.code) }
       }.to change(CaseInformation, :count).by(1)
@@ -95,7 +96,7 @@ feature "womens missing info journey" do
 
       expect_case_information_page(prison_code: prison.code, prisoner_id: prisoner_id)
 
-      fill_in_case_information(resourcing: 'true', tier: 'A')
+      fill_in_case_information(resourcing: 'true', tier: 'A', rosh_level: 'HIGH')
       click_button 'Save'
       wait_for { page.current_path == missing_information_prison_prisoners_path(prison.code) }
     end
@@ -131,7 +132,7 @@ feature "womens missing info journey" do
     end
 
     def fill_in_missing_case_information
-      fill_in_case_information(resourcing: 'true', tier: 'A')
+      fill_in_case_information(resourcing: 'true', tier: 'A', rosh_level: 'LOW')
       click_button 'Save'
     end
   end

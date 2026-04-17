@@ -8,6 +8,7 @@ class DeliusImportError < ApplicationRecord
   MISSING_TEAM = 4
   MISSING_LDU = 5
   MISMATCHED_DOB = 6
+  INVALID_ROSH_LEVEL = 7
 
   validates :nomis_offender_id, presence: true
 
@@ -18,6 +19,7 @@ class DeliusImportError < ApplicationRecord
          INVALID_CASE_ALLOCATION,
          MISSING_TEAM,
          MISSING_LDU,
-         MISMATCHED_DOB]
+         MISMATCHED_DOB,
+         INVALID_ROSH_LEVEL]
   }
 end

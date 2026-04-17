@@ -45,15 +45,11 @@ RSpec.feature "Delius import feature", :disable_push_to_delius do
     it "imports from Delius and creates case information" do
       visit missing_information_prison_prisoners_path(prison_code)
       expect(page).to have_content("Add missing details")
-      expect(page).to have_content(offender_no)
+      expect(page).not_to have_content(offender_no)
 
       ProcessDeliusDataJob.perform_now offender_no
 
       expect(DeliusImportError.all).to eq []
-
-      reload_page
-      expect(page).to have_content("Add missing details")
-      expect(page).not_to have_content(offender_no)
 
       visit allocated_prison_prisoners_path(prison_code)
       expect(page).to have_content("See allocations")
