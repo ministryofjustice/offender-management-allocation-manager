@@ -17,8 +17,7 @@ CSV_COLUMNS = %w[
 namespace :reports do
   desc 'Create a CSV report listing counds of allocated tier A & B by prison code'
   task high_risk_cases_for_probation_poms: :environment do
-    prisons_range = ENV.fetch('PRISONS_RANGE', '0').split('..').map(&:to_i)
-    prisons_range = Range.new(prisons_range[0], prisons_range[1])
+    prisons_range = Reports::TaskOptions.prisons_range
 
     results = in_batches(Prison.active.order(name: :asc)[prisons_range], 2) do |prison|
       puts ">> Obtaining cases for #{prison.name} (#{prison.code})"
@@ -26,7 +25,7 @@ namespace :reports do
       results_for_prison(prison)
     end
 
-    filename = ENV.fetch('FILENAME', 'high_risk_cases_for_probation_poms.csv')
+    filename = Reports::TaskOptions.filename('high_risk_cases_for_probation_poms.csv')
     CSV.open(filename, 'wb') do |csv|
       csv << CSV_COLUMNS
 

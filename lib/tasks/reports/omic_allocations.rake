@@ -7,11 +7,7 @@ namespace :reports do
   task allocations: :environment do
     require 'csv'
 
-    $stdout.sync = true
-    Rails.logger = Logger.new($stdout)
-
-    # avoid lots of log traces from the API calls
-    Rails.logger.level = :warn
+    Reports::TaskLogger.configure!
 
     # rubocop:disable Rake/MethodDefinitionInTask
     def pom_type_at_version(allocation)
@@ -40,17 +36,14 @@ namespace :reports do
     end
 
     def log(msg)
-      Rails.logger.warn("[AllocationsReport] #{msg}")
+      Reports::TaskLogger.warn('AllocationsReport', msg)
     end
     # rubocop:enable Rake/MethodDefinitionInTask
 
-    # Examples: 0.. | 0..60 | 61..
-    prisons_range = ENV.fetch('PRISONS_RANGE', '0').split('..').map(&:to_i)
-    prisons_range = Range.new(prisons_range[0], prisons_range[1])
-
-    # Format for dates: 2026-02-16
-    from_date = ENV.fetch('DATE_FROM', 1.year.ago.to_date.to_s).to_date.at_beginning_of_day
-    to_date = ENV.fetch('DATE_TO', Date.current.end_of_day.to_date.to_s).to_date.end_of_day
+    prisons_range = Reports::TaskOptions.prisons_range
+    from_date, to_date = Reports::TaskOptions.date_range
+    from_date = from_date.beginning_of_day
+    to_date = to_date.end_of_day
 
     log 'Report started'
     log "NOTE: Using range: #{prisons_range}"
@@ -58,7 +51,7 @@ namespace :reports do
 
     total = 0
 
-    CSV.open(ENV.fetch('FILENAME', 'allocations.csv'), 'wb') do |csv|
+    CSV.open(Reports::TaskOptions.filename('allocations.csv'), 'wb') do |csv|
       csv << %w[allocation_date prison nomis_offender_id tier CRD PRRD SLED remaining_sentence pom_type pom_responsible pom_supporting]
 
       Prison.active.order(name: :asc)[prisons_range].each do |prison|
