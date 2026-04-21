@@ -73,8 +73,7 @@ private
   end
 
   def redirect_to_female_missing_info?
-    PrisonService.womens_prison?(active_prison_id) && @prisoner.complexity_level.blank? &&
-      (@case_info.persisted? || !complexity_recently_saved?)
+    PrisonService.womens_prison?(active_prison_id) && @prisoner.complexity_level.blank? && !complexity_recently_saved?
   end
 
   def complexity_recently_saved?
