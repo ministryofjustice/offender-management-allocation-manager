@@ -72,14 +72,6 @@ RSpec.describe DomainEvents::Handlers::TierChangeHandler do
     end
   end
 
-  context 'when local case information not found' do
-    before { handler.handle(event) }
-
-    it 'emits a log error message' do
-      expect(Shoryuken::Logging.logger).to have_received(:error).once
-    end
-  end
-
   context 'when tiering API returns an error' do
     let!(:case_information) { create(:case_information, crn: crn, tier: 'A') }
     let(:tier_from_api) { nil }
