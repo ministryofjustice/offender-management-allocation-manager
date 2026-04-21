@@ -9,7 +9,7 @@ namespace :reports do
 
     # rubocop:disable Rake/MethodDefinitionInTask
     def log(msg)
-      Rails.logger.warn("#{Time.current.strftime('%Y-%m-%d %H:%M:%S.%3N')} [HandoversReport] #{msg}")
+      Reports::TaskLogger.warn('HandoversReport', msg)
     end
 
     def handover_type(offender)
@@ -20,19 +20,12 @@ namespace :reports do
     end
     # rubocop:enable Rake/MethodDefinitionInTask
 
-    $stdout.sync = true
-    Rails.logger = Logger.new($stdout)
+    Reports::TaskLogger.configure!
 
-    # avoid lots of log traces from the API calls
-    Rails.logger.level = :warn
-
-    # Examples: 0.. | 0..60 | 61..
-    prisons_range = ENV.fetch('PRISONS_RANGE', '0').split('..').map(&:to_i)
-    prisons_range = Range.new(prisons_range[0], prisons_range[1])
-
-    # Format for dates: 2026-02-16
-    from_date = ENV.fetch('DATE_FROM', 1.year.ago.to_date.to_s).to_date.at_beginning_of_day
-    to_date = ENV.fetch('DATE_TO', Date.current.end_of_day.to_date.to_s).to_date.end_of_day
+    prisons_range = Reports::TaskOptions.prisons_range
+    from_date, to_date = Reports::TaskOptions.date_range
+    from_date = from_date.beginning_of_day
+    to_date = to_date.end_of_day
 
     log 'Report started'
     log "NOTE: Using range: #{prisons_range}"
@@ -44,7 +37,7 @@ namespace :reports do
       'handover_date >= ? AND handover_date <= ?', from_date, to_date
     ].freeze
 
-    CSV.open(ENV.fetch('FILENAME', 'handovers.csv'), 'wb') do |csv|
+    CSV.open(Reports::TaskOptions.filename('handovers.csv'), 'wb') do |csv|
       csv << %w[prison nomis_offender_id ldu_code ldu_name handover_date CRD PED TED handover_type]
 
       Prison.active.order(code: :asc)[prisons_range].each do |prison|

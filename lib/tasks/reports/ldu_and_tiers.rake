@@ -7,9 +7,7 @@ namespace :reports do
   task ldu_and_tiers: :environment do
     require 'csv'
 
-    # Examples: 0.. | 0..60 | 61..
-    prisons_range = ENV.fetch('PRISONS_RANGE', '0').split('..').map(&:to_i)
-    prisons_range = Range.new(prisons_range[0], prisons_range[1])
+    prisons_range = Reports::TaskOptions.prisons_range
 
     ldu_and_tiers prisons_range
 
@@ -18,7 +16,7 @@ namespace :reports do
 end
 
 def ldu_and_tiers(prisons_range, show_header: true)
-  CSV.open('ldu_and_tiers.csv', 'wb') do |csv|
+  CSV.open(Reports::TaskOptions.filename('ldu_and_tiers.csv'), 'wb') do |csv|
     csv << %w[nomis_id ldu sentence_type tier] if show_header
 
     Prison.active.order(name: :asc)[prisons_range].each do |prison|
