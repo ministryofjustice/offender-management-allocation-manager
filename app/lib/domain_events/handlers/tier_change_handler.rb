@@ -3,14 +3,9 @@ module DomainEvents
     class TierChangeHandler
       def handle(event, logger: Shoryuken::Logging.logger)
         logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
-        case_info = CaseInformation.find_by_crn(event.crn_number)
 
-        if case_info.nil?
-          logger.error "event=domain_event_handle_failure,domain_event_type=#{event.event_type}," \
-            "crn=#{event.crn_number}|Case information not found for this CRN"
-
-          return
-        end
+        case_info = CaseInformation.find_by(crn: event.crn_number)
+        return if case_info.nil?
 
         api_tier_info = HmppsApi::TieringApi.get_calculation(
           event.crn_number, event.additional_information['calculationId']
