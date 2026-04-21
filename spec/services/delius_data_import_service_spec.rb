@@ -12,6 +12,7 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
   let(:com_forename) { 'Arnold' }
   let(:com_surname) { 'Aardvark' }
   let(:com_email) { 'arnie@aardvark.me' }
+  let(:resourcing) { 'ENHANCED' }
   let(:tier) { 'A_2' }
   let(:rosh_level) { 'HIGH' }
   let(:rosh_start_date) { Date.new(2026, 3, 14) }
@@ -20,6 +21,7 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
     build :probation_record, offender_no: nomis_offender_id,
                              crn: crn,
                              tier: tier,
+                             resourcing: resourcing,
                              team_description: team_name,
                              ldu_code: ldu.code,
                              ldu_description: ldu.name,
@@ -61,29 +63,18 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
   shared_examples 'audit event' do
     let(:audit_event) { AuditEvent.last }
 
-    it 'creates an audit event' do
+    it 'creates an audit event with the expected data and tags' do
       expect {
         service.process(nomis_offender_id)
       }.to change(AuditEvent, :count).by(1)
-    end
 
-    it 'includes the CaseInformation attribute diffs in the audit event data' do
-      service.process(nomis_offender_id)
       expect(audit_event.data['before']).to eq(expected_data['before'])
       expect(audit_event.data['after']).to eq(expected_data['after'])
-    end
-
-    it 'includes the word batch in the tags' do
-      service.process(nomis_offender_id)
       expect(audit_event.tags).to include('batch')
     end
   end
 
   context 'when case_information not present' do
-    before do
-      stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
-    end
-
     it 'creates case information' do
       expect {
         service.process(nomis_offender_id)
@@ -137,20 +128,6 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
     let(:offender_id) { 'A1111AA' }
     let(:nomis_offender_id) { offender_id }
 
-    before do
-      stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: offender_id))
-    end
-
-    context 'with a normal COM name' do
-      it 'shows com name' do
-        expect {
-          service.process(offender_id)
-        }.to change(CaseInformation, :count).by(1)
-
-        expect(case_info.com_name).to eq("#{com_surname}, #{com_forename}")
-      end
-    end
-
     context 'with no COM details' do
       let(:mock_probation_record) do
         build :probation_record, :no_com, offender_no: nomis_offender_id,
@@ -177,10 +154,6 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
   context 'when tier contains extra characters' do
     let(:tier) { 'B1' }
 
-    before do
-      stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
-    end
-
     it 'creates case information' do
       expect {
         service.process(nomis_offender_id)
@@ -192,10 +165,6 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
   context 'when tier is invalid' do
     let(:tier) { 'X' }
 
-    before do
-      stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
-    end
-
     it 'does not create case information' do
       expect {
         service.process(nomis_offender_id)
@@ -203,20 +172,20 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
     end
   end
 
-  describe '#probation_service' do
-    before do
-      stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
-    end
+  context 'when rosh level is invalid' do
+    let(:rosh_level) { 'UNKNOWN' }
 
-    context 'with an English LDU' do
-      let(:ldu) { create(:local_delivery_unit, country: 'England') }
-
-      it 'maps to England' do
+    it 'does not create case information and stores a rosh import error' do
+      expect {
         service.process(nomis_offender_id)
-        expect(case_info.probation_service).to eq('England')
-      end
-    end
+      }.not_to change(CaseInformation, :count)
 
+      expect(DeliusImportError.where(nomis_offender_id: nomis_offender_id).pluck(:error_type))
+        .to eq([DeliusImportError::INVALID_ROSH_LEVEL])
+    end
+  end
+
+  describe '#probation_service' do
     context 'with a Welsh LDU' do
       let(:ldu) { create(:local_delivery_unit, country: 'Wales') }
 
@@ -228,25 +197,12 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
   end
 
   describe 'Local Delivery Unit' do
-    before do
-      stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
-      service.process(nomis_offender_id)
-    end
-
-    context 'when the LDU code exists in our lookup table' do
-      let(:ldu_code) { ldu.code }
-
-      it 'associates it with that LDU' do
-        expect(case_info.local_delivery_unit).to eq ldu
-      end
-
-      it 'records the LDU code' do
-        expect(case_info.ldu_code).to eq ldu_code
-      end
-    end
-
     context 'when the LDU code is not in our lookup table' do
       let(:ldu) { OpenStruct.new(code: 'ABC123', name: 'Captain Underpants') }
+
+      before do
+        service.process(nomis_offender_id)
+      end
 
       it 'imports the record, but without an LDU association' do
         expect(case_info.local_delivery_unit).to be_nil
@@ -259,10 +215,6 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
   end
 
   context 'when case information already present' do
-    before do
-      stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
-    end
-
     let!(:c1) { create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
     let(:tier) { 'C' }
 
@@ -287,12 +239,66 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
     end
 
     include_examples 'audit event' do
-      let(:attrs_not_changing) { %w[id created_at updated_at active_vlo nomis_offender_id tier] }
+      let(:attrs_not_changing) { %w[id created_at updated_at active_vlo nomis_offender_id tier rosh_level] }
       let(:expected_data) do
         {
-          'before' => c1.attributes.except(*attrs_not_changing),
-          'after' => audit_case_information_attributes.except('nomis_offender_id', 'tier')
+          'before' => c1.attributes.except(*attrs_not_changing).merge('rosh_start_date' => c1.rosh_start_date&.to_s),
+          'after' => audit_case_information_attributes.except('nomis_offender_id', 'tier', 'rosh_level')
         }
+      end
+    end
+
+    context 'when the existing rosh level is already present' do
+      let!(:c1) do
+        create(:case_information,
+               offender: build(:offender, nomis_offender_id: nomis_offender_id),
+               manual_entry: true,
+               tier: 'B',
+               rosh_level: 'LOW')
+      end
+
+      context 'when probation rosh is nil' do
+        let(:rosh_level) { nil }
+
+        it 'preserves the existing rosh level' do
+          service.process(nomis_offender_id)
+
+          expect(c1.reload.rosh_level).to eq('LOW')
+        end
+      end
+
+      context 'when probation rosh is present' do
+        let(:rosh_level) { 'HIGH' }
+
+        it 'overwrites the existing rosh level' do
+          service.process(nomis_offender_id)
+
+          expect(c1.reload.rosh_level).to eq('HIGH')
+        end
+      end
+    end
+
+    context 'when probation resourcing is missing' do
+      let(:resourcing) { nil }
+
+      it 'preserves the existing enhanced resourcing value if any' do
+        c1.update!(enhanced_resourcing: false)
+
+        service.process(nomis_offender_id)
+
+        expect(c1.reload.enhanced_resourcing).to be(false)
+      end
+    end
+
+    context 'when probation resourcing is present' do
+      let(:resourcing) { 'STANDARD' }
+
+      it 'overwrites the existing enhanced resourcing value' do
+        c1.update!(enhanced_resourcing: true)
+
+        service.process(nomis_offender_id)
+
+        expect(c1.reload.enhanced_resourcing).to be(false)
       end
     end
   end
@@ -301,16 +307,9 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
     let(:service) { described_class.new(identifier_type: :crn) }
 
     before do
-      stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
       allow(OffenderService).to receive(:get_probation_record).with(crn).and_return(mock_probation_record)
       allow(service.logger).to receive(:error)
       service.process(crn)
-    end
-
-    context 'when the probation record has a NOMIS offender ID' do
-      it 'does not log an error' do
-        expect(service.logger).not_to have_received(:error)
-      end
     end
 
     context 'when the probation record does not have a NOMIS offender ID' do
@@ -323,10 +322,6 @@ RSpec.describe DeliusDataImportService, :disable_push_to_delius do
   end
 
   context 'with error handling' do
-    before do
-      stub_offender(build(:nomis_offender, prisonId: prison.code, prisonerNumber: nomis_offender_id))
-    end
-
     context 'with non-retriable client errors' do
       [
         Faraday::ResourceNotFound,

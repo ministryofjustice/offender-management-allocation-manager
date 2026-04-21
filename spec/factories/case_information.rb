@@ -7,6 +7,9 @@ FactoryBot.define do
 
     tier { 'A' }
 
+    rosh_level { 'HIGH' }
+    rosh_start_date { Date.new(2025, 6, 1) }
+
     manual_entry { true }
 
     crn { Faker::Alphanumeric.alpha(number: 10) }
@@ -27,6 +30,11 @@ FactoryBot.define do
 
     trait :with_active_vlo do
       active_vlo { true }
+    end
+
+    trait :without_rosh do
+      rosh_level { nil }
+      rosh_start_date { nil }
     end
   end
 end

@@ -3,39 +3,60 @@
              method: method,
              builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |form| %>
   <%= form.govuk_error_summary %>
+
   <%= render 'heading', heading: heading %>
+
   <%= hidden_field_tag('from', @source_page) %>
   <%= hidden_field_tag("sort", params[:sort]) %>
   <%= hidden_field_tag("page", params[:page]) %>
 
-  <%= form.govuk_collection_radio_buttons(
-        :tier,
-        [OpenStruct.new(name: 'A', value: 'A'),
-         OpenStruct.new(name: 'B', value: 'B'),
-         OpenStruct.new(name: 'C', value: 'C'),
-         OpenStruct.new(name: 'D', value: 'D')],
-        :value,
-        :name,
-        legend: { text: t('.tier.legend') }
-      ) %>
+  <% show_all_fields = action_name.in?(%w[edit update]) %>
+  <% editable_fields = @editable_case_information_fields || [] %>
+  <% show_tier = show_all_fields || editable_fields.include?(:tier) %>
+  <% show_rosh_level = (show_all_fields && FeatureFlags.rosh_level.enabled?) || editable_fields.include?(:rosh_level) %>
+  <% show_enhanced_resourcing = show_all_fields || editable_fields.include?(:enhanced_resourcing) %>
 
-  <%= form.govuk_collection_radio_buttons(
-        :enhanced_resourcing,
-        [OpenStruct.new(name: t('.resourcing.labels.enhanced'), value: 'true'),
-         OpenStruct.new(name: t('.resourcing.labels.standard'), value: 'false')],
-        :value,
-        :name,
-        legend: { text: t('.resourcing.legend') },
-        hint: { text: t('.resourcing.hint') },
-      ) %>
+  <% if show_tier %>
+    <%= form.govuk_collection_radio_buttons(
+          :tier,
+          CaseInformation::TIER_LEVELS.map { OpenStruct.new(name: it, value: it) },
+          :value,
+          :name,
+          legend: { text: t('case_information.form.tier.legend') }
+        ) %>
+  <% end %>
+
+  <% if show_rosh_level %>
+    <%= form.govuk_collection_radio_buttons(
+          :rosh_level,
+          CaseInformation::ROSH_LEVELS.map { OpenStruct.new(name: it.humanize, value: it) },
+          :value,
+          :name,
+          legend: { text: t('case_information.form.rosh.legend') }
+        ) %>
+  <% end %>
+
+  <% if show_enhanced_resourcing %>
+    <%= form.govuk_collection_radio_buttons(
+          :enhanced_resourcing,
+          [OpenStruct.new(name: t('case_information.form.resourcing.labels.enhanced'), value: 'true'),
+           OpenStruct.new(name: t('case_information.form.resourcing.labels.standard'), value: 'false')],
+          :value,
+          :name,
+          legend: { text: t('case_information.form.resourcing.legend') },
+          hint: { text: t('case_information.form.resourcing.hint') },
+        ) %>
+  <% end %>
 
   <div class="govuk-button-group govuk-!-margin-top-7">
     <% buttons.each do |button| %>
-      <%= form.submit button.fetch(:text),
-                      role: "button",
-                      draggable: "false",
-                      class: "govuk-button #{button.fetch(:class, '')}".strip,
-                      data: { module: 'govuk-button' } %>
+      <% submit_options = {
+           class: "govuk-button #{button.fetch(:class, '')}".strip,
+           data: { module: 'govuk-button' },
+           name: button[:name]
+         }.compact %>
+      <% submit_options[:value] = button[:value] if button.key?(:value) %>
+      <%= form.submit button.fetch(:text), submit_options %>
     <% end %>
   </div>
 <% end %>

@@ -14,6 +14,7 @@ RSpec.describe "allocations/show", type: :view do
                     date_of_birth: Faker::Date.backward,
                     category_label: 'X',
                     tier: 'A',
+                    rosh_level: 'HIGH',
                     manual_entry?: false,
                     handover_start_date: nil,
                     handover_date: nil,
@@ -27,6 +28,7 @@ RSpec.describe "allocations/show", type: :view do
   end
 
   let(:page) { Nokogiri::HTML(rendered) }
+  let(:rosh_level_feature_enabled) { true }
 
   before do
     assign(:prison, prison)
@@ -41,6 +43,7 @@ RSpec.describe "allocations/show", type: :view do
 
     allow(view).to receive(:vlo_tag).and_return('')
     allow(view).to receive(:prisoner_location).and_return('')
+    stub_rosh_level_feature(enabled: rosh_level_feature_enabled)
     assign(:prisoner, offender)
   end
 
@@ -75,6 +78,39 @@ RSpec.describe "allocations/show", type: :view do
 
     it 'shows Previous Parole section' do
       expect(page).to have_css('.govuk-table__header', text: 'Previous parole applications')
+    end
+  end
+
+  describe 'At a glance rows' do
+    before do
+      stub_template 'shared/_vlo_information.html.erb' => ''
+    end
+
+    it 'shows the rosh row' do
+      render
+
+      expect(page.at_css('tr#rosh-row')).to have_text('ROSH')
+      expect(page.at_css('tr#rosh-row')).to have_text('High')
+    end
+
+    it 'links the rosh change action to missing details when the feature flag is enabled and case information is editable' do
+      allow(offender).to receive(:manual_entry?).and_return(true)
+
+      render
+
+      expect(page.at_css('tr#rosh-row')).to have_css("a[href='#{edit_prison_prisoner_case_information_path(prison.code, offender.offender_no, from: :allocation)}']", text: 'Change')
+    end
+
+    context 'when the rosh feature flag is disabled' do
+      let(:rosh_level_feature_enabled) { false }
+
+      it 'does not show the rosh change link' do
+        allow(offender).to receive(:manual_entry?).and_return(true)
+
+        render
+
+        expect(page.at_css('tr#rosh-row')).not_to have_css("a[href='#{edit_prison_prisoner_case_information_path(prison.code, offender.offender_no, from: :allocation)}']")
+      end
     end
   end
 

@@ -100,7 +100,7 @@ feature 'complexity level feature' do
 
       visit prison_prisoner_review_case_details_path(prison_id: womens_prison.code, prisoner_id: offender_no)
 
-      find('tr', text: 'Complexity of need level').click_link('Change')
+      find('#complexity-level-row').click_link('Change')
 
       expect(page).to have_text 'Update complexity of need level'
 
@@ -115,14 +115,14 @@ feature 'complexity level feature' do
       click_on('Return to prisoner page')
 
       expect(page).to have_current_path(prison_prisoner_review_case_details_path(prison_id: womens_prison.code, prisoner_id: offender_no), ignore_query: true)
-      expect(page).to have_css('tr', text: 'Complexity of need level')
+      expect(page).to have_css('#complexity-level-row', text: 'Complexity of need level')
       expect(page).to have_text('Low')
     end
 
     it 'keeps the review case details back link after a validation error' do
       visit prison_prisoner_review_case_details_path(prison_id: womens_prison.code, prisoner_id: offender_no)
 
-      find('tr', text: 'Complexity of need level').click_link('Change')
+      find('#complexity-level-row').click_link('Change')
 
       find('label[for=complexity-level-low-field]').click
       click_on('Update')

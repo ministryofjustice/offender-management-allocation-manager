@@ -231,6 +231,8 @@ en:
     form:
       tier:
         legend: "What is this person’s tier?"
+      rosh:
+        legend: "What is this person’s ROSH?"
       resourcing:
         labels:
           enhanced: 'Retained/Enhanced Resourcing'

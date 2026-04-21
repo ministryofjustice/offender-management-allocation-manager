@@ -159,11 +159,11 @@ private
         local_delivery_unit: ldu_record,
         ldu_code: ldu_code,
         team_name: probation_record.dig(:manager, :team, :description),
-        enhanced_resourcing: enhanced_resourcing(probation_record.fetch(:resourcing)),
+        enhanced_resourcing: enhanced_resourcing(probation_record.fetch(:resourcing), case_info.enhanced_resourcing),
         probation_service: ldu_record&.country || 'England',
         active_vlo: probation_record.fetch(:vlo_assigned),
         mappa_level: probation_record.fetch(:mappa_level),
-        rosh_level: probation_record.dig(:rosh, :level),
+        rosh_level: probation_record.dig(:rosh, :level).presence || case_info.rosh_level,
         rosh_start_date: probation_record.dig(:rosh, :start_date),
       )
     end
@@ -184,18 +184,19 @@ private
     tier[0] if tier.present?
   end
 
+  def enhanced_resourcing(probation_value, case_value)
+    return case_value if probation_value.blank?
+
+    probation_value.upcase == 'ENHANCED'
+  end
+
   def error_type(field)
     {
       tier: DeliusImportError::INVALID_TIER,
+      rosh_level: DeliusImportError::INVALID_ROSH_LEVEL,
       case_allocation: DeliusImportError::INVALID_CASE_ALLOCATION,
       local_delivery_unit: DeliusImportError::MISSING_LDU,
       team: DeliusImportError::MISSING_TEAM,
     }.fetch(field)
-  end
-
-  def enhanced_resourcing(value)
-    return nil if value.blank?
-
-    value.upcase == 'ENHANCED'
   end
 end

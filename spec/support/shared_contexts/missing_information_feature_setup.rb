@@ -19,14 +19,18 @@ RSpec.shared_context 'with missing information feature defaults' do
     end
   end
 
-  def expect_case_information_page(prison_code:, prisoner_id:, expected_path: new_prison_prisoner_case_information_path(prison_code, prisoner_id))
+  def expect_case_information_page(prison_code:, prisoner_id:, expected_path: new_prison_prisoner_case_information_path(prison_code, prisoner_id),
+                                   show_tier: true, show_rosh_level: true, show_enhanced_resourcing: true)
     expect(page).to have_current_path(expected_path, ignore_query: true)
     expect(page).to have_content('Add missing details for')
-    expect(page).to have_content('What is this person’s tier?')
+    expect(page).to(show_tier ? have_content('What is this person’s tier?') : have_no_content('What is this person’s tier?'))
+    expect(page).to(show_rosh_level ? have_content('What is this person’s ROSH?') : have_no_content('What is this person’s ROSH?'))
+    expect(page).to(show_enhanced_resourcing ? have_content('What case allocation decision has been made for this person?') : have_no_content('What case allocation decision has been made for this person?'))
   end
 
-  def fill_in_case_information(resourcing:, tier:)
-    find("label[for=case-information-enhanced-resourcing-#{resourcing}-field]").click
-    find("label[for=case-information-tier-#{tier.downcase}-field]").click
+  def fill_in_case_information(resourcing: nil, tier: nil, rosh_level: nil)
+    find("label[for=case-information-tier-#{tier.downcase}-field]", visible: :all).click if tier.present?
+    find("label[for=case-information-rosh-level-#{rosh_level.downcase.tr('_', '-')}-field]", visible: :all).click if rosh_level.present?
+    find("label[for=case-information-enhanced-resourcing-#{resourcing}-field]", visible: :all).click if resourcing.present?
   end
 end

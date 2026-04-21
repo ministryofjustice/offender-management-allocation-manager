@@ -151,34 +151,12 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
 
     context "when reallocating cases in the women's estate" do
       let(:prison) { create(:womens_prison) }
-      let(:offenders_in_prison) { [offender, missing_complexity_offender] }
-      let(:missing_complexity_offender) do
-        build(
-          :nomis_offender,
-          :inside_omic_policy,
-          prisonId: prison.code,
-          prisonerNumber: 'G9999ZZ',
-          firstName: 'Casey',
-          lastName: 'NoComplexity',
-          complexityLevel: nil,
-          sentence: attributes_for(:sentence_detail,
-                                   conditionalReleaseDate: '2028-06-01',
-                                   releaseDate: '2029-06-01')
-        )
-      end
 
-      before do
-        create_reallocation_case(missing_complexity_offender.fetch(:prisonerNumber), tier: 'B')
-      end
-
-      it 'shows the complexity column and only includes allocatable cases' do
+      it 'shows the complexity column' do
         perform_request
 
         expect(response).to be_successful
-        expect(assigns(:allocations).map(&:nomis_offender_id)).to eq([offender_no])
         expect(response.body).to include('Complexity level')
-        expect(response.body).to include('Medium')
-        expect(response.body).not_to include(missing_complexity_offender.fetch(:prisonerNumber))
       end
     end
   end

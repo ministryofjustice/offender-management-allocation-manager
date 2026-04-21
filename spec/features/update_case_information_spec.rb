@@ -19,13 +19,13 @@ RSpec.feature "Update case information", type: :feature do
 
   context 'when there is a new allocation' do
     before do
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), rosh_level: 'HIGH')
     end
 
     it 'returns to review case details after updating from review case details' do
       visit prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no)
 
-      within('tr#tier') do
+      within('#tier') do
         click_link('Change')
       end
 
@@ -38,7 +38,7 @@ RSpec.feature "Update case information", type: :feature do
   context 'when there is an existing allocation' do
     before do
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: pom.staff_id,  prison: prison.code)
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), rosh_level: 'HIGH')
     end
 
     it 'returns to allocation information after updating from allocation information' do
@@ -60,6 +60,7 @@ RSpec.feature "Update case information", type: :feature do
       create(:case_information,
              offender: build(:offender, nomis_offender_id: offender_no),
              tier: 'B',
+             rosh_level: 'HIGH',
              enhanced_resourcing: nil)
     end
 

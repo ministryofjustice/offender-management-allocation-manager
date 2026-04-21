@@ -15,7 +15,7 @@ private
     @summary = @prison.unfiltered_offenders.group_by do |offender|
       if !offender.inside_omic_policy?
         :outside_omic_policy
-      elsif @prison.offender_allocatable?(offender) && @prison.offender_allocated?(offender)
+      elsif @prison.offender_allocated?(offender)
         :allocated
       elsif @prison.offender_allocatable?(offender)
         :unallocated

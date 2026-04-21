@@ -48,10 +48,11 @@ feature "womens missing info journey" do
         click_button 'Save'
         within '.govuk-error-summary' do
           expect(page).to have_content('Select tier')
+          expect(page).to have_content('Select ROSH')
           expect(page).to have_content('Select case allocation decision')
         end
 
-        fill_in_case_information(resourcing: 'false', tier: 'B')
+        fill_in_case_information(resourcing: 'false', tier: 'B', rosh_level: 'MEDIUM')
         click_button 'Save'
         wait_for { page.current_path == missing_information_prison_prisoners_path(prison.code) }
       }.to change(CaseInformation, :count).by(1)
@@ -87,6 +88,34 @@ feature "womens missing info journey" do
     end
   end
 
+  context 'when case information is present but still incomplete' do
+    let(:complexity) { nil }
+
+    before do
+      create(:case_information,
+             offender: build(:offender, nomis_offender_id: prisoner_id),
+             rosh_level: nil,
+             enhanced_resourcing: false)
+
+      start_missing_information_journey(prison_code: prison.code, prisoner_id: prisoner_id)
+
+      find('label[for=complexity-form-complexity-level-medium-field]').click
+    end
+
+    it 'shows save and continue because case information is still needed' do
+      expect(page).to have_button('Save and continue')
+      expect(page).to have_no_button('Save and allocate')
+    end
+
+    it 'continues to the case information step after saving complexity' do
+      expect(HmppsApi::ComplexityApi).to receive(:save).with(prisoner_id, level: 'medium', username: username, reason: nil)
+
+      click_button 'Save and continue'
+
+      expect(page).to have_current_path(new_prison_prisoner_case_information_path(prison.code, prisoner_id), ignore_query: true)
+    end
+  end
+
   context 'when complexity level is present' do
     let(:complexity) { 'medium' }
 
@@ -95,7 +124,7 @@ feature "womens missing info journey" do
 
       expect_case_information_page(prison_code: prison.code, prisoner_id: prisoner_id)
 
-      fill_in_case_information(resourcing: 'true', tier: 'A')
+      fill_in_case_information(resourcing: 'true', tier: 'A', rosh_level: 'HIGH')
       click_button 'Save'
       wait_for { page.current_path == missing_information_prison_prisoners_path(prison.code) }
     end
@@ -131,7 +160,7 @@ feature "womens missing info journey" do
     end
 
     def fill_in_missing_case_information
-      fill_in_case_information(resourcing: 'true', tier: 'A')
+      fill_in_case_information(resourcing: 'true', tier: 'A', rosh_level: 'LOW')
       click_button 'Save'
     end
   end
