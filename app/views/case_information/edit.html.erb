@@ -9,7 +9,9 @@
           heading: t('.heading', name: @prisoner.full_name_ordered),
           action: prison_prisoner_case_information_path(@prison.code, @prisoner.offender_no),
           method: :put,
-          buttons: [{class:'' , text: 'Update'}]
+          buttons: [
+            { text: 'Update' }
+          ]
     } %>
   </div>
 </div>

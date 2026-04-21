@@ -9,7 +9,10 @@
           heading: t('.heading', name: @prisoner.full_name_ordered),
           action: prison_prisoner_case_information_path(@prison.code, @prisoner.offender_no),
           method: :post,
-          buttons: [{class: '', text: 'Save'}, {class: 'govuk-button--secondary', text: 'Save and allocate' }]
+          buttons: [
+            { text: 'Save' },
+            { text: 'Save and allocate', name: 'save_and_allocate', class: 'govuk-button--secondary' }
+          ]
     } %>
   </div>
 </div>

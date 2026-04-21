@@ -26,7 +26,7 @@ class CaseInformationController < PrisonsApplicationController
     if @case_info.save(context: :manual_entry)
       session.delete(complexity_saved_session_key)
 
-      if params.fetch(:commit) == 'Save'
+      if save_and_return?
         redirect_to missing_information_prison_prisoners_path(active_prison_id, sort: params[:sort], page: params[:page])
       else
         redirect_to prison_prisoner_review_case_details_path(prison_id: active_prison_id, prisoner_id:)
@@ -82,6 +82,10 @@ private
 
   def complexity_saved_session_key
     "female_missing_info_complexity_saved_#{prisoner_id}"
+  end
+
+  def save_and_return?
+    params[:save_and_allocate].blank? && params.fetch(:commit, 'Save') == 'Save'
   end
 
   def ensure_new_case_allowed

@@ -50,11 +50,13 @@
 
   <div class="govuk-button-group govuk-!-margin-top-7">
     <% buttons.each do |button| %>
-      <%= form.submit button.fetch(:text),
-                      role: "button",
-                      draggable: "false",
-                      class: "govuk-button #{button.fetch(:class, '')}".strip,
-                      data: { module: 'govuk-button' } %>
+      <% submit_options = {
+           class: "govuk-button #{button.fetch(:class, '')}".strip,
+           data: { module: 'govuk-button' },
+           name: button[:name]
+         }.compact %>
+      <% submit_options[:value] = button[:value] if button.key?(:value) %>
+      <%= form.submit button.fetch(:text), submit_options %>
     <% end %>
   </div>
 <% end %>
