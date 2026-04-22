@@ -5,8 +5,10 @@ RSpec.describe "shared/_rosh", type: :view do
   let(:widget) { page.at_css('.rosh-widget') }
   let(:rosh) { RoshSummary.send(:new, **rosh_attrs) }
 
+  let(:ndelius_rosh_level) { nil }
+
   before do
-    render partial: 'shared/rosh', locals: { rosh: rosh }
+    render partial: 'shared/rosh', locals: { rosh:, ndelius_rosh_level: }
   end
 
   shared_examples 'a rosh widget' do
@@ -105,7 +107,7 @@ RSpec.describe "shared/_rosh", type: :view do
     end
 
     it 'displays the last updated date' do
-      expect(widget).to have_text("Last updated: #{last_updated.to_fs(:rfc822)}")
+      expect(widget).to have_text("Last updated: #{last_updated.to_fs(:rfc822)} on OASys")
     end
 
     it 'renders a risk table' do
@@ -238,6 +240,58 @@ RSpec.describe "shared/_rosh", type: :view do
 
     it 'displays the overall risk level in the heading' do
       expect(widget.at_css('h3 strong').text).to eq('VERY HIGH')
+    end
+  end
+
+  describe 'ROSH mismatch warning' do
+    let(:last_updated) { Date.new(2024, 6, 15) }
+
+    shared_examples 'renders the mismatch warning' do |expected_level|
+      it 'renders a warning with the nDelius ROSH level' do
+        warning = widget.at_css('.govuk-warning-text')
+        expect(warning).not_to be_nil
+        expect(warning.text).to include("Latest ROSH from NDelius or this service: #{expected_level}")
+      end
+    end
+
+    shared_examples 'does not render the mismatch warning' do
+      it 'does not render a warning' do
+        expect(widget.at_css('.govuk-warning-text')).to be_nil
+      end
+    end
+
+    context 'when found and levels match' do
+      let(:rosh_attrs) { { status: :found, overall: 'HIGH', last_updated: } }
+      let(:ndelius_rosh_level) { 'HIGH' }
+
+      include_examples 'does not render the mismatch warning'
+    end
+
+    context 'when nDelius ROSH level is not present' do
+      let(:rosh_attrs) { { status: :found, overall: 'HIGH', last_updated: } }
+
+      include_examples 'does not render the mismatch warning'
+    end
+
+    context 'when found and levels differ' do
+      let(:rosh_attrs) { { status: :found, overall: 'HIGH', last_updated: } }
+      let(:ndelius_rosh_level) { 'MEDIUM' }
+
+      include_examples 'renders the mismatch warning', 'Medium'
+    end
+
+    context 'when rosh is missing and nDelius ROSH level is present' do
+      let(:rosh) { RoshSummary.missing }
+      let(:ndelius_rosh_level) { 'HIGH' }
+
+      include_examples 'renders the mismatch warning', 'High'
+    end
+
+    context 'when rosh is unable and nDelius ROSH level is present' do
+      let(:rosh) { RoshSummary.unable }
+      let(:ndelius_rosh_level) { 'VERY_HIGH' }
+
+      include_examples 'renders the mismatch warning', 'Very high'
     end
   end
 end

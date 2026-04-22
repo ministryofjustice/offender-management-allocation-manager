@@ -3,15 +3,20 @@
   <h3 class="govuk-heading-m"><strong><%= overall_display_text(rosh.overall) %></strong> ROSH</h3>
   <p class="govuk-body-m">Risk of serious harm</p>
   <% if rosh.missing? %>
-    <p class="govuk-hint govuk-body-m">A ROSH summary has not been completed for this individual. Check OASys for this
-      person's current assessment status.</p>
+    <%= render 'shared/rosh_mismatch_warning', ndelius_rosh_level:, oasys_rosh_level: nil %>
+    <p class="govuk-hint govuk-body-m">
+      A ROSH summary has not been completed for this individual. Check OASys for this person's current assessment status.
+    </p>
   <% elsif rosh.unable? %>
-    <p class="govuk-hint govuk-body-m">Something went wrong. We are unable to show ROSH information at this time. Try
-      again later.</p>
+    <%= render 'shared/rosh_mismatch_warning', ndelius_rosh_level:, oasys_rosh_level: nil %>
+    <p class="govuk-hint govuk-body-m">
+      Something went wrong. We are unable to show ROSH information at this time. Try again later.
+    </p>
   <% else %>
     <p class="govuk-hint govuk-body-m">
-      Last updated: <%= rosh.last_updated ? format_date(rosh.last_updated) : 'Not known' %>
+      Last updated: <%= rosh.last_updated ? "#{format_date(rosh.last_updated)} on OASys" : 'Not known' %>
     </p>
+    <%= render 'shared/rosh_mismatch_warning', ndelius_rosh_level:, oasys_rosh_level: rosh.overall %>
     <% if rosh.custody || rosh.community %>
       <div class="moj-scrollable-pane">
         <table class="govuk-table rosh-widget__table">
@@ -58,4 +63,3 @@
     <% end %>
   <% end %>
 </aside>
-

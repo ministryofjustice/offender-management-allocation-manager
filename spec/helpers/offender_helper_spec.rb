@@ -184,7 +184,8 @@ RSpec.describe OffenderHelper do
       let(:date_hash) { { type: 'LED', date: Date.new(2000, 1, 1) } }
 
       it 'returns formatted output' do
-        expect(subject).to eq('Licence expiry date: 01 Jan 2000')
+        expect(subject).to eq('Licence expiry date:<br>01 Jan 2000')
+        expect(subject).to be_html_safe
       end
     end
 

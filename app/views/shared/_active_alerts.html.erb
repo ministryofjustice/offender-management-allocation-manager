@@ -1,0 +1,19 @@
+<h3 class="govuk-heading-m">
+  Active alerts
+</h3>
+
+<% if alerts.none? %>
+  <p>None</p>
+<% else %>
+  <ul class="govuk-list govuk-list--bullet">
+    <% alerts.each do |alert| %>
+      <li><%= alert %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<p>
+  <%= link_to 'View more alerts information',
+              "#{ENV['DIGITAL_PRISON_SERVICE_HOST']}/prisoner/#{offender_no}/alerts",
+              class: 'govuk-link govuk-link--no-visited-state', target: '_blank' %>
+</p>
