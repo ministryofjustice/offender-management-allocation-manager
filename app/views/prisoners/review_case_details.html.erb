@@ -407,7 +407,7 @@
   <div class="govuk-grid-column-one-third">
     <aside role="complementary">
       <%= render partial: 'shared/mappa', locals: { mappa: @mappa } %>
-      <%= render partial: 'shared/rosh', locals: { rosh: @rosh } %>
+      <%= render partial: 'shared/rosh', locals: { rosh: @rosh, ndelius_rosh_level: @prisoner.rosh_level } %>
       <%= render partial: 'shared/active_alerts', locals: { alerts: @alerts, offender_no: @prisoner.offender_no } %>
     </aside>
   </div>

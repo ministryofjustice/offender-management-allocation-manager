@@ -1,0 +1,9 @@
+<% if ndelius_rosh_level.present? && ndelius_rosh_level != oasys_rosh_level %>
+  <div class="govuk-warning-text">
+    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+    <strong class="govuk-warning-text__text">
+      <span class="govuk-visually-hidden">Warning</span>
+      Latest ROSH from NDelius or this service: <%= ndelius_rosh_level.humanize %>
+    </strong>
+  </div>
+<% end %>
