@@ -405,29 +405,10 @@
 
   <!--Right column-->
   <div class="govuk-grid-column-one-third">
-    <aside class="app-related-items" role="complementary">
-      <h3 class="govuk-heading-m">
-        Active alerts
-      </h3>
-
-      <% if @alerts.none? %>
-        <p>None</p>
-      <% else %>
-        <ul class="govuk-list govuk-list--bullet">
-          <% @alerts.each do |alert| %>
-            <li><%= alert %></li>
-          <% end %>
-        </ul>
-      <% end %>
-
-      <p class="govuk-!-margin-bottom-6">
-        <a class="govuk-link govuk-link--no-visited-state" href="<%= ENV['DIGITAL_PRISON_SERVICE_HOST'] %>/prisoner/<%= @prisoner.offender_no %>/alerts" target="_blank">
-          View more alerts information
-        </a>
-      </p>
-
+    <aside role="complementary">
       <%= render partial: 'shared/mappa', locals: { mappa: @mappa } %>
       <%= render partial: 'shared/rosh', locals: { rosh: @rosh } %>
+      <%= render partial: 'shared/active_alerts', locals: { alerts: @alerts, offender_no: @prisoner.offender_no } %>
     </aside>
   </div>
 </div>

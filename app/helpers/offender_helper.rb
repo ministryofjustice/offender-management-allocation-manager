@@ -135,6 +135,6 @@ module OffenderHelper
   def format_earliest_release_date(date_hash)
     return '' if date_hash.nil?
 
-    "#{TYPE_DESCRIPTIONS[date_hash[:type]]}: #{date_hash[:date].to_fs(:rfc822)}"
+    safe_join(["#{TYPE_DESCRIPTIONS[date_hash[:type]]}:", tag.br, date_hash[:date].to_fs(:rfc822)])
   end
 end
