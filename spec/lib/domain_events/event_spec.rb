@@ -1,4 +1,4 @@
-RSpec.describe DomainEvents::Event do
+RSpec.describe DomainEvents::Event, :enable_domain_event_publish do
   subject(:basic_event) { described_class.new(event_type: 'test-domain.changed', version: 77) }
 
   let(:full_event) do

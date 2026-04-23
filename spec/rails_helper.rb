@@ -50,7 +50,6 @@ RSpec.configure do |config|
     page.driver.browser.manage.window.resize_to(1280,3072)
   end
 
-
   config.before(:each, :disable_early_allocation_event) do
     allow(EarlyAllocationService).to receive(:send_early_allocation)
   end
@@ -109,8 +108,8 @@ RSpec.configure do |config|
       stub_dps_header_footer
     end
 
-    if example.metadata[:enable_allocation_change_publish].blank?
-      allow_any_instance_of(AllocationHistory).to receive(:publish_allocation_changed_event)
+    if example.metadata[:enable_domain_event_publish].blank?
+      allow_any_instance_of(DomainEvents::Event).to receive(:publish)
     end
 
     if example.metadata[:skip_active_caseload_check_stubbing].blank?
