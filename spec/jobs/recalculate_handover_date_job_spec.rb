@@ -1,7 +1,7 @@
 describe RecalculateHandoverDateJob do
   subject(:offender) { new_mpc_offender 'G1234AB' }
 
-  let(:ndelius_event) { double(:ndelius_event) }
+  let(:handover_event) { double(:handover_event) }
   let(:handover_change_event) { double(:handover_change_event) }
   let(:request_supporting_com_email) { double(:request_supporting_com_email).as_null_object }
   let(:assign_com_email) { double(:assign_com_email).as_null_object }
@@ -47,9 +47,9 @@ describe RecalculateHandoverDateJob do
       expect(handover_change_event).not_to have_received(:publish)
     end
 
-    it 'does not emit an event to NDelius' do
+    it 'does not emit a handover event' do
       recalculate_handover_dates
-      expect(ndelius_event).not_to have_received(:publish)
+      expect(handover_event).not_to have_received(:publish)
     end
   end
 
@@ -97,7 +97,6 @@ describe RecalculateHandoverDateJob do
               'last_calculated_at' => be_within(1.second).of(Time.zone.now),
               'nomis_offender_id' => offender.nomis_offender_id,
             },
-            'case_info_manual_entry' => false,
             'nomis_offender_state' => offender.attributes_to_archive
           }
         }
@@ -112,22 +111,9 @@ describe RecalculateHandoverDateJob do
       the_responsibility_will_be_calculated_as(CalculatedHandoverDate.pom_with_com(reason: :determinate_short, handover_date: 2.days.from_now))
     end
 
-    context 'when the case information comes from nDelius' do
-      before { the_case_information_is manual_entry: false }
-
-      it 'emits an event to nDelius to inform it of a new handover date' do
-        expect(ndelius_event).to receive(:publish).with(job: 'recalculate_handover_date')
-        recalculate_handover_dates
-      end
-    end
-
-    context 'when the case information is manually entered' do
-      before { the_case_information_is manual_entry: true }
-
-      it 'does not emit an event to nDelius' do
-        recalculate_handover_dates
-        expect(ndelius_event).not_to have_received(:publish)
-      end
+    it 'emits a handover event' do
+      expect(handover_event).to receive(:publish).with(job: 'recalculate_handover_date')
+      recalculate_handover_dates
     end
   end
 
@@ -223,7 +209,7 @@ describe RecalculateHandoverDateJob do
 
     it 'does not emit any events' do
       recalculate_handover_dates
-      expect(ndelius_event).not_to have_received(:publish)
+      expect(handover_event).not_to have_received(:publish)
       expect(handover_change_event).not_to have_received(:publish)
     end
 
@@ -275,10 +261,10 @@ describe RecalculateHandoverDateJob do
       .with(offender.nomis_offender_id)
       .and_return(offender)
 
-    # Publish to NDelius event
-    allow(ndelius_event).to receive(:publish)
+    # Handover event
+    allow(handover_event).to receive(:publish)
     allow(DomainEvents::EventFactory).to receive(:build_handover_event)
-      .and_return(ndelius_event)
+      .and_return(handover_event)
 
     # Audit Event
     stub_const('AuditEvent', handover_change_event)

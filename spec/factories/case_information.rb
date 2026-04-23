@@ -10,7 +10,7 @@ FactoryBot.define do
     rosh_level { 'HIGH' }
     rosh_start_date { Date.new(2025, 6, 1) }
 
-    manual_entry { true }
+    manual_entry { false }
 
     crn { Faker::Alphanumeric.alpha(number: 10) }
 
@@ -22,6 +22,10 @@ FactoryBot.define do
 
     trait :english do
       probation_service { 'England' }
+    end
+
+    trait :manual_entry do
+      manual_entry { true }
     end
 
     trait :with_com do

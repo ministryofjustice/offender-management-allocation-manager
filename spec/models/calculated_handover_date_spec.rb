@@ -1,4 +1,4 @@
-RSpec.describe CalculatedHandoverDate, :disable_push_to_delius do
+RSpec.describe CalculatedHandoverDate do
   subject { build(:calculated_handover_date) }
 
   let(:today) { Time.zone.today }

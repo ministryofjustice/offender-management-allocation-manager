@@ -19,7 +19,7 @@ RSpec.feature "Update case information", type: :feature do
 
   context 'when there is a new allocation' do
     before do
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), rosh_level: 'HIGH')
+      create(:case_information, :manual_entry, offender: build(:offender, nomis_offender_id: offender_no), rosh_level: 'HIGH')
     end
 
     it 'returns to review case details after updating from review case details' do
@@ -38,7 +38,7 @@ RSpec.feature "Update case information", type: :feature do
   context 'when there is an existing allocation' do
     before do
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: pom.staff_id,  prison: prison.code)
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no), rosh_level: 'HIGH')
+      create(:case_information, :manual_entry, offender: build(:offender, nomis_offender_id: offender_no), rosh_level: 'HIGH')
     end
 
     it 'returns to allocation information after updating from allocation information' do
@@ -57,7 +57,7 @@ RSpec.feature "Update case information", type: :feature do
   context 'when the update is invalid' do
     before do
       create(:allocation_history, nomis_offender_id: offender_no, primary_pom_nomis_id: pom.staff_id,  prison: prison.code)
-      create(:case_information,
+      create(:case_information, :manual_entry,
              offender: build(:offender, nomis_offender_id: offender_no),
              tier: 'B',
              rosh_level: 'HIGH',

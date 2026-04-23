@@ -101,7 +101,7 @@ describe CaseInformation do
 
   context 'without manual flag' do
     it 'will be valid' do
-      expect(build(:case_information, manual_entry: false)).to be_valid
+      expect(build(:case_information)).to be_valid
     end
   end
 

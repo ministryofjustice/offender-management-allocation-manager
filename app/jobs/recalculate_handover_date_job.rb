@@ -45,7 +45,6 @@ private
           tags: %w[job recalculate_handover_date handover changed],
           system_event: true,
           data: {
-            'case_info_manual_entry' => case_info.manual_entry?,
             'before' => handover_before,
             'after' => handover_after,
             'nomis_offender_state' => nomis_offender.attributes_to_archive,
@@ -53,15 +52,13 @@ private
         )
       end
 
-      # Don't push if the CaseInformation record is a manual entry (meaning it didn't match against nDelius)
-      # This avoids 404 Not Found errors for offenders who don't exist in nDelius (they could be Scottish, etc.)
-      push_to_delius record unless case_info.manual_entry?
+      publish_event(record)
 
       request_supporting_com record, nomis_offender
     end
   end
 
-  def push_to_delius(record)
+  def publish_event(record)
     # Don't push if the dates haven't changed
     if record.saved_change_to_start_date? || record.saved_change_to_handover_date?
       event = DomainEvents::EventFactory.build_handover_event(host: Rails.configuration.allocation_manager_host,
