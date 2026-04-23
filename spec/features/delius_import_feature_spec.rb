@@ -1,4 +1,4 @@
-RSpec.feature "Delius import feature", :disable_push_to_delius do
+RSpec.feature "Delius import feature" do
   let(:offender_no) {  offender.fetch(:prisonerNumber) }
   let(:prison) { create(:prison) }
   let(:prison_code) { prison.code }

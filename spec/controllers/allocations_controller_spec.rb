@@ -181,7 +181,7 @@ RSpec.describe AllocationsController, type: :controller do
         end
       end
 
-      context 'when COM name has been updated by nDelius', :disable_push_to_delius do
+      context 'when COM name has been updated by nDelius' do
         let(:create_time) { 3.days.ago }
         let(:create_date) { create_time.to_date }
         let(:yesterday) { 1.day.ago.to_date }

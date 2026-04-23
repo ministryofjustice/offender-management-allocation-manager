@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe DeliusDataImportService, :disable_push_to_delius do
+RSpec.describe DeliusDataImportService do
   subject(:service) { described_class.new }
 
   let(:nomis_offender_id) { 'G4281GV' }
