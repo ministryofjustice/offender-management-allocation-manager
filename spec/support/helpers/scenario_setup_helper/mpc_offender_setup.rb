@@ -5,7 +5,7 @@ module ScenarioSetupHelper
         .new(offender: create(:offender, nomis_offender_id:),
              prison: create(:prison, code: prison_code),
              prison_record: build(:hmpps_api_offender, prisonerNumber: nomis_offender_id))
-        .tap { create(:case_information, nomis_offender_id:, manual_entry: false) }
+        .tap { create(:case_information, nomis_offender_id:) }
     end
   end
 end

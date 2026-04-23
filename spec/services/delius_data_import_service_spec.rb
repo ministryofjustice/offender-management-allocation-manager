@@ -215,7 +215,7 @@ RSpec.describe DeliusDataImportService do
   end
 
   context 'when case information already present' do
-    let!(:c1) { create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
+    let!(:c1) { create(:case_information, :manual_entry, tier: 'B', offender: build(:offender, nomis_offender_id: nomis_offender_id)) }
     let(:tier) { 'C' }
 
     it 'does not create case information' do
@@ -250,9 +250,8 @@ RSpec.describe DeliusDataImportService do
 
     context 'when the existing rosh level is already present' do
       let!(:c1) do
-        create(:case_information,
+        create(:case_information, :manual_entry,
                offender: build(:offender, nomis_offender_id: nomis_offender_id),
-               manual_entry: true,
                tier: 'B',
                rosh_level: 'LOW')
       end

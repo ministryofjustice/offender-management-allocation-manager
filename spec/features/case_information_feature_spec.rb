@@ -36,7 +36,7 @@ describe 'case information feature' do
 
     context 'when updating missing information (edit journey)' do
       before do
-        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
+        create(:case_information, :manual_entry, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
       end
 
       it 'no longer displays the save and allocate button' do
@@ -77,7 +77,6 @@ describe 'case information feature' do
       before do
         create(:case_information,
                offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)),
-               manual_entry: false,
                tier: 'A',
                rosh_level: nil,
                enhanced_resourcing: false)
@@ -136,7 +135,7 @@ describe 'case information feature' do
 
     context 'when trying to edit a non manual entry' do
       before do
-        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)), manual_entry: false)
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
       end
 
       it 'does not allow the user to edit the case information' do

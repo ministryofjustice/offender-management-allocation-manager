@@ -63,7 +63,6 @@ RSpec.describe CaseInformationController, type: :controller do
       let!(:case_information) do
         create(:case_information,
                offender: offender_record,
-               manual_entry: false,
                tier: 'B',
                rosh_level: 'LOW',
                enhanced_resourcing: false)
@@ -94,7 +93,6 @@ RSpec.describe CaseInformationController, type: :controller do
         let!(:case_information) do
           create(:case_information,
                  offender: offender_record,
-                 manual_entry: false,
                  tier: 'B',
                  rosh_level: nil,
                  enhanced_resourcing: false)
@@ -125,7 +123,6 @@ RSpec.describe CaseInformationController, type: :controller do
           let!(:case_information) do
             create(:case_information,
                    offender: offender_record,
-                   manual_entry: false,
                    tier: 'B',
                    rosh_level: 'HIGH',
                    enhanced_resourcing: nil)
@@ -157,7 +154,6 @@ RSpec.describe CaseInformationController, type: :controller do
           let!(:case_information) do
             create(:case_information,
                    offender: offender_record,
-                   manual_entry: false,
                    tier: 'B',
                    rosh_level: nil,
                    enhanced_resourcing: nil)
@@ -186,9 +182,8 @@ RSpec.describe CaseInformationController, type: :controller do
 
       context 'when some fields are still missing on a manual entry record' do
         let!(:case_information) do
-          create(:case_information,
+          create(:case_information, :manual_entry,
                  offender: offender_record,
-                 manual_entry: true,
                  tier: 'B',
                  rosh_level: nil,
                  enhanced_resourcing: false)
@@ -235,7 +230,6 @@ RSpec.describe CaseInformationController, type: :controller do
       before do
         create(:case_information,
                offender: offender_record,
-               manual_entry: false,
                tier: 'A',
                rosh_level: 'HIGH',
                enhanced_resourcing: false)
@@ -298,9 +292,8 @@ RSpec.describe CaseInformationController, type: :controller do
   describe '#update' do
     context 'when case information is a manual entry' do
       let!(:case_information) do
-        create(:case_information,
+        create(:case_information, :manual_entry,
                offender: offender_record,
-               manual_entry: true,
                tier: 'B',
                rosh_level: 'LOW',
                enhanced_resourcing: false)
@@ -366,7 +359,6 @@ RSpec.describe CaseInformationController, type: :controller do
       let!(:case_information) do
         create(:case_information,
                offender: offender_record,
-               manual_entry: false,
                tier: 'B',
                rosh_level: 'LOW',
                enhanced_resourcing: false)

@@ -117,7 +117,6 @@ describe RecalculateHandoverDateJob do
     end
   end
 
-
   context 'when responsibility changes from POM only to POM with COM support (ISPs)' do
     before do
       the_responsibility_is_recorded_as(CalculatedHandoverDate.pom_only(reason: :indeterminate))

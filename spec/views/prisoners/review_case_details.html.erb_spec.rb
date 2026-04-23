@@ -16,7 +16,7 @@ RSpec.describe "prisoners/review_case_details", type: :view do
   let(:vlo_row) { contacts_table.find('tr', text: 'Victim liaison officer (VLO)') }
   let(:vlo_cells) { vlo_row.all('td') }
   let(:at_a_glance_summary) { page.all('dl.govuk-summary-list').first }
-  let(:case_info) { build(:case_information, rosh_level: 'HIGH') }
+  let(:case_info) { build(:case_information, :manual_entry, rosh_level: 'HIGH') }
   let(:prison) { build(:prison) }
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
   let(:api_offender) { build(:hmpps_api_offender, category: build(:offender_category, :cat_a)) }

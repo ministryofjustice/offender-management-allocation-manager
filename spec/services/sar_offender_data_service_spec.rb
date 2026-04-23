@@ -223,7 +223,7 @@ RSpec.describe SarOffenderDataService do
           end
 
           it 'returns booleans' do
-            expect(case_information['manualEntry']).to eq(true)
+            expect(case_information['manualEntry']).to eq(false)
             expect(case_information['enhancedResourcing']).to eq(false)
           end
 
