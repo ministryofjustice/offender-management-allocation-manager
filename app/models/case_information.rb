@@ -5,6 +5,7 @@ class CaseInformation < ApplicationRecord
 
   MAPPA_LEVELS = [0, 1, 2, 3].freeze
   TIER_LEVELS = %w[A B C D].freeze
+  EXTENDED_TIER_LEVELS = %w[E F G].freeze
   ROSH_LEVELS = %w[VERY_HIGH HIGH MEDIUM LOW].freeze
 
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
@@ -17,7 +18,7 @@ class CaseInformation < ApplicationRecord
   validates :manual_entry, inclusion: { in: [true, false] }
   validates :nomis_offender_id, presence: true, uniqueness: true
 
-  validates :tier, inclusion: { in: TIER_LEVELS, message: 'Select tier' }
+  validates :tier, inclusion: { in: ->(_) { CaseInformation.tier_levels }, message: 'Select tier' }
 
   validates :rosh_level, inclusion: { in: ROSH_LEVELS, allow_blank: true }
   validates :rosh_level, presence: { message: 'Select ROSH' }, on: :manual_entry, if: :rosh_level_feature_enabled?
@@ -31,6 +32,10 @@ class CaseInformation < ApplicationRecord
   validates :mappa_level, inclusion: { in: MAPPA_LEVELS, allow_nil: true }
 
   scope :without_com, -> { where(com_name: nil) }
+
+  def self.tier_levels
+    FeatureFlags.new_tiers.enabled? ? TIER_LEVELS + EXTENDED_TIER_LEVELS : TIER_LEVELS
+  end
 
   def complete_for_allocation?
     tier.present? && (!rosh_level_feature_enabled? || rosh_level.present?)

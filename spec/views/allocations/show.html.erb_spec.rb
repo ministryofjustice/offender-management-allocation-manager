@@ -43,7 +43,7 @@ RSpec.describe "allocations/show", type: :view do
 
     allow(view).to receive(:vlo_tag).and_return('')
     allow(view).to receive(:prisoner_location).and_return('')
-    stub_rosh_level_feature(enabled: rosh_level_feature_enabled)
+    stub_feature_flag(:rosh_level, enabled: rosh_level_feature_enabled)
     assign(:prisoner, offender)
   end
 

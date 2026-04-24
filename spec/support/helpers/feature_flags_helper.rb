@@ -1,7 +1,7 @@
 module FeatureFlagsHelper
-  def stub_rosh_level_feature(enabled: true)
-    allow(FeatureFlags).to receive(:rosh_level).and_return(
-      instance_double(FeatureFlags::EnabledFeature, enabled?: enabled)
+  def stub_feature_flag(name, enabled: true)
+    allow(FeatureFlags).to receive(name).and_return(
+      instance_double(FeatureFlags::EnabledFeature, enabled?: enabled, disabled?: !enabled)
     )
   end
 end

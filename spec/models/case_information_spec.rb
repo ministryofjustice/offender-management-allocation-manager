@@ -3,7 +3,7 @@ describe CaseInformation do
   let(:rosh_level_feature_enabled) { true }
 
   before do
-    stub_rosh_level_feature(enabled: rosh_level_feature_enabled)
+    stub_feature_flag(:rosh_level, enabled: rosh_level_feature_enabled)
   end
 
   context 'with mappa level' do
@@ -79,6 +79,42 @@ describe CaseInformation do
     it 'is not valid' do
       expect(subject).not_to be_valid
       expect(subject.errors.messages).to eq(tier: ['Select tier'])
+    end
+  end
+
+  describe '.tier_levels' do
+    context 'when new_tiers feature flag is enabled' do
+      before { stub_feature_flag(:new_tiers, enabled: true) }
+
+      it 'returns extended tiers A-G' do
+        expect(described_class.tier_levels).to eq %w[A B C D E F G]
+      end
+
+      it 'accepts tier E' do
+        expect(build(:case_information, tier: 'E')).to be_valid
+      end
+
+      it 'accepts tier F' do
+        expect(build(:case_information, tier: 'F')).to be_valid
+      end
+
+      it 'accepts tier G' do
+        expect(build(:case_information, tier: 'G')).to be_valid
+      end
+    end
+
+    context 'when new_tiers feature flag is disabled' do
+      before { stub_feature_flag(:new_tiers, enabled: false) }
+
+      it 'returns base tiers A-D' do
+        expect(described_class.tier_levels).to eq %w[A B C D]
+      end
+
+      it 'rejects tier E' do
+        ci = build(:case_information, tier: 'E')
+        expect(ci).not_to be_valid
+        expect(ci.errors.messages).to eq(tier: ['Select tier'])
+      end
     end
   end
 

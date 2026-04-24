@@ -5,4 +5,7 @@ Rails.application.config.filter_parameters += [:password,
                                                :message,
                                                :more_detail,
                                                :suitability_detail,
-                                               :reason_text]
+                                               :override_detail,
+                                               :reason,
+                                               :reason_text,
+                                               :system_admin_note]

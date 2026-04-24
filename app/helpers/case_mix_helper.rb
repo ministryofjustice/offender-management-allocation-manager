@@ -53,13 +53,13 @@ module CaseMixHelper
 private
 
   def tier_labels
-    @tier_labels ||= CaseInformation::TIER_LEVELS
+    @tier_labels ||= CaseInformation.tier_levels
                        .index_with { "Tier #{it}" }
                        .transform_keys { "tier_#{it.downcase}".to_sym }
   end
 
   def tier_counts(allocations)
-    CaseInformation::TIER_LEVELS.each_with_object({}) do |tier, counts|
+    CaseInformation.tier_levels.each_with_object({}) do |tier, counts|
       counts["tier_#{tier.downcase}".to_sym] = allocations.count { |allocation| allocation.tier == tier }
     end
   end

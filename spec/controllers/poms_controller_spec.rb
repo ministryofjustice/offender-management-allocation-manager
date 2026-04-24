@@ -129,13 +129,7 @@ RSpec.describe PomsController, type: :controller do
     let(:limbo_bulk_reallocation_enabled) { true }
 
     before do
-      allow(FeatureFlags.instance).to receive(:config).and_return(
-        {
-          limbo_bulk_reallocation: {
-            test: limbo_bulk_reallocation_enabled,
-          }
-        }.with_indifferent_access
-      )
+      stub_feature_flag(:limbo_bulk_reallocation, enabled: limbo_bulk_reallocation_enabled)
 
       create(:pom_detail, :inactive, prison_code: prison.code, nomis_staff_id: removed_staff_id)
       create(:case_information, offender: build(:offender, nomis_offender_id: removed_offender.fetch(:prisonerNumber)))

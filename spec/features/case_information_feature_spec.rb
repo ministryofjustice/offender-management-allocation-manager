@@ -9,7 +9,7 @@ describe 'case information feature' do
     include_context 'with missing information feature defaults'
 
     before do
-      stub_rosh_level_feature(enabled: rosh_level_feature_enabled)
+      stub_feature_flag(:rosh_level, enabled: rosh_level_feature_enabled)
     end
 
     context 'when add missing details the first time (create journey)' do

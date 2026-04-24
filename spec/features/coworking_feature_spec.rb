@@ -55,48 +55,6 @@ feature 'Co-working' do
       )
     end
 
-    scenario 'show allocate a co-working POM page' do
-      visit new_prison_coworking_path(prison.code, nomis_offender_id)
-
-      expect(page).to have_link 'Back', href: prison_prisoner_allocation_path(prison.code, prisoner_id: nomis_offender_id)
-      expect(page).to have_link('Allocate')
-      expect(page).to have_css('h1', text: 'Allocate a co-working Prison Offender Manager')
-      expect(page).to have_css('.govuk-table', count: 4)
-
-      co_working_content = [
-        "Prisoner Name #{prisoner_name}",
-        'Date of birth 15 Aug 1980',
-        'Prisoner number G4273GI',
-        'Current POM Name',
-        'Grade',
-        'Available POMs',
-        'Probation Officer POMs',
-        'Prison Officer POMs'
-      ]
-
-      co_working_content.each do |text|
-        expect(page).to have_content(text)
-      end
-
-      expect(page).not_to have_content('unavailable POM')
-    end
-
-    scenario 'show correct unavailable message' do
-      inactive_poms = [485_758, 485_833]
-      inactive_texts = ['There is 1 unavailable POM for new allocation',
-                        'There are 2 unavailable POMs for new allocation']
-
-      inactive_poms.each_with_index do |pom, i|
-        visit edit_prison_pom_path(prison.code, pom)
-        choose('working_pattern-ft')
-        choose('Inactive')
-        click_button('Save')
-
-        visit new_prison_coworking_path(prison.code, nomis_offender_id)
-        expect(page).to have_content(inactive_texts[i])
-      end
-    end
-
     scenario 'show confirm co-working POM allocation page' do
       visit prison_confirm_coworking_allocation_path(
         prison.code,

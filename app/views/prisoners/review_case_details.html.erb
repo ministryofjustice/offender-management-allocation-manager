@@ -66,14 +66,16 @@
             <dt class="govuk-summary-list__key">Category</dt>
             <dd class="govuk-summary-list__value"><%= @prisoner.category_code.presence || 'No category found' %></dd>
           </div>
+          <% if FeatureFlags.rosh_level.enabled? %>
           <div class="govuk-summary-list__row" id="rosh-row">
             <dt class="govuk-summary-list__key">ROSH</dt>
             <dd class="govuk-summary-list__value"><%= @prisoner.rosh_level.present? ? @prisoner.rosh_level.humanize : 'No ROSH found' %></dd>
             <dd class="govuk-summary-list__actions">
               <%= link_to('Change', edit_prison_prisoner_case_information_path(@prison, @prisoner.offender_no, from: :review_case),
-                          class: 'govuk-link govuk-link--no-visited-state') if @prisoner.manual_entry? && FeatureFlags.rosh_level.enabled? %>
+                          class: 'govuk-link govuk-link--no-visited-state') if @prisoner.manual_entry? %>
             </dd>
           </div>
+          <% end %>
           <% if @prison.womens? %>
             <div class="govuk-summary-list__row" id="complexity-level-row">
               <dt class="govuk-summary-list__key">Complexity of need level</dt>

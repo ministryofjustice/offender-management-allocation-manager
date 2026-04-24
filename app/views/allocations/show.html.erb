@@ -50,15 +50,17 @@
       </td>
     </tr>
 
+    <% if FeatureFlags.rosh_level.enabled? %>
     <tr class="govuk-table__row" id="rosh-row">
       <td class="govuk-table__cell">ROSH</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= @prisoner.rosh_level.present? ? @prisoner.rosh_level.humanize : 'No ROSH found' %>
         <%= link_to 'Change',
                     edit_prison_prisoner_case_information_path(@prison.code, @prisoner.offender_no, from: :allocation),
-                    class: 'govuk-link pull-right' if @prisoner.manual_entry? && FeatureFlags.rosh_level.enabled? %>
+                    class: 'govuk-link pull-right' if @prisoner.manual_entry? %>
       </td>
     </tr>
+    <% end %>
 
     <% if @prison.womens? %>
       <tr class="govuk-table__row" id="complexity-level-row">
