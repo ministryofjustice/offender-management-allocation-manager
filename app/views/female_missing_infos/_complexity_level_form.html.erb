@@ -25,10 +25,11 @@
       ) %>
 
   <div class="govuk-button-group">
-    <%= form.submit @next_step_required ? "Save and continue" : "Save and allocate",
-                    role: "button",
-                    draggable: "false",
-                    class: "govuk-button",
-                    data: { module: 'govuk-button' } %>
+    <% if @next_step_required %>
+      <%= form.submit "Save and continue", class: "govuk-button", name: "save_and_continue", data: { module: 'govuk-button' } %>
+    <% else %>
+      <%= form.submit "Save", class: "govuk-button", data: { module: 'govuk-button' } %>
+      <%= form.submit "Save and allocate", class: "govuk-button govuk-button--secondary", name: "save_and_allocate", data: { module: 'govuk-button' } %>
+    <% end %>
   </div>
 <% end %>
