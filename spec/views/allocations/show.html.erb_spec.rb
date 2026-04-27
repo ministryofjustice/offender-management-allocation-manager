@@ -86,10 +86,11 @@ RSpec.describe "allocations/show", type: :view do
     context 'when the rosh feature flag is enabled' do
       before do
         stub_feature_flag(:rosh_level, enabled: true)
-        render
       end
 
       it 'shows the rosh row' do
+        render
+
         expect(page.at_css('tr#rosh-row')).to have_text('ROSH')
         expect(page.at_css('tr#rosh-row')).to have_text('High')
       end
