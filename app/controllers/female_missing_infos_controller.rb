@@ -21,7 +21,9 @@ class FemaleMissingInfosController < PrisonsApplicationController
         @missing_info.nomis_offender_id, level: @missing_info.complexity_level, username: current_user, reason: nil
       )
 
-      if @next_step_required
+      if save_and_return?
+        redirect_to missing_information_prison_prisoners_path(active_prison_id, sort: params[:sort], page: params[:page])
+      elsif @next_step_required
         session[complexity_saved_session_key] = true
         redirect_to next_step_path
       else
@@ -60,6 +62,10 @@ private
 
   def step_params
     params.fetch(:complexity_form, {}).permit(:complexity_level)
+  end
+
+  def save_and_return?
+    params[:save_and_continue].blank? && params[:save_and_allocate].blank?
   end
 
   def ensure_womens_prison
