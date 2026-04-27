@@ -14,7 +14,7 @@ RSpec.describe CaseInformationController, type: :controller do
     stub_offender(offender)
     stub_sso_data(prison.code)
     stub_poms(prison.code, [pom])
-    stub_rosh_level_feature(enabled: rosh_level_feature_enabled)
+    stub_feature_flag(:rosh_level, enabled: rosh_level_feature_enabled)
   end
 
   describe '#create' do

@@ -1,20 +1,6 @@
 # frozen_string_literal: true
 
 class CoworkingController < PrisonsApplicationController
-  def new
-    clear_latest_allocation_details!
-
-    @prisoner = offender(nomis_offender_id_from_url)
-    current_pom_id = allocation_for!(nomis_offender_id_from_url).primary_pom_nomis_id
-    poms = @prison.get_list_of_poms
-    @current_pom = poms.detect { |pom| pom.staff_id == current_pom_id }
-
-    @active_poms, @unavailable_poms = poms.reject { |p| p.staff_id == current_pom_id }.partition(&:active?)
-
-    @prison_poms = @active_poms.select(&:prison_officer?)
-    @probation_poms = @active_poms.select(&:probation_officer?)
-  end
-
   def confirm
     clear_latest_allocation_details!
 

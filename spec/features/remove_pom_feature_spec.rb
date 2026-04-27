@@ -14,13 +14,7 @@ feature "remove a POM no longer present in NOMIS" do
   end
 
   before do
-    allow(FeatureFlags.instance).to receive(:config).and_return(
-      {
-        limbo_bulk_reallocation: {
-          test: limbo_bulk_reallocation_enabled,
-        }
-      }.with_indifferent_access
-    )
+    stub_feature_flag(:limbo_bulk_reallocation, enabled: limbo_bulk_reallocation_enabled)
 
     stub_pom(spo)
     stub_signin_spo(spo, [prison.code])

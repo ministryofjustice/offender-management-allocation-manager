@@ -19,12 +19,7 @@ RSpec.describe "prisoners/review_case_details", type: :view do
   let(:case_info) { build(:case_information, :manual_entry, rosh_level: 'HIGH') }
   let(:prison) { build(:prison) }
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
-  let(:api_offender) { build(:hmpps_api_offender, category: build(:offender_category, :cat_a)) }
-  let(:rosh_level_feature_enabled) { true }
-
-  before do
-    stub_rosh_level_feature(enabled: rosh_level_feature_enabled)
-  end
+  let(:api_offender) { build(:hmpps_api_offender) }
 
   describe 'Sentence and offence section' do
     before { render }
@@ -42,28 +37,34 @@ RSpec.describe "prisoners/review_case_details", type: :view do
   end
 
   describe 'At a glance section' do
-    before { render }
+    context 'when the rosh feature flag is enabled' do
+      before do
+        stub_feature_flag(:rosh_level, enabled: true)
+        render
+      end
 
-    it 'shows the rosh row' do
-      row = at_a_glance_summary.find('#rosh-row')
+      it 'shows the rosh row' do
+        row = at_a_glance_summary.find('#rosh-row')
 
-      expect(row).to have_text('ROSH')
-      expect(row).to have_text('High')
-    end
+        expect(row).to have_text('ROSH')
+        expect(row).to have_text('High')
+      end
 
-    it 'shows the rosh change link when the feature flag is enabled and the case information is editable' do
-      row = at_a_glance_summary.find('#rosh-row')
+      it 'shows the rosh change link when the case information is editable' do
+        row = at_a_glance_summary.find('#rosh-row')
 
-      expect(row).to have_link('Change', href: edit_prison_prisoner_case_information_path(prison, offender.offender_no, from: :review_case))
+        expect(row).to have_link('Change', href: edit_prison_prisoner_case_information_path(prison, offender.offender_no, from: :review_case))
+      end
     end
 
     context 'when the rosh feature flag is disabled' do
-      let(:rosh_level_feature_enabled) { false }
+      before do
+        stub_feature_flag(:rosh_level, enabled: false)
+        render
+      end
 
-      it 'does not show the rosh change link' do
-        row = at_a_glance_summary.find('#rosh-row')
-
-        expect(row).not_to have_link('Change', href: edit_prison_prisoner_case_information_path(prison, offender.offender_no, from: :review_case))
+      it 'does not show the rosh row' do
+        expect(at_a_glance_summary).not_to have_css('#rosh-row')
       end
     end
   end
@@ -85,12 +86,6 @@ RSpec.describe "prisoners/review_case_details", type: :view do
 
   describe 'VLO section' do
     context 'with no VLO in nDelius' do
-      it 'has a stand-alone link to create a VLO' do
-        render
-        expect(vlo_cells[1]).to have_link('Add new VLO contact')
-        expect(vlo_cells[2]).not_to have_link('Add new VLO contact')
-      end
-
       context 'with no VLO in MPC' do
         before { render }
 
@@ -104,6 +99,11 @@ RSpec.describe "prisoners/review_case_details", type: :view do
 
         it 'renders the VLO row with separate details and actions cells' do
           expect(vlo_row).to have_css('td', count: 3)
+        end
+
+        it 'has a stand-alone link to create a VLO' do
+          expect(vlo_cells[1]).to have_link('Add new VLO contact')
+          expect(vlo_cells[2]).not_to have_link('Add new VLO contact')
         end
       end
 

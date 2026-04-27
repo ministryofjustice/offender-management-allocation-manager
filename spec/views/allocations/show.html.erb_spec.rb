@@ -28,7 +28,6 @@ RSpec.describe "allocations/show", type: :view do
   end
 
   let(:page) { Nokogiri::HTML(rendered) }
-  let(:rosh_level_feature_enabled) { true }
 
   before do
     assign(:prison, prison)
@@ -43,8 +42,6 @@ RSpec.describe "allocations/show", type: :view do
 
     allow(view).to receive(:vlo_tag).and_return('')
     allow(view).to receive(:prisoner_location).and_return('')
-    stub_rosh_level_feature(enabled: rosh_level_feature_enabled)
-    assign(:prisoner, offender)
   end
 
   describe 'responsibility' do
@@ -86,37 +83,41 @@ RSpec.describe "allocations/show", type: :view do
       stub_template 'shared/_vlo_information.html.erb' => ''
     end
 
-    it 'shows the rosh row' do
-      render
+    context 'when the rosh feature flag is enabled' do
+      before do
+        stub_feature_flag(:rosh_level, enabled: true)
+      end
 
-      expect(page.at_css('tr#rosh-row')).to have_text('ROSH')
-      expect(page.at_css('tr#rosh-row')).to have_text('High')
-    end
+      it 'shows the rosh row' do
+        render
 
-    it 'links the rosh change action to missing details when the feature flag is enabled and case information is editable' do
-      allow(offender).to receive(:manual_entry?).and_return(true)
+        expect(page.at_css('tr#rosh-row')).to have_text('ROSH')
+        expect(page.at_css('tr#rosh-row')).to have_text('High')
+      end
 
-      render
+      it 'shows the rosh change link when the case information is editable' do
+        allow(offender).to receive(:manual_entry?).and_return(true)
+        render
 
-      expect(page.at_css('tr#rosh-row')).to have_css("a[href='#{edit_prison_prisoner_case_information_path(prison.code, offender.offender_no, from: :allocation)}']", text: 'Change')
+        expect(page.at_css('tr#rosh-row')).to have_css("a[href='#{edit_prison_prisoner_case_information_path(prison.code, offender.offender_no, from: :allocation)}']", text: 'Change')
+      end
     end
 
     context 'when the rosh feature flag is disabled' do
-      let(:rosh_level_feature_enabled) { false }
-
-      it 'does not show the rosh change link' do
-        allow(offender).to receive(:manual_entry?).and_return(true)
-
+      before do
+        stub_feature_flag(:rosh_level, enabled: false)
         render
+      end
 
-        expect(page.at_css('tr#rosh-row')).not_to have_css("a[href='#{edit_prison_prisoner_case_information_path(prison.code, offender.offender_no, from: :allocation)}']")
+      it 'does not show the rosh row' do
+        expect(page).not_to have_css('tr#rosh-row')
       end
     end
   end
 
   describe 'VLO section' do
     let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
-    let(:api_offender) { build(:hmpps_api_offender, category: build(:offender_category, :cat_a)) }
+    let(:api_offender) { build(:hmpps_api_offender) }
 
     context 'with no VLO in nDelius' do
       let(:case_info) { build(:case_information) }

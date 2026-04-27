@@ -65,22 +65,6 @@ module OffenderHelper
     end
   end
 
-  def tier_a_case_count(offenders)
-    offenders.count { |a| a.tier == 'A' }
-  end
-
-  def tier_b_case_count(offenders)
-    offenders.count { |a| a.tier == 'B' }
-  end
-
-  def tier_c_case_count(offenders)
-    offenders.count { |a| a.tier == 'C' }
-  end
-
-  def tier_d_case_count(offenders)
-    offenders.count { |a| a.tier == 'D' }
-  end
-
   def probation_field(offender, field)
     offender.public_send field if offender.probation_record.present?
   end

@@ -19,7 +19,7 @@
   <% if show_tier %>
     <%= form.govuk_collection_radio_buttons(
           :tier,
-          CaseInformation::TIER_LEVELS.map { OpenStruct.new(name: it, value: it) },
+          CaseInformation.tier_levels.map { OpenStruct.new(name: it, value: it) },
           :value,
           :name,
           legend: { text: t('case_information.form.tier.legend') }

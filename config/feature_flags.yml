@@ -8,3 +8,5 @@ feature_flags:
     staging: false
   rosh_level:
     staging: true
+  new_tiers:
+    staging: true

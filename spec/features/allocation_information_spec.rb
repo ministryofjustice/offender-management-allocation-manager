@@ -154,7 +154,7 @@ feature "view an offender's allocation information", flaky: true do
 
       within table_row do
         expect(page).to have_link('Allocate',
-                                  href: new_prison_coworking_path('LEI', nomis_offender_id_with_keyworker))
+                                  href: prison_prisoner_review_case_details_path('LEI', nomis_offender_id_with_keyworker, coworking: true))
         expect(page).to have_content('Co-working POM N/A')
       end
     end

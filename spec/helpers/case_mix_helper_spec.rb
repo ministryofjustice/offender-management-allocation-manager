@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe CaseMixHelper, type: :helper do
   let(:page) { Nokogiri::HTML(subject) }
-  let(:tier_names) { CaseInformation::TIER_LEVELS }
+  let(:tier_names) { CaseInformation.tier_levels }
   let(:tier_definitions) do
     tier_names.map do |tier|
       {
@@ -103,6 +103,51 @@ RSpec.describe CaseMixHelper, type: :helper do
       it 'renders nothing' do
         expect(case_mix_bar).not_to be_present
         expect(page.text).to be_blank
+      end
+    end
+  end
+
+  context 'when new_tiers feature flag is enabled' do
+    before { stub_feature_flag(:new_tiers, enabled: true) }
+
+    describe '#case_mix_key' do
+      subject { helper.case_mix_key }
+
+      it 'renders keys for all tiers A-G' do
+        %w[A B C D E F G].each do |tier|
+          expect(page.text).to include "Tier #{tier}"
+        end
+      end
+    end
+
+    describe '#case_mix_bar_by_tiers' do
+      subject { helper.case_mix_bar_by_tiers(allocations) }
+
+      let(:allocations) do
+        %w[A B C D E F G].flat_map { |tier| [double(tier: tier)] }
+      end
+
+      it 'includes extended tiers in the bar' do
+        %w[E F G].each do |tier|
+          expect(page.text).to include "Tier #{tier}"
+        end
+      end
+    end
+  end
+
+  context 'when new_tiers feature flag is disabled' do
+    before { stub_feature_flag(:new_tiers, enabled: false) }
+
+    describe '#case_mix_key' do
+      subject { helper.case_mix_key }
+
+      it 'renders keys only for tiers A-D' do
+        %w[A B C D].each do |tier|
+          expect(page.text).to include "Tier #{tier}"
+        end
+        %w[E F G].each do |tier|
+          expect(page.text).not_to include "Tier #{tier}"
+        end
       end
     end
   end

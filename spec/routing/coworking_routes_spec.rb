@@ -15,13 +15,4 @@ describe 'coworking routes', type: :routing do
                                   secondary_pom_id: '654232'
     }
   end
-
-  describe get: '/prisons/LEI/coworking/G343234/new' do
-    it {
-      expect(subject).to route_to(controller: 'coworking',
-                                  action: 'new',
-                                  prison_id: 'LEI',
-                                  nomis_offender_id: 'G343234')
-    }
-  end
 end
