@@ -26,7 +26,13 @@ if sentry_dsn
 
     config.before_send = lambda do |event, hint|
       return nil if hint[:exception]&.full_message&.match?(/ApplicationInsights::TelemetryClient/)
-      return nil unless SentryCircuitBreakerService.check_within_quota
+
+      begin
+        return nil unless SentryCircuitBreakerService.check_within_quota
+      rescue StandardError => e
+        Rails.logger.warn("event=sentry_circuit_breaker_error|#{e.message}")
+        # Allow the event through if the circuit breaker check fails
+      end
 
       # Sanitize extra data
       if event.extra
