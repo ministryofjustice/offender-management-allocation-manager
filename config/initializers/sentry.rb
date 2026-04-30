@@ -34,19 +34,25 @@ if sentry_dsn
         # Allow the event through if the circuit breaker check fails
       end
 
-      # Sanitize extra data
-      if event.extra
-        event.extra = param_filter.filter(event.extra)
-      end
+      begin
+        # Sanitize extra data
+        if event.extra
+          event.extra = param_filter.filter(event.extra)
+        end
 
-      # Sanitize user data
-      if event.user
-        event.user = param_filter.filter(event.user)
-      end
+        # Sanitize user data
+        if event.user
+          event.user = param_filter.filter(event.user)
+        end
 
-      # Sanitize context data
-      if event.contexts
-        event.contexts = param_filter.filter(event.contexts)
+        # Sanitize context data
+        if event.contexts
+          event.contexts = param_filter.filter(event.contexts)
+        end
+      rescue StandardError => e
+        Rails.logger.warn(
+          "event=sentry_sanitization_error|original_exception_class=#{hint[:exception]&.class}|#{e.message}"
+        )
       end
 
       # Return the sanitized event object
