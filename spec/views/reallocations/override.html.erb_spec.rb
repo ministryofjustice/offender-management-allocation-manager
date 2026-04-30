@@ -35,7 +35,8 @@ RSpec.describe 'reallocations/override', type: :view do
       full_name_ordered: 'Bob Amber',
       immigration_case?: false,
       pom_responsible?: true,
-      tier: 'C'
+      tier: 'C',
+      rosh_level: 'LOW',
     )
   end
 

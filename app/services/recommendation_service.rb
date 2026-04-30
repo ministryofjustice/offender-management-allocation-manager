@@ -6,31 +6,30 @@ class RecommendationService
   PRISON_POM = 'PRO'
   PROBATION_POM = 'PO'
 
-  def self.recommended_pom_type(offender)
-    if offender.immigration_case?
-      PRISON_POM
-    elsif offender.pom_responsible?
-      if %w[A B].include?(offender.tier)
-        PROBATION_POM
-      else
-        PRISON_POM
-      end
-    else
-      PRISON_POM
-    end
-  end
+  POM_TYPE_LABELS = {
+    PRISON_POM => 'prison',
+    PROBATION_POM => 'probation',
+  }.freeze
 
-  def self.recommended_pom_type_reason(offender)
-    if offender.immigration_case?
-      'This is an immigration case, so should be given to a <strong>prison POM</strong>'.html_safe
-    elsif offender.pom_responsible?
-      if %w[A B].include?(offender.tier)
-        "#{offender.first_name.capitalize} is tier #{offender.tier}, so we recommend allocating to a <strong>probation POM</strong>".html_safe
-      else
-        "As #{offender.first_name.capitalize} is tier #{offender.tier}, we recommend allocating to a <strong>prison POM</strong>".html_safe
-      end
-    else
-      "#{offender.first_name.capitalize} needs a POM in a supporting role, so should be allocated to a <strong>prison POM</strong>".html_safe
+  class << self
+    # rubocop:disable Rails/Delegate
+    def recommended_pom_type(offender)
+      strategy.recommended_pom_type(offender)
+    end
+
+    def recommended_pom_type_reason(offender)
+      strategy.recommended_pom_type_reason(offender)
+    end
+    # rubocop:enable Rails/Delegate
+
+    def reason(key, **options)
+      I18n.t(key, scope: 'recommendation_service.reasons', **options).html_safe
+    end
+
+  private
+
+    def strategy
+      FeatureFlags.rosh_recommendations.enabled? ? RoshStrategy : TierStrategy
     end
   end
 end

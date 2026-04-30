@@ -42,8 +42,8 @@ RSpec.shared_context 'with reallocation controller defaults' do
     create_reallocation_case(offender_no, tier: 'A')
   end
 
-  def create_reallocation_case(nomis_offender_id, tier:, primary_pom: old_pom)
-    create(:case_information, offender: build(:offender, nomis_offender_id:), tier:)
+  def create_reallocation_case(nomis_offender_id, tier:, rosh_level: nil, primary_pom: old_pom)
+    create(:case_information, tier:, rosh_level:, offender: build(:offender, nomis_offender_id:))
     create(
       :allocation_history,
       prison: prison.code,

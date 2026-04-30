@@ -192,7 +192,7 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
       let(:nomis_offender_ids) { [override_offender_no] }
 
       before do
-        create_reallocation_case(override_offender_no, tier: 'C')
+        create_reallocation_case(override_offender_no, tier: 'C', rosh_level: 'LOW')
       end
 
       it 'redirects to the first override step' do

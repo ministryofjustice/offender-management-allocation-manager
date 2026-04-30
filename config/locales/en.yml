@@ -252,3 +252,10 @@ en:
       reason:
         label: 'Provide the reason(s) for this change'
         hint: 'You must justify why you are changing the complexity of need level – include any key dates and details.'
+
+  recommendation_service:
+    reasons:
+      immigration_case: "This is an immigration case, so should be given to a <strong>prison POM</strong>"
+      supporting_role: "%{name} needs a POM in a supporting role, so should be allocated to a <strong>prison POM</strong>"
+      tier_based: "%{name} is tier %{tier}, so we recommend allocating to a <strong>%{pom_type} POM</strong>"
+      rosh_based: "%{name} has a %{rosh_level} ROSH, so we recommend allocating to a <strong>%{pom_type} POM</strong>"

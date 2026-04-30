@@ -60,11 +60,11 @@ module OmniAuth
       end
 
       def user_details
-        @user_details = HmppsApi::NomisUserRolesApi.staff_details(staff_id, cache: false)
+        @user_details ||= HmppsApi::NomisUserRolesApi.staff_details(staff_id, cache: false)
       end
 
       def caseload_codes
-        @caseload_codes = @user_details.caseloads
+        @caseload_codes ||= user_details.caseloads
       end
 
       # :nocov:
