@@ -18,7 +18,7 @@ module SortableAllocation
   end
 
   def complexity_level_number
-    ComplexityLevelHelper::COMPLEXITIES.fetch(complexity_level)
+    ComplexityLevelHelper::COMPLEXITIES.fetch(complexity_level, 0)
   end
 
   def high_complexity?

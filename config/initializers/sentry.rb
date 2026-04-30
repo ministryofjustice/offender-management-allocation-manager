@@ -8,10 +8,20 @@ if sentry_dsn
     config.dsn = sentry_dsn
     config.release = ENV['BUILD_NUMBER']
     config.enable_metrics = false
+    config.rails.report_rescued_exceptions = true
 
     config.excluded_exceptions += %w[
       JWT::ExpiredSignature
+      JWT::VerificationError
+      HmppsApi::Error::Unauthorized
       ProcessDeliusDataJob::ImportTransientError
+      ActiveRecord::RecordNotFound
+      ActionController::RoutingError
+      ActionController::UnknownFormat
+      ActionController::InvalidAuthenticityToken
+      ActionController::BadRequest
+      Faraday::ConnectionFailed
+      Faraday::TimeoutError
     ]
 
     config.before_send = lambda do |event, hint|
