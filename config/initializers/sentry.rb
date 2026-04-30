@@ -8,15 +8,31 @@ if sentry_dsn
     config.dsn = sentry_dsn
     config.release = ENV['BUILD_NUMBER']
     config.enable_metrics = false
+    config.rails.report_rescued_exceptions = true
 
     config.excluded_exceptions += %w[
       JWT::ExpiredSignature
+      JWT::VerificationError
+      HmppsApi::Error::Unauthorized
       ProcessDeliusDataJob::ImportTransientError
+      ActiveRecord::RecordNotFound
+      ActionController::RoutingError
+      ActionController::UnknownFormat
+      ActionController::InvalidAuthenticityToken
+      ActionController::BadRequest
+      Faraday::ConnectionFailed
+      Faraday::TimeoutError
     ]
 
     config.before_send = lambda do |event, hint|
       return nil if hint[:exception]&.full_message&.match?(/ApplicationInsights::TelemetryClient/)
-      return nil unless SentryCircuitBreakerService.check_within_quota
+
+      begin
+        return nil unless SentryCircuitBreakerService.check_within_quota
+      rescue StandardError => e
+        Rails.logger.warn("event=sentry_circuit_breaker_error|#{e.message}")
+        # Allow the event through if the circuit breaker check fails
+      end
 
       # Sanitize extra data
       if event.extra

@@ -14,7 +14,7 @@
   </td>
   <% if @prison.womens? %>
     <td aria-label="Complexity Level" class="govuk-table__cell">
-      <%= caseload_homd.complexity_level.titleize %>
+      <%= caseload_homd.complexity_level&.titleize %>
     </td>
   <% end %>
   <td aria-label="Earliest release date" class="govuk-table__cell ">
