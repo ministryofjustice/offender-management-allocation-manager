@@ -55,6 +55,18 @@ RSpec.describe AllocationsController, type: :controller do
         stub_keyworker(offender_no)
       end
 
+      context 'when the prisoner cannot be loaded' do
+        before do
+          stub_non_existent_offender(offender_no)
+        end
+
+        it 'redirects to 404' do
+          get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
+
+          expect(response).to redirect_to('/404')
+        end
+      end
+
       context 'when POM has left' do
         before do
           create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: inactive_pom_staff_id)
@@ -149,7 +161,7 @@ RSpec.describe AllocationsController, type: :controller do
         before do
           case_info = create(:case_information, offender: build(:offender, victim_liaison_officers: [build(:victim_liaison_officer)]))
           create(:allocation_history, prison: prison_code, nomis_offender_id: case_info.nomis_offender_id)
-          stub_offender(build(:nomis_offender, prisonerNumber: case_info.nomis_offender_id))
+          stub_offender(build(:nomis_offender, prisonerNumber: case_info.nomis_offender_id, prisonId: prison_code))
           stub_movements_for case_info.nomis_offender_id, [attributes_for(:movement)]
           stub_pom_emails(485_926, [])
         end

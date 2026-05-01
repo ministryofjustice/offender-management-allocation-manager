@@ -19,6 +19,22 @@ RSpec.describe BuildAllocationsController, type: :controller do
   end
 
   describe '#new' do
+    context 'when the prisoner cannot be loaded' do
+      before do
+        stub_non_existent_offender(offender_no)
+
+        get :new, params: {
+          prison_id: prison.code,
+          prisoner_id: offender_no,
+          staff_id: pom.staffId
+        }
+      end
+
+      it 'redirects to 404' do
+        expect(response).to redirect_to('/404')
+      end
+    end
+
     context 'when the selected POM is no longer eligible' do
       before do
         create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no,

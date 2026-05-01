@@ -114,7 +114,7 @@ class EarlyAllocationsController < PrisonsApplicationController
 private
 
   def load_prisoner
-    @prisoner = OffenderService.get_offender(params[:prisoner_id])
+    @prisoner = get_offender_or_404(params[:prisoner_id])
   end
 
   def pdf_as_string

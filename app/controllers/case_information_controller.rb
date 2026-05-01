@@ -49,8 +49,7 @@ class CaseInformationController < PrisonsApplicationController
 private
 
   def set_prisoner
-    @prisoner = OffenderService.get_offender(prisoner_id)
-    redirect_to('/404') if @prisoner.nil?
+    @prisoner = get_offender_or_404(prisoner_id)
   end
 
   def set_case_info_or_redirect
