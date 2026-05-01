@@ -10,8 +10,7 @@ class OnboardingController < PrisonsApplicationController
   before_action :set_pom_details, only: [:position, :working_pattern, :check_answers]
 
   rescue_from StandardError do |e|
-    Rails.logger.error(e)
-    Sentry.capture_exception(e)
+    Rails.error.report(e, severity: :error, source: 'onboarding')
     render :error
   end
 

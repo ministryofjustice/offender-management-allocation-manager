@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-PrisonInfo = Struct.new(:code, :name, :country, :gender)
-
 class PrisonService
+  PrisonInfo = Struct.new(:code, :name, :country, :gender)
+
   PRISONS = [
     PrisonInfo.new('ACI', 'Altcourse (HMP)', :england, :male),
     PrisonInfo.new('AGI', 'Askham Grange (HMP/YOI)', :england, :female),

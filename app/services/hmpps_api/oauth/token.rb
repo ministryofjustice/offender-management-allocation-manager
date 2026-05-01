@@ -52,7 +52,6 @@ module HmppsApi
         true
       rescue JWT::DecodeError => e
         Rails.logger.error("event=api_access_blocked|#{e.message}")
-        Sentry.capture_exception(e)
         false
       end
 

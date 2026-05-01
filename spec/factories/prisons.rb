@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  CLOSED_MALE_PRISON_CODES = PrisonService.prison_codes.reject { |x|
-    PrisonService::OPEN_PRISON_CODES.include?(x) ||
-      PrisonService::ENGLISH_HUB_PRISON_CODES.include?(x) ||
-      PrisonService::WOMENS_PRISON_CODES.include?(x) ||
-      ['LEI', 'PVI'].include?(x)
-  }
-
   factory :prison do
     # rotate around every male closed prison - open and womens prisons have different rules
     sequence(:code) do |c|
-      CLOSED_MALE_PRISON_CODES[c % CLOSED_MALE_PRISON_CODES.size]
+      prison_codes = PrisonService.prison_codes.reject { |x|
+        PrisonService::OPEN_PRISON_CODES.include?(x) ||
+          PrisonService::ENGLISH_HUB_PRISON_CODES.include?(x) ||
+          PrisonService::WOMENS_PRISON_CODES.include?(x) ||
+          %w[LEI PVI].include?(x)
+      }
+
+      prison_codes[c % prison_codes.size]
     end
 
     trait :open do

@@ -6,7 +6,7 @@ RSpec.describe 'Sentry initializer' do
     Struct.new(:dsn, :release, :enable_metrics, :before_send, :excluded_exceptions, :rails, keyword_init: true)
   end
   let(:fake_event_class) { Struct.new(:extra, :user, :contexts) }
-  let(:rails_config) { double('rails_config', report_rescued_exceptions: nil) }
+  let(:rails_config) { double('rails_config', register_error_subscriber: nil) }
   let(:config) { fake_sentry_config_class.new(excluded_exceptions: [], rails: rails_config) }
   let(:event) do
     fake_event_class.new(
@@ -19,7 +19,9 @@ RSpec.describe 'Sentry initializer' do
 
   before do
     allow(Rails.configuration).to receive(:sentry_dsn).and_return('https://public@example.com/1')
-    allow(rails_config).to receive(:report_rescued_exceptions=)
+    allow(Rails.application.config).to receive(:after_initialize).and_yield
+    allow(Rails.error).to receive(:subscribe)
+    allow(rails_config).to receive(:register_error_subscriber=)
     allow(Sentry).to receive(:init).and_yield(config)
     allow(SentryCircuitBreakerService).to receive(:check_within_quota).and_return(true)
   end
@@ -30,6 +32,9 @@ RSpec.describe 'Sentry initializer' do
 
   it 'sanitises event payloads before sending them to Sentry' do
     load_initializer
+
+    expect(rails_config).to have_received(:register_error_subscriber=).with(true)
+    expect(Rails.error).to have_received(:subscribe).with(an_instance_of(LoggerErrorSubscriber))
 
     expect(config.before_send.call(event, { exception: exception })).to eq(
       fake_event_class.new(
