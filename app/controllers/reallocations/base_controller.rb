@@ -83,7 +83,7 @@ module Reallocations
         "event=bulk_reallocation_error,prison_id=#{@prison.code},source_pom_id=#{@pom&.staff_id}," \
         "target_pom_id=#{@new_pom&.staff_id},path=#{request.fullpath}|#{error.message}"
       )
-      Sentry.capture_exception(error)
+      Rails.error.report(error, severity: :error, source: 'bulk_reallocation')
       render 'reallocations/error', status: :internal_server_error
     end
   end

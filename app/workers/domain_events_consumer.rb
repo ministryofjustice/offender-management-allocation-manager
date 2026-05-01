@@ -37,11 +37,9 @@ class DomainEventsConsumer
       log sqs_msg, 'success', append: "sns_message_id=#{sns_msg['MessageId']},event_type=#{event_type}"
     rescue StandardError => e
       log sqs_msg, 'error', append: "reason=exception|#{e.inspect},#{e.backtrace.join(',')}", brief: true
-      Sentry.capture_exception(e,
-                               tags: {
-                                 domain_event: true,
-                                 domain_event_type: event_type,
-                               })
+      Rails.error.report(
+        e, handled: false, source: 'domain_events_consumer', context: { tags: { domain_event: true, domain_event_type: event_type } }
+      )
       raise
     end
   end

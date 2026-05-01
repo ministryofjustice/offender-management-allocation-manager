@@ -9,9 +9,9 @@ class ApplicationMailer < GovukNotifyRails::Mailer
   # are not recoverable so it is not useful to retry failed jobs
   # :nocov:
   rescue_from 'Notifications::Client::BadRequestError' do |ex|
-    Rails.logger.warn("[#{self.class}] #{ex} - #{message.to}")
-    Sentry.capture_exception(
-      ex, contexts: { recipient: { emails: message.to.join(',') } }
+    Rails.logger.error("[#{self.class}] #{ex} - #{message.to}")
+    Rails.error.report(
+      ex, severity: :error, source: 'mailer', context: { recipient: { emails: message.to.join(',') } }
     )
   end
   # :nocov:

@@ -8,7 +8,10 @@ if sentry_dsn
     config.dsn = sentry_dsn
     config.release = ENV['BUILD_NUMBER']
     config.enable_metrics = false
-    config.rails.report_rescued_exceptions = true
+
+    # Opt in to new Rails error reporting API
+    # https://edgeguides.rubyonrails.org/error_reporting.html
+    config.rails.register_error_subscriber = true
 
     config.excluded_exceptions += %w[
       JWT::ExpiredSignature
@@ -61,4 +64,8 @@ if sentry_dsn
   end
 else
   Rails.logger.warn '[WARN] Sentry is not configured (SENTRY_DSN)'
+end
+
+Rails.application.config.after_initialize do
+  Rails.error.subscribe(LoggerErrorSubscriber.new)
 end

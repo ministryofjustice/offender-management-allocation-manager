@@ -161,4 +161,39 @@ RSpec.describe DomainEventsConsumer do
     expect { consumer.perform(sqs_msg, sns_msg_raw) }.not_to raise_error
     expect(DomainEventTestHandler.handled_events).to eq []
   end
+
+  it 'reports and re-raises unexpected errors' do
+    sns_msg_raw = {
+      'Type' => 'Notification',
+      'MessageId' => 'sns_msg_id',
+      'TopicArn' => 'arn:::::',
+      'Message' => {
+        'eventType' => 'testapp.domain.action',
+        'version' => 1,
+      }.to_json,
+      'MessageAttributes' => {
+        'eventType' => {
+          'Type' => 'String',
+          'Value' => 'testapp.domain.action',
+        },
+      },
+    }.to_json
+    error = StandardError.new('boom')
+
+    allow(consumer).to receive(:consume).and_raise(error)
+    allow(Rails.error).to receive(:report)
+
+    expect { consumer.perform(sqs_msg, sns_msg_raw) }.to raise_error(error)
+    expect(Rails.error).to have_received(:report).with(
+      error,
+      handled: false,
+      source: 'domain_events_consumer',
+      context: {
+        tags: {
+          domain_event: true,
+          domain_event_type: 'testapp.domain.action',
+        },
+      }
+    )
+  end
 end
