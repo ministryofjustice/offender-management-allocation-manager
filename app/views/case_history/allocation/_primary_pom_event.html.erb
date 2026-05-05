@@ -1,0 +1,21 @@
+<% description = capture do %>
+  Prisoner <%= variant %> to <%= allocation.primary_pom_name.titleize %> - <%= format_email(allocation.primary_pom_email) %>
+  <br/>Tier: <%= allocation.allocated_at_tier %>
+  <% if allocation.allocated_at_rosh.present? %>
+  <br/>ROSH: <%= allocation.allocated_at_rosh.humanize %>
+  <% end %>
+  <% if allocation.override_reasons.present? %>
+    <p class="govuk-body govuk-!-margin-bottom-1 govuk-!-margin-top-3"><%= display_override_pom(allocation) %></p>
+    <p class="govuk-body govuk-!-margin-bottom-1">Reason(s):</p>
+    <div class="app-override-reasons">
+      <% allocation.override_reasons.each do |reason| %>
+        <%= display_override_details(reason, allocation) %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
+<%= render 'case_history/case_history',
+           title: "Prisoner #{variant}",
+           description: description,
+           object: allocation %>

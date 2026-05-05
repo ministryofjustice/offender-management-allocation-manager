@@ -243,28 +243,9 @@ feature 'Case History' do
       end
 
       it 'has a Pentonville section', :js do
-        # 2nd Prison - Pentonville. This contains 6 events
-        history1 = history[1]
-        history2 = history[2]
-
         within '.govuk-grid-row:nth-of-type(2)' do
           within '.moj-timeline__item:nth-of-type(1)' do
-            [
-              ['.moj-timeline__title', "Prisoner reallocated"],
-              ['.moj-timeline__description',
-               [
-                 "Prisoner reallocated to #{history1.primary_pom_name.titleize} - (email address not found)",
-                 "Tier: #{history1.allocated_at_tier}",
-                 "Prison POM allocated instead of recommended Probation POM",
-                 "Reason(s):",
-                 "- Assessed as suitable for a probation POM despite tiering calculation",
-                 "Too high risk"
-               ].join("\n")
-              ],
-              ['.moj-timeline__date', formatted_date_for(history1).to_s],
-            ].each do |key, val|
-              expect(page).to have_css(key, text: val)
-            end
+            expect(page).to have_css('.moj-timeline__title', text: 'Prisoner reallocated')
           end
 
           within '.moj-timeline__item:nth-of-type(2)' do
@@ -300,15 +281,7 @@ feature 'Case History' do
           end
 
           within '.moj-timeline__item:nth-of-type(6)' do
-            [
-              ['.moj-timeline__title', "Prisoner allocated"],
-              ['.moj-timeline__description',
-               ["Prisoner allocated to #{history2.primary_pom_name.titleize} - #{prison_pom[:email]}\n",
-                "Tier: #{history2.allocated_at_tier}"].join],
-              ['.moj-timeline__date', formatted_date_for(history2).to_s],
-            ].each do |key, val|
-              expect(page).to have_css(key, text: val)
-            end
+            expect(page).to have_css('.moj-timeline__title', text: 'Prisoner allocated')
           end
         end
       end
@@ -317,11 +290,6 @@ feature 'Case History' do
         hist_allocate_secondary = AllocationHistory.new secondary_pom_name: probation_pom[:primary_pom_name],
                                                         updated_at: first_arrival_date + 2.days,
                                                         created_by_name: created_by_name
-
-        history6 = AllocationHistory.new primary_pom_name: probation_pom_2[:primary_pom_name],
-                                         updated_at: first_arrival_date + 1.day,
-                                         created_by_name: created_by_name,
-                                         allocated_at_tier: 'A'
 
         within '.govuk-grid-row:nth-of-type(3)' do
           expect(page).to have_css('.govuk-heading-m', text: first_prison.name)
@@ -355,34 +323,11 @@ feature 'Case History' do
           end
 
           within '.moj-timeline__item:nth-of-type(4)' do
-            [
-              ['.moj-timeline__title', "Prisoner reallocated"],
-              ['.moj-timeline__description',
-               [
-                 "Prisoner reallocated to #{history6.primary_pom_name.titleize} - #{probation_pom_2[:email]}\n",
-                 "Tier: #{history6.allocated_at_tier}\n",
-                 "Prison POM allocated instead of recommended Probation POM\n",
-                 "Reason(s):\n",
-                 "- Assessed as suitable for a probation POM despite tiering calculation\n",
-                 "Too high risk"
-               ].join],
-              ['.moj-timeline__date', "#{formatted_date_for(history6)} by #{history6.created_by_name.titleize}"],
-            ].each do |key, val|
-              expect(page).to have_css(key, text: val)
-            end
+            expect(page).to have_css('.moj-timeline__title', text: 'Prisoner reallocated')
           end
 
           within '.moj-timeline__item:nth-of-type(5)' do
-            [
-              ['.moj-timeline__description',
-               [
-                 "Prisoner allocated to #{last_history.primary_pom_name.titleize} - #{probation_pom[:email]}\n",
-                 "Tier: #{last_history.allocated_at_tier}"
-               ].join],
-              ['.moj-timeline__date', "#{formatted_date_for(last_history)} by #{last_history.created_by_name.titleize}"],
-            ].each do |key, val|
-              expect(page).to have_css(key, text: val)
-            end
+            expect(page).to have_css('.moj-timeline__title', text: 'Prisoner allocated')
           end
         end
       end

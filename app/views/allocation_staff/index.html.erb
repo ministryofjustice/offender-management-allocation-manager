@@ -41,43 +41,50 @@
   </div>
 </div>
 
-<h2 class="govuk-heading-m govuk-!-margin-top-5">
-  <%= recommended_pom_type_label(@prisoner) %> POM recommended
-</h2>
-
-<div class="govuk-inset-text">
-  <p><%= RecommendationService.recommended_pom_type_reason(@prisoner) %>.</p>
-</div>
-
-<% if @recent_pom_history.any? %>
-  <div class="govuk-warning-text">
-    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-    <p class="govuk-warning-text__text">
-      <span class="govuk-visually-hidden">Warning</span>
-      The following POMs have been allocated to this case most recently:
-    </p>
-    <div class="govuk-!-margin-left-5">
-      <ul class="govuk-list govuk-list--bullet">
-        <% @recent_pom_history.each do |term| %>
-          <li>
-            <%= render partial: 'case_history/allocation/pom_term', locals: {term: term} %>
-          </li>
-        <% end %>
-      </ul>
-
-      <p class="govuk-body">
-        <%= link_to 'View allocation history', history_prison_prisoner_allocation_path(@prison.code, @prisoner.offender_no) %> for more information.
-      </p>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h2 class="govuk-heading-m govuk-!-margin-top-5">
+      <%= recommended_pom_type_label(@prisoner) %> POM recommended
+    </h2>
+    <div class="govuk-inset-text">
+      <p><%= RecommendationService.recommended_pom_type_reason(@prisoner) %>.</p>
     </div>
   </div>
-<% end %>
+</div>
 
-<h2 class="govuk-heading-m govuk-!-margin-top-8">
-  Choose a POM
-</h2>
+<div class="govuk-grid-row govuk-!-margin-bottom-5">
+  <div class="govuk-grid-column-two-thirds">
+    <% if @recent_pom_history.any? %>
+      <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <p class="govuk-warning-text__text">
+          <span class="govuk-visually-hidden">Warning</span>
+          The following POMs have been allocated to this case most recently:
+        </p>
+        <div class="govuk-!-margin-left-5">
+          <ul class="govuk-list govuk-list--bullet">
+            <% @recent_pom_history.each do |term| %>
+              <li>
+                <%= render partial: 'case_history/allocation/pom_term', locals: {term: term} %>
+              </li>
+            <% end %>
+          </ul>
 
-<p>You can choose an available prison POM below or allocate to a probation POM,<br>
-for example if a particular POM has worked with <%= @prisoner.first_name.capitalize %> before.</p>
+          <p class="govuk-body">
+            <%= link_to 'View allocation history', history_prison_prisoner_allocation_path(@prison.code, @prisoner.offender_no) %> for more information.
+          </p>
+        </div>
+      </div>
+    <% end %>
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">
+      Choose a POM
+    </h2>
+    <p class="govuk-body">
+      <%= t(@prisoner.recommended_pom_type, scope: 'recommendation_service.guidance', name: @prisoner.full_name_ordered) %>
+    </p>
+  </div>
+</div>
 
 <%= form_tag(prison_prisoner_check_compare_list_path(@prison, @prisoner.offender_no, coworking: @coworking), method: :put) do %>
   <%= render 'shared/pom_selection_table',

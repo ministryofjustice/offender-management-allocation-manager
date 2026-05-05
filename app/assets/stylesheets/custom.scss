@@ -68,3 +68,16 @@
 .app-related-items .govuk-list > li {
   margin-bottom: govuk-spacing(2);
 }
+
+// Allocation history recommendation overrides
+//
+.app-override-reasons {
+  p {
+    @include govuk-font($size: 19);
+    margin-bottom: govuk-spacing(1);
+  }
+
+  p.app-override-reason--detail {
+    margin-left: govuk-spacing(5);
+  }
+}

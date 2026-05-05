@@ -39,6 +39,19 @@ describe 'HOMD allocates cases to POMS' do
     expect(page).to have_content('Offender, Allocatable')
   end
 
+  specify 'HOMD must choose an override reason before allocating a different type of POM to a case' do
+    visit unallocated_prison_prisoners_path(prison)
+
+    within('tr', text: 'G1234AB') { click_on 'Offender, Allocatable' }
+    click_on 'Choose POM', match: :first
+    click_link poms.last.full_name_ordered
+    click_on 'Continue'
+
+    within('.govuk-error-summary') do
+      expect(page).to have_content('Select one or more reasons for not accepting the recommendation')
+    end
+  end
+
   specify 'HOMD compares staff workloads before allocating a POM to a case' do
     alloc1 = build(:stubbed_offender, nomis_id: 'G1234XX', responsibility: :pom, tier: 'A', first_name: 'PrisPom', last_name: 'Off1')
     create(:allocation_history, nomis_offender_id: 'G1234XX', primary_pom_nomis_id: 9876, primary_pom_name: 'Prison Pom', prison: prison.code)

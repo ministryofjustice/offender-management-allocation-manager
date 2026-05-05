@@ -49,6 +49,7 @@ module Reallocation
         event_trigger: :user,
         created_by_username: current_user,
         allocated_at_tier: offender.tier,
+        allocated_at_rosh: FeatureFlags.rosh_recommendations.enabled? ? offender.rosh_level : nil,
         recommended_pom_type: recommended_pom_type_for(offender),
         prison: prison.code,
         message: message,

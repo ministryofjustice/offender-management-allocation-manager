@@ -13,7 +13,10 @@ RSpec.describe "allocation_staff/index", type: :view do
   let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
   let(:prison) { create(:prison) }
   let(:pom) { build(:pom) }
-  let(:page) { Capybara.string(rendered) }
+  let(:page) do
+    render
+    Capybara.string(rendered)
+  end
   let(:poms) { [pom] }
   let(:recent_pom_history) { [] }
 
@@ -29,7 +32,6 @@ RSpec.describe "allocation_staff/index", type: :view do
     assign(:available_poms, poms.map { |p| StaffMember.new(prison, p.staff_id) })
     assign(:prison_poms, [])
     assign(:recent_pom_history, recent_pom_history)
-    render
   end
 
   it 'renders the allocation-specific wrapper around the shared POM selection table' do
@@ -42,6 +44,30 @@ RSpec.describe "allocation_staff/index", type: :view do
       expect(page).to have_link(
         StaffMember.new(prison, available_pom.staff_id).full_name_ordered,
         href: new_prison_prisoner_staff_build_allocation_path(prison.code, offender.offender_no, available_pom.staff_id)
+      )
+    end
+  end
+
+  context 'when a prison POM is recommended' do
+    before do
+      allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PRISON_POM)
+    end
+
+    it 'shows the correct guidance' do
+      expect(page).to have_text(
+        I18n.t(RecommendationService::PRISON_POM, scope: 'recommendation_service.guidance', name: offender.full_name_ordered)
+      )
+    end
+  end
+
+  context 'when a probation POM is recommended' do
+    before do
+      allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PROBATION_POM)
+    end
+
+    it 'shows the correct guidance' do
+      expect(page).to have_text(
+        I18n.t(RecommendationService::PROBATION_POM, scope: 'recommendation_service.guidance', name: offender.full_name_ordered)
       )
     end
   end
