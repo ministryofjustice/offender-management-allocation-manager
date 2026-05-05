@@ -89,12 +89,12 @@ private
   end
 
   def load_offender_from_url
-    @offender = OffenderService.get_offender(nomis_offender_id_from_url)
+    @offender = get_offender_or_404(nomis_offender_id_from_url)
   end
 
   def load_offender_from_responsibility_params
     offender_id = responsibility_params.fetch(:nomis_offender_id)
-    @offender = OffenderService.get_offender(offender_id)
+    @offender = get_offender_or_404(offender_id)
   end
 
   def responsibility_params

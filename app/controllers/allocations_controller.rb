@@ -62,6 +62,6 @@ private
   end
 
   def load_prisoner
-    @prisoner = OffenderService.get_offender(nomis_offender_id_from_url)
+    @prisoner = get_offender_or_404(nomis_offender_id_from_url)
   end
 end

@@ -19,7 +19,7 @@ class ParoleReviewsController < PrisonsApplicationController
 private
 
   def load_offender
-    @offender = OffenderService.get_offender(params[:prisoner_id])
+    @offender = get_offender_or_404(params[:prisoner_id])
   end
 
   def load_parole_review_record

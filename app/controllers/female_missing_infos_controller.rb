@@ -45,8 +45,7 @@ private
   end
 
   def load_prisoner
-    @prisoner = OffenderService.get_offender(prisoner_id)
-    redirect_to('/404') if @prisoner.nil?
+    @prisoner = get_offender_or_404(prisoner_id)
   end
 
   def load_missing_info
