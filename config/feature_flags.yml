@@ -10,3 +10,5 @@ feature_flags:
     staging: true
   new_tiers:
     staging: true
+  rosh_recommendations:
+    staging: true

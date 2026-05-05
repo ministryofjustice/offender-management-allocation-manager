@@ -17,7 +17,8 @@ RSpec.describe 'build_allocations/override', type: :view do
       offender_no: 'G4198UW',
       immigration_case?: false,
       pom_responsible?: true,
-      tier: 'C'
+      tier: 'C',
+      rosh_level: 'LOW',
     )
   end
 

@@ -2,37 +2,35 @@ require 'rails_helper'
 
 describe RecommendationService do
   let(:prison) { build(:prison) }
+  let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :determinate_release_in_three_years)) }
+  let(:case_info) { build(:case_information, tier: 'A') }
+  let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
 
-  context 'when tier A' do
-    let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :determinate_release_in_three_years)) }
-    let(:case_info) { build(:case_information, tier: 'A') }
-    let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
+  context 'when rosh_recommendations feature flag is disabled' do
+    before { stub_feature_flag(:rosh_recommendations, enabled: false) }
 
-    it "can determine the best type of POM for Tier A" do
-      expect(described_class.recommended_pom_type(offender)).to eq(described_class::PROBATION_POM)
+    it 'delegates recommended_pom_type to TierStrategy' do
+      expect(described_class::TierStrategy).to receive(:recommended_pom_type).with(offender).and_call_original
+      described_class.recommended_pom_type(offender)
+    end
+
+    it 'delegates recommended_pom_type_reason to TierStrategy' do
+      expect(described_class::TierStrategy).to receive(:recommended_pom_type_reason).with(offender).and_call_original
+      described_class.recommended_pom_type_reason(offender)
     end
   end
 
-  context 'when tier D' do
-    let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :determinate_release_in_three_years)) }
-    let(:case_info) { build(:case_information, tier: 'D') }
-    let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
+  context 'when rosh_recommendations feature flag is enabled' do
+    before { stub_feature_flag(:rosh_recommendations, enabled: true) }
 
-    it "can determine the best type of POM for Tier D" do
-      expect(described_class.recommended_pom_type(offender)).to eq(described_class::PRISON_POM)
+    it 'delegates recommended_pom_type to RoshStrategy' do
+      expect(described_class::RoshStrategy).to receive(:recommended_pom_type).with(offender).and_call_original
+      described_class.recommended_pom_type(offender)
     end
-  end
 
-  context 'when tier A immigration case' do
-    let(:api_offender) do
-      build(:hmpps_api_offender,
-            sentence: attributes_for(:sentence_detail, imprisonmentStatus: 'DET', sentenceStartDate: Time.zone.today))
-    end
-    let(:case_info) { build(:case_information, tier: 'A') }
-    let(:offender) { build(:mpc_offender, prison: prison, offender: case_info.offender, prison_record: api_offender) }
-
-    it "can determine the best type of POM for an immigration case" do
-      expect(described_class.recommended_pom_type(offender)).to eq(described_class::PRISON_POM)
+    it 'delegates recommended_pom_type_reason to RoshStrategy' do
+      expect(described_class::RoshStrategy).to receive(:recommended_pom_type_reason).with(offender).and_call_original
+      described_class.recommended_pom_type_reason(offender)
     end
   end
 end

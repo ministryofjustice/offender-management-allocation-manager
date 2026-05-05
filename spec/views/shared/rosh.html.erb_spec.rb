@@ -250,7 +250,7 @@ RSpec.describe "shared/_rosh", type: :view do
       it 'renders a warning with the nDelius ROSH level' do
         warning = widget.at_css('.govuk-warning-text')
         expect(warning).not_to be_nil
-        expect(warning.text).to include("Latest ROSH from NDelius or this service: #{expected_level}")
+        expect(warning.text).to include("ROSH from NDelius or this service: #{expected_level}")
       end
     end
 

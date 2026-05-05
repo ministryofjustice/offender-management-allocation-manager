@@ -138,7 +138,7 @@ feature "womens allocation journey" do
     before do
       stub_keyworker(offender_id)
 
-      create(:case_information, tier: 'C', offender: build(:offender, nomis_offender_id: offender_id))
+      create(:case_information, tier: 'C', rosh_level: 'LOW', offender: build(:offender, nomis_offender_id: offender_id))
       create(:allocation_history, nomis_offender_id: offender_id, prison: prison.code, primary_pom_nomis_id: probation_pom.staff_id)
 
       visit allocated_prison_prisoners_path prison.code
