@@ -43,6 +43,7 @@ RSpec.describe Reallocation::BulkReallocationService do
       MpcOffender,
       offender_no: offender_no,
       tier: 'A',
+      rosh_level: 'HIGH',
       recommended_pom_type: 'probation',
       full_name_ordered: 'Zephyr, Alice',
       pom_responsible?: true,
@@ -93,6 +94,7 @@ RSpec.describe Reallocation::BulkReallocationService do
   end
 
   before do
+    stub_feature_flag(:rosh_recommendations, enabled: true)
     allocation # ensure it's created
 
     allow(OffenderService).to receive(:get_offender).with(offender_no).and_return(offender)
@@ -126,6 +128,7 @@ RSpec.describe Reallocation::BulkReallocationService do
           event: :reallocate_primary_pom,
           event_trigger: :user,
           created_by_username: 'spo-user',
+          allocated_at_rosh: 'HIGH',
           prison: prison.code,
           message: 'Moving cases',
         )
@@ -177,6 +180,20 @@ RSpec.describe Reallocation::BulkReallocationService do
         service.call([selected_case], message: 'Moving cases')
 
         expect(notifier).not_to have_received(:call)
+      end
+    end
+
+    context 'when rosh_recommendations is disabled' do
+      before do
+        stub_feature_flag(:rosh_recommendations, enabled: false)
+      end
+
+      it 'stores nil allocated_at_rosh' do
+        service.call([selected_case], message: 'Moving cases')
+
+        expect(AllocationService).to have_received(:create_or_update) do |attributes, _further_info, **_options|
+          expect(attributes[:allocated_at_rosh]).to be_nil
+        end
       end
     end
   end

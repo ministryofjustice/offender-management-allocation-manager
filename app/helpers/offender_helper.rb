@@ -61,7 +61,7 @@ module OffenderHelper
     if RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM
       'Assessed as not suitable for a prison POM'
     else
-      'Assessed as suitable for a prison POM despite tiering calculation'
+      'Assessed as suitable for a prison POM despite probation POM recommendation'
     end
   end
 

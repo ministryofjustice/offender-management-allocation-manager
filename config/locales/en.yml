@@ -259,3 +259,6 @@ en:
       supporting_role: "%{name} needs a POM in a supporting role, so should be allocated to a <strong>prison POM</strong>"
       tier_based: "%{name} is tier %{tier}, so we recommend allocating to a <strong>%{pom_type} POM</strong>"
       rosh_based: "%{name} has a %{rosh_level} ROSH, so we recommend allocating to a <strong>%{pom_type} POM</strong>"
+    guidance:
+      PRO: "You can choose an available prison POM below or allocate to a probation POM, for example if a particular POM has worked with %{name} before."
+      PO: "You can choose an available probation POM below or allocate to a prison POM, for example if a particular POM has worked with %{name} before."

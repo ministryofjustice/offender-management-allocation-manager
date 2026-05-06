@@ -56,6 +56,7 @@ class BuildAllocationsController < PrisonsApplicationController
         event_trigger: :user,
         created_by_username: current_user,
         allocated_at_tier: @prisoner.tier,
+        allocated_at_rosh: FeatureFlags.rosh_recommendations.enabled? ? @prisoner.rosh_level : nil,
         recommended_pom_type: recommended_pom_type_code == RecommendationService::PRISON_POM ? 'prison' : 'probation',
         prison: @prison.code,
         message: allocation_params[:message],

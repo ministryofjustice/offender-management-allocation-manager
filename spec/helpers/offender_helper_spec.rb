@@ -107,7 +107,7 @@ RSpec.describe OffenderHelper do
       end
 
       it "can get for a probation owned offender" do
-        expect(helper.complex_reason_label(offender)).to eq('Assessed as suitable for a prison POM despite tiering calculation')
+        expect(helper.complex_reason_label(offender)).to eq('Assessed as suitable for a prison POM despite probation POM recommendation')
       end
     end
   end

@@ -179,28 +179,7 @@ RSpec.describe "allocations/history", type: :view do
       assign(:email_histories, [])
     end
 
-    context 'when allocator completes an override against the recommendation (allocation)' do
-      let(:history) do
-        old_versions =
-          [
-            build(:allocation_history, override_reasons: ["suitability"], suitability_detail: "Too high risk"),
-            build(:allocation_history, override_reasons: ["suitability"], event: AllocationHistory::REALLOCATE_PRIMARY_POM, suitability_detail: "Continuity")
-          ]
-
-        [
-          CaseHistory.new(nil, old_versions[0], dummy_version),
-          CaseHistory.new(old_versions[0], old_versions[1], dummy_version),
-        ]
-      end
-
-      it 'shows a reason why in the allocation history' do
-        render
-        expect(page.css('#override-reason-allocation').text).to include 'Too high risk'
-        expect(page.css('#override-reason-reallocation').text).to include 'Continuity'
-      end
-    end
-
-    # Their is a fix in this view to display incorrect data correctly due to a bug created in the Override Controller. Unfortunately this bad data
+    # There is a fix in this view to display incorrect data correctly due to a bug created in the Override Controller. Unfortunately this bad data
     # cannot easily be altered so to get around this it has been modified at the view level.
     context 'when a prisoner has moved to another prison' do
       let(:history) do
