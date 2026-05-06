@@ -29,7 +29,7 @@ RSpec.describe OverrideHelper do
   end
 
   describe '#display_override_pom' do
-    it 'displays which POM type was overriden, if present' do
+    it 'displays which POM type was overridden, if present' do
       expect(display_override_pom(allocation_one)).to eq('Probation POM allocated instead of recommended prison POM')
     end
 

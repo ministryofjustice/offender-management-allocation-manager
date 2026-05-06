@@ -179,7 +179,7 @@ RSpec.describe "allocations/history", type: :view do
       assign(:email_histories, [])
     end
 
-    # Their is a fix in this view to display incorrect data correctly due to a bug created in the Override Controller. Unfortunately this bad data
+    # There is a fix in this view to display incorrect data correctly due to a bug created in the Override Controller. Unfortunately this bad data
     # cannot easily be altered so to get around this it has been modified at the view level.
     context 'when a prisoner has moved to another prison' do
       let(:history) do
