@@ -2,7 +2,9 @@
   Active alerts
 </h3>
 
-<% if alerts.none? %>
+<% if alerts.nil? %>
+  <p>This information is currently unavailable. Try again later.</p>
+<% elsif alerts.none? %>
   <p>None</p>
 <% else %>
   <ul class="govuk-list govuk-list--bullet">

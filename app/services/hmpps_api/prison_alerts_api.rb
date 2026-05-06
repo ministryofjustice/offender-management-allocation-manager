@@ -10,7 +10,13 @@ module HmppsApi
       safe_offender_no = URI.encode_www_form_component(nomis_offender_id)
       route = "/prisoners/#{safe_offender_no}/alerts"
       data, = client.get(route)
+
+      raise TypeError, 'unexpected response body' unless data.is_a?(Hash)
+
       data.fetch('content', [])
+    rescue Faraday::Error, JSON::ParserError, TypeError => e
+      Rails.logger.error("event=prison_alerts_api_error,nomis_offender_id=#{nomis_offender_id}|#{e.message}")
+      nil
     end
   end
 end

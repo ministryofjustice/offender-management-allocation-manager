@@ -21,7 +21,7 @@ module Reallocation
         handover_start_date: format_date(offender.handover_start_date).presence || 'Unknown',
         handover_completion_date: format_date(offender.responsibility_handover_date).presence || 'Unknown',
         last_oasys_completed: format_date(last_oasys_completed(offender.offender_no)).presence || 'No OASys information',
-        active_alerts: offender.active_alert_labels.join(', '),
+        active_alerts: format_active_alerts(offender),
         additional_notes: nil,
       }
     end

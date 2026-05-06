@@ -166,6 +166,16 @@ RSpec.describe OffenderHelper do
       end
     end
 
+    context 'when prison alerts are unavailable' do
+      before do
+        allow(offender).to receive(:active_alert_labels).and_return(nil)
+      end
+
+      it 'displays the unavailable message' do
+        expect(subject[:active_alerts]).to eq('This information is currently unavailable')
+      end
+    end
+
     context 'when no COM name' do
       before do
         allow(offender).to receive(:allocated_com_name).and_return(nil)
