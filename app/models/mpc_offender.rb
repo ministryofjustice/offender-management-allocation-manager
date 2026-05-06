@@ -260,8 +260,10 @@ class MpcOffender
   def rosh_summary = RoshSummary.for(crn)
 
   def active_alert_labels
-    HmppsApi::PrisonAlertsApi.alerts_for(offender_no)
-      .select { |alert| alert['isActive'] }
+    alerts = HmppsApi::PrisonAlertsApi.alerts_for(offender_no)
+    return nil if alerts.nil?
+
+    alerts.select { |alert| alert['isActive'] }
       .sort_by { |alert| alert['createdAt'] }
       .map { |alert| alert.dig('alertCode', 'description') }
   end

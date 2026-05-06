@@ -224,6 +224,12 @@ RSpec.describe MpcOffender, type: :model do
 
       expect(subject.active_alert_labels).to eq(["Alert B", "Alert D"])
     end
+
+    it 'returns nil when prison alerts are unavailable' do
+      allow(HmppsApi::PrisonAlertsApi).to receive(:alerts_for).and_return(nil)
+
+      expect(subject.active_alert_labels).to be_nil
+    end
   end
 
   describe '#model' do
