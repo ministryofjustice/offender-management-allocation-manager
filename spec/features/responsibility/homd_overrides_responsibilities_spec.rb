@@ -50,7 +50,7 @@ describe 'HOMD overrides responsibilities' do
     within('tr', text: 'Current responsibility Custody') { click_on 'Change' }
     choose 'The prisoner has less than 10 months less to serve'
     click_on 'Continue'
-    fill_in 'Add a note to the email:', with: 'Reasons are thus'
+    fill_in 'Add a note to the email (optional)', with: 'Reasons are thus'
     click_on 'Confirm'
 
     visit allocated_prison_prisoners_path(prison)

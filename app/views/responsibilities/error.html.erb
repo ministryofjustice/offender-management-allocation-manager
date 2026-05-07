@@ -1,17 +1,19 @@
-<fieldset class="govuk-fieldset" aria-describedby="how-contacted-conditional-hint">
-  <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-    <h1 class="govuk-fieldset__heading">
-      Responsibility for this case can't be changed
-    </h1>
-  </legend>
-</fieldset>
+<% content_for :title, "Responsibility for this case can’t be changed – Digital Prison Services" %>
 
-<p class="govuk-body">
-  As there is no community LDU information available for this prisoner, it’s not possible to change
-  case responsibility from custody to the community.
-</p>
-<p class="govuk-body">
-  This is something we are currently working on.
-</p>
+<%= link_to 'Back', prison_prisoner_allocation_path(@prison.code, @offender.offender_no),
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
 
-<%= back_link %>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Responsibility for this case can’t be changed</h1>
+
+    <p class="govuk-body">
+      As there is no community LDU information available for this prisoner, it’s not possible to change
+      case responsibility from custody to the community.
+    </p>
+
+    <p class="govuk-body">
+      This is something we are currently working on.
+    </p>
+  </div>
+</div>

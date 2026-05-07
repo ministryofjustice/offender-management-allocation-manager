@@ -4,13 +4,16 @@ require 'rails_helper'
 
 RSpec.describe ResponsibilitiesController, type: :controller do
   before do
-    offender = create(:case_information, local_delivery_unit: build(:local_delivery_unit))
-    create(:responsibility, nomis_offender_id: offender.nomis_offender_id)
+    create(:case_information, local_delivery_unit: build(:local_delivery_unit))
 
     stub_sso_data(prison.code, email: sso_email_address)
 
-    allow(ResponsibilityMailer).to receive(:with).and_return(double(responsibility_to_custody: responsibility_to_custody_mailer,
-                                                                    responsibility_to_custody_with_pom: responsibility_to_custody_with_pom_mailer))
+    allow(ResponsibilityMailer).to receive(:with).and_return(
+      double(
+        responsibility_to_custody: responsibility_to_custody_mailer,
+        responsibility_to_custody_with_pom: responsibility_to_custody_with_pom_mailer
+      )
+    )
   end
 
   let(:case_info) { CaseInformation.last }
@@ -23,9 +26,158 @@ RSpec.describe ResponsibilitiesController, type: :controller do
   let(:offender) { OffenderService.get_offender(offender_no) }
   let(:responsibility_to_custody_mailer) { double(:responsibility_to_custody_mailer, deliver_later: nil) }
   let(:responsibility_to_custody_with_pom_mailer) { double(:responsibility_to_custody_with_pom_mailer, deliver_later: nil) }
+  let(:responsibility_override_mailer) { double(:responsibility_override_mailer, deliver_later: nil) }
+
+  describe '#new' do
+    before do
+      stub_offender(nomis_offender)
+    end
+
+    context 'when a responsibility override already exists' do
+      render_views
+
+      before do
+        create(:responsibility, nomis_offender_id: offender_no)
+      end
+
+      it 'renders an error page explaining the override already exists' do
+        get :new, params: { prison_id: prison.code, nomis_offender_id: offender_no }
+
+        aggregate_failures do
+          expect(response).to have_http_status(:ok)
+          expect(response).to render_template(:presence_error)
+          expect(response.body).to include(prison_prisoner_allocation_path(prison.code, offender_no))
+        end
+      end
+    end
+  end
+
+  describe '#confirm' do
+    before do
+      stub_offender(nomis_offender)
+    end
+
+    context 'when a responsibility override already exists' do
+      render_views
+
+      before do
+        create(:responsibility, nomis_offender_id: offender_no)
+      end
+
+      it 'renders an error page instead of allowing confirmation' do
+        post :confirm, params: {
+          prison_id: prison.code,
+          responsibility: {
+            nomis_offender_id: offender_no,
+            reason: :less_than_10_months_to_serve,
+          }
+        }
+
+        aggregate_failures do
+          expect(response).to have_http_status(:ok)
+          expect(response).to render_template(:presence_error)
+          expect(response.body).to include(prison_prisoner_allocation_path(prison.code, offender_no))
+        end
+      end
+    end
+  end
+
+  describe '#create' do
+    let(:message) { 'Useful context for the community team' }
+
+    before do
+      stub_offender(nomis_offender)
+
+      allow(PomMailer).to receive(:with)
+        .and_return(double(responsibility_override: responsibility_override_mailer))
+    end
+
+    it 'creates a responsibility override and sends emails when one does not already exist' do
+      expect {
+        post :create, params: {
+          prison_id: prison.code,
+          responsibility: {
+            nomis_offender_id: offender_no,
+            reason: :less_than_10_months_to_serve,
+            message:,
+          }
+        }
+      }.to change(Responsibility, :count).by(1)
+
+      aggregate_failures do
+        expect(response).to redirect_to(prison_prisoner_allocation_path(prison.code, offender_no))
+        expect(PomMailer).to have_received(:with).with(
+          message:,
+          prisoner_number: offender_no,
+          prisoner_name: "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}",
+          prison_name: prison.name,
+          email: sso_email_address
+        )
+        expect(PomMailer).to have_received(:with).with(
+          message:,
+          prisoner_number: offender_no,
+          prisoner_name: "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}",
+          prison_name: prison.name,
+          email: offender.ldu_email_address
+        )
+        expect(responsibility_override_mailer).to have_received(:deliver_later).twice
+      end
+    end
+
+    it 'reuses the existing responsibility override and does not send duplicate emails' do
+      create(:responsibility, nomis_offender_id: offender_no)
+
+      expect {
+        post :create, params: {
+          prison_id: prison.code,
+          responsibility: {
+            nomis_offender_id: offender_no,
+            reason: :less_than_10_months_to_serve,
+            message:,
+          }
+        }
+      }.not_to change(Responsibility, :count)
+
+      aggregate_failures do
+        expect(response).to redirect_to(prison_prisoner_allocation_path(prison.code, offender_no))
+        expect(PomMailer).not_to have_received(:with)
+        expect(responsibility_override_mailer).not_to have_received(:deliver_later)
+      end
+    end
+
+    it 'treats a uniqueness validation failure as an existing override and does not send duplicate emails' do
+      existing_responsibility = create(:responsibility, nomis_offender_id: offender_no)
+      unsaved_responsibility = Responsibility.new(nomis_offender_id: offender_no)
+      unsaved_responsibility.errors.add(:nomis_offender_id, :taken)
+
+      allow(Responsibility).to receive(:find_or_initialize_by)
+        .and_return(unsaved_responsibility)
+      allow(unsaved_responsibility).to receive(:save!)
+        .and_raise(ActiveRecord::RecordInvalid.new(unsaved_responsibility))
+
+      expect {
+        post :create, params: {
+          prison_id: prison.code,
+          responsibility: {
+            nomis_offender_id: offender_no,
+            reason: :less_than_10_months_to_serve,
+            message:,
+          }
+        }
+      }.not_to change(Responsibility, :count)
+
+      aggregate_failures do
+        expect(assigns(:responsibility)).to eq(existing_responsibility)
+        expect(response).to redirect_to(prison_prisoner_allocation_path(prison.code, offender_no))
+        expect(PomMailer).not_to have_received(:with)
+        expect(responsibility_override_mailer).not_to have_received(:deliver_later)
+      end
+    end
+  end
 
   describe '#destroy' do
     before do
+      create(:responsibility, nomis_offender_id: offender_no)
       stub_offender(nomis_offender)
     end
 

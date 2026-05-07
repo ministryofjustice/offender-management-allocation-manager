@@ -164,8 +164,9 @@ Rails.application.routes.draw do
 
     resources :tasks, only: %i[index]
 
-    resources :responsibilities, only: %i[new create destroy], param: :nomis_offender_id do
+    resources :responsibilities, only: %i[create destroy], param: :nomis_offender_id do
       member do
+        get :new, path: :new, as: :new
         get :confirm_removal
       end
       collection do

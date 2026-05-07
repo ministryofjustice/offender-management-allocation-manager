@@ -1,0 +1,16 @@
+<% content_for :title, "Changing responsibility for this person – Digital Prison Services" %>
+
+<%= link_to 'Back', prison_prisoner_allocation_path(@prison.code, @offender.offender_no),
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Changing responsibility for this person</h1>
+
+    <p class="govuk-body">
+      To change whether custody or community is responsible for this person, go to
+      their <%= link_to 'allocation information', prison_prisoner_allocation_path(@prison.code, @offender.offender_no), class: 'govuk-link' %>
+      and choose to change their current responsibility.
+    </p>
+  </div>
+</div>
