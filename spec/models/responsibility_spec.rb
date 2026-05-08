@@ -47,4 +47,52 @@ RSpec.describe Responsibility, type: :model do
 
     it { is_expected.to be_valid }
   end
+
+  describe 'audit events' do
+    let(:audit_payloads) { [] }
+
+    before do
+      allow(AuditEvent).to receive(:publish) do |**payload|
+        audit_payloads << payload
+      end
+      PaperTrail.request.whodunnit = 'HOMD_USER'
+    end
+
+    after do
+      PaperTrail.request.whodunnit = nil
+    end
+
+    it 'publishes an audit event when a responsibility override is created' do
+      create(:responsibility, offender: offender)
+
+      expect(AuditEvent).to have_received(:publish).once
+      expect(audit_payloads.last).to include(
+        nomis_offender_id: offender.nomis_offender_id,
+        tags: %w[record responsibility override created],
+        system_event: false,
+        username: 'HOMD_USER',
+        data: {
+          'value' => Responsibility::PROBATION,
+          'reason' => 'less_than_10_months_to_serve',
+        }
+      )
+    end
+
+    it 'publishes an audit event when a responsibility override is removed' do
+      responsibility = create(:responsibility, offender: offender)
+
+      responsibility.destroy!
+
+      expect(audit_payloads.last).to include(
+        nomis_offender_id: offender.nomis_offender_id,
+        tags: %w[record responsibility override removed],
+        system_event: false,
+        username: 'HOMD_USER',
+        data: {
+          'value' => Responsibility::PROBATION,
+          'reason' => 'less_than_10_months_to_serve',
+        }
+      )
+    end
+  end
 end

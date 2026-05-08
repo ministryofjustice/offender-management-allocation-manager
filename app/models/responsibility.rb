@@ -3,6 +3,8 @@
 class Responsibility < ApplicationRecord
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
+  after_commit :publish_audit_event, on: %i[create destroy]
+
   belongs_to :offender,
              primary_key: :nomis_offender_id,
              foreign_key: :nomis_offender_id,
@@ -11,7 +13,10 @@ class Responsibility < ApplicationRecord
   PRISON = 'Prison'
   PROBATION = 'Probation'
 
-  validates :nomis_offender_id, presence: true
+  # transient attribute used in the email sent, not persisted to the DB
+  attr_accessor :message
+
+  validates :nomis_offender_id, presence: true, uniqueness: true
   validates :reason_text,
             presence: {
               message: 'Please provide reason when Other is selected'
@@ -42,4 +47,16 @@ class Responsibility < ApplicationRecord
   def pom_supporting? = value == PROBATION
   def com_responsible? = value == PROBATION
   def com_supporting? = value == PRISON
+
+private
+
+  def publish_audit_event
+    AuditEvent.publish(
+      nomis_offender_id:,
+      tags: %w[record responsibility override] << (destroyed? ? 'removed' : 'created'),
+      system_event: PaperTrail.request.whodunnit.blank?,
+      username: PaperTrail.request.whodunnit,
+      data: attributes.slice('value', 'reason')
+    )
+  end
 end

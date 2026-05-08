@@ -74,22 +74,22 @@
       </tr>
     <% end %>
 
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
-      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half responsibility_change">
-        <%= case_owner_label(@prisoner) %>
-        <% if @prisoner.pom_responsible? %>
-          <%= link_to 'Change', new_prison_responsibility_path(@prison.code, nomis_offender_id: @prisoner.offender_no), class: 'govuk-link pull-right' %>
-        <% elsif @prisoner.com_responsible? && @prisoner.responsibility_override? %>
-          <%= link_to 'Change', confirm_removal_prison_responsibility_path(@prison.code, nomis_offender_id: @prisoner.offender_no), class: 'govuk-link pull-right' %>
-        <% end %>
-      </td>
-    </tr>
     <tr class="govuk-table__row" id="service-provider-row">
       <td class="govuk-table__cell">Handover type</td>
       <td class="govuk-table__cell table_cell__left_align">
         <%= handover_type_label(@prisoner) %>
         <%= link_to 'Change', edit_prison_prisoner_case_information_path(@prison.code, @prisoner.offender_no, from: :allocation), class: 'govuk-link pull-right' if @prisoner.manual_entry? %>
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
+      <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half responsibility_change">
+        <%= case_owner_label(@prisoner) %>
+        <% if @prisoner.pom_responsible? %>
+          <%= link_to 'Change', new_prison_responsibility_path(@prison.code, @prisoner.offender_no), class: 'govuk-link pull-right' %>
+        <% elsif @prisoner.com_responsible? && @prisoner.responsibility_override? %>
+          <%= link_to 'Change', confirm_removal_prison_responsibility_path(@prison.code, nomis_offender_id: @prisoner.offender_no), class: 'govuk-link pull-right' %>
+        <% end %>
       </td>
     </tr>
     <tr id="oasys-date" class="govuk-table__row">

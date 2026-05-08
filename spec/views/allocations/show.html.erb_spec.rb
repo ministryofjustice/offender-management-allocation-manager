@@ -49,7 +49,7 @@ RSpec.describe "allocations/show", type: :view do
 
     it 'allows POM responsible cases to have responsibility overridden' do
       render
-      expect(page).to have_css ".responsibility_change a[href='#{new_prison_responsibility_path(prison.code, nomis_offender_id: offender.offender_no)}']"
+      expect(page).to have_css ".responsibility_change a[href='#{new_prison_responsibility_path(prison.code, offender.offender_no)}']"
     end
 
     it 'allows COM responsible overrides to be deleted' do
