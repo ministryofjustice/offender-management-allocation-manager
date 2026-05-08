@@ -6,7 +6,9 @@ RSpec.describe 'Sentry initializer' do
     Struct.new(:dsn, :release, :enable_metrics, :before_send, :excluded_exceptions, :rails, keyword_init: true)
   end
   let(:fake_event_class) { Struct.new(:extra, :user, :contexts) }
-  let(:rails_config) { double('rails_config', register_error_subscriber: nil) }
+  let(:rails_config) do
+    double('rails_config', register_error_subscriber: nil, report_rescued_exceptions: nil)
+  end
   let(:config) { fake_sentry_config_class.new(excluded_exceptions: [], rails: rails_config) }
   let(:event) do
     fake_event_class.new(
@@ -22,6 +24,7 @@ RSpec.describe 'Sentry initializer' do
     allow(Rails.application.config).to receive(:after_initialize).and_yield
     allow(Rails.error).to receive(:subscribe)
     allow(rails_config).to receive(:register_error_subscriber=)
+    allow(rails_config).to receive(:report_rescued_exceptions=)
     allow(Sentry).to receive(:init).and_yield(config)
     allow(SentryCircuitBreakerService).to receive(:check_within_quota).and_return(true)
   end
@@ -34,7 +37,12 @@ RSpec.describe 'Sentry initializer' do
     load_initializer
 
     expect(rails_config).to have_received(:register_error_subscriber=).with(true)
-    expect(Rails.error).to have_received(:subscribe).with(an_instance_of(LoggerErrorSubscriber))
+    expect(rails_config).to have_received(:report_rescued_exceptions=) do |value|
+      expect(value).to be(false)
+    end
+    expect(Rails.error).to have_received(:subscribe) do |subscriber|
+      expect(subscriber).to be_a(LoggerErrorSubscriber)
+    end
 
     expect(config.before_send.call(event, { exception: exception })).to eq(
       fake_event_class.new(
@@ -56,12 +64,10 @@ RSpec.describe 'Sentry initializer' do
     load_initializer
 
     expect(config.before_send.call(event, { exception: exception })).to be(event)
-    expect(Rails.logger).to have_received(:warn).with(
-      a_string_including(
-        'event=sentry_sanitization_error',
-        'original_exception_class=StandardError',
-        "undefined method 'dig' for Sentry context"
-      )
-    )
+    expect(Rails.logger).to have_received(:warn) do |message|
+      expect(message).to include('event=sentry_sanitization_error')
+      expect(message).to include('original_exception_class=StandardError')
+      expect(message).to include("undefined method 'dig' for Sentry context")
+    end
   end
 end

@@ -12,6 +12,12 @@ if sentry_dsn
     # Opt in to new Rails error reporting API
     # https://edgeguides.rubyonrails.org/error_reporting.html
     config.rails.register_error_subscriber = true
+    config.rails.report_rescued_exceptions = false
+
+    if Rails.env.development?
+      config.background_worker_threads = 0
+      config.sdk_logger = Sentry::Logger.new($stdout).tap { it.level = Logger::DEBUG }
+    end
 
     config.excluded_exceptions += %w[
       JWT::ExpiredSignature
@@ -28,8 +34,6 @@ if sentry_dsn
     ]
 
     config.before_send = lambda do |event, hint|
-      return nil if hint[:exception]&.full_message&.match?(/ApplicationInsights::TelemetryClient/)
-
       begin
         return nil unless SentryCircuitBreakerService.check_within_quota
       rescue StandardError => e
