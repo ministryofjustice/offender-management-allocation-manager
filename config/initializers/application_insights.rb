@@ -8,6 +8,11 @@ Rails.application.configure do
     require 'patches/application_insights/telemetry_context'
     ApplicationInsights::Channel::TelemetryContext.prepend Patches::ApplicationInsights::TelemetryContext
 
+    # Disable Application Insights exception reporting and rely on Sentry instead,
+    # because the upstream gem's parser is not compatible with our Ruby/Rails versions.
+    require 'patches/application_insights/telemetry_client'
+    ApplicationInsights::TelemetryClient.prepend Patches::ApplicationInsights::TelemetryClient
+
     config.middleware.use(
       ApplicationInsights::Rack::TrackRequest, key
     )
