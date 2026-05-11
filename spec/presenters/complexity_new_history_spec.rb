@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Timeline::ComplexityNewHistory do
+RSpec.describe ComplexityNewHistory do
   subject(:presenter) { described_class.new(history) }
 
   let(:timestamp) { Time.utc(2024, 1, 15, 10, 30, 0) }

@@ -73,17 +73,17 @@ class AllocationService
 
   # Gets the versions in *forward* order - so often we want to reverse
   # this list as we're interested in recent rather than ancient history
-  # Returns an array of Timeline::CaseHistory objects
+  # Returns an array of CaseHistory objects
   def self.history(allocation)
     return [] if allocation.blank?
 
     version_pairs = allocation.get_old_versions.append(allocation).zip(allocation.versions)
 
-    # make Timeline::CaseHistory records which contain the previous and current allocation history
+    # make CaseHistory records which contain the previous and current allocation history
     # records - so that deallocation can look at the old version to work out the POM name and ID
-    [Timeline::CaseHistory.new(nil, version_pairs.first.first, version_pairs.first.second)] +
+    [CaseHistory.new(nil, version_pairs.first.first, version_pairs.first.second)] +
       version_pairs.each_cons(2).map do |prev_pair, curr_pair|
-        Timeline::CaseHistory.new(prev_pair.first, curr_pair.first, curr_pair.second)
+        CaseHistory.new(prev_pair.first, curr_pair.first, curr_pair.second)
       end
   end
 

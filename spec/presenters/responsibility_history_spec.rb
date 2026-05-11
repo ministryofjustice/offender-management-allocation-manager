@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Timeline::ResponsibilityHistory do
+RSpec.describe ResponsibilityHistory do
   let(:event) { 'destroy' }
   let(:version) { PaperTrail::Version.new(event:) }
   let(:presenter) { described_class.new(version) }

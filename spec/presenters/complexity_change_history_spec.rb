@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Timeline::ComplexityChangeHistory do
+RSpec.describe ComplexityChangeHistory do
   subject(:presenter) { described_class.new(previous, current) }
 
   let(:previous) { { level: 'low' } }

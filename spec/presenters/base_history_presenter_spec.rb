@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Timeline::BaseHistoryPresenter do
+RSpec.describe BaseHistoryPresenter do
   subject(:presenter) { presenter_class.new }
 
   let(:presenter_class) do

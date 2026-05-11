@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Timeline::EarlyAllocationDecision do
+RSpec.describe EarlyAllocationDecision do
   describe '#created_at' do
     it 'uses the updated_at timestamp' do
       updated_at = Time.zone.local(2024, 1, 15, 10, 30, 0)

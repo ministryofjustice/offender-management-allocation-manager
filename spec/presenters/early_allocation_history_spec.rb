@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Timeline::EarlyAllocationHistory do
+RSpec.describe EarlyAllocationHistory do
   describe '#created_by_name' do
     it 'returns the creator full name' do
       early_allocation = build(:early_allocation, created_by_firstname: 'Joe', created_by_lastname: 'Bloggs')
