@@ -1,0 +1,9 @@
+<% description = capture do %>
+  <p>
+    Responsibility returned to custody and allocated POM notified at <%= responsibility_to_custody_with_pom.email %>
+  </p>
+<% end %>
+<%= render 'case_history/email_history',
+           title: 'System generated email sent',
+           description: description,
+           object: responsibility_to_custody_with_pom %>

@@ -8,6 +8,8 @@ class EmailHistory < ApplicationRecord
     OPEN_PRISON_COMMUNITY_ALLOCATION = 'open_prison_community_allocation',
     IMMEDIATE_COMMUNITY_ALLOCATION = 'immediate_community_allocation',
     RESPONSIBILITY_OVERRIDE = 'responsibility_override',
+    RESPONSIBILITY_TO_CUSTODY = 'responsibility_to_custody',
+    RESPONSIBILITY_TO_CUSTODY_WITH_POM = 'responsibility_to_custody_with_pom',
     URGENT_PIPELINE_TO_COMMUNITY = 'urgent_pipeline_to_community',
     COMMUNITY_EARLY_ALLOCATION = 'community_early_allocation'
   ].freeze
