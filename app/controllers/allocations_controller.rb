@@ -6,7 +6,7 @@ class AllocationsController < PrisonsApplicationController
 
   def show
     allocation = AllocationHistory.find_by!(nomis_offender_id: @prisoner.offender_no)
-    @allocation = CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
+    @allocation = Timeline::CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
     @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@prisoner.offender_no)
 
     @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id, nil)
@@ -30,13 +30,16 @@ class AllocationsController < PrisonsApplicationController
 
     allocation = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id_from_url)
     vlo_history = PaperTrail::Version
-        .where(item_type: 'VictimLiaisonOfficer', nomis_offender_id: nomis_offender_id_from_url).map { |vlo_version| VloHistory.new(vlo_version) }
+        .where(item_type: 'VictimLiaisonOfficer', nomis_offender_id: nomis_offender_id_from_url).map { |vlo_version| Timeline::VloHistory.new(vlo_version) }
+    responsibility_history = PaperTrail::Version
+        .where(item_type: 'Responsibility', nomis_offender_id: nomis_offender_id_from_url)
+        .map { |responsibility_version| Timeline::ResponsibilityHistory.new(responsibility_version) }
     complexity_history = if @prison.womens?
                            hists = HmppsApi::ComplexityApi.get_history(nomis_offender_id_from_url)
                            if hists.any?
-                             [ComplexityNewHistory.new(hists.first)] +
+                             [Timeline::ComplexityNewHistory.new(hists.first)] +
                                hists.each_cons(2).map do |hpair|
-                                 ComplexityChangeHistory.new(hpair.first, hpair.second)
+                                 Timeline::ComplexityChangeHistory.new(hpair.first, hpair.second)
                                end
                            end
                          end
@@ -46,13 +49,20 @@ class AllocationsController < PrisonsApplicationController
 
     ea_history = early_allocations.map { |ea|
       if ea.updated_by_firstname.present?
-        [EarlyAllocationHistory.new(ea), EarlyAllocationDecision.new(ea)]
+        [Timeline::EarlyAllocationHistory.new(ea), Timeline::EarlyAllocationDecision.new(ea)]
       else
-        [EarlyAllocationHistory.new(ea)]
+        [Timeline::EarlyAllocationHistory.new(ea)]
       end
     }.flatten
 
-    @history = (AllocationService.history(allocation) + vlo_history + complexity_history + email_history + ea_history).sort_by(&:created_at)
+    @history = [
+      AllocationService.history(allocation),
+      vlo_history,
+      responsibility_history,
+      complexity_history,
+      email_history,
+      ea_history,
+    ].flatten.sort_by(&:created_at)
   end
 
 private

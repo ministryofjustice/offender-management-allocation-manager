@@ -43,6 +43,18 @@ class Responsibility < ApplicationRecord
     prisoner_moved_to_open_prison: PRISONER_MOVED_TO_OPEN_PRISON
   }
 
+  class << self
+    def human_reason(reason)
+      return '' if reason.blank?
+
+      I18n.t(reason, scope: 'activerecord.attributes.responsibility.reasons', default: '')
+    end
+  end
+
+  def human_reason
+    self.class.human_reason(reason)
+  end
+
   def pom_responsible? = value == PRISON
   def pom_supporting? = value == PROBATION
   def com_responsible? = value == PROBATION

@@ -68,7 +68,7 @@ class PrisonersController < PrisonsApplicationController
     @tasks = @prisoner.pom_tasks
 
     if (allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no))
-      @allocation = CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
+      @allocation = Timeline::CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
     end
 
     @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@prisoner.offender_no)

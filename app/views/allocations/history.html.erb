@@ -2,16 +2,20 @@
 
 <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
-<h1 class="govuk-heading-l"><%= full_name @prisoner %></h1>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-8">
+      <%= @prisoner.full_name %>
+    </h1>
 
-<!-- @history is forward-sorted - having converted to a hash key -> list we need to convert back to a list, reverse and also reverse the list itself  -->
-<% prison_episodes(@timeline, @history).each do |episode, case_histories| %>
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column">
+    <!-- @history is forward-sorted - having converted to a hash key -> list we need to convert back to a list, reverse and also reverse the list itself  -->
+    <% prison_episodes(@timeline, @history).each do |episode, case_histories| %>
+      <section class="app-case-history__episode">
       <h2 class="govuk-heading-m"><%= PrisonService.name_for(episode.prison_code) %></h2>
       <div class="moj-timeline">
         <%= render case_histories %>
       </div>
-    </div>
+      </section>
+    <% end %>
   </div>
-<% end %>
+</div>

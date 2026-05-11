@@ -29,7 +29,8 @@ module AuthHelper
       }.to_json)
   end
 
-  def stub_sso_data(prison, username: 'user', staff_id: 754_732, roles: [SsoIdentity::SPO_ROLE], email: '754732@example.com',
+  def stub_sso_data(prison, username: 'user', staff_id: 754_732, first_name: 'MOIC', last_name: 'POM',
+                    roles: [SsoIdentity::SPO_ROLE], email: '754732@example.com',
                     active_caseload: prison, caseloads: [prison], token: USER_ACCESS_TOKEN)
     allow(HmppsApi::Oauth::TokenService).to receive(:valid_token).and_return(ACCESS_TOKEN)
 
@@ -45,6 +46,8 @@ module AuthHelper
         'caseloads' => caseloads,
         'username' => username,
         'staff_id' => staff_id,
+        'first_name' => first_name,
+        'last_name' => last_name,
         'token' => token,
       }
     end

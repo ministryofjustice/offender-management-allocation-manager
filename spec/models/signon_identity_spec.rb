@@ -6,6 +6,8 @@ describe SignonIdentity, model: true do
     double('user_auth_data',
            username: 'MOIC_POM',
            staff_id: 123_456,
+           first_name: 'MOIC',
+           last_name: 'POM',
            active_caseload: 'LEI',
            caseloads: %w[LEI RNI],
            roles: ['ROLE_ALLOC_MGR']
@@ -30,6 +32,8 @@ describe SignonIdentity, model: true do
     session = {
       username: 'MOIC_POM',
       staff_id: 123_456,
+      first_name: 'MOIC',
+      last_name: 'POM',
       active_caseload: 'LEI',
       caseloads: %w[LEI RNI],
       expiry: time_stamp,

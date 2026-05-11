@@ -10,7 +10,7 @@ RSpec.describe "allocations/history", type: :view do
   before do
     assign(:prison, prison)
     assign(:prisoner, offender)
-    assign(:history, history + early_allocations.map { |ea| EarlyAllocationHistory.new(ea) })
+    assign(:history, history + early_allocations.map { |ea| Timeline::EarlyAllocationHistory.new(ea) })
     assign(:timeline, build(:hmpps_api_prison_timeline, movements: build_list(:movement, 1)))
     stub_pom_emails 123_456, []
     stub_pom_emails 485_926, []
@@ -133,7 +133,7 @@ RSpec.describe "allocations/history", type: :view do
     context 'when community accept the case' do
       let(:ea) { create(:early_allocation, :discretionary_accepted, created_at: Time.zone.local(2060, 11, 19, 11, 28, 0), updated_at: Time.zone.local(2060, 11, 21, 11, 35, 0)) }
       let(:early_allocations) { [] }
-      let(:history) { [EarlyAllocationHistory.new(ea), EarlyAllocationDecision.new(ea)] }
+      let(:history) { [Timeline::EarlyAllocationHistory.new(ea), Timeline::EarlyAllocationDecision.new(ea)] }
 
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ['Early allocation decision recorded', "Early allocation assessment form completed"]
@@ -154,7 +154,7 @@ RSpec.describe "allocations/history", type: :view do
     context 'when community reject the case' do
       let(:ea) { create(:early_allocation, :discretionary_declined, created_at: Time.zone.local(2060, 11, 19, 11, 28, 0), updated_at: Time.zone.local(2060, 11, 21, 11, 35, 0)) }
       let(:early_allocations) { [] }
-      let(:history) { [EarlyAllocationHistory.new(ea), EarlyAllocationDecision.new(ea)] }
+      let(:history) { [Timeline::EarlyAllocationHistory.new(ea), Timeline::EarlyAllocationDecision.new(ea)] }
 
       it 'shows a single record' do
         expect(page.css(".moj-timeline__title").map(&:text).map(&:strip)).to eq ['Early allocation decision recorded', "Early allocation assessment form completed",]
@@ -191,9 +191,9 @@ RSpec.describe "allocations/history", type: :view do
           ]
 
         [
-          CaseHistory.new(nil, old_versions[0], dummy_version),
-          CaseHistory.new(old_versions[0], old_versions[1], dummy_version),
-          CaseHistory.new(old_versions[1], old_versions[2], dummy_version),
+          Timeline::CaseHistory.new(nil, old_versions[0], dummy_version),
+          Timeline::CaseHistory.new(old_versions[0], old_versions[1], dummy_version),
+          Timeline::CaseHistory.new(old_versions[1], old_versions[2], dummy_version),
         ]
       end
 
@@ -210,7 +210,7 @@ RSpec.describe "allocations/history", type: :view do
       let(:history) do
         [build(:allocation_history, :primary),
          build(:allocation_history, :release)]
-          .map { |ah| CaseHistory.new(nil, ah, released_version) }
+          .map { |ah| Timeline::CaseHistory.new(nil, ah, released_version) }
       end
 
       let(:released_version) { PaperTrail::Version.new(object_changes: { 'updated_at' => [release_date_and_time, release_date_and_time] }.to_yaml) }

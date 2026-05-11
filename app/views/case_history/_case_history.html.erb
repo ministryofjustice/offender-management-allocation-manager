@@ -4,10 +4,10 @@
   </div>
 
   <p class="moj-timeline__date">
-    <%= format_date_long(object.created_at) %> by <%= object.created_by_name.present? ? object.created_by_name.titleize : "System Admin" %>
+    <%= format_date_long(object.created_at) %> by <%= object.created_by_name.present? ? object.created_by_name : "System Admin" %>
   </p>
 
-  <div class="moj-timeline__description">
+  <div class="moj-timeline__description app-case-history__description">
     <%= description %>
 
     <% if object.respond_to?(:system_admin_note) && object.system_admin_note %>

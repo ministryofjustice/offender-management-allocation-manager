@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe CaseHistory do
+describe Timeline::CaseHistory do
   describe '#created_by_name' do
     context 'when the version has a name and note from the system admin' do
       it 'displays System Admin (the admin name)' do

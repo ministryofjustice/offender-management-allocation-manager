@@ -18,6 +18,18 @@ RSpec.describe Responsibility, type: :model do
     it { expect(described_class.new(value: Responsibility::PROBATION)).not_to be_com_supporting }
   end
 
+  describe '.human_reason' do
+    it 'returns the shared translated label for a reason key' do
+      expect(described_class.human_reason(:less_than_10_months_to_serve)).to eq(
+        'The prisoner has less than 10 months less to serve'
+      )
+    end
+
+    it 'returns an empty string when a locale entry is not present' do
+      expect(described_class.human_reason('unknown_reason')).to eq('')
+    end
+  end
+
   context 'with other reason' do
     subject { build(:responsibility, offender: offender, reason: :other_reason) }
 

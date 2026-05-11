@@ -118,6 +118,15 @@ en:
               inclusion: You must say if there is another reason for early allocation
 
   activerecord:
+    attributes:
+      responsibility:
+        reasons:
+          less_than_10_months_to_serve: The prisoner has less than 10 months less to serve
+          community_team_to_work_with_offender: Decision made for the community probation team to work with this prisoner
+          prisoner_has_been_recalled: Prisoner has been recalled
+          other_reason: Other
+          # legacy reasons below, no longer selectable but showing up in history/timeline
+          prisoner_moved_to_open_prison: Prisoner moved to open prison
     errors:
       models:
         victim_liaison_officer:

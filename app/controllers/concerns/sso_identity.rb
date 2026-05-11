@@ -24,6 +24,14 @@ class SsoIdentity
     @sso_identity[:staff_id] if @sso_identity.present?
   end
 
+  def current_user_first_name
+    @sso_identity[:first_name] if @sso_identity.present?
+  end
+
+  def current_user_last_name
+    @sso_identity[:last_name] if @sso_identity.present?
+  end
+
   def current_user
     @sso_identity[:username] if @sso_identity.present?
   end

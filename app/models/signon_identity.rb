@@ -10,19 +10,25 @@ class SignonIdentity
   end
 
   def initialize(omniauth_data)
-    @username = omniauth_data.fetch('info').username
-    @staff_id = omniauth_data.fetch('info').staff_id
+    info = omniauth_data.fetch('info')
+
+    @username = info.username
+    @staff_id = info.staff_id
+    @first_name = info.first_name if info.respond_to?(:first_name)
+    @last_name = info.last_name if info.respond_to?(:last_name)
     @token = omniauth_data.fetch('credentials').token
-    @active_caseload = omniauth_data.fetch('info').active_caseload
-    @caseloads = omniauth_data.fetch('info').caseloads
+    @active_caseload = info.active_caseload
+    @caseloads = info.caseloads
     @expiry = omniauth_data.fetch('credentials').expires_at
-    @roles = omniauth_data.fetch('info').roles
+    @roles = info.roles
   end
 
   def attributes
     {
       username: @username,
       staff_id: @staff_id,
+      first_name: @first_name,
+      last_name: @last_name,
       token: @token,
       active_caseload: @active_caseload,
       caseloads: @caseloads,

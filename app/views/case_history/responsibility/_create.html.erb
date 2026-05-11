@@ -1,0 +1,12 @@
+<% description = capture do %>
+  Community probation team made responsible for this case
+  <% if create.reason_detail.present? %>
+    <p class="govuk-body govuk-!-margin-bottom-1">
+      Reason: <%= create.reason_detail %>
+    </p>
+  <% end %>
+<% end %>
+<%= render 'case_history/case_history',
+           title: 'Responsibility override added',
+           description: description,
+           object: create %>

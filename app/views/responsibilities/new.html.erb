@@ -14,13 +14,13 @@
       <%= f.govuk_radio_buttons_fieldset(
               :reason, legend: { text: 'Why are you changing responsibility for this case?', size: 'l', tag: 'h1' }) do %>
         <%= f.govuk_radio_button :reason, 'less_than_10_months_to_serve',
-                                 label: { text: 'The prisoner has less than 10 months less to serve' }, link_errors: true %>
+                                 label: { text: Responsibility.human_reason(:less_than_10_months_to_serve) }, link_errors: true %>
         <%= f.govuk_radio_button :reason, 'community_team_to_work_with_offender',
-                                 label: { text: 'Decision made for the community probation team to work with this prisoner' } %>
+                                 label: { text: Responsibility.human_reason(:community_team_to_work_with_offender) } %>
         <%= f.govuk_radio_button :reason, 'prisoner_has_been_recalled',
-                                 label: { text: 'Prisoner has been recalled' } %>
+                                 label: { text: Responsibility.human_reason(:prisoner_has_been_recalled) } %>
         <%= f.govuk_radio_button :reason, 'other_reason',
-                                 label: { text: 'Other' } do %>
+                                 label: { text: Responsibility.human_reason(:other_reason) } do %>
           <%= f.govuk_text_area :reason_text, label: { text: 'Enter reason' }, rows: 3 %>
         <% end %>
       <% end %>
