@@ -3,9 +3,9 @@ describe "Email history partials" do
     EmailHistory::RESPONSIBILITY_OVERRIDE => \
       "Request for responsible COM to be allocated sent to test@email.com",
     EmailHistory::RESPONSIBILITY_TO_CUSTODY => \
-      "Responsibility returned to custody and community team notified at test@email.com",
+      "Responsibility returned to custody notification sent to test@email.com",
     EmailHistory::RESPONSIBILITY_TO_CUSTODY_WITH_POM => \
-      "Responsibility returned to custody and allocated POM notified at test@email.com",
+      "Responsibility returned to custody notification sent to test@email.com",
     EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION => \
       "Request for supporting COM to be allocated after move to open prison sent to test@email.com",
     EmailHistory::URGENT_PIPELINE_TO_COMMUNITY => \

@@ -14,7 +14,7 @@ describe "Emails sent are logged in EmailHistory" do
   end
   let(:responsibility_to_custody) do
     ResponsibilityMailer.with(
-      emails: ["test1@email.com", "test2@email.com"],
+      email: "test1@email.com",
       prisoner_name: "Test Offender",
       prisoner_number: offender.nomis_offender_id,
       prison_name: prison.name,
@@ -23,7 +23,7 @@ describe "Emails sent are logged in EmailHistory" do
   end
   let(:responsibility_to_custody_with_pom) do
     ResponsibilityMailer.with(
-      emails: ["test1@email.com", "test2@email.com", "pom@email.com"],
+      email: "test1@email.com",
       prisoner_name: "Test Offender",
       prisoner_number: offender.nomis_offender_id,
       prison_name: prison.name,
@@ -133,8 +133,8 @@ describe "Emails sent are logged in EmailHistory" do
     }
     email_overrides = {
       responsibility_override: 'test1@email.com',
-      responsibility_to_custody: 'test2@email.com',
-      responsibility_to_custody_with_pom: 'pom@email.com',
+      responsibility_to_custody: 'test1@email.com',
+      responsibility_to_custody_with_pom: 'test1@email.com',
       open_prison_supporting_com_needed: 'test1@email.com',
       urgent_pipeline_to_community: 'test1@email.com',
       assign_com_less_than_10_months: 'test1@email.com',
@@ -151,6 +151,47 @@ describe "Emails sent are logged in EmailHistory" do
       expect { mailer.deliver_later }
         .to change { email_histories.where(event:, email:).count }
         .from(0).to(1)
+    end
+  end
+
+  context 'when responsibility removal notifications are fanned out to multiple recipients' do
+    let(:without_pom_recipients) { %w[test1@email.com test2@email.com] }
+    let(:with_pom_recipients) { %w[test1@email.com test2@email.com pom@email.com] }
+
+    it 'logs one responsibility_to_custody history row per recipient' do
+      expect {
+        without_pom_recipients.each do |email|
+          ResponsibilityMailer.with(
+            email:,
+            prisoner_name: "Test Offender",
+            prisoner_number: offender.nomis_offender_id,
+            prison_name: prison.name,
+            notes: "Useful context"
+          ).responsibility_to_custody.deliver_later
+        end
+      }.to change { email_histories.where(event: EmailHistory::RESPONSIBILITY_TO_CUSTODY).count }
+        .from(0).to(2)
+
+      expect(email_histories.responsibility_to_custody.pluck(:email)).to match_array(without_pom_recipients)
+    end
+
+    it 'logs one responsibility_to_custody_with_pom history row per recipient' do
+      expect {
+        with_pom_recipients.each do |email|
+          ResponsibilityMailer.with(
+            email:,
+            prisoner_name: "Test Offender",
+            prisoner_number: offender.nomis_offender_id,
+            prison_name: prison.name,
+            notes: "Useful context",
+            pom_name: "Example POM",
+            pom_email: "pom@email.com"
+          ).responsibility_to_custody_with_pom.deliver_later
+        end
+      }.to change { email_histories.where(event: EmailHistory::RESPONSIBILITY_TO_CUSTODY_WITH_POM).count }
+        .from(0).to(3)
+
+      expect(email_histories.responsibility_to_custody_with_pom.pluck(:email)).to match_array(with_pom_recipients)
     end
   end
 

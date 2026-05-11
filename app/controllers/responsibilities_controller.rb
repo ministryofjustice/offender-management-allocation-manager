@@ -60,30 +60,32 @@ class ResponsibilitiesController < PrisonsApplicationController
 
   def destroy
     @responsibility = RemoveResponsibilityForm.new(responsibility_params)
-    @ldu_email_address = @offender.ldu_email_address
-
-    allocation = AllocationHistory.find_by(nomis_offender_id:)
-    emails = [@current_user.email_address, @ldu_email_address]
 
     if @responsibility.valid?
       Responsibility.find_by!(nomis_offender_id:).destroy!
 
+      emails = [@current_user.email_address, @offender.ldu_email_address]
+      allocation = AllocationHistory.find_by(nomis_offender_id:)
+
       if allocation&.active?
-        pom_email = HmppsApi::NomisUserRolesApi.email_address(allocation.primary_pom_nomis_id)
-        emails << pom_email
-        ResponsibilityMailer.with(emails: emails.compact_blank,
-                                  pom_name: allocation.primary_pom_name,
-                                  pom_email: pom_email,
-                                  prisoner_name: @offender.full_name,
-                                  prisoner_number: nomis_offender_id,
-                                  prison_name: @prison.name,
-                                  notes: @responsibility.reason_text).responsibility_to_custody_with_pom.deliver_later
+        pom_email = safe_primary_pom_email_for(allocation)
+        [*emails, pom_email].compact_blank.uniq.each do |email|
+          ResponsibilityMailer.with(email: email,
+                                    pom_name: allocation.primary_pom_name,
+                                    pom_email: pom_email,
+                                    prisoner_name: @offender.full_name,
+                                    prisoner_number: nomis_offender_id,
+                                    prison_name: @prison.name,
+                                    notes: @responsibility.reason_text).responsibility_to_custody_with_pom.deliver_later
+        end
       else
-        ResponsibilityMailer.with(emails: emails.compact_blank,
-                                  prisoner_name: @offender.full_name,
-                                  prisoner_number: nomis_offender_id,
-                                  prison_name: @prison.name,
-                                  notes: @responsibility.reason_text).responsibility_to_custody.deliver_later
+        emails.compact_blank.each do |email|
+          ResponsibilityMailer.with(email: email,
+                                    prisoner_name: @offender.full_name,
+                                    prisoner_number: nomis_offender_id,
+                                    prison_name: @prison.name,
+                                    notes: @responsibility.reason_text).responsibility_to_custody.deliver_later
+        end
       end
       redirect_back_to_allocation
     else
@@ -123,5 +125,16 @@ private
       .require(:responsibility)
       .permit(:nomis_offender_id, :reason, :reason_text, :message)
       .merge(value: Responsibility::PROBATION)
+  end
+
+  def safe_primary_pom_email_for(allocation)
+    HmppsApi::NomisUserRolesApi.email_address(allocation.primary_pom_nomis_id)
+  rescue StandardError => e
+    Rails.logger.error(
+      'event=responsibility_removal_pom_email_lookup_failed,' \
+      "nomis_offender_id=#{nomis_offender_id}," \
+      "primary_pom_nomis_id=#{allocation.primary_pom_nomis_id}|#{e.message}"
+    )
+    nil
   end
 end
