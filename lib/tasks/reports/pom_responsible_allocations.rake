@@ -21,9 +21,11 @@ namespace :reports do
         'NOMIS Offender ID',
         'CRD',
         'Tier',
-        'RoSH',
+        'RoSH Level',
+        'RoSH Start Date',
         'SED/SLED',
         'Sentence Remaining',
+        'Handover Type',
         'Current POM Responsible',
         'Current POM ID',
         'Current POM Name'
@@ -56,6 +58,13 @@ namespace :reports do
         .where(prison: prison.code, nomis_offender_id: offenders.map(&:offender_no))
         .pluck(:nomis_offender_id)
         .to_set
+    end
+
+    def handover_type(case_information)
+      enhanced_resourcing = case_information.enhanced_resourcing
+      return if enhanced_resourcing.nil?
+
+      enhanced_resourcing ? 'enhanced' : 'standard'
     end
 
     def calculated_handover_dates_by_id(offenders)
@@ -120,8 +129,10 @@ namespace :reports do
           format_date(offender[:offender].conditional_release_date),
           case_information.tier,
           case_information.rosh_level.presence,
+          case_information.rosh_start_date.presence,
           format_date(offender[:offender].licence_expiry_date),
           sentence_remaining_for(offender),
+          handover_type(case_information),
           pom_types[allocation.primary_pom_nomis_id],
           allocation.primary_pom_nomis_id,
           allocation.formatted_primary_pom_name,
