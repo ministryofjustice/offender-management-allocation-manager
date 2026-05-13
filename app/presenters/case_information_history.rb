@@ -21,7 +21,7 @@ class CaseInformationHistory < BaseHistoryPresenter
       .where(item_type: 'CaseInformation', nomis_offender_id:)
       .filter_map do |version|
         history = new(version)
-        history if history.event == 'destroy' || history.change_details.any?
+        history if history.change_details.any?
       end
   end
 

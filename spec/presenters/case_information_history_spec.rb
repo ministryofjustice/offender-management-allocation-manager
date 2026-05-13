@@ -16,14 +16,14 @@ RSpec.describe CaseInformationHistory do
     let(:destroy_version) { PaperTrail::Version.new(event: 'destroy') }
     let(:hidden_version) { PaperTrail::Version.new }
 
-    it 'builds presenters for tracked create and update versions, including changes to nil, keeps destroy versions, and filters out hidden entries' do
+    it 'builds presenters for tracked create and update versions, including changes to nil, and filters out hidden entries' do
       allow(PaperTrail::Version).to receive(:where)
         .with(item_type: 'CaseInformation', nomis_offender_id: nomis_offender_id)
         .and_return([create_version, tracked_version, tracked_nil_version, destroy_version, hidden_version])
 
       entries = described_class.timeline_entries_for(nomis_offender_id)
 
-      expect(entries.map(&:event)).to eq(%w[create update update destroy])
+      expect(entries.map(&:event)).to eq(%w[create update update])
     end
   end
 
@@ -48,15 +48,6 @@ RSpec.describe CaseInformationHistory do
       aggregate_failures do
         expect(presenter.event).to eq('create')
         expect(presenter.to_partial_path).to eq('case_history/case_information/create')
-      end
-    end
-
-    it 'keeps destroy versions mapped to the destroy partial' do
-      presenter = described_class.new(PaperTrail::Version.new(event: 'destroy'))
-
-      aggregate_failures do
-        expect(presenter.event).to eq('destroy')
-        expect(presenter.to_partial_path).to eq('case_history/case_information/destroy')
       end
     end
   end
