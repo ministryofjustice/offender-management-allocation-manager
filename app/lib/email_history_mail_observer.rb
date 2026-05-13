@@ -1,6 +1,8 @@
 class EmailHistoryMailObserver
   EVENT_FOR_REFERENCE = {
     'email.pom.responsibility_override' => EmailHistory::RESPONSIBILITY_OVERRIDE,
+    'email.responsibility.responsibility_to_custody' => EmailHistory::RESPONSIBILITY_TO_CUSTODY,
+    'email.responsibility.responsibility_to_custody_with_pom' => EmailHistory::RESPONSIBILITY_TO_CUSTODY_WITH_POM,
     'email.community.open_prison_supporting_com_needed' => EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
     'email.community.urgent_pipeline_to_community' => EmailHistory::URGENT_PIPELINE_TO_COMMUNITY,
     'email.community.assign_com_less_than_10_months' => EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION,

@@ -128,7 +128,7 @@ describe 'View a prisoner profile page' do
 
       # Let's go and check out the allocation history
       within('tr', text: 'Allocation history') { click_link 'View' }
-      within('.moj-timeline__item', text: 'Contact removed') { expect(page).to have_content('by Pom, Moic') }
+      within('.moj-timeline__item', text: 'Contact removed') { expect(page).to have_content('by MOIC POM') }
     end
   end
 

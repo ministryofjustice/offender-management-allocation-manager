@@ -1,19 +1,16 @@
 # frozen_string_literal: true
 
-class CaseHistory
+class CaseHistory < BaseHistoryPresenter
   delegate :primary_pom_nomis_id, :event_trigger, :secondary_pom_nomis_id,
            :allocated_at_tier, :allocated_at_rosh, :nomis_offender_id, :primary_pom_name,
            :override_reasons, :suitability_detail, :override_detail,
            :recommended_pom_type, :secondary_pom_name, :prison, to: :@allocation
 
   def initialize(prev_allocation, allocation, version)
+    super()
     @previous_allocation = prev_allocation
     @allocation = allocation
     @version = version
-  end
-
-  def system_admin_name
-    @version.whodunnit
   end
 
   # rubocop:disable Rails/Delegate
@@ -47,8 +44,8 @@ class CaseHistory
   def created_by_name
     if @allocation.event_trigger == 'user'
       @allocation.created_by_name
-    elsif system_admin_note && system_admin_name
-      "System Admin (#{system_admin_name})"
+    else
+      system_admin_created_by_name(@version)
     end
   end
 

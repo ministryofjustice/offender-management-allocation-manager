@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-class VloHistory
+class VloHistory < BaseHistoryPresenter
   delegate :created_at, :event, to: :@version
 
   def initialize(version)
+    super()
     @version = version
   end
 
@@ -12,8 +13,6 @@ class VloHistory
   end
 
   def created_by_name
-    if @version.whodunnit
-      "#{@version.user_last_name}, #{@version.user_first_name}"
-    end
+    paper_trail_created_by_name(@version)
   end
 end

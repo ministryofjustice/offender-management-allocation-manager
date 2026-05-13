@@ -1,5 +1,6 @@
-class ComplexityNewHistory
+class ComplexityNewHistory < BaseHistoryPresenter
   def initialize(history)
+    super()
     @history = history
   end
 
@@ -20,10 +21,6 @@ class ComplexityNewHistory
   end
 
   def created_by_name
-    username = @history[:sourceUser]
-    if username
-      user = HmppsApi::NomisUserRolesApi.user_details(username)
-      "#{user.last_name}, #{user.first_name}"
-    end
+    nomis_created_by_name(@history[:sourceUser])
   end
 end

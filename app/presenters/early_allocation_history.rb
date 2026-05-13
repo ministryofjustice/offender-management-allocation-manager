@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
-class EarlyAllocationHistory
+class EarlyAllocationHistory < BaseHistoryPresenter
   delegate :id, :prison, :created_at, :nomis_offender_id, to: :@early_allocation
 
   def initialize(early_allocation)
+    super()
     @early_allocation = early_allocation
   end
 
   def created_by_name
-    "#{@early_allocation.created_by_firstname} #{@early_allocation.created_by_lastname}"
+    full_name(@early_allocation.created_by_firstname, @early_allocation.created_by_lastname)
   end
 
   def to_partial_path

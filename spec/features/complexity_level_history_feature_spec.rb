@@ -67,7 +67,7 @@ feature 'Case history with complexity level' do
                "Prisoner allocated to #{pom_name.titleize} - #{pom.emails.first}\n",
                "Tier: #{case_info.tier}"
              ].join],
-            ['.moj-timeline__date', "#{formatted_date_for(now.getlocal)} by #{created_by_name.titleize}"],
+            ['.moj-timeline__date', "#{formatted_date_for(now.getlocal)} by #{created_by_name}"],
           ].each do |key, val|
             expect(page).to have_css(key, text: val)
           end
@@ -81,7 +81,7 @@ feature 'Case history with complexity level' do
           [
             ['.moj-timeline__title', 'Complexity of need level added'],
             ['.moj-timeline__description', 'Level: High'],
-            ['.moj-timeline__date', "#{formatted_date_for(complexity_add_time.getlocal)} by #{pom_name.titleize}"],
+            ['.moj-timeline__date', "#{formatted_date_for(complexity_add_time.getlocal)} by #{pom.first_name} #{pom.last_name}"],
           ].each do |key, val|
             expect(page).to have_css(key, text: val)
           end
@@ -121,7 +121,7 @@ feature 'Case history with complexity level' do
             'Changed from: High to Medium',
             "Reason(s) for the change: #{reason}"
           ].join("\n"))
-          expect(page).to have_css('.moj-timeline__date', text: "#{formatted_date_for(complexity_change_time.getlocal)} by #{pom_name.titleize}")
+          expect(page).to have_css('.moj-timeline__date', text: "#{formatted_date_for(complexity_change_time.getlocal)} by #{pom.first_name} #{pom.last_name}")
         end
       end
     end

@@ -1,3 +1,6 @@
+# This wrapper reuses ComplexityNewHistory for the current change details,
+# including created_by_name from BaseHistoryPresenter.
+
 class ComplexityChangeHistory
   delegate :created_at, :prison, :level, :created_by_name, to: :@current
   attr_reader :reasons

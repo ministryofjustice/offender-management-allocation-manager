@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-class EarlyAllocationDecision
+class EarlyAllocationDecision < BaseHistoryPresenter
   def initialize(early_allocation)
+    super()
     @early_allocation = early_allocation
   end
 
@@ -10,7 +11,7 @@ class EarlyAllocationDecision
   end
 
   def created_by_name
-    "#{@early_allocation.updated_by_firstname} #{@early_allocation.updated_by_lastname}"
+    full_name(@early_allocation.updated_by_firstname, @early_allocation.updated_by_lastname)
   end
 
   def to_partial_path

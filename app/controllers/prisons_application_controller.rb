@@ -10,6 +10,18 @@ class PrisonsApplicationController < ApplicationController
 
 protected
 
+  # we need to record users first name and last name for audit purposes
+  # (as we can't rely on their details forever being available on NOMIS)
+  # and we also record the context prison as the case history is organised
+  # in that way.
+  def info_for_paper_trail
+    {
+      user_first_name: current_user_first_name,
+      user_last_name: current_user_last_name,
+      prison: active_prison_id,
+    }
+  end
+
   def active_prison_id
     params.fetch(:prison_id, default_prison_code)
   end

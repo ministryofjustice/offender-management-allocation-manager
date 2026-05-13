@@ -209,12 +209,12 @@ feature 'Case History' do
 
       it 'has 3 prison sections' do
         #  expect 3 'prison' sections - Prescoed, Pentonville and Leeds
-        expect(all('.govuk-grid-row').size).to eq(3)
+        expect(all('.app-case-history__episode').size).to eq(3)
       end
 
       it 'has a section for Prescoed transfer to open conditions' do
         # 1st Prison - Prescoed. This only contains the transfer to open conditions
-        within '.govuk-grid-row:nth-of-type(1)' do
+        within '.app-case-history__episode:nth-of-type(1)' do
           expect(page).to have_css('.govuk-heading-m', text: "Prescoed (HMP/YOI)")
 
           prescoed_transfer = EmailHistory.where(nomis_offender_id: nomis_offender_id, event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
@@ -236,14 +236,14 @@ feature 'Case History' do
       end
 
       it 'has a Pentonville section with 6 items' do
-        within '.govuk-grid-row:nth-of-type(2)' do
+        within '.app-case-history__episode:nth-of-type(2)' do
           expect(page).to have_css('.govuk-heading-m', text: second_prison.name)
           expect(all('.moj-timeline__item').size).to eq(6)
         end
       end
 
       it 'has a Pentonville section', :js do
-        within '.govuk-grid-row:nth-of-type(2)' do
+        within '.app-case-history__episode:nth-of-type(2)' do
           within '.moj-timeline__item:nth-of-type(1)' do
             expect(page).to have_css('.moj-timeline__title', text: 'Prisoner reallocated')
           end
@@ -291,7 +291,7 @@ feature 'Case History' do
                                                         updated_at: first_arrival_date + 2.days,
                                                         created_by_name: created_by_name
 
-        within '.govuk-grid-row:nth-of-type(3)' do
+        within '.app-case-history__episode:nth-of-type(3)' do
           expect(page).to have_css('.govuk-heading-m', text: first_prison.name)
           expect(all('.moj-timeline__item').size).to eq(5)
 
@@ -316,7 +316,7 @@ feature 'Case History' do
             [
               ['.moj-timeline__title', "Co-working allocation"],
               ['.moj-timeline__description', "Prisoner allocated to #{hist_allocate_secondary.secondary_pom_name.titleize} - #{probation_pom[:email]}"],
-              ['.moj-timeline__date', "#{formatted_date_for(hist_allocate_secondary)} by #{hist_allocate_secondary.created_by_name.titleize}"],
+              ['.moj-timeline__date', "#{formatted_date_for(hist_allocate_secondary)} by #{hist_allocate_secondary.created_by_name}"],
             ].each do |key, val|
               expect(page).to have_css(key, text: val)
             end
@@ -334,7 +334,7 @@ feature 'Case History' do
 
       it 'links to previous Early Allocation assessments' do
         # The 5th history item is an 'eligible' early allocation assessment
-        eligible_assessment = within '.govuk-grid-row:nth-of-type(2)' do
+        eligible_assessment = within '.app-case-history__episode:nth-of-type(2)' do
           page.find('.moj-timeline > .moj-timeline__item:nth-child(5)')
         end
 
@@ -414,6 +414,52 @@ feature 'Case History' do
 
       it 'displays all the data and doesnt crash' do
         visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
+      end
+    end
+
+    context 'when responsibility override is created and later removed' do
+      let(:tomorrow) { Time.zone.tomorrow }
+      let(:day_after) { tomorrow + 1.day }
+      let(:responsibility_reason_text) { 'Because of local circumstances' }
+
+      before do
+        Timecop.travel tomorrow do
+          PaperTrail.request(whodunnit: 'legacy.user') do
+            create(
+              :responsibility,
+              offender: case_info.offender,
+              nomis_offender_id: nomis_offender_id,
+              reason: :other_reason,
+              reason_text: responsibility_reason_text
+            )
+          end
+        end
+
+        Timecop.travel day_after do
+          PaperTrail.request(
+            whodunnit: 'current.user',
+            controller_info: { user_first_name: 'MOIC', user_last_name: 'POM' }
+          ) do
+            Responsibility.find_by!(nomis_offender_id: nomis_offender_id).destroy!
+          end
+        end
+      end
+
+      it 'displays responsibility override history entries' do
+        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
+
+        expect(page).to have_css('.moj-timeline__title', text: 'Responsibility override added')
+        expect(page).to have_css('.moj-timeline__description', text: 'Community probation team made responsible for this case')
+        expect(page).to have_css('.moj-timeline__description', text: "Reason: Other – #{responsibility_reason_text}")
+        expect(page).to have_css('.moj-timeline__title', text: 'Responsibility override removed')
+        expect(page).to have_css('.moj-timeline__description', text: 'Community probation team no longer responsible for this case')
+      end
+
+      it 'renders historical and newly populated PaperTrail actor names together' do
+        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
+
+        expect(page).to have_css('.moj-timeline__date', text: 'by legacy.user')
+        expect(page).to have_css('.moj-timeline__date', text: 'by MOIC POM')
       end
     end
   end

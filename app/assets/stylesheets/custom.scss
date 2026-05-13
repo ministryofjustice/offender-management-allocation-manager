@@ -69,8 +69,15 @@
   margin-bottom: govuk-spacing(2);
 }
 
-// Allocation history recommendation overrides
+// Case history styling overrides
 //
+.app-case-history__description,
+.app-email-history__description {
+  p {
+    margin-bottom: 0;
+  }
+}
+
 .app-override-reasons {
   p {
     @include govuk-font($size: 19);

@@ -1,0 +1,9 @@
+<% description = capture do %>
+  <p>
+    Responsibility returned to custody notification sent to <%= responsibility_to_custody.email %>
+  </p>
+<% end %>
+<%= render 'case_history/email_history',
+           title: 'System generated email sent',
+           description: description,
+           object: responsibility_to_custody %>

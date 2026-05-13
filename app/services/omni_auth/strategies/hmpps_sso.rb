@@ -13,6 +13,8 @@ module OmniAuth
         {
           username: user_details.username,
           staff_id: user_details.staff_id,
+          first_name: user_details.first_name,
+          last_name: user_details.last_name,
           active_caseload: active_caseload.upcase,
           caseloads: caseload_codes,
           roles: decode_roles

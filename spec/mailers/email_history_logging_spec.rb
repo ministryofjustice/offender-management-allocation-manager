@@ -12,6 +12,26 @@ describe "Emails sent are logged in EmailHistory" do
       email: "test1@email.com"
     ).responsibility_override
   end
+  let(:responsibility_to_custody) do
+    ResponsibilityMailer.with(
+      email: "test1@email.com",
+      prisoner_name: "Test Offender",
+      prisoner_number: offender.nomis_offender_id,
+      prison_name: prison.name,
+      notes: "Useful context"
+    ).responsibility_to_custody
+  end
+  let(:responsibility_to_custody_with_pom) do
+    ResponsibilityMailer.with(
+      email: "test1@email.com",
+      prisoner_name: "Test Offender",
+      prisoner_number: offender.nomis_offender_id,
+      prison_name: prison.name,
+      notes: "Useful context",
+      pom_name: "Example POM",
+      pom_email: "pom@email.com"
+    ).responsibility_to_custody_with_pom
+  end
   let(:open_prison_supporting_com_needed) do
     CommunityMailer.with(
       prisoner_name: "Test Offender",
@@ -86,7 +106,6 @@ describe "Emails sent are logged in EmailHistory" do
     EmailHistory.where(
       nomis_offender_id: offender.nomis_offender_id,
       prison: prison.code,
-      email: "test1@email.com",
     )
   end
 
@@ -96,6 +115,8 @@ describe "Emails sent are logged in EmailHistory" do
 
   actions = [
     :responsibility_override,
+    :responsibility_to_custody,
+    :responsibility_to_custody_with_pom,
     :open_prison_supporting_com_needed,
     :urgent_pipeline_to_community,
     :assign_com_less_than_10_months,
@@ -108,16 +129,69 @@ describe "Emails sent are logged in EmailHistory" do
     event_overrides = {
       review_early_allocation: EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION,
       open_prison_supporting_com_needed: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION,
-      assign_com_less_than_10_months: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION
+      assign_com_less_than_10_months: EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION,
+    }
+    email_overrides = {
+      responsibility_override: 'test1@email.com',
+      responsibility_to_custody: 'test1@email.com',
+      responsibility_to_custody_with_pom: 'test1@email.com',
+      open_prison_supporting_com_needed: 'test1@email.com',
+      urgent_pipeline_to_community: 'test1@email.com',
+      assign_com_less_than_10_months: 'test1@email.com',
+      community_early_allocation: 'test1@email.com',
+      auto_early_allocation: 'test1@email.com',
+      review_early_allocation: 'test1@email.com'
     }
 
     it "is logs #{action} emails as EmailHistory records" do
       mailer = send(action)
       event = event_overrides.fetch(action, action)
+      email = email_overrides.fetch(action)
 
       expect { mailer.deliver_later }
-        .to change { email_histories.where(event:).count }
+        .to change { email_histories.where(event:, email:).count }
         .from(0).to(1)
+    end
+  end
+
+  context 'when responsibility removal notifications are fanned out to multiple recipients' do
+    let(:without_pom_recipients) { %w[test1@email.com test2@email.com] }
+    let(:with_pom_recipients) { %w[test1@email.com test2@email.com pom@email.com] }
+
+    it 'logs one responsibility_to_custody history row per recipient' do
+      expect {
+        without_pom_recipients.each do |email|
+          ResponsibilityMailer.with(
+            email:,
+            prisoner_name: "Test Offender",
+            prisoner_number: offender.nomis_offender_id,
+            prison_name: prison.name,
+            notes: "Useful context"
+          ).responsibility_to_custody.deliver_later
+        end
+      }.to change { email_histories.where(event: EmailHistory::RESPONSIBILITY_TO_CUSTODY).count }
+        .from(0).to(2)
+
+      expect(email_histories.responsibility_to_custody.pluck(:email)).to match_array(without_pom_recipients)
+    end
+
+    it 'logs one responsibility_to_custody_with_pom history row per recipient' do
+      expect {
+        with_pom_recipients.each do |email|
+          ResponsibilityMailer.with(
+            email:,
+            prisoner_name: "Test Offender",
+            prisoner_number: offender.nomis_offender_id,
+            prison_name: prison.name,
+            notes: "Useful context",
+            pom_name: "Example POM",
+            pom_email: "pom@email.com"
+          ).responsibility_to_custody_with_pom.deliver_later
+        end
+      }.to change { email_histories.where(event: EmailHistory::RESPONSIBILITY_TO_CUSTODY_WITH_POM).count }
+        .from(0).to(3)
+
+      expect(email_histories.responsibility_to_custody_with_pom.pluck(:email)).to match_array(with_pom_recipients)
     end
   end
 

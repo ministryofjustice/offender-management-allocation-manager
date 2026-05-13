@@ -21,7 +21,7 @@ FactoryBot.define do
     trait :immediate_community_allocation do
       event { EmailHistory::IMMEDIATE_COMMUNITY_ALLOCATION }
     end
-    
+
     trait :auto_early_allocation do
       event { EmailHistory::AUTO_EARLY_ALLOCATION }
     end
@@ -36,6 +36,14 @@ FactoryBot.define do
 
     trait :open_prison_community_allocation do
       event { EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION }
+    end
+
+    trait :responsibility_to_custody do
+      event { EmailHistory::RESPONSIBILITY_TO_CUSTODY }
+    end
+
+    trait :responsibility_to_custody_with_pom do
+      event { EmailHistory::RESPONSIBILITY_TO_CUSTODY_WITH_POM }
     end
   end
 end
