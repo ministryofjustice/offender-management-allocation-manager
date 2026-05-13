@@ -173,7 +173,9 @@ RSpec.describe AllocationsController, type: :controller do
 
         it 'has a VLO create record' do
           get :history, params: { prison_id: prison_code, prisoner_id: vlo_offender_no }
-          expect(history.map(&:event)).to eq(['create', 'allocate_primary_pom'])
+          relevant_history = history.select { |entry| entry.is_a?(VloHistory) || entry.is_a?(CaseHistory) }
+
+          expect(relevant_history.map(&:event)).to eq(['create', 'allocate_primary_pom'])
         end
 
         context 'with update and delete VLO events' do
@@ -188,7 +190,9 @@ RSpec.describe AllocationsController, type: :controller do
 
           it 'has VLO and alloocation data sorted by date' do
             get :history, params: { prison_id: prison_code, prisoner_id: vlo_offender_no }
-            expect(history.map(&:event)).to eq(['create', 'allocate_primary_pom', 'update', 'destroy', "reallocate_primary_pom"])
+            relevant_history = history.select { |entry| entry.is_a?(VloHistory) || entry.is_a?(CaseHistory) }
+
+            expect(relevant_history.map(&:event)).to eq(['create', 'allocate_primary_pom', 'update', 'destroy', "reallocate_primary_pom"])
           end
         end
       end
@@ -224,8 +228,10 @@ RSpec.describe AllocationsController, type: :controller do
           it 'doesnt mess up the allocation history updated_at because we surface the value' do
             get :history, params: { prison_id: prison_code, prisoner_id: offender_no }
             history = assigns(:history)
-            expect(history.size).to eq(2)
-            expect(history.map(&:created_at).map(&:to_date)).to eq([create_date, yesterday])
+            allocation_history = history.select { |entry| entry.is_a?(CaseHistory) }
+
+            expect(allocation_history.size).to eq(2)
+            expect(allocation_history.map(&:created_at).map(&:to_date)).to eq([create_date, yesterday])
           end
         end
 
@@ -272,8 +278,9 @@ RSpec.describe AllocationsController, type: :controller do
           it "get the allocation history for an offender" do
             get :history, params: { prison_id: prison_code, prisoner_id: offender_no }
             allocation_list = assigns(:history)
+            allocation_history = allocation_list.select { |entry| entry.is_a?(CaseHistory) }
 
-            expect(allocation_list.map(&:event)).to eq(['allocate_primary_pom', 'allocate_primary_pom'])
+            expect(allocation_history.map(&:event)).to eq(['allocate_primary_pom', 'allocate_primary_pom'])
           end
         end
       end

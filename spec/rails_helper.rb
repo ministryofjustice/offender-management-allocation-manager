@@ -47,7 +47,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each, :js) do
-    page.driver.browser.manage.window.resize_to(1280,3072)
+    page.driver.browser.manage.window.resize_to(1280, 3072)
   end
 
   config.before(:each, :disable_early_allocation_event) do
@@ -73,7 +73,7 @@ RSpec.configure do |config|
     # We need to use a proper cache store to support the cache-backed session store
     Rails.cache.clear
   end
-  
+
   config.before(:each) do
     stub_bank_holidays
   end
@@ -83,6 +83,8 @@ RSpec.configure do |config|
   config.include AuthHelper
   config.include ApiHelper
   config.include ScenarioSetupHelper
+  config.include CaseHistoryTimelineHelper, type: :feature
+  config.include CaseHistoryTimelineHelper, type: :view
 
   config.before(:each, type: :view) do
     # This is needed for any view test that uses the sort_link and sort_arrow helpers
@@ -102,7 +104,7 @@ RSpec.configure do |config|
     stub_auth_token
     stub_request(:get, %r{#{Rails.configuration.prison_api_host}/api/offender-sentences/booking/\d+/sentenceTerms}).to_return(body: [].to_json)
 
-    if [:feature, :controller].include?(example.metadata[:type]) and
+    if [:feature, :controller].include?(example.metadata[:type]) &&
       example.metadata[:skip_dps_header_footer_stubbing].blank?
 
       stub_dps_header_footer
@@ -139,7 +141,7 @@ Faker::Config.locale = 'en-GB'
 FactoryBot.define do
   sequence :nomis_offender_id do |seq|
     index = seq - 1 # because seq starts at 1, not 0
-    number = "%04d" % (index / 26) # zero-pad to 4 digits, e.g. 0001
+    number = sprintf('%04d', index / 26) # zero-pad to 4 digits, e.g. 0001
     letter = ('A'..'Z').to_a[index % 26]
 
     # Start with "T" to indicate that this is a "test" offender ID
@@ -147,7 +149,7 @@ FactoryBot.define do
     "T#{number}A#{letter}"
   end
 end
-FactoryBot::SyntaxRunner.send(:include, ApiHelper)
+FactoryBot::SyntaxRunner.include(ApiHelper)
 FactoryBot::SyntaxRunner.send(:delegate, :stub_request, to: WebMock)
 
 Shoryuken::Logging.logger = Rails.logger

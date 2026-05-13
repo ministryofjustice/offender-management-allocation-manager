@@ -50,17 +50,18 @@ feature 'Case history with complexity level' do
       expect(all('.govuk-grid-row').size).to eq(1)
     end
 
-    it 'has a section with complexity and allocation' do
-      within '.govuk-grid-row:nth-of-type(1)' do
+    it 'has a section with the expected complexity and allocation entries' do
+      within_timeline_section(prison.name) do
         expect(page).to have_css('.govuk-heading-m', text: prison.name)
-        expect(all('.moj-timeline__item').size).to eq(2)
+
+        expect_timeline_titles('Prisoner allocated', 'Case information created', 'Complexity of need level added')
       end
     end
 
     # have to put :js here as \n is handled differently between Capybara and Rack::Test
     it 'has a section with the allocation in it', :js do
-      within '.govuk-grid-row:nth-of-type(1)' do
-        within '.moj-timeline__item:nth-of-type(1)' do
+      within_timeline_section(prison.name) do
+        within_timeline_item('Prisoner allocated to') do
           [
             ['.moj-timeline__description',
              [
@@ -75,17 +76,11 @@ feature 'Case history with complexity level' do
       end
     end
 
-    it 'has a section with the level in it' do
-      within '.govuk-grid-row:nth-of-type(1)' do
-        within '.moj-timeline__item:nth-of-type(2)' do
-          [
-            ['.moj-timeline__title', 'Complexity of need level added'],
-            ['.moj-timeline__description', 'Level: High'],
-            ['.moj-timeline__date', "#{formatted_date_for(complexity_add_time.getlocal)} by #{pom.first_name} #{pom.last_name}"],
-          ].each do |key, val|
-            expect(page).to have_css(key, text: val)
-          end
-        end
+    it 'shows the complexity level timeline entry' do
+      within_timeline_section(prison.name) do
+        expect(page).to have_css('.moj-timeline__title', text: 'Complexity of need level added')
+        expect(page).to have_css('.moj-timeline__description', text: 'Level: High')
+        expect(page).to have_css('.moj-timeline__date', text: "#{formatted_date_for(complexity_add_time.getlocal)} by #{pom.first_name} #{pom.last_name}")
       end
     end
   end
@@ -106,16 +101,17 @@ feature 'Case history with complexity level' do
       expect(all('.govuk-grid-row').size).to eq(1)
     end
 
-    it 'has 3 detail sections' do
-      within '.govuk-grid-row:nth-of-type(1)' do
+    it 'has the expected complexity history entries' do
+      within_timeline_section(prison.name) do
         expect(page).to have_css('.govuk-heading-m', text: prison.name)
-        expect(all('.moj-timeline__item').size).to eq(3)
+
+        expect_timeline_titles('Prisoner allocated', 'Case information created', 'Complexity of need level added', 'Complexity of need level updated')
       end
     end
 
-    it 'has a complexity change section', :js do
-      within '.govuk-grid-row:nth-of-type(1)' do
-        within '.moj-timeline__item:nth-of-type(1)' do
+    it 'shows the complexity level updated timeline entry', :js do
+      within_timeline_section(prison.name) do
+        within_timeline_item('Complexity of need level updated') do
           expect(page).to have_css('.moj-timeline__title', text: 'Complexity of need level updated')
           expect(page).to have_css('.moj-timeline__description', text: [
             'Changed from: High to Medium',
@@ -134,10 +130,11 @@ feature 'Case history with complexity level' do
       expect(all('.govuk-grid-row').size).to eq(1)
     end
 
-    it 'has 1 detail sections' do
-      within '.govuk-grid-row:nth-of-type(1)' do
+    it 'shows the baseline history entries' do
+      within_timeline_section(prison.name) do
         expect(page).to have_css('.govuk-heading-m', text: prison.name)
-        expect(all('.moj-timeline__item').size).to eq(1)
+
+        expect_timeline_titles('Prisoner allocated', 'Case information created')
       end
     end
   end

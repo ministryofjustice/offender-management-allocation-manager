@@ -1,0 +1,12 @@
+<% details = update.change_details %>
+<% description = capture do %>
+  <% details.each do |detail| %>
+    <p class="govuk-body">
+      <%= detail.label %>: <%= detail.from_value %> → <%= detail.to_value %>
+    </p>
+  <% end %>
+<% end %>
+<%= render 'case_history/case_history',
+           title: 'Case information updated',
+           description: description,
+           object: update %>

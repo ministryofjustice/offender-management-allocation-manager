@@ -28,9 +28,11 @@ class AllocationsController < PrisonsApplicationController
   def history
     @timeline = HmppsApi::PrisonApi::MovementApi.movements_for nomis_offender_id_from_url
 
+    # TODO: refactor this mess following the pattern set in `CaseInformationHistory`
     allocation = AllocationHistory.find_by!(nomis_offender_id: nomis_offender_id_from_url)
     vlo_history = PaperTrail::Version
         .where(item_type: 'VictimLiaisonOfficer', nomis_offender_id: nomis_offender_id_from_url).map { |vlo_version| VloHistory.new(vlo_version) }
+    case_information_history = CaseInformationHistory.timeline_entries_for(nomis_offender_id_from_url)
     responsibility_history = PaperTrail::Version
         .where(item_type: 'Responsibility', nomis_offender_id: nomis_offender_id_from_url)
         .map { |responsibility_version| ResponsibilityHistory.new(responsibility_version) }
@@ -58,6 +60,7 @@ class AllocationsController < PrisonsApplicationController
     @history = [
       AllocationService.history(allocation),
       vlo_history,
+      case_information_history,
       responsibility_history,
       complexity_history,
       email_history,
