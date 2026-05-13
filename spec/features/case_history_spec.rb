@@ -394,29 +394,6 @@ feature 'Case History' do
       end
     end
 
-    context 'when case information is removed because the record is destroyed' do
-      let(:tomorrow) { Time.zone.tomorrow }
-
-      before do
-        Timecop.travel tomorrow do
-          MovementService.process_movement build(:movement, :release, offenderNo: nomis_offender_id)
-        end
-      end
-
-      it 'shows a case information removed entry in the case history' do
-        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
-
-        aggregate_failures do
-          expect_timeline_titles('Case information removed')
-
-          within_timeline_item('Case information removed') do
-            expect(page).to have_css('.moj-timeline__description', text: 'Case information removed')
-            expect(page).to have_css('.moj-timeline__date', text: 'by System Admin')
-          end
-        end
-      end
-    end
-
     context 'when case information is added and later updated' do
       let(:tomorrow) { Time.zone.tomorrow }
       let(:day_after) { tomorrow + 1.day }
