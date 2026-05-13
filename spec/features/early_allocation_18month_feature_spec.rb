@@ -30,14 +30,18 @@ feature 'early allocation when crossing 18 month threshold' do
       stub_signin_spo user, [prison.code]
     end
 
-    it 'does some funky history record stuff' do
+    it 'shows the early allocation reassessment reminder in case history' do
       visit history_prison_prisoner_allocation_path prison.code, offender_no
       # expect only 1 prison record
       expect(all('.govuk-grid-row').size).to eq(1)
-      # and expect 3 timeline items (the allocation itself, plus 2 emails)
 
-      within '.govuk-grid-row:nth-of-type(1)' do
-        expect(all('.moj-timeline__item').size).to eq(3)
+      within_timeline_section(prison.name) do
+        expect_timeline_titles(
+          'Prisoner allocated',
+          'Case information created',
+          'Early allocation assessment form completed',
+          'Reminder sent to POM for early allocation re-assessment'
+        )
       end
     end
   end

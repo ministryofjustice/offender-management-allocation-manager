@@ -214,12 +214,12 @@ feature 'Case History' do
 
       it 'has a section for Prescoed transfer to open conditions' do
         # 1st Prison - Prescoed. This only contains the transfer to open conditions
-        within '.app-case-history__episode:nth-of-type(1)' do
+        within_timeline_section("Prescoed (HMP/YOI)") do
           expect(page).to have_css('.govuk-heading-m', text: "Prescoed (HMP/YOI)")
 
           prescoed_transfer = EmailHistory.where(nomis_offender_id: nomis_offender_id, event: EmailHistory::OPEN_PRISON_COMMUNITY_ALLOCATION).first
 
-          within '.moj-timeline__item:nth-of-type(1)' do
+          within_timeline_item(prescoed_transfer.email) do
             [
               ['.moj-timeline__title', "System generated email sent"],
               ['.moj-timeline__date', "#{prescoed_transfer.created_at.strftime("#{prescoed_transfer.created_at.day.ordinalize} %B %Y")} (#{prescoed_transfer.created_at.strftime('%R')}) email sent automatically"],
@@ -235,53 +235,26 @@ feature 'Case History' do
         expect(page).to have_css('.moj-timeline__title', text: "Prisoner unallocated")
       end
 
-      it 'has a Pentonville section with 6 items' do
-        within '.app-case-history__episode:nth-of-type(2)' do
+      it 'has a Pentonville section with the expected history entries' do
+        within_timeline_section(second_prison.name) do
           expect(page).to have_css('.govuk-heading-m', text: second_prison.name)
-          expect(all('.moj-timeline__item').size).to eq(6)
+
+          aggregate_failures do
+            expect_timeline_titles('Prisoner reallocated', 'Prisoner allocated')
+            expect(page).to have_css('.moj-timeline__header', text: 'Early allocation decision requested')
+            expect(page).to have_css('.moj-timeline__header', text: 'Early allocation assessment form completed')
+            expect(page).to have_css('.moj-timeline__header', text: 'System generated email sent')
+          end
         end
       end
 
       it 'has a Pentonville section', :js do
-        within '.app-case-history__episode:nth-of-type(2)' do
-          within '.moj-timeline__item:nth-of-type(1)' do
-            expect(page).to have_css('.moj-timeline__title', text: 'Prisoner reallocated')
-          end
-
-          within '.moj-timeline__item:nth-of-type(2)' do
-            [
-              ['.moj-timeline__header', "Early allocation decision requested"],
-            ].each do |key, val|
-              expect(page).to have_css(key, text: val)
-            end
-          end
-
-          within '.moj-timeline__item:nth-of-type(3)' do
-            [
-              ['.moj-timeline__header', "Early allocation assessment form completed"],
-            ].each do |key, val|
-              expect(page).to have_css(key, text: val)
-            end
-          end
-
-          within '.moj-timeline__item:nth-of-type(4)' do
-            [
-              ['.moj-timeline__header', "System generated email sent"],
-            ].each do |key, val|
-              expect(page).to have_css(key, text: val)
-            end
-          end
-
-          within '.moj-timeline__item:nth-of-type(5)' do
-            [
-              ['.moj-timeline__header', "Early allocation assessment form completed"],
-            ].each do |key, val|
-              expect(page).to have_css(key, text: val)
-            end
-          end
-
-          within '.moj-timeline__item:nth-of-type(6)' do
-            expect(page).to have_css('.moj-timeline__title', text: 'Prisoner allocated')
+        within_timeline_section(second_prison.name) do
+          aggregate_failures do
+            expect_timeline_titles('Prisoner reallocated', 'Prisoner allocated')
+            expect(page).to have_css('.moj-timeline__header', text: 'Early allocation decision requested')
+            expect(page).to have_css('.moj-timeline__header', text: 'Early allocation assessment form completed')
+            expect(page).to have_css('.moj-timeline__header', text: 'System generated email sent')
           end
         end
       end
@@ -291,11 +264,12 @@ feature 'Case History' do
                                                         updated_at: first_arrival_date + 2.days,
                                                         created_by_name: created_by_name
 
-        within '.app-case-history__episode:nth-of-type(3)' do
+        within_timeline_section(first_prison.name) do
           expect(page).to have_css('.govuk-heading-m', text: first_prison.name)
-          expect(all('.moj-timeline__item').size).to eq(5)
 
-          within '.moj-timeline__item:nth-of-type(1)' do
+          within find_timeline_item("#{formatted_deallocate_date} by System Admin") { |item|
+                   item.has_css?('.moj-timeline__title', text: 'Prisoner unallocated')
+                 } do
             [
               ['.moj-timeline__title', "Prisoner unallocated"],
               ['.moj-timeline__date', "#{formatted_deallocate_date} by System Admin"],
@@ -304,7 +278,7 @@ feature 'Case History' do
             end
           end
 
-          within '.moj-timeline__item:nth-of-type(2)' do
+          within_timeline_item('Co-working unallocated') do
             [
               ['.moj-timeline__title', "Co-working unallocated"],
             ].each do |key, val|
@@ -312,7 +286,7 @@ feature 'Case History' do
             end
           end
 
-          within '.moj-timeline__item:nth-of-type(3)' do
+          within_timeline_item('Co-working allocation') do
             [
               ['.moj-timeline__title', "Co-working allocation"],
               ['.moj-timeline__description', "Prisoner allocated to #{hist_allocate_secondary.secondary_pom_name.titleize} - #{probation_pom[:email]}"],
@@ -322,20 +296,15 @@ feature 'Case History' do
             end
           end
 
-          within '.moj-timeline__item:nth-of-type(4)' do
-            expect(page).to have_css('.moj-timeline__title', text: 'Prisoner reallocated')
-          end
-
-          within '.moj-timeline__item:nth-of-type(5)' do
-            expect(page).to have_css('.moj-timeline__title', text: 'Prisoner allocated')
-          end
+          expect_timeline_titles('Prisoner reallocated', 'Prisoner allocated')
         end
       end
 
       it 'links to previous Early Allocation assessments' do
-        # The 5th history item is an 'eligible' early allocation assessment
-        eligible_assessment = within '.app-case-history__episode:nth-of-type(2)' do
-          page.find('.moj-timeline > .moj-timeline__item:nth-child(5)')
+        eligible_assessment = within_timeline_section(second_prison.name) do
+          find_timeline_item('Early allocation assessment form completed') do |item|
+            item.has_css?('.moj-timeline__description', text: 'Assessment outcome: eligible.')
+          end
         end
 
         within eligible_assessment do
@@ -392,7 +361,15 @@ feature 'Case History' do
 
       it 'displays 3 sections - allocation plus 2 early allocation records' do
         visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
-        expect(all('.moj-timeline__item').size).to eq(3)
+
+        aggregate_failures do
+          expect_timeline_titles(
+            'Prisoner allocated',
+            'Case information created',
+            'Early allocation assessment form completed',
+            'Early allocation decision recorded'
+          )
+        end
       end
     end
 
@@ -412,8 +389,166 @@ feature 'Case History' do
         Timecop.return
       end
 
-      it 'displays all the data and doesnt crash' do
+      it 'displays the timeline without crashing' do
         visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
+      end
+    end
+
+    context 'when case information is removed because the record is destroyed' do
+      let(:tomorrow) { Time.zone.tomorrow }
+
+      before do
+        Timecop.travel tomorrow do
+          MovementService.process_movement build(:movement, :release, offenderNo: nomis_offender_id)
+        end
+      end
+
+      it 'shows a case information removed entry in the case history' do
+        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
+
+        aggregate_failures do
+          expect_timeline_titles('Case information removed')
+
+          within_timeline_item('Case information removed') do
+            expect(page).to have_css('.moj-timeline__description', text: 'Case information removed')
+            expect(page).to have_css('.moj-timeline__date', text: 'by System Admin')
+          end
+        end
+      end
+    end
+
+    context 'when case information is added and later updated' do
+      let(:tomorrow) { Time.zone.tomorrow }
+      let(:day_after) { tomorrow + 1.day }
+      let(:two_days_after) { day_after + 1.day }
+      let!(:case_info) { nil }
+      let!(:offender_record) { create(:offender, nomis_offender_id: nomis_offender_id) }
+
+      before do
+        Timecop.travel tomorrow do
+          PaperTrail.request(
+            whodunnit: 'legacy.user',
+            controller_info: { user_first_name: 'Legacy', user_last_name: 'User', prison: open_prison.code }
+          ) do
+            create(
+              :case_information,
+              :manual_entry,
+              offender: offender_record,
+              tier: 'B',
+              rosh_level: 'LOW',
+              enhanced_resourcing: true
+            )
+          end
+        end
+
+        Timecop.travel day_after do
+          CaseInformation.find_by!(nomis_offender_id: nomis_offender_id).update!(tier: 'C')
+        end
+
+        Timecop.travel two_days_after do
+          PaperTrail.request(
+            whodunnit: 'current.user',
+            controller_info: { user_first_name: 'MOIC', user_last_name: 'POM', prison: open_prison.code }
+          ) do
+            CaseInformation.find_by!(nomis_offender_id: nomis_offender_id)
+              .update!(rosh_level: 'VERY_HIGH', enhanced_resourcing: false)
+          end
+        end
+      end
+
+      it 'displays both manual and relevant system-generated case information history entries' do
+        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
+
+        aggregate_failures do
+          expect_timeline_titles('Case information created', 'Case information updated')
+
+          within(find_timeline_item('Case information created') { |item| item.text.include?('by Legacy User') }) do
+            expect(page).to have_css('.moj-timeline__description', text: 'Tier: B')
+            expect(page).to have_css('.moj-timeline__date', text: 'by Legacy User')
+          end
+
+          within(find_timeline_item('Case information updated') { |item| item.text.include?('by System Admin') }) do
+            expect(page).to have_css('.moj-timeline__description', text: 'Tier: B → C')
+            expect(page).to have_css('.moj-timeline__date', text: 'by System Admin')
+          end
+
+          within(find_timeline_item('Case information updated') { |item| item.text.include?('by MOIC POM') }) do
+            expect(page).to have_css('.moj-timeline__description', text: 'Resourcing: enhanced → standard')
+            expect(page).to have_css('.moj-timeline__date', text: 'by MOIC POM')
+          end
+        end
+      end
+    end
+
+    context 'when case information is updated by the system' do
+      let(:tomorrow) { Time.zone.tomorrow }
+
+      before do
+        Timecop.travel tomorrow do
+          PaperTrail.request(whodunnit: nil, controller_info: {}) do
+            case_info.update!(tier: 'B', rosh_level: 'LOW', enhanced_resourcing: true)
+          end
+        end
+      end
+
+      it 'shows the tracked case information changes as a system generated timeline entry' do
+        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
+
+        within_timeline_item('Case information updated') do
+          aggregate_failures do
+            expect(page).to have_css('.moj-timeline__description', text: 'ROSH: High → Low')
+            expect(page).to have_css('.moj-timeline__date', text: 'by System Admin')
+          end
+        end
+      end
+    end
+
+    context 'when case information is updated by the system and the rosh feature flag is disabled' do
+      let(:tomorrow) { Time.zone.tomorrow }
+
+      before do
+        stub_feature_flag(:rosh_level, enabled: false)
+
+        Timecop.travel tomorrow do
+          PaperTrail.request(whodunnit: nil, controller_info: {}) do
+            case_info.update!(tier: 'B', rosh_level: 'LOW', enhanced_resourcing: true)
+          end
+        end
+      end
+
+      it 'hides the ROSH change from the case history timeline entry' do
+        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
+
+        within_timeline_item('Case information updated') do
+          aggregate_failures do
+            expect(page).to have_no_css('.moj-timeline__description', text: 'ROSH: High → Low')
+            expect(page).to have_css('.moj-timeline__description', text: 'Resourcing: standard → enhanced')
+          end
+        end
+      end
+    end
+
+    context 'when case allocation decision is cleared by the system' do
+      let(:tomorrow) { Time.zone.tomorrow }
+
+      before do
+        Timecop.travel tomorrow do
+          PaperTrail.request(whodunnit: nil, controller_info: {}) do
+            case_info.update!(enhanced_resourcing: nil)
+          end
+        end
+      end
+
+      it 'shows the tracked case information change to (unset)' do
+        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
+
+        within_timeline_item('Case information updated') do
+          aggregate_failures do
+            expect(page).to have_css('.moj-timeline__title', text: 'Case information updated')
+            expect(page).to have_css('.moj-timeline__description', text: 'Resourcing: standard → (unset)')
+            expect(page).to have_css('.moj-timeline__date', text: 'by System Admin')
+          end
+        end
       end
     end
 
