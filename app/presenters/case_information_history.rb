@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 class CaseInformationHistory < BaseHistoryPresenter
-  DETAIL_ATTRIBUTES = %w[tier rosh_level enhanced_resourcing].freeze
-  DETAIL_LABELS = { 'tier' => 'Tier', 'rosh_level' => 'ROSH', 'enhanced_resourcing' => 'Resourcing' }.freeze
+  TIMELINE_DETAILS = {
+    'tier' => 'Tier',
+    'rosh_level' => 'ROSH',
+    'enhanced_resourcing' => 'Resourcing',
+  }.freeze
 
   Detail = Struct.new(:label, :from_value, :to_value)
 
@@ -35,14 +38,14 @@ class CaseInformationHistory < BaseHistoryPresenter
 
     changeset = @version.changeset || {}
 
-    DETAIL_ATTRIBUTES.filter_map do |attribute|
+    TIMELINE_DETAILS.filter_map do |attribute, label|
       next if attribute == 'rosh_level' && FeatureFlags.rosh_level.disabled?
       next unless changeset.key?(attribute)
 
       previous_value, new_value = changeset.fetch(attribute, [nil, nil])
 
       Detail.new(
-        detail_label_for(attribute),
+        label,
         detail_value_for(attribute, previous_value),
         detail_value_for(attribute, new_value)
       )
@@ -50,10 +53,6 @@ class CaseInformationHistory < BaseHistoryPresenter
   end
 
 private
-
-  def detail_label_for(attribute)
-    DETAIL_LABELS.fetch(attribute)
-  end
 
   def detail_value_for(attribute, value)
     return '(unset)' if value.nil?
