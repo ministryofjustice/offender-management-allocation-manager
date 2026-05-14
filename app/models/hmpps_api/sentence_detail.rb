@@ -13,7 +13,7 @@ module HmppsApi
                 :tariff_date,
                 :legal_status
 
-    delegate :criminal_sentence?, :immigration_case?, :civil_sentence?, to: :@sentence_type
+    delegate :criminal_sentence?, :immigration_case?, :civil_sentence?, :recall?, to: :@sentence_type
 
     # Note - this is hiding a defect - we never get sentence_expiry_date from NOMIS (but maybe we should?)
     attr_accessor :sentence_expiry_date
@@ -74,6 +74,10 @@ module HmppsApi
       else
         past_dates.max_by { |date| date[:date].to_date }
       end
+    end
+
+    def recalled?
+      @recall || recall?
     end
 
     def initialize(payload)

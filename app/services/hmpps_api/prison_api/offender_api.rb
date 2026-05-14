@@ -9,10 +9,6 @@ module HmppsApi
       # Used to filter out offenders who are on remand, civil prisoners, unsentenced, etc.
       ALLOWED_LEGAL_STATUSES = %w[SENTENCED INDETERMINATE_SENTENCE RECALL IMMIGRATION_DETAINEE].freeze
 
-      # Despite filtering out civil cases (legal status `CIVIL_PRISONER`) some civil cases
-      # will show up as `SENTENCED` legal status, and we need to filter by their sentence type code.
-      EXCLUDED_IMPRISONMENT_STATUSES = %w[A_FINE].freeze
-
       def self.get_offenders_in_prison(prison, *args)
         offenders = get_search_api_offenders_in_prison(prison)
 
@@ -119,10 +115,12 @@ module HmppsApi
         client.get(path)
       end
 
+      # Despite filtering out civil cases (legal status `CIVIL_PRISONER`) some civil cases
+      # will show up as `SENTENCED` legal status, and we need to filter by their sentence type code.
       def self.filtered_offenders(offenders)
         offenders.select do |o|
           ALLOWED_LEGAL_STATUSES.include?(o['legalStatus']) &&
-            EXCLUDED_IMPRISONMENT_STATUSES.exclude?(o['imprisonmentStatus'])
+            SentenceType::CIVIL_SENTENCE_TYPES.exclude?(o['imprisonmentStatus'])
         end
       end
 

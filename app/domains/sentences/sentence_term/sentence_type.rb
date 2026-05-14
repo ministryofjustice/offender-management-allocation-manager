@@ -1,41 +1,37 @@
 class Sentences::SentenceTerm::SentenceType < SimpleDelegator
-  # Available Sentence Types, Sentence Descriptions
-  # DLP           Adult Discretionary Life
-  # MLP           Adult Mandatory Life
-  # ALP           Automatic LIfe
-  # ALP           Automatic Life
-  # ADIMP         CJA03 Standard Determinate Sentence
-  # EDS21         EDS Sec 279 Sentencing Code (21+)
-  # EPP           Extended Sent Public Protection CJA 03
-  # A/FINE        Imprisonment in Default of Fine
-  # IPP           Indeterminate Sentence for the Public Protection
-  # LEGACY        Legacy (pre 1991 Act)
-  # LR            Licence Recall
-  # LR_IPP        Licence recall from IPP Sentence
-  # LIFE          Life Imprisonment or Detention S.53(1) CYPA 1933
-  # LR_EDS21      LR EDS Sec 279 Sentencing Code (21+)
-  # 14FTR_ORA     ORA 14 Day Fixed Term Recall
-  # LR_ORA        ORA Licence Recall
-  # ADIMP_ORA     ORA Sentencing Code Standard Determinate Sentence
-  # LR_ALP        Recall from Automatic Life
-  # LR_ALP_CDE21  Recall from Automatic Life Sec 283 Sentencing Code (21+)
-  # LR_DLP        Recall from Discretionary Life
-  # LR_LIFE       Recall to Custody Indeterminate Sentence
-  # ADIMP         Sentencing Code Standard Determinate Sentence
-
-  INDETERMINATE_SENTENCE_TYPES = [
-    'IPP',
-    'LR_IPP',
-    'ALP',
-    'LR_ALP',
-    'ALP_CDE21',
-    'LR_ALP_CDE21',
-    'LIFE',
-    'LR_LIFE',
-    'DLP',
-    'LR_DLP',
-    'MLP',
-    'LR_MLP'
+  # Source of truth for indeterminate sentence types:
+  # https://github.com/ministryofjustice/prison-api/blob/main/src/main/java/uk/gov/justice/hmpps/prison/api/model/SentenceTypeRecallType.kt
+  # Keep this list aligned for now, we should evaluate using an API to get this info.
+  INDETERMINATE_SENTENCE_TYPES = %w[
+    20
+    ALP
+    ALP_CODE18
+    ALP_CODE21
+    ALP_LASPO
+    DFL
+    DLP
+    DPP
+    HMPL
+    IPP
+    LEGACY
+    LIFE
+    LIFE/IPP
+    LR_ALP
+    LR_ALP_CDE18
+    LR_ALP_CDE21
+    LR_ALP_LASPO
+    LR_DLP
+    LR_DPP
+    LR_IPP
+    LR_LIFE
+    LR_MLP
+    MLP
+    SEC272
+    SEC275
+    SEC93
+    SEC93_03
+    SEC94
+    ZMD
   ].freeze
 
   def indeterminate? = in?(INDETERMINATE_SENTENCE_TYPES)

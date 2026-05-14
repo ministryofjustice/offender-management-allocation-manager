@@ -13,15 +13,20 @@ describe HmppsApi::PrisonApi::OffenderApi do
 
   # These offenders should be filtered out because of their legal status or imprisonment code
   let(:rejected_offenders) do
-    [
+    base_rejected = [
       build(:nomis_offender, legalStatus: 'CIVIL_PRISONER'),
       build(:nomis_offender, legalStatus: 'CONVICTED_UNSENTENCED'),
       build(:nomis_offender, legalStatus: 'DEAD'),
       build(:nomis_offender, legalStatus: 'OTHER'),
       build(:nomis_offender, legalStatus: 'REMAND'),
       build(:nomis_offender, legalStatus: 'UNKNOWN'),
-      build(:nomis_offender, legalStatus: 'SENTENCED', sentence: { imprisonmentStatus: 'A_FINE' })
     ]
+
+    civil_status_rejected = SentenceType::CIVIL_SENTENCE_TYPES.map do |status|
+      build(:nomis_offender, legalStatus: 'SENTENCED', sentence: { imprisonmentStatus: status })
+    end
+
+    base_rejected + civil_status_rejected
   end
 
   describe 'List of offenders' do
