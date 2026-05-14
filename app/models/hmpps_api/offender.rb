@@ -11,8 +11,7 @@ module HmppsApi
              :automatic_release_date, :licence_expiry_date,
              :post_recall_release_date, :earliest_release_date, :earliest_release,
              :indeterminate_sentence?, :immigration_case?, :civil_sentence?, :describe_sentence,
-             :legal_status,
-             to: :sentence
+             :legal_status, :recalled?, to: :sentence
 
     delegate :code, :label, :active_since, to: :@category, prefix: :category, allow_nil: true
 
@@ -67,10 +66,6 @@ module HmppsApi
         sentence.home_detention_curfew_eligibility_date.present? ||
         sentence.tariff_date.present? ||
         sentence.indeterminate_sentence?
-    end
-
-    def recalled?
-      @sentence.recall
     end
 
     def over_18?
