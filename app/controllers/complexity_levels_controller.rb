@@ -40,8 +40,4 @@ class ComplexityLevelsController < PrisonsApplicationController
     @return_path = prisoner_page_path(prison_id: active_prison_id, prisoner_id: @offender_id)
     @source_page = prisoner_page_source
   end
-
-  def default_prisoner_page_source
-    'allocation'
-  end
 end

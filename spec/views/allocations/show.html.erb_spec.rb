@@ -40,7 +40,6 @@ RSpec.describe "allocations/show", type: :view do
     stub_template 'shared/_offence_info.html.erb' => ''
     stub_template 'prisoners/_community_information.html.erb' => ''
 
-    allow(view).to receive(:vlo_tag).and_return('')
     allow(view).to receive(:prisoner_location).and_return('')
   end
 
@@ -49,7 +48,14 @@ RSpec.describe "allocations/show", type: :view do
 
     it 'allows POM responsible cases to have responsibility overridden' do
       render
-      expect(page).to have_css ".responsibility_change a[href='#{new_prison_responsibility_path(prison.code, offender.offender_no)}']"
+      expect(page).to have_css ".responsibility_change a[href='#{new_prison_responsibility_path(prison.code, offender.offender_no, from: :allocation)}']"
+    end
+
+    it 'does not bold the current responsibility when it has not been overridden' do
+      render
+
+      expect(page.at_css('.responsibility_change strong')).to be_nil
+      expect(page.at_css('.responsibility_change')).to have_text('Custody')
     end
 
     it 'allows COM responsible overrides to be deleted' do
@@ -59,7 +65,18 @@ RSpec.describe "allocations/show", type: :view do
         responsibility_override?: true,
       )
       render
-      expect(page).to have_css ".responsibility_change a[href='#{confirm_removal_prison_responsibility_path(prison.code, nomis_offender_id: offender.offender_no)}']"
+      expect(page).to have_css ".responsibility_change a[href='#{confirm_removal_prison_responsibility_path(prison.code, nomis_offender_id: offender.offender_no, from: :allocation)}']"
+    end
+
+    it 'bolds the current responsibility when it has been overridden' do
+      allow(offender).to receive_messages(
+        pom_responsible?: false,
+        com_responsible?: true,
+        responsibility_override?: true,
+      )
+      render
+
+      expect(page.at_css('.responsibility_change strong')).to have_text('Community')
     end
   end
 

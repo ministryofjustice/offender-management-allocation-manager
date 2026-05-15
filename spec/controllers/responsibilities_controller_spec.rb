@@ -10,6 +10,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
   let(:nomis_offender) { build(:nomis_offender, prisonId: prison.code, prisonerNumber: offender_no) }
   let(:full_name) { "#{nomis_offender.fetch(:lastName)}, #{nomis_offender.fetch(:firstName)}" }
   let(:reason) { 'Just because' }
+  let(:from_param) { nil }
   let(:sso_email_address) { Faker::Internet.email }
   let(:offender) { OffenderService.get_offender(offender_no) }
   let(:responsibility_to_custody_mailer) { double(:responsibility_to_custody_mailer, deliver_later: nil) }
@@ -27,6 +28,19 @@ RSpec.describe ResponsibilitiesController, type: :controller do
     )
   end
 
+  describe 'SPO-only access' do
+    before do
+      stub_high_level_staff_member_auth(prison: prison)
+      allow(controller).to receive(:current_user_is_spo?).and_return(false)
+    end
+
+    it 'rejects non-SPO users' do
+      get :new, params: { prison_id: prison.code, nomis_offender_id: offender_no }
+
+      expect(response).to redirect_to('/401')
+    end
+  end
+
   shared_examples 'renders the presence error page' do
     render_views
 
@@ -41,13 +55,23 @@ RSpec.describe ResponsibilitiesController, type: :controller do
       aggregate_failures do
         expect(response).to have_http_status(:ok)
         expect(response).to render_template(:presence_error)
+        expect(response.body).to include(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
+      end
+    end
+
+    context 'when coming from the allocation page' do
+      let(:from_param) { 'allocation' }
+
+      it 'links back to the allocation page' do
+        perform_request
+
         expect(response.body).to include(prison_prisoner_allocation_path(prison.code, offender_no))
       end
     end
   end
 
   describe '#new' do
-    subject(:perform_request) { get :new, params: { prison_id: prison.code, nomis_offender_id: offender_no } }
+    subject(:perform_request) { get :new, params: { prison_id: prison.code, nomis_offender_id: offender_no, from: from_param } }
 
     include_examples 'renders the presence error page'
   end
@@ -56,6 +80,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
     subject(:perform_request) do
       post :confirm, params: {
         prison_id: prison.code,
+        from: from_param,
         responsibility: {
           nomis_offender_id: offender_no,
           reason: :less_than_10_months_to_serve,
@@ -73,6 +98,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
     let(:create_params) do
       {
         prison_id: prison.code,
+        from: from_param,
         responsibility: {
           nomis_offender_id: offender_no,
           reason: :less_than_10_months_to_serve,
@@ -100,8 +126,18 @@ RSpec.describe ResponsibilitiesController, type: :controller do
       expect { perform_request }.to change(Responsibility, :count).by(1)
 
       aggregate_failures do
-        expect(response).to redirect_to(prison_prisoner_allocation_path(prison.code, offender_no))
+        expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
         expect_override_emails(sso_email_address, offender.ldu_email_address)
+      end
+    end
+
+    context 'when coming from the allocation page' do
+      let(:from_param) { 'allocation' }
+
+      it 'redirects back to the allocation page' do
+        perform_request
+
+        expect(response).to redirect_to(prison_prisoner_allocation_path(prison.code, offender_no))
       end
     end
 
@@ -111,7 +147,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
       expect { perform_request }.not_to change(Responsibility, :count)
 
       aggregate_failures do
-        expect(response).to redirect_to(prison_prisoner_allocation_path(prison.code, offender_no))
+        expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
         expect(PomMailer).not_to have_received(:with)
         expect(responsibility_override_mailer).not_to have_received(:deliver_later)
       end
@@ -131,7 +167,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
 
       aggregate_failures do
         expect(assigns(:responsibility)).to eq(existing_responsibility)
-        expect(response).to redirect_to(prison_prisoner_allocation_path(prison.code, offender_no))
+        expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
         expect(PomMailer).not_to have_received(:with)
         expect(responsibility_override_mailer).not_to have_received(:deliver_later)
       end
@@ -145,6 +181,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
       {
         prison_id: prison.code,
         nomis_offender_id: responsibility.nomis_offender_id,
+        from: from_param,
         responsibility: attributes_for(:remove_responsibility_form,
                                        nomis_offender_id: responsibility.nomis_offender_id,
                                        reason_text: reason)
@@ -168,10 +205,21 @@ RSpec.describe ResponsibilitiesController, type: :controller do
       it 'destroys and sends an email to the LDU and the SPO' do
         aggregate_failures do
           expect { perform_request }.to change(Responsibility, :count).by(-1)
+          expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
           expect_responsibility_removal_emails(
             mailer: responsibility_to_custody_mailer,
             emails: [sso_email_address, offender.ldu_email_address]
           )
+        end
+      end
+
+      context 'when coming from the allocation page' do
+        let(:from_param) { 'allocation' }
+
+        it 'redirects back to the allocation page' do
+          perform_request
+
+          expect(response).to redirect_to(prison_prisoner_allocation_path(prison.code, offender_no))
         end
       end
     end
@@ -244,7 +292,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
           aggregate_failures do
             expect { perform_request }.to change(Responsibility, :count).by(-1)
 
-            expect(response).to redirect_to(prison_prisoner_allocation_path(prison.code, offender_no))
+            expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
             expect_responsibility_removal_emails(
               mailer: responsibility_to_custody_with_pom_mailer,
               emails: [sso_email_address, offender.ldu_email_address],

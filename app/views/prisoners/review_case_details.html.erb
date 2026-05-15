@@ -46,8 +46,7 @@
       <div class="govuk-notification-banner__content">
         <p class="govuk-notification-banner__heading"></p>
         <p>
-          <span class="govuk-tag govuk-tag--blue"><%= sentence_type_label(@prisoner) %></span>
-          <%= vlo_tag(@prisoner) %>
+          <%= render 'shared/badges', offender: @prisoner %>
         </p>
 
         <dl class="govuk-summary-list">
@@ -104,9 +103,18 @@
             <dt class="govuk-summary-list__key">Location</dt>
             <dd class="govuk-summary-list__value"><%= @prisoner.location %></dd>
           </div>
-          <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+          <div class="govuk-summary-list__row" id="pom-role-needed-row">
             <dt class="govuk-summary-list__key">POM role needed</dt>
             <dd class="govuk-summary-list__value"><%= pom_responsibility_label(@prisoner) %></dd>
+            <% if @prisoner.pom_responsible? %>
+              <dd class="govuk-summary-list__actions">
+                <%= link_to 'Change', new_prison_responsibility_path(@prison.code, @prisoner.offender_no, from: :review_case), class: 'govuk-link govuk-link--no-visited-state' %>
+              </dd>
+            <% elsif @prisoner.com_responsible? && @prisoner.responsibility_override? %>
+              <dd class="govuk-summary-list__actions">
+                <%= link_to 'Change', confirm_removal_prison_responsibility_path(@prison.code, nomis_offender_id: @prisoner.offender_no, from: :review_case), class: 'govuk-link govuk-link--no-visited-state' %>
+              </dd>
+            <% end %>
           </div>
           <% if @pom.present? %>
             <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">

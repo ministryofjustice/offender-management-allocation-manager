@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 class ResponsibilitiesController < PrisonsApplicationController
+  include PrisonerPageNavigation
+
+  before_action :ensure_spo_user
   before_action :load_offender_from_url, only: [:new, :confirm_removal, :destroy]
   before_action :load_offender_from_responsibility_params, only: [:confirm, :create]
+  before_action :set_navigation_context
   before_action :check_existing_responsibility, only: [:new, :confirm]
 
   def new
@@ -29,7 +33,7 @@ class ResponsibilitiesController < PrisonsApplicationController
     @responsibility = Responsibility.find_or_initialize_by(nomis_offender_id:)
 
     # Treat repeated submits as a no-op so we don't create duplicate overrides or emails.
-    return redirect_back_to_allocation unless @responsibility.new_record?
+    return redirect_back_to_origin unless @responsibility.new_record?
 
     @responsibility.assign_attributes(responsibility_params.slice(:reason, :reason_text, :value))
     @responsibility.save!
@@ -45,12 +49,12 @@ class ResponsibilitiesController < PrisonsApplicationController
       ).responsibility_override.deliver_later
     end
 
-    redirect_back_to_allocation
+    redirect_back_to_origin
   rescue ActiveRecord::RecordInvalid
     @responsibility = Responsibility.find_by(nomis_offender_id:)
     raise unless @responsibility
 
-    redirect_back_to_allocation
+    redirect_back_to_origin
   end
 
   def confirm_removal
@@ -87,7 +91,7 @@ class ResponsibilitiesController < PrisonsApplicationController
                                     notes: @responsibility.reason_text).responsibility_to_custody.deliver_later
         end
       end
-      redirect_back_to_allocation
+      redirect_back_to_origin
     else
       render :confirm_removal
     end
@@ -99,8 +103,8 @@ private
     render 'responsibilities/presence_error' if Responsibility.exists?(nomis_offender_id:)
   end
 
-  def redirect_back_to_allocation
-    redirect_to prison_prisoner_allocation_path(@prison.code, nomis_offender_id)
+  def redirect_back_to_origin
+    redirect_to prisoner_page_path(prison_id: @prison.code, prisoner_id: nomis_offender_id)
   end
 
   def nomis_offender_id_from_url
@@ -118,6 +122,11 @@ private
 
   def nomis_offender_id
     @offender.offender_no
+  end
+
+  def set_navigation_context
+    @back_path = prisoner_page_path(prison_id: @prison.code, prisoner_id: nomis_offender_id)
+    @source_page = prisoner_page_source
   end
 
   def responsibility_params

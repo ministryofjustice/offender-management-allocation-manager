@@ -15,7 +15,6 @@
 <h1 class="govuk-heading-l govuk-!-margin-bottom-5">Allocation information</h1>
 
 <%= render 'shared/badges', offender: @prisoner %>
-<%= vlo_tag(@prisoner) %>
 
 <div class="govuk-!-margin-top-1">
   <table class="govuk-table">
@@ -84,11 +83,15 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">Current responsibility</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half responsibility_change">
-        <%= case_owner_label(@prisoner) %>
+        <% if @prisoner.responsibility_override? %>
+          <strong><%= case_owner_label(@prisoner) %></strong>
+        <% else %>
+          <%= case_owner_label(@prisoner) %>
+        <% end %>
         <% if @prisoner.pom_responsible? %>
-          <%= link_to 'Change', new_prison_responsibility_path(@prison.code, @prisoner.offender_no), class: 'govuk-link pull-right' %>
+          <%= link_to 'Change', new_prison_responsibility_path(@prison.code, @prisoner.offender_no, from: :allocation), class: 'govuk-link pull-right' %>
         <% elsif @prisoner.com_responsible? && @prisoner.responsibility_override? %>
-          <%= link_to 'Change', confirm_removal_prison_responsibility_path(@prison.code, nomis_offender_id: @prisoner.offender_no), class: 'govuk-link pull-right' %>
+          <%= link_to 'Change', confirm_removal_prison_responsibility_path(@prison.code, nomis_offender_id: @prisoner.offender_no, from: :allocation), class: 'govuk-link pull-right' %>
         <% end %>
       </td>
     </tr>

@@ -43,6 +43,10 @@ RSpec.describe "prisoners/review_case_details", type: :view do
         render
       end
 
+      it 'shows the shared case type badge' do
+        expect(page).to have_css('#prisoner-case-type', text: 'Determinate')
+      end
+
       it 'shows the rosh row' do
         row = at_a_glance_summary.find('#rosh-row')
 
@@ -55,6 +59,19 @@ RSpec.describe "prisoners/review_case_details", type: :view do
 
         expect(row).to have_link('Change', href: edit_prison_prisoner_case_information_path(prison, offender.offender_no, from: :review_case))
       end
+
+      it 'shows the pom role needed row' do
+        row = at_a_glance_summary.find('#pom-role-needed-row')
+
+        expect(row).to have_text('POM role needed')
+        expect(row).to have_text('Responsible')
+      end
+
+      it 'shows the override change link in the pom role needed row when custody is currently responsible' do
+        row = at_a_glance_summary.find('#pom-role-needed-row')
+
+        expect(row).to have_link('Change', href: new_prison_responsibility_path(prison, offender.offender_no, from: :review_case))
+      end
     end
 
     context 'when the rosh feature flag is disabled' do
@@ -65,6 +82,59 @@ RSpec.describe "prisoners/review_case_details", type: :view do
 
       it 'does not show the rosh row' do
         expect(at_a_glance_summary).not_to have_css('#rosh-row')
+      end
+    end
+
+    context 'when there is active VLO contact information' do
+      let(:case_info) { build(:case_information, :with_active_vlo, rosh_level: 'HIGH') }
+
+      before do
+        stub_feature_flag(:rosh_level, enabled: true)
+        render
+      end
+
+      it 'shows the VLO contact tag' do
+        expect(page).to have_css('.govuk-tag', text: 'VLO contact')
+      end
+    end
+
+    context 'when responsibility is overridden to community' do
+      before do
+        allow(offender).to receive_messages(
+          pom_responsible?: false,
+          com_responsible?: true,
+          responsibility_override?: true,
+        )
+        allow(view).to receive(:pom_responsibility_label).with(offender).and_return('Supporting')
+        stub_feature_flag(:rosh_level, enabled: true)
+        render
+      end
+
+      it 'shows the pom role needed row with a removal change link' do
+        row = at_a_glance_summary.find('#pom-role-needed-row')
+
+        expect(row).to have_text('Supporting')
+        expect(row).to have_link('Change', href: confirm_removal_prison_responsibility_path(prison, nomis_offender_id: offender.offender_no, from: :review_case))
+      end
+    end
+
+    context 'when community is responsible without an override' do
+      before do
+        allow(offender).to receive_messages(
+          pom_responsible?: false,
+          com_responsible?: true,
+          responsibility_override?: false,
+        )
+        allow(view).to receive(:pom_responsibility_label).with(offender).and_return('Supporting')
+        stub_feature_flag(:rosh_level, enabled: true)
+        render
+      end
+
+      it 'shows no change link in the pom role needed row' do
+        row = at_a_glance_summary.find('#pom-role-needed-row')
+
+        expect(row).to have_text('Supporting')
+        expect(row).not_to have_link('Change')
       end
     end
   end
