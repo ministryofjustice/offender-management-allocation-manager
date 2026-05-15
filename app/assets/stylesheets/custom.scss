@@ -69,6 +69,18 @@
   margin-bottom: govuk-spacing(2);
 }
 
+.app-badge-list {
+  display: inline-flex;
+  flex-wrap: wrap;
+  column-gap: govuk-spacing(1);
+  row-gap: govuk-spacing(2);
+  align-items: flex-start;
+
+  span.govuk-tag {
+    max-width: 162px;
+  }
+}
+
 // Case history styling overrides
 //
 .app-case-history__description,

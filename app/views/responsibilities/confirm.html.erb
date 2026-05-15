@@ -1,7 +1,7 @@
 <% content_for :title, "Confirm change of responsibility – Digital Prison Services" %>
 
 <%= link_to 'Back',
-            new_prison_responsibility_path(@prison.code, @offender.offender_no),
+            new_prison_responsibility_path(@prison.code, @offender.offender_no, from: @source_page),
             class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
 
 <div class="govuk-grid-row">
@@ -9,6 +9,7 @@
     <%= form_for(@responsibility,
                  url: prison_responsibilities_path(@prison.code),
                  builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+      <%= hidden_field_tag('from', @source_page) %>
       <%= f.hidden_field(:nomis_offender_id) %>
       <%= f.hidden_field(:reason) %>
       <%= f.hidden_field(:reason_text) %>
@@ -35,7 +36,7 @@
 
       <div class="govuk-button-group">
         <%= f.submit 'Confirm', class: 'govuk-button', data: { module: 'govuk-button' } %>
-        <%= link_to 'Cancel', prison_prisoner_allocation_path(@prison.code, @offender.offender_no), class: 'govuk-link' %>
+        <%= link_to 'Cancel', @back_path, class: 'govuk-link' %>
       </div>
     <% end %>
   </div>

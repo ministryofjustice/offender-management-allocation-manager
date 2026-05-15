@@ -1,22 +1,40 @@
-<span id="prisoner-case-type" class="govuk-tag govuk-tag--<%= badge_colour(offender) %>"><%= badge_text(offender) %></span>
-<%= render('shared/badges/recall_badge') if offender.recalled? %>
-<%= render('shared/badges/parole_badge') if offender.approaching_parole? %>
-
-<% status = offender.early_allocation_state %>
-<% if EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.key?(status) %>
-  <span id="early-allocation-badge" class="govuk-tag govuk-tag--blue">
-    Early allocation <%= EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.fetch(status) %>
-  </span>
-<% end %>
-<% if offender.restricted_patient? %>
-  <%= render('shared/badges/restricted_patient_badge') %>
-<% end %>
-<% if @prison.womens? %>
-  <% if offender.complexity_level == 'high' %>
-    <%= render('shared/badges/complexity_badge', complexity_badge_text: 'High complexity') %>
-  <% elsif offender.complexity_level == 'medium' %>
-    <%= render('shared/badges/complexity_badge', complexity_badge_text: 'Medium complexity') %>
-  <% elsif offender.complexity_level == 'low' %>
-    <%= render('shared/badges/complexity_badge', complexity_badge_text: 'Low complexity') %>
+<span class="app-badge-list">
+  <% if offender.indeterminate_sentence? %>
+    <span id="prisoner-case-type" class="govuk-tag govuk-tag--purple">Indeterminate</span>
+  <% else %>
+    <span id="prisoner-case-type" class="govuk-tag govuk-tag--blue">Determinate</span>
   <% end %>
-<% end %>
+
+  <% if offender.responsibility_override? %>
+    <span id="responsibility-override-badge" class="govuk-tag govuk-tag--yellow">Overridden</span>
+  <% end %>
+
+  <% if offender.active_vlo? || offender.victim_liaison_officers.any? %>
+    <span id="vlo-contact-badge" class="govuk-tag govuk-tag--red">VLO contact</span>
+  <% end %>
+
+  <% if offender.recalled? %>
+    <span id="recall-badge" class="govuk-tag govuk-tag--grey">Recall</span>
+  <% end %>
+
+  <% if offender.approaching_parole? %>
+    <span id="parole-badge" class="govuk-tag govuk-tag--grey">Parole eligible</span>
+  <% end %>
+
+  <% status = offender.early_allocation_state %>
+  <% if EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.key?(status) %>
+    <span id="early-allocation-badge" class="govuk-tag govuk-tag--blue">
+      Early allocation <%= EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.fetch(status) %>
+    </span>
+  <% end %>
+
+  <% if offender.restricted_patient? %>
+    <span id="restricted-patient-badge" class="govuk-tag govuk-tag--purple">Restricted patient</span>
+  <% end %>
+
+  <% if @prison.womens? && offender.complexity_level.present? %>
+    <span id="complexity-badge" class="govuk-tag govuk-tag--blue">
+      <%= offender.complexity_level.titleize %> complexity
+    </span>
+  <% end %>
+</span>
