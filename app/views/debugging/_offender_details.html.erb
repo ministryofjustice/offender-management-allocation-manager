@@ -58,6 +58,10 @@
         <dd class="govuk-summary-list__value"><%= probation_field(@offender, :tier) || 'Not provided' %></dd>
       </div>
       <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">ROSH level</dt>
+        <dd class="govuk-summary-list__value"><%= probation_field(@offender, :rosh_level) || 'Not provided' %></dd>
+      </div>
+      <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">MAPPA level</dt>
         <dd class="govuk-summary-list__value"><%= probation_field(@offender, :mappa_level) || 'Not provided' %></dd>
       </div>

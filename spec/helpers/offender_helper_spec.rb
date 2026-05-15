@@ -12,9 +12,11 @@ RSpec.describe OffenderHelper do
     end
   end
 
-  describe '#event_type' do
+  describe '#last_event' do
     let(:nomis_staff_id) { 456_789 }
     let(:nomis_offender_id) { 123_456 }
+    let(:first_allocation_date) { Time.zone.local(2026, 1, 10, 9, 0, 0) }
+    let(:last_allocation_event_date) { Time.zone.local(2026, 2, 20, 14, 30, 0) }
 
     let!(:allocation) do
       create(
@@ -22,12 +24,30 @@ RSpec.describe OffenderHelper do
         prison: prison.code,
         nomis_offender_id: nomis_offender_id,
         primary_pom_nomis_id: nomis_staff_id,
-        event: 'allocate_primary_pom'
+        event: 'allocate_primary_pom',
+        created_at: first_allocation_date,
+        updated_at: last_allocation_event_date
       )
     end
 
+    it 'returns the event in a more readable format using the latest event date' do
+      expect(helper.last_event(allocation)).to eq("POM allocated - #{last_allocation_event_date.strftime('%d/%m/%Y')}")
+    end
+
+    it 'falls back to created_at for CaseHistory-style objects without updated_at' do
+      allocation_history = instance_double(
+        CaseHistory,
+        event: 'allocate_primary_pom',
+        created_at: last_allocation_event_date
+      )
+
+      expect(helper.last_event(allocation_history)).to eq("POM allocated - #{last_allocation_event_date.strftime('%d/%m/%Y')}")
+    end
+  end
+
+  describe '#event_type' do
     it 'returns the event in a more readable format' do
-      expect(helper.last_event(allocation)).to eq("POM allocated - #{allocation.updated_at.strftime('%d/%m/%Y')}")
+      expect(helper.event_type('allocate_primary_pom')).to eq('POM allocated')
     end
   end
 

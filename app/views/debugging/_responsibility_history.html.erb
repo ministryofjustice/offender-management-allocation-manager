@@ -4,6 +4,7 @@
   </div>
   <div class="govuk-summary-card__content">
     <% if history&.any? %>
+      <% history_items = history.to_a %>
       <table class="govuk-table">
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
@@ -18,7 +19,9 @@
           </tr>
         </thead>
         <tbody class="govuk-table__body">
-          <% history.each do |item| %>
+          <% history_items.each.with_index(1) do |item, index| %>
+            <% previous_item = history_items[index] %>
+            <% comparison = Debugging::HandoverAttributeComparison.new(item, previous_item) %>
             <tr class="govuk-table__row">
               <th scope="row" class="govuk-table__header"><%= item.updated_at.strftime('%d/%m/%Y %H:%M:%S') %></th>
               <td class="govuk-table__cell"><%= item.responsibility %></td>
@@ -38,14 +41,30 @@
                     </span>
                   </summary>
                   <div class="govuk-details__text">
-                    <dl class="govuk-summary-list">
-                      <% item.offender_attributes.sort.each do |key, value| %>
-                        <div class="govuk-summary-list__row">
-                          <dt class="govuk-summary-list__key"><%= key.humanize %></dt>
-                          <dd class="govuk-summary-list__value"><%= value %></dd>
-                        </div>
-                      <% end %>
-                    </dl>
+                    <table class="govuk-table govuk-!-margin-bottom-0">
+                      <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                          <th scope="col" class="govuk-table__header"></th>
+                          <th scope="col" class="govuk-table__header">Before</th>
+                          <th scope="col" class="govuk-table__header">After</th>
+                        </tr>
+                      </thead>
+                      <tbody class="govuk-table__body">
+                        <% comparison.rows.each do |row| %>
+                          <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header"><%= row[:label] %></th>
+                            <td class="govuk-table__cell"><%= row[:before] %></td>
+                            <td class="govuk-table__cell">
+                              <% if row[:changed] %>
+                                <strong><%= row[:after] %></strong>
+                              <% else %>
+                                <%= row[:after] %>
+                              <% end %>
+                            </td>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
                   </div>
                 </details>
               </td>
