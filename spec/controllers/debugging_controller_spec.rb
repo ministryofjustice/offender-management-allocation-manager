@@ -47,6 +47,56 @@ RSpec.describe DebuggingController, type: :controller do
       expect(movements.from_agency).to eq "LEI"
       expect(movements.to_agency).to eq prison_id
     end
+
+    context 'when rendering handover history comparisons' do
+      render_views
+
+      it 'renders the handover history comparison block' do
+        stub_offender(build(:nomis_offender, prisonId: prison.code, sentence: attributes_for(:sentence_detail, :indeterminate), prisonerNumber: offender_no))
+
+        stub_movements_for offender_no, [attributes_for(:movement, offenderNo: offender_no,
+                                                                   fromAgency: 'LEI',
+                                                                   toAgency: prison_id,
+                                                                   movementType: 'TRN',
+                                                                   directionCode: 'IN')], movement_types: %w[ADM TRN REL]
+
+        offender = create(:offender, nomis_offender_id: offender_no)
+        create(:case_information, offender:)
+        create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no, primary_pom_nomis_id: pom_staff_id, primary_pom_name: primary_pom_name)
+
+        calculated_handover = build(:calculated_handover_date,
+                                    offender:,
+                                    nomis_offender_id: offender_no,
+                                    responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+                                    reason: :recall_case)
+        calculated_handover.offender_attributes_to_archive = {
+          'mappa_level' => 1,
+          'recalled?' => false,
+          'test_same_value' => 'same',
+          'ldu_email_address' => 'pom@example.com',
+          'team_name' => nil
+        }
+        calculated_handover.save!
+
+        calculated_handover.offender_attributes_to_archive = {
+          'mappa_level' => 2,
+          'recalled?' => true,
+          'test_same_value' => 'same',
+          'ldu_email_address' => nil,
+          'team_name' => nil
+        }
+        calculated_handover.update!(reason: :determinate_short)
+
+        get :debugging, params: { prison_id: prison_id, offender_no: offender_no }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('Offender details recorded at this point')
+        expect(response.body).to include('Before')
+        expect(response.body).to include('After')
+        expect(response.body).to include('Ldu email address')
+        expect(response.body).to include('(unset)')
+      end
+    end
   end
 
   describe 'debugging the timeline of events' do

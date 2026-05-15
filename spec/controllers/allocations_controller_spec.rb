@@ -148,6 +148,32 @@ RSpec.describe AllocationsController, type: :controller do
           expect(page.css('#oasys-date')).to have_text('No OASys information')
         end
       end
+
+      context 'when rendering the allocation summary' do
+        let(:active_pom) { poms.last }
+        let(:allocation_event_date) { Time.zone.local(2026, 3, 4, 12, 0, 0) }
+
+        render_views
+
+        before do
+          allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
+          create(:allocation_history,
+                 prison: prison_code,
+                 nomis_offender_id: offender_no,
+                 primary_pom_nomis_id: active_pom.staffId,
+                 event: AllocationHistory::ALLOCATE_PRIMARY_POM,
+                 created_at: allocation_event_date,
+                 updated_at: allocation_event_date)
+        end
+
+        it 'renders the last allocation event for the CaseHistory presenter' do
+          get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
+
+          expect(response).to have_http_status(:ok)
+          expect(response.body).to include('Allocation history')
+          expect(response.body).to include("POM allocated - #{allocation_event_date.strftime('%d/%m/%Y')}")
+        end
+      end
     end
 
     describe '#history' do
