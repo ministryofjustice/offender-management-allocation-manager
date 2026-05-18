@@ -25,6 +25,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
   let(:page) { Capybara::Node::Simple.new(rendered) }
 
   before do
+    stub_feature_flag(:simplified_enhanced_handover, enabled: false)
     offender # instantiate and stub
 
     assign(:prison, prison)
@@ -116,6 +117,46 @@ RSpec.describe 'handover_progress_checklists/edit' do
     it 'does not render reviewed_oasys checkbox' do
       expect(page).not_to have_css('input[name="handover_progress_checklist[reviewed_oasys]"]',
                                    visible: :all)
+    end
+  end
+
+  describe 'when simplified_enhanced_handover feature flag is enabled' do
+    before do
+      stub_feature_flag(:simplified_enhanced_handover, enabled: true)
+    end
+
+    context 'with enhanced handover' do
+      before do
+        allow(handover_progress_checklist).to receive_messages(handover_type: 'enhanced')
+        render
+      end
+
+      it 'renders only reviewed_oasys and contacted_com checkboxes' do
+        aggregate_failures do
+          expect(page).to have_content '0 of 2 tasks', normalize_ws: true
+          expect(page).to have_css('input[name="handover_progress_checklist[reviewed_oasys]"]', visible: :all)
+          expect(page).to have_css('input[name="handover_progress_checklist[contacted_com]"]', visible: :all)
+          expect(page).not_to have_css('input[name="handover_progress_checklist[attended_handover_meeting]"]', visible: :all)
+          expect(page).not_to have_css('input[name="handover_progress_checklist[sent_handover_report]"]', visible: :all)
+        end
+      end
+    end
+
+    context 'with standard handover' do
+      before do
+        allow(handover_progress_checklist).to receive_messages(handover_type: 'standard')
+        render
+      end
+
+      it 'still renders the standard checkboxes unchanged' do
+        aggregate_failures do
+          expect(page).to have_content '0 of 2 tasks', normalize_ws: true
+          expect(page).to have_css('input[name="handover_progress_checklist[contacted_com]"]', visible: :all)
+          expect(page).to have_css('input[name="handover_progress_checklist[sent_handover_report]"]', visible: :all)
+          expect(page).not_to have_css('input[name="handover_progress_checklist[reviewed_oasys]"]', visible: :all)
+          expect(page).not_to have_css('input[name="handover_progress_checklist[attended_handover_meeting]"]', visible: :all)
+        end
+      end
     end
   end
 end

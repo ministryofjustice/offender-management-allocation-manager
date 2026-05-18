@@ -1,49 +1,52 @@
 class HandoverProgressChecklistsController < PrisonsApplicationController
+  before_action :load_offender, :ensure_allocated_pom, :ensure_handover_in_progress
+
   def edit
     flash.keep(:current_handovers_url)
     @prison_id = active_prison_id
-    with_valid_offender do |offender, nomis_offender_id|
-      flash.keep[:current_handovers_url]
-      @offender = offender
-      @handover_progress_checklist =
-        HandoverProgressChecklist.find_or_initialize_by(nomis_offender_id: nomis_offender_id)
-    end
+    @handover_progress_checklist = HandoverProgressChecklist.find_or_initialize_by(nomis_offender_id:)
   end
 
   def update
-    with_valid_offender do |offender, nomis_offender_id|
-      unless @current_user.has_allocation?(nomis_offender_id)
-        redirect_to '/401'
-        return
-      end
+    checklist = HandoverProgressChecklist.find_or_initialize_by(nomis_offender_id:)
+    checklist.attributes = handover_progress_checklist_params(@offender)
+    checklist.save!
 
-      checklist = HandoverProgressChecklist.find_or_initialize_by(nomis_offender_id: nomis_offender_id)
-      checklist.attributes = handover_progress_checklist_params
-      checklist.save!
-      flash[:handover_success_notice] = "Handover tasks for #{offender.full_name_ordered} updated"
-      redirect_to helpers.last_handovers_url
-    end
+    flash[:handover_success_notice] = "Handover tasks for #{@offender.full_name_ordered} updated"
+    redirect_to helpers.last_handovers_url
   end
 
 private
 
-  def with_valid_offender
-    nomis_offender_id = params[:nomis_offender_id]
-    offender = OffenderService.get_offender(nomis_offender_id)
-    unless offender
-      redirect_to '/404'
-      return
-    end
-
-    yield offender, nomis_offender_id
+  def load_offender
+    @offender = get_offender_or_404(nomis_offender_id)
   end
 
-  def handover_progress_checklist_params
-    params.require(:handover_progress_checklist).permit(
-      :reviewed_oasys,
-      :contacted_com,
-      :attended_handover_meeting,
-      :sent_handover_report,
-    )
+  def ensure_allocated_pom
+    return if @current_user.has_allocation?(nomis_offender_id)
+
+    redirect_to '/401'
+  end
+
+  def ensure_handover_in_progress
+    return redirect_to('/401') if offender_released?
+
+    return if CalculatedHandoverDate.by_handover_in_progress(offender_ids: [nomis_offender_id]).exists?
+    return if CalculatedHandoverDate.by_upcoming_handover(offender_ids: [nomis_offender_id]).exists?
+
+    redirect_to '/401'
+  end
+
+  def offender_released?
+    @offender.earliest_release_date.present? && @offender.earliest_release_date <= Time.zone.today
+  end
+
+  def nomis_offender_id
+    params.fetch(:nomis_offender_id)
+  end
+
+  def handover_progress_checklist_params(offender)
+    fields = HandoverProgressChecklist.permitted_task_fields(handover_type: offender.handover_type)
+    params.require(:handover_progress_checklist).permit(*fields)
   end
 end

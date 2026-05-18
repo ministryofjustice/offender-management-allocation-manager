@@ -6,14 +6,17 @@ module HandoverHelper
   end
 
   def handover_progress_checklist_completion_tag(value)
-    css_classes = %w[govuk-tag app-task-list__tag]
+    css_classes = %w[govuk-tag]
     if value
       text = 'Complete'
     else
       text = 'To do'
-      css_classes.push 'govuk-tag govuk-tag--grey'
+      css_classes.push 'govuk-tag--grey'
     end
-    tag.strong text, class: css_classes
+
+    tag.span(class: 'app-handover-task-status-tag-wrapper') do
+      tag.strong(text, class: css_classes)
+    end
   end
 
   def last_handovers_url
@@ -26,5 +29,26 @@ module HandoverHelper
     url = send("#{action}_prison_handovers_path", link_params)
     aria = (controller.action_name == action) ? { current: 'page' } : nil
     link_to title, url, class: %w[moj-sub-navigation__link], aria: aria
+  end
+
+  def handover_progress_task_label(task_field)
+    I18n.t("handovers.progress_checklist.tasks.#{task_field}.label")
+  end
+
+  def handover_progress_task_hint_id(task_field)
+    "#{task_field.to_s.tr('_', '-')}-hint"
+  end
+
+  def handover_progress_task_hint(task_field)
+    task_field = task_field.to_sym
+    return t("handovers.progress_checklist.tasks.#{task_field}.hint") unless task_field == :sent_handover_report
+
+    t(
+      'handovers.progress_checklist.tasks.sent_handover_report.hint_html',
+      equip_link: link_to(
+        t('handovers.progress_checklist.tasks.sent_handover_report.equip_link_text'),
+        t(:equip_url), target: '_blank', rel: 'noopener'
+      )
+    )
   end
 end

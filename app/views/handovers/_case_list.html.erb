@@ -8,7 +8,7 @@
 
 <% handover_cases = local_assigns[:handover_data] || @filtered_handover_cases %>
 
-<%= handover_list_table(table_class: [table_class],
+<%= handover_list_table(table_class: [table_class] + ['govuk-!-margin-top-7'],
                         anchor: local_assigns[:anchor],
                         headers: [
                           { sort: 'offender_last_name', body: 'Prisoner details' },

@@ -235,6 +235,21 @@ en:
         contacted_com: 'Have contact from COM'
         attended_handover_meeting: 'Attend handover meeting'
         sent_handover_report: 'Send handover report'
+    progress_checklist:
+      tasks:
+        reviewed_oasys:
+          label: 'Review the last OASys assessment'
+          hint: 'Check the last OASys assessment still reflects current risks and circumstances. If not, update it to show how things have changed and any work not completed.'
+        contacted_com:
+          label: 'Have contact from COM'
+          hint: "Highlight any of the prisoner's pre-release or pre-parole needs and any public protection concerns you have identified."
+        attended_handover_meeting:
+          label: 'Attend handover meeting'
+          hint: 'The COM should be in touch about arranging this with you, the prisoner and anyone else involved in the case, such as family members and key workers.'
+        sent_handover_report:
+          label: 'Send handover report'
+          hint_html: 'You can find a template for this in the %{equip_link}.'
+          equip_link_text: 'handover guidance on EQuiP'
     email_preferences:
       success_notice: 'You have successfully updated your email preferences.'
 

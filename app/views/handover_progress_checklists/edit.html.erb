@@ -9,7 +9,7 @@
       Record handover progress for <%= @offender.first_name.titleize %>
     </h1>
 
-    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
       <% if @handover_progress_checklist.progress_data['complete'] == 0 %>
         Handover not started
       <% else %>
@@ -25,86 +25,31 @@
       tasks.
     </p>
 
-    <div class="govuk-inset-text govuk-inset-text--handover-date">
+    <div class="govuk-inset-text">
       COM responsible from <%= format_date(@offender.model.handover_date, replacement: 'Unknown') %>
     </div>
 
     <%= form_for(@handover_progress_checklist,
-                 url: prison_update_handover_progress_checklist_path(@prison.code,
-                                                                     @handover_progress_checklist.nomis_offender_id),
-                 method: :put) do |form| %>
+                 url: prison_update_handover_progress_checklist_path(
+                   @prison.code, @handover_progress_checklist.nomis_offender_id
+                 ), method: :put) do |form| %>
       <div class="app-task-list">
         <ul class="app-task-list__items">
-
-          <% if @handover_progress_checklist.handover_type == 'enhanced' %>
+          <% @handover_progress_checklist.task_completion_data.each do |task_field, complete| %>
+            <% task_field = task_field.to_sym %>
+            <% hint_id = handover_progress_task_hint_id(task_field) %>
             <li class="app-task-list__item with-divider">
               <div class="govuk-checkboxes">
                 <div class="govuk-checkboxes__item">
-                  <%= form.check_box :reviewed_oasys, class: 'govuk-checkboxes__input', 'aria-describedby': 'reviewed-oasys-hint' %>
-                  <%= form.label :reviewed_oasys, class: 'govuk-label govuk-checkboxes__label' do %>
-                    <strong>Review the last OASys assessment</strong>
+                  <%= form.check_box task_field, class: 'govuk-checkboxes__input', 'aria-describedby': hint_id %>
+                  <%= form.label task_field, class: 'govuk-label govuk-checkboxes__label' do %>
+                    <strong><%= handover_progress_task_label(task_field) %></strong>
                   <% end %>
-                  <%= handover_progress_checklist_completion_tag @handover_progress_checklist.reviewed_oasys %>
+                  <%= handover_progress_checklist_completion_tag(complete) %>
 
-                  <span class="govuk-hint govuk-checkboxes__hint" id="reviewed-oasys-hint">
-                  Check the last OASys assessment still reflects current risks and circumstances. If not, update it to
-                  show how things have changed and any work not completed.
-                </span>
-                </div>
-              </div>
-            </li>
-          <% end %>
-
-          <li class="app-task-list__item with-divider">
-            <div class="govuk-checkboxes">
-              <div class="govuk-checkboxes__item">
-                <%= form.check_box :contacted_com, class: 'govuk-checkboxes__input', 'aria-describedby': 'contacted-com-hint' %>
-                <%= form.label :contacted_com, class: 'govuk-label govuk-checkboxes__label' do %>
-                  <strong>Have contact from COM</strong>
-                <% end %>
-                <%= handover_progress_checklist_completion_tag @handover_progress_checklist.contacted_com %>
-
-                <span class="govuk-hint govuk-checkboxes__hint" id="contacted-com-hint">
-                    Highlight any of the prisoner's pre-release or pre-parole needs and any public protection concerns
-                    you have identified.
-                </span>
-              </div>
-            </div>
-          </li>
-
-          <% if @handover_progress_checklist.handover_type == 'enhanced' %>
-            <li class="app-task-list__item with-divider">
-              <div class="govuk-checkboxes">
-                <div class="govuk-checkboxes__item">
-                  <%= form.check_box :attended_handover_meeting, class: 'govuk-checkboxes__input',
-                                     'aria-describedby': 'attended-handover-meeting-hint' %>
-                  <%= form.label :attended_handover_meeting, class: 'govuk-label govuk-checkboxes__label' do %>
-                    <strong>Attend handover meeting</strong>
-                  <% end %>
-                  <%= handover_progress_checklist_completion_tag @handover_progress_checklist.attended_handover_meeting %>
-
-                  <span class="govuk-hint govuk-checkboxes__hint" id="attended-handover-meeting-hint">
-                    The COM should be in touch about arranging this with you, the prisoner and anyone else involved in
-                    the case, such as family members and key workers.
+                  <span class="govuk-hint govuk-checkboxes__hint" id="<%= hint_id %>">
+                    <%= handover_progress_task_hint(task_field) %>
                   </span>
-                </div>
-              </div>
-            </li>
-          <% else %>
-            <li class="app-task-list__item with-divider">
-              <div class="govuk-checkboxes">
-                <div class="govuk-checkboxes__item">
-                  <%= form.check_box :sent_handover_report, class: 'govuk-checkboxes__input',
-                                     'aria-describedby': 'sent-handover-report-hint' %>
-                  <%= form.label :sent_handover_report, class: 'govuk-label govuk-checkboxes__label' do %>
-                    <strong>Send handover report</strong>
-                  <% end %>
-                  <%= handover_progress_checklist_completion_tag @handover_progress_checklist.sent_handover_report %>
-
-                  <span class="govuk-hint govuk-checkboxes__hint" id="sent-handover-report-hint">
-                    You can find a template for this in the
-                    <%= link_to 'handover guidance on EQuiP', translate(:equip_url), target: '_blank' %>.
-                </span>
                 </div>
               </div>
             </li>
@@ -130,16 +75,12 @@
     <h2 class="govuk-heading-m" id="subsection-title">
       Case details
     </h2>
-    <ul class="govuk-list govuk-!-font-size-16">
-      <li>
-        <p class="govuk-body">
-          Name: <%= link_to @offender.full_name_ordered, prison_prisoner_path(@prison.code, @offender.offender_no) %>
-        </p>
-        <p class="govuk-body">Date of birth: <%= format_date(@offender.date_of_birth, replacement: 'Unknown') %></p>
-        <p class="govuk-body">Prison number: <%= @offender.offender_no %></p>
-        <p class="govuk-body">COM name: <%= @offender.allocated_com_name || 'Unknown' %></p>
-        <p class="govuk-body">COM email: <%= @offender.allocated_com_email || 'Unknown' %></p>
-      </li>
+    <ul class="govuk-list">
+      <li>Name: <%= link_to @offender.full_name_ordered, prison_prisoner_path(@prison.code, @offender.offender_no) %></li>
+      <li>Date of birth: <%= format_date(@offender.date_of_birth, replacement: 'Unknown') %></li>
+      <li>Prison number: <%= @offender.offender_no %></li>
+      <li>COM name: <%= @offender.allocated_com_name || 'Unknown' %></li>
+      <li>COM email: <%= @offender.allocated_com_email || 'Unknown' %></li>
     </ul>
   </div>
 </div>
