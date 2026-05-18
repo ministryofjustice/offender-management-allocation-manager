@@ -157,6 +157,19 @@ RSpec.describe CaseloadController, type: :controller do
           get :updates_required, params: { prison_id: prison.code, staff_id: staff_id }
           expect(response).to be_successful
         end
+
+        it 'maps outstanding tasks to presenters for the view' do
+          pom_task = instance_double(PomTask)
+          presenter = instance_double(PomTaskPresenter)
+
+          allow_any_instance_of(StaffMember).to receive(:pom_tasks).and_return([pom_task])
+          allow(PomTaskPresenter).to receive(:for).with(pom_task).and_return(presenter)
+
+          get :updates_required, params: { prison_id: prison.code, staff_id: staff_id }
+
+          expect(response).to be_successful
+          expect(assigns(:pom_tasks)).to eq([presenter])
+        end
       end
 
       describe '#new_cases' do

@@ -162,8 +162,6 @@ Rails.application.routes.draw do
 
     get '/poms/:nomis_staff_id/non_pom' => 'poms#show_non_pom', as: 'pom_non_pom'
 
-    resources :tasks, only: %i[index]
-
     resources :responsibilities, only: %i[create destroy], param: :nomis_offender_id do
       member do
         get :new, path: :new, as: :new
