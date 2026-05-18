@@ -2,7 +2,6 @@
 
 module Sorting
   SORTABLE_FIELDS = %i[
-    action_label
     additional_information
     allocated_com_name
     allocated_pom_role
