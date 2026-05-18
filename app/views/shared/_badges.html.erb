@@ -6,7 +6,10 @@
   <% end %>
 
   <% if offender.responsibility_override? %>
-    <span id="responsibility-override-badge" class="govuk-tag govuk-tag--yellow">Overridden</span>
+    <span id="responsibility-override-badge" class="govuk-tag govuk-tag--yellow app-tag--stacked">
+      <span class="app-tag__line">Responsibility</span>
+      <span class="app-tag__line">overridden</span>
+    </span>
   <% end %>
 
   <% if offender.active_vlo? || offender.victim_liaison_officers.any? %>
@@ -23,8 +26,9 @@
 
   <% status = offender.early_allocation_state %>
   <% if EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.key?(status) %>
-    <span id="early-allocation-badge" class="govuk-tag govuk-tag--blue">
-      Early allocation <%= EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.fetch(status) %>
+    <span id="early-allocation-badge" class="govuk-tag govuk-tag--blue app-tag--stacked">
+      <span class="app-tag__line">Early allocation</span>
+      <span class="app-tag__line"><%= EarlyAllocationHelper::EARLY_ALLOCATION_STATUSES.fetch(status) %></span>
     </span>
   <% end %>
 

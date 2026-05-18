@@ -28,7 +28,7 @@ RSpec.describe "prisoners/show", type: :view do
         it 'displays corresponding badge' do
           expect(badge_count).to eq(1)
           expect(early_allocation_badge.attributes['class'].value).to include 'govuk-tag--blue'
-          expect(early_allocation_badge.text.strip).to eq 'Early allocation assessment saved'
+          expect(early_allocation_badge.text.squish).to eq 'Early allocation assessment saved'
         end
       end
 
@@ -42,7 +42,7 @@ RSpec.describe "prisoners/show", type: :view do
           it 'displays corresponding badge' do
             expect(badge_count).to eq(1)
             expect(early_allocation_badge.attributes['class'].value).to include 'govuk-tag--blue'
-            expect(early_allocation_badge.text.strip).to eq 'Early allocation assessment saved'
+            expect(early_allocation_badge.text.squish).to eq 'Early allocation assessment saved'
           end
         end
 
@@ -52,7 +52,7 @@ RSpec.describe "prisoners/show", type: :view do
           it 'displays corresponding badge' do
             expect(badge_count).to eq(1)
             expect(early_allocation_badge.attributes['class'].value).to include 'govuk-tag--blue'
-            expect(early_allocation_badge.text.strip).to eq 'Early allocation decision pending'
+            expect(early_allocation_badge.text.squish).to eq 'Early allocation decision pending'
           end
         end
 
@@ -62,7 +62,7 @@ RSpec.describe "prisoners/show", type: :view do
           it 'displays corresponding badge' do
             expect(badge_count).to eq(1)
             expect(early_allocation_badge.attributes['class'].value).to include 'govuk-tag--blue'
-            expect(early_allocation_badge.text.strip).to eq 'Early allocation eligible'
+            expect(early_allocation_badge.text.squish).to eq 'Early allocation eligible'
           end
         end
 
@@ -71,7 +71,7 @@ RSpec.describe "prisoners/show", type: :view do
 
           it 'displays corresponding badge' do
             expect(early_allocation_badge.attributes['class'].value).to include 'govuk-tag--blue'
-            expect(early_allocation_badge.text.strip).to eq 'Early allocation eligible'
+            expect(early_allocation_badge.text.squish).to eq 'Early allocation eligible'
           end
         end
       end

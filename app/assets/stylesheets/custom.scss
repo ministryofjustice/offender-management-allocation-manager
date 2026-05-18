@@ -77,7 +77,14 @@
   align-items: flex-start;
 
   span.govuk-tag {
-    max-width: 162px;
+    white-space: nowrap;
+    width: fit-content;
+    max-width: fit-content;
+  }
+
+  span.app-tag--stacked .app-tag__line {
+    display: block;
+    white-space: nowrap;
   }
 }
 
