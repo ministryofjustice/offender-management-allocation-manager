@@ -25,7 +25,7 @@ describe 'HOMD overrides responsibilities' do
 
     visit allocated_prison_prisoners_path(prison)
     click_on 'Offender, Overridden'
-    expect(page).to have_css('#responsibility-override-badge', text: 'Overridden')
+    expect(page).to have_css('#responsibility-override-badge', text: 'Responsibility overridden')
     within('tr', text: 'Current responsibility Community') { click_on 'Change' }
     fill_in 'Why are you changing responsibility for this case?', with: 'Reasons are thus'
     click_on 'Confirm'
@@ -58,6 +58,6 @@ describe 'HOMD overrides responsibilities' do
     visit allocated_prison_prisoners_path(prison)
     click_on 'Offender, Calculated'
     expect(page).to have_content('Current responsibility Community')
-    expect(page).to have_css('#responsibility-override-badge', text: 'Overridden')
+    expect(page).to have_css('#responsibility-override-badge', text: 'Responsibility overridden')
   end
 end

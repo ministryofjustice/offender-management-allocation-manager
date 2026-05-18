@@ -66,13 +66,13 @@ RSpec.describe "shared/badges", type: :view do
 
     it 'displays a responsibility override badge' do
       expect(responsibility_override_badge.first.attributes['class'].value).to include 'govuk-tag--yellow'
-      expect(responsibility_override_badge.text).to include 'Overridden'
+      expect(responsibility_override_badge.text.squish).to eq 'Responsibility overridden'
     end
 
     it 'places the responsibility override badge immediately after the case type badge' do
       badge_text = page.css('.govuk-tag').map { |tag| tag.text.squish }
 
-      expect(badge_text.last(3)).to eq(['Determinate', 'Overridden', 'VLO contact'])
+      expect(badge_text.last(3)).to eq(['Determinate', 'Responsibility overridden', 'VLO contact'])
     end
   end
 
