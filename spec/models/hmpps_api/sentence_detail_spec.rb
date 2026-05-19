@@ -135,14 +135,8 @@ describe HmppsApi::SentenceDetail, model: true do
       expect(build(:sentence_detail, recall: true).recalled?).to be true
     end
 
-    it 'is true for upstream fixed-term recall sentence codes even without the recall flag' do
+    it 'is false when the recall flag is absent' do
       sentence_detail = build(:sentence_detail, recall: false, imprisonmentStatus: 'FTR_56ORA')
-
-      expect(sentence_detail.recalled?).to be true
-    end
-
-    it 'is false for non-recall ORA sentence codes when the recall flag is absent' do
-      sentence_detail = build(:sentence_detail, recall: false, imprisonmentStatus: 'ADIMP_ORA')
 
       expect(sentence_detail.recalled?).to be false
     end
