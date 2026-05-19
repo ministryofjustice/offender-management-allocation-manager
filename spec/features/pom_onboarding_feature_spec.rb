@@ -80,11 +80,13 @@ feature 'POM onboarding' do
             {
               totalElements: 1,
               content: [
-                username: 'TEST_USER',
-                staffId: staff_id,
-                firstName: 'Joe',
-                lastName: 'Bloggs',
-                email: 'joe.bloggs@example.com',
+                {
+                  username: 'TEST_USER',
+                  staffId: staff_id,
+                  firstName: 'Joe',
+                  lastName: 'Bloggs',
+                  email: 'joe.bloggs@example.com'
+                },
               ]
             }
           end

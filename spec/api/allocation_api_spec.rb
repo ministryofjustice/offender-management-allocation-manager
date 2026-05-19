@@ -14,7 +14,7 @@ describe 'Allocation API' do
 
       describe 'when not authorised' do
         response '401', 'Request is not authorised' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }
@@ -28,7 +28,7 @@ describe 'Allocation API' do
         end
 
         response '200', 'Offender is allocated' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema required: %w[primary_pom secondary_pom],
                  type: :object,
                  properties: {
@@ -65,7 +65,7 @@ describe 'Allocation API' do
         end
 
         response '404', 'Allocation for offender not found' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }
@@ -83,7 +83,7 @@ describe 'Allocation API' do
 
       describe 'when not authorised' do
         response '401', 'Request is not authorised' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }
@@ -101,7 +101,7 @@ describe 'Allocation API' do
         end
 
         response '200', 'Offender is allocated' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema required: %w[manager prison],
                  type: :object,
                  properties: {
@@ -141,7 +141,7 @@ describe 'Allocation API' do
         end
 
         response '404', 'Allocation for offender not found' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }

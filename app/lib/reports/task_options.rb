@@ -9,7 +9,7 @@ module Reports
       start_index, end_index = ENV.fetch('PRISONS_RANGE', '0').split('..', 2)
       start_index = start_index.to_i
 
-      end_index.present? ? (start_index..end_index.to_i) : (start_index..)
+      end_index.present? ? (start_index..end_index.to_i) : start_index..
     end
 
     # Format for dates: 2026-02-16

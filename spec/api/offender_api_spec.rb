@@ -19,7 +19,7 @@ describe 'Offender Early Allocation API' do
 
       describe 'when not authorised' do
         response '401', 'Request is not authorised' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }
@@ -33,7 +33,7 @@ describe 'Offender Early Allocation API' do
         end
 
         response '200', 'Offender has an early allocation' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema type: :object,
                  properties: {
                    offender_no: { '$ref' => '#/components/schemas/NomsNumber' },
@@ -57,7 +57,7 @@ describe 'Offender Early Allocation API' do
         end
 
         response '404', 'Offender not found' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }
