@@ -15,6 +15,7 @@ FactoryBot.define do
 
     # 1 day after policy start in Wales
     sentenceStartDate { '2019-02-05' }
+    sentenceExpiryDate { nil }
     releaseDate { Time.zone.today + 2.years }
     conditionalReleaseDate { Time.zone.today + 1.year }
 
@@ -115,9 +116,9 @@ FactoryBot.define do
 
     trait :criminal_sentence do
     end
-    
+
     trait :civil_sentence do
-      imprisonmentStatus {'CIVIL'}
+      imprisonmentStatus { 'CIVIL' }
     end
 
     trait :less_than_10_months_to_serve do

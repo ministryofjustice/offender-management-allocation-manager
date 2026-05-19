@@ -10,13 +10,11 @@ module HmppsApi
                 :recall,
                 :release_date,
                 :sentence_start_date,
+                :sentence_expiry_date,
                 :tariff_date,
                 :legal_status
 
     delegate :criminal_sentence?, :immigration_case?, :civil_sentence?, to: :@sentence_type
-
-    # Note - this is hiding a defect - we never get sentence_expiry_date from NOMIS (but maybe we should?)
-    attr_accessor :sentence_expiry_date
 
     def initialize(payload)
       @actual_parole_date = payload['actualParoleDate']&.to_date
@@ -32,6 +30,7 @@ module HmppsApi
       @parole_eligibility_date = payload['paroleEligibilityDate']&.to_date
       @release_date = payload['releaseDate']&.to_date
       @sentence_start_date = payload['sentenceStartDate']&.to_date
+      @sentence_expiry_date = payload['sentenceExpiryDate']&.to_date
       @tariff_date = payload['tariffDate']&.to_date
 
       @sentence_type = SentenceType.new payload.fetch('imprisonmentStatus', 'UNK_SENT')

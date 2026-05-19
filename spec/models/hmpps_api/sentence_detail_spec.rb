@@ -78,6 +78,12 @@ describe HmppsApi::SentenceDetail, model: true do
     end
   end
 
+  describe '#sentence_expiry_date' do
+    it 'populates the sentence expiry date from the payload' do
+      expect(build(:sentence_detail, sentenceExpiryDate: date.to_s).sentence_expiry_date).to eq(date)
+    end
+  end
+
   describe "#post_recall_release_date" do
     subject do
       build :sentence_detail, automaticReleaseDate: date,
