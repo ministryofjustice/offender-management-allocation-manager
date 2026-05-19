@@ -36,7 +36,7 @@ describe 'SAR API' do
         let(:Authorization) { nil }
 
         response '401', 'Request is not authorised' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/SarError'
 
           let(:crn) { nil }
@@ -64,7 +64,7 @@ describe 'SAR API' do
         end
 
         response '403', 'Invalid token role' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/SarError'
 
           let(:crn) { nil }
@@ -82,7 +82,7 @@ describe 'SAR API' do
         end
 
         response '400', 'Both PRN and CRN parameter passed' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/SarError'
 
           let(:crn) { '123456' }
@@ -94,7 +94,7 @@ describe 'SAR API' do
         end
 
         response '209', 'Just CRN parameter passed' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/SarError'
 
           let(:crn) { '123456' }
@@ -106,7 +106,7 @@ describe 'SAR API' do
         end
 
         response '210', 'Invalid date format' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/SarError'
 
           let(:crn) { nil }
@@ -118,7 +118,7 @@ describe 'SAR API' do
         end
 
         response '204', 'Offender not found' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
 
           let(:crn) { nil }
           let(:prn) { 'A1111AA' }
@@ -129,7 +129,7 @@ describe 'SAR API' do
         end
 
         response '200', 'Offender found' do
-          security [Bearer: []]
+          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/SarOffenderData'
 
           before do
