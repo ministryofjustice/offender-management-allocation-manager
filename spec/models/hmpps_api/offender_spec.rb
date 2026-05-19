@@ -94,12 +94,7 @@ describe HmppsApi::Offender do
       let(:today_plus1) { Time.zone.today + 1.day }
 
       context 'with just the sentence expiry date' do
-        let(:sentence) { attributes_for(:sentence_detail, :blank) }
-
-        before do
-          # Set the sentence expiry date – this one is a bit odd because we don't actually populate it from the API
-          subject.sentence.sentence_expiry_date = today_plus1
-        end
+        let(:sentence) { attributes_for(:sentence_detail, :blank, sentenceExpiryDate: today_plus1) }
 
         it 'uses the SED' do
           expect(subject.earliest_release_date).to eq(today_plus1)
@@ -109,13 +104,10 @@ describe HmppsApi::Offender do
       context 'with many dates' do
         let(:sentence) do
           attributes_for(:sentence_detail, :blank,
+                         sentenceExpiryDate: sentence_expiry_date,
                          licenceExpiryDate: licence_expiry_date,
                          postRecallReleaseDate: post_recall_release_date,
                          actualParoleDate: actual_parole_date)
-        end
-
-        before do
-          subject.sentence.sentence_expiry_date = sentence_expiry_date
         end
 
         context 'with future dates' do

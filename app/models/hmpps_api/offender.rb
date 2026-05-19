@@ -7,6 +7,7 @@ module HmppsApi
     delegate :home_detention_curfew_eligibility_date,
              :home_detention_curfew_actual_date,
              :conditional_release_date, :release_date,
+             :sentence_expiry_date, :actual_parole_date,
              :parole_eligibility_date, :tariff_date,
              :automatic_release_date, :licence_expiry_date,
              :post_recall_release_date, :earliest_release_date, :earliest_release,

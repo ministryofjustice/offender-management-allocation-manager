@@ -251,6 +251,8 @@ RSpec.describe MpcOffender, type: :model do
         sentence_start_date
         conditional_release_date
         automatic_release_date
+        sentence_expiry_date
+        actual_parole_date
         parole_eligibility_date
         tariff_date
         post_recall_release_date
@@ -258,7 +260,6 @@ RSpec.describe MpcOffender, type: :model do
         home_detention_curfew_actual_date
         home_detention_curfew_eligibility_date
         prison_arrival_date
-        earliest_release_date
         earliest_release
         earliest_release_for_handover
         latest_temp_movement_date
@@ -287,6 +288,9 @@ RSpec.describe MpcOffender, type: :model do
         allocated_com_name
         allocated_com_email
         target_hearing_date
+        parole_outcome_not_release?
+        sentenced_to_additional_future_isp?
+        early_allocation?
         early_allocation_state
       ]
 
