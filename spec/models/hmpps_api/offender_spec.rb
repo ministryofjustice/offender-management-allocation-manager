@@ -257,15 +257,15 @@ describe HmppsApi::Offender do
       end
     end
 
-    context 'when recall flag is false but imprisonment status is an upstream recall code' do
+    context 'when recall flag unset' do
       let(:sentence) { attributes_for(:sentence_detail, recall: false, imprisonmentStatus: 'FTR_56ORA') }
 
-      it 'is true' do
-        expect(subject.recalled?).to eq(true)
+      it 'is false' do
+        expect(subject.recalled?).to eq(false)
       end
     end
 
-    context 'when recall flag unset' do
+    context 'when recall flag is false' do
       let(:sentence) { attributes_for(:sentence_detail, recall: false) }
 
       it 'is false' do

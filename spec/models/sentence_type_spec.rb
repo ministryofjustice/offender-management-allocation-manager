@@ -27,15 +27,4 @@ RSpec.describe SentenceType, type: :model do
   it 'does not treat criminal sentence types as civil' do
     expect(described_class.new('IPP').civil_sentence?).to be false
   end
-
-  describe '#recall?' do
-    it 'recognises the current upstream Prison API recall sentence codes' do
-      expect(described_class::RECALL_SENTENCE_TYPES).to all(satisfy { |code| described_class.new(code).recall? })
-    end
-
-    it 'does not treat non-recall sentence codes as recall' do
-      expect(described_class.new('ADIMP_ORA').recall?).to be false
-      expect(described_class.new('EDS21').recall?).to be false
-    end
-  end
 end

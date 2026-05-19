@@ -13,10 +13,33 @@ module HmppsApi
                 :tariff_date,
                 :legal_status
 
-    delegate :criminal_sentence?, :immigration_case?, :civil_sentence?, :recall?, to: :@sentence_type
+    delegate :criminal_sentence?, :immigration_case?, :civil_sentence?, to: :@sentence_type
 
     # Note - this is hiding a defect - we never get sentence_expiry_date from NOMIS (but maybe we should?)
     attr_accessor :sentence_expiry_date
+
+    def initialize(payload)
+      @actual_parole_date = payload['actualParoleDate']&.to_date
+      @automatic_release_date = payload['automaticReleaseDate']&.to_date
+      @automatic_release_override_date = payload['automaticReleaseOverrideDate']&.to_date
+      @conditional_release_date = payload['conditionalReleaseDate']&.to_date
+      @conditional_release_override_date = payload['conditionalReleaseOverrideDate']&.to_date
+      @home_detention_curfew_actual_date = payload['homeDetentionCurfewActualDate']&.to_date
+      @home_detention_curfew_eligibility_date = payload['homeDetentionCurfewEligibilityDate']&.to_date
+      @licence_expiry_date = payload['licenceExpiryDate']&.to_date
+      @nomis_post_recall_release_date = payload['postRecallReleaseDate']&.to_date
+      @nomis_post_recall_release_override_date = payload['postRecallReleaseOverrideDate']&.to_date
+      @parole_eligibility_date = payload['paroleEligibilityDate']&.to_date
+      @release_date = payload['releaseDate']&.to_date
+      @sentence_start_date = payload['sentenceStartDate']&.to_date
+      @tariff_date = payload['tariffDate']&.to_date
+
+      @sentence_type = SentenceType.new payload.fetch('imprisonmentStatus', 'UNK_SENT')
+      @recall = payload.fetch('recall', false)
+      @indeterminate_sentence = payload['indeterminateSentence']
+      @description = payload.fetch('imprisonmentStatusDescription', 'Unknown Sentenced')
+      @legal_status = payload['legalStatus']
+    end
 
     def automatic_release_date
       @automatic_release_override_date.presence || @automatic_release_date
@@ -77,30 +100,7 @@ module HmppsApi
     end
 
     def recalled?
-      @recall || recall?
-    end
-
-    def initialize(payload)
-      @actual_parole_date = payload['actualParoleDate']&.to_date
-      @automatic_release_date = payload['automaticReleaseDate']&.to_date
-      @automatic_release_override_date = payload['automaticReleaseOverrideDate']&.to_date
-      @conditional_release_date = payload['conditionalReleaseDate']&.to_date
-      @conditional_release_override_date = payload['conditionalReleaseOverrideDate']&.to_date
-      @home_detention_curfew_actual_date = payload['homeDetentionCurfewActualDate']&.to_date
-      @home_detention_curfew_eligibility_date = payload['homeDetentionCurfewEligibilityDate']&.to_date
-      @licence_expiry_date = payload['licenceExpiryDate']&.to_date
-      @nomis_post_recall_release_date = payload['postRecallReleaseDate']&.to_date
-      @nomis_post_recall_release_override_date = payload['postRecallReleaseOverrideDate']&.to_date
-      @parole_eligibility_date = payload['paroleEligibilityDate']&.to_date
-      @release_date = payload['releaseDate']&.to_date
-      @sentence_start_date = payload['sentenceStartDate']&.to_date
-      @tariff_date = payload['tariffDate']&.to_date
-
-      @sentence_type = SentenceType.new payload.fetch('imprisonmentStatus', 'UNK_SENT')
-      @recall = payload.fetch('recall', false)
-      @indeterminate_sentence = payload['indeterminateSentence']
-      @description = payload.fetch('imprisonmentStatusDescription', 'Unknown Sentenced')
-      @legal_status = payload['legalStatus']
+      @recall
     end
 
     def indeterminate_sentence?
