@@ -220,6 +220,7 @@ RSpec.describe SarOffenderDataService do
             expect(case_information.keys).not_to include('crn')
             expect(case_information.keys).not_to include('localDeliveryUnitId')
             expect(case_information.keys).not_to include('lduCode')
+            expect(case_information.keys).not_to include('roshStartDate')
           end
 
           it 'returns booleans' do

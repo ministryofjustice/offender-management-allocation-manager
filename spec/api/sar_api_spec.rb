@@ -49,18 +49,8 @@ describe 'SAR API' do
       end
 
       describe 'when forbidden due to role' do
-        let(:payload) do
-          {
-            'internal_user' => false,
-            'scope' => %w[read],
-            'exp' => 1.hour.from_now.to_i,
-            'client_id' => 'offender-management-allocation-manager',
-            'authorities' => %w[ROLE_FOOBAR]
-          }
-        end
-
         before do
-          allow(JwksDecoder).to receive(:decode_token).and_return([payload])
+          stub_decoded_token(authorities: %w[ROLE_FOOBAR])
         end
 
         response '403', 'Invalid token role' do

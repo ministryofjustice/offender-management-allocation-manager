@@ -2,13 +2,7 @@ require 'rails_helper'
 
 describe HmppsApi::Oauth::Token do
   def mock_jwt_token(options = {})
-    payload = {
-      'internal_user' => false,
-      'scope' => %w[read write],
-      'exp' => 4.hours.from_now.to_i,
-      'client_id' => 'offender-management-allocation-manager',
-    }.merge(options)
-    allow(JwksDecoder).to receive(:decode_token).and_return([payload])
+    stub_decoded_token(options)
   end
 
   it 'can confirm if it is not expired' do
