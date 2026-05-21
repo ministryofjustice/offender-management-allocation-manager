@@ -16,15 +16,15 @@ WORKDIR /app
 FROM base AS builder
 
 # Build-only dependencies required for native gems.
-RUN apk add --no-cache \
-    build-base \
-    ca-certificates \
-    nodejs \
-    postgresql-dev \
-    tzdata \
-    yaml-dev \
-    yarn \
-  && apk upgrade --no-cache zlib
+RUN apk upgrade --no-cache \
+  && apk add --no-cache \
+  build-base \
+  ca-certificates \
+  nodejs \
+  postgresql-dev \
+  tzdata \
+  yaml-dev \
+  yarn
 
 RUN mkdir -p /tmp/rds-cert \
   && wget -qO /tmp/rds-cert/root.crt https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
@@ -42,12 +42,12 @@ RUN SECRET_KEY_BASE=key RAILS_ENV=production bundle exec rails assets:precompile
 
 FROM base AS runtime
 
-RUN apk add --no-cache \
+RUN apk upgrade --no-cache \
+  && apk add --no-cache \
   ca-certificates \
   libcurl \
   postgresql-libs \
-  tzdata \
-  && apk upgrade --no-cache zlib
+  tzdata
 
 RUN addgroup -S appgroup -g 1001 \
   && adduser -S appuser -u 1001 -G appgroup -h /home/appuser
