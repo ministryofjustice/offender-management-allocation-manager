@@ -1,20 +1,38 @@
 ---
 openapi: 3.0.3
 info:
-  title: MPC/MOIC API
+  title: Manage POM Cases API
   version: v2
+  description: |-
+    API endpoints for Manage POM Cases, covering offender allocations, handovers, early allocation status, and subject access request (SAR) data.
+
+    ### Authentication
+
+    This API is secured by OAuth 2 with Bearer tokens supplied by HMPPS Auth.
+
+    Most read endpoints require the role `ROLE_VIEW_POM_ALLOCATIONS`.
+
+    SAR endpoints require the role `ROLE_SAR_DATA_ACCESS`.
+
+    ---
+
+    Owned by the **Manage POM Cases** team
+
+    - Slack: [#manage-pom-cases](https://mojdt.slack.com/channels/manage-pom-cases)
+    - GitHub: [ministryofjustice/offender-management-allocation-manager](https://github.com/ministryofjustice/offender-management-allocation-manager)
 servers:
-- url: "{protocol}://{defaultHost}"
-  variables:
-    protocol:
-      default: https
-    defaultHost:
-      default: dev.moic.service.justice.gov.uk
+- url: https://dev.moic.service.justice.gov.uk
+  description: Staging/dev environment
+- url: https://preprod.moic.service.justice.gov.uk
+  description: Pre-production environment
+- url: https://moic.service.justice.gov.uk
+  description: Production environment
 components:
   securitySchemes:
     Bearer:
       type: apiKey
-      description: A bearer token obtained from HMPPS SSO
+      description: A Bearer token obtained from HMPPS Auth and supplied in the Authorization
+        header
       name: Authorization
       in: header
   schemas:
@@ -365,20 +383,38 @@ components:
               "$ref": "#/components/schemas/SarHandoverProgressChecklist"
             responsibility:
               "$ref": "#/components/schemas/SarResponsibility"
+tags:
+- name: Allocations
+  description: Retrieve current prison offender manager allocation details for a prisoner
+- name: Handovers
+  description: Retrieve handover dates and current responsibility between prison and
+    probation
+- name: Offenders
+  description: Retrieve prisoner-level data exposed by Manage POM Cases APIs
+- name: Subject Access Request
+  description: SAR endpoints for retrieving service data and the Mustache template
+    used by the SAR HTML renderer
 paths:
   "/api/allocation/{nomsNumber}":
     get:
       summary: Retrieves the current allocation for an offender
+      security:
+      - Bearer: []
       tags:
       - Allocations
+      description: |-
+        Returns the current primary and secondary prison offender manager allocation for the supplied prisoner.
+
+        Authentication requirements:
+        * A valid Bearer token must be supplied in the Authorization header.
+        * The role ROLE_VIEW_POM_ALLOCATIONS is required.
       parameters:
       - name: nomsNumber
         in: path
         schema:
           "$ref": "#/components/schemas/NomsNumber"
+        description: NOMIS Prison Number for the prisoner
         required: true
-      security:
-      - Bearer: []
       responses:
         '401':
           description: Request is not authorised
@@ -419,16 +455,23 @@ paths:
   "/api/allocation/{nomsNumber}/primary_pom":
     get:
       summary: Retrieves the primary POM for an offender
+      security:
+      - Bearer: []
       tags:
       - Allocations
+      description: |-
+        Returns the currently allocated primary prison offender manager for the supplied prisoner, including live manager details and prison code.
+
+        Authentication requirements:
+        * A valid Bearer token must be supplied in the Authorization header.
+        * The role ROLE_VIEW_POM_ALLOCATIONS is required.
       parameters:
       - name: nomsNumber
         in: path
         schema:
           "$ref": "#/components/schemas/NomsNumber"
+        description: NOMIS Prison Number for the prisoner
         required: true
-      security:
-      - Bearer: []
       responses:
         '401':
           description: Request is not authorised
@@ -469,16 +512,23 @@ paths:
   "/api/handovers/{nomsNumber}":
     get:
       summary: Retrieves the handover information for an offender
+      security:
+      - Bearer: []
       tags:
       - Handovers
+      description: |-
+        Returns handover dates and the current responsibility split between prison and probation for the supplied prisoner.
+
+        Authentication requirements:
+        * A valid Bearer token must be supplied in the Authorization header.
+        * The role ROLE_VIEW_POM_ALLOCATIONS is required.
       parameters:
       - name: nomsNumber
         in: path
         schema:
           "$ref": "#/components/schemas/NomsNumber"
+        description: NOMIS Prison Number for the prisoner
         required: true
-      security:
-      - Bearer: []
       responses:
         '401':
           description: Request is not authorised
@@ -530,16 +580,23 @@ paths:
   "/api/offenders/{nomsNumber}":
     get:
       summary: Retrieves information for a prisoner including early allocation status
+      security:
+      - Bearer: []
       tags:
       - Offenders
+      description: |-
+        Returns prisoner information exposed by Manage POM Cases for the supplied prisoner number, including whether the prisoner currently has early allocation eligibility.
+
+        Authentication requirements:
+        * A valid Bearer token must be supplied in the Authorization header.
+        * The role ROLE_VIEW_POM_ALLOCATIONS is required.
       parameters:
       - name: nomsNumber
         in: path
         schema:
           "$ref": "#/components/schemas/NomsNumber"
+        description: NOMIS Prison Number for the prisoner
         required: true
-      security:
-      - Bearer: []
       responses:
         '401':
           description: Request is not authorised
@@ -575,9 +632,12 @@ paths:
   "/subject-access-request":
     get:
       summary: Retrieves all held info for offender
+      security:
+      - Bearer: []
       tags:
       - Subject Access Request
       description: |-
+        * A valid Bearer token must be supplied in the Authorization header.
         * NOMIS Prison Number (PRN) must be provided as part of the request.
         * The role ROLE_SAR_DATA_ACCESS is required
         * If the product uses the identifier type transmitted in the request, it can respond with its data and HTTP code 200
@@ -607,37 +667,70 @@ paths:
           which should be returned in the response (if used, both dates must be provided)
         schema:
           type: string
-      security:
-      - Bearer: []
       responses:
         '401':
           description: Request is not authorised
           content:
             application/json:
+              examples:
+                error_example:
+                  value:
+                    developerMessage: Valid authorisation token required
+                    errorCode: 1
+                    status: 401
+                    userMessage: Valid authorisation token required
               schema:
                 "$ref": "#/components/schemas/SarError"
         '403':
           description: Invalid token role
           content:
             application/json:
+              examples:
+                error_example:
+                  value:
+                    developerMessage: Invalid token role
+                    errorCode: 5
+                    status: 403
+                    userMessage: Invalid token role
               schema:
                 "$ref": "#/components/schemas/SarError"
         '400':
-          description: Both PRN and CRN parameter passed
+          description: PRN and CRN parameters passed
           content:
             application/json:
+              examples:
+                error_example:
+                  value:
+                    developerMessage: PRN and CRN parameters passed
+                    errorCode: 2
+                    status: 400
+                    userMessage: PRN and CRN parameters passed
               schema:
                 "$ref": "#/components/schemas/SarError"
         '209':
-          description: Just CRN parameter passed
+          description: CRN parameter not allowed
           content:
             application/json:
+              examples:
+                error_example:
+                  value:
+                    developerMessage: CRN parameter not allowed
+                    errorCode: 3
+                    status: 209
+                    userMessage: CRN parameter not allowed
               schema:
                 "$ref": "#/components/schemas/SarError"
         '210':
           description: Invalid date format
           content:
             application/json:
+              examples:
+                error_example:
+                  value:
+                    developerMessage: Invalid date format
+                    errorCode: 4
+                    status: 210
+                    userMessage: Invalid date format
               schema:
                 "$ref": "#/components/schemas/SarError"
         '204':
@@ -651,13 +744,14 @@ paths:
   "/subject-access-request/template":
     get:
       summary: Retrieves the SAR Mustache template for this service
+      security:
+      - Bearer: []
       tags:
       - Subject Access Request
       description: |-
+        * A valid Bearer token must be supplied in the Authorization header.
         * The role ROLE_SAR_DATA_ACCESS is required
         * Returns the plain-text Mustache template configured for the service
-      security:
-      - Bearer: []
       responses:
         '401':
           description: Request is not authorised
@@ -665,14 +759,28 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/SarError"
+              examples:
+                error_example:
+                  value:
+                    developerMessage: Valid authorisation token required
+                    errorCode: 1
+                    status: 401
+                    userMessage: Valid authorisation token required
         '403':
           description: Invalid token role
           content:
             application/json:
               schema:
                 "$ref": "#/components/schemas/SarError"
+              examples:
+                error_example:
+                  value:
+                    developerMessage: Invalid token role
+                    errorCode: 5
+                    status: 403
+                    userMessage: Invalid token role
         '200':
-          description: Template returned for SAR users
+          description: Template returned
           content:
             text/plain:
               schema:

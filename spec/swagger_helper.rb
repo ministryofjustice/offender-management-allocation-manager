@@ -6,27 +6,46 @@ RSpec.configure do |config|
     'public/openapi.yml' => {
       openapi: '3.0.3',
       info: {
-        title: 'MPC/MOIC API',
+        title: 'Manage POM Cases API',
         version: 'v2',
+        description: [
+          'API endpoints for Manage POM Cases, covering offender allocations, handovers, early allocation status, and subject access request (SAR) data.',
+          '',
+          '### Authentication',
+          '',
+          'This API is secured by OAuth 2 with Bearer tokens supplied by HMPPS Auth.',
+          '',
+          'Most read endpoints require the role `ROLE_VIEW_POM_ALLOCATIONS`.',
+          '',
+          'SAR endpoints require the role `ROLE_SAR_DATA_ACCESS`.',
+          '',
+          '---',
+          '',
+          'Owned by the **Manage POM Cases** team',
+          '',
+          '- Slack: [#manage-pom-cases](https://mojdt.slack.com/channels/manage-pom-cases)',
+          '- GitHub: [ministryofjustice/offender-management-allocation-manager](https://github.com/ministryofjustice/offender-management-allocation-manager)'
+        ].join("\n")
       },
       servers: [
         {
-          url: '{protocol}://{defaultHost}',
-          variables: {
-            protocol: {
-              default: :https
-            },
-            defaultHost: {
-              default: 'dev.moic.service.justice.gov.uk'
-            }
-          }
+          url: 'https://dev.moic.service.justice.gov.uk',
+          description: 'Staging/dev environment',
+        },
+        {
+          url: 'https://preprod.moic.service.justice.gov.uk',
+          description: 'Pre-production environment',
+        },
+        {
+          url: 'https://moic.service.justice.gov.uk',
+          description: 'Production environment',
         },
       ],
       components: {
         securitySchemes: {
           Bearer: {
             type: "apiKey",
-            description: "A bearer token obtained from HMPPS SSO",
+            description: "A Bearer token obtained from HMPPS Auth and supplied in the Authorization header",
             name: "Authorization",
             in: "header",
           }
@@ -292,6 +311,24 @@ RSpec.configure do |config|
           },
         },
       },
+      tags: [
+        {
+          name: 'Allocations',
+          description: 'Retrieve current prison offender manager allocation details for a prisoner',
+        },
+        {
+          name: 'Handovers',
+          description: 'Retrieve handover dates and current responsibility between prison and probation',
+        },
+        {
+          name: 'Offenders',
+          description: 'Retrieve prisoner-level data exposed by Manage POM Cases APIs',
+        },
+        {
+          name: 'Subject Access Request',
+          description: 'SAR endpoints for retrieving service data and the Mustache template used by the SAR HTML renderer',
+        },
+      ],
       paths: {}
     }
   }

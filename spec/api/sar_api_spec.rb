@@ -5,12 +5,19 @@ describe 'SAR API' do
 
   path '/subject-access-request' do
     get 'Retrieves all held info for offender' do
+      security [{ Bearer: [] }]
+
       tags 'Subject Access Request'
-      description "* NOMIS Prison Number (PRN) must be provided as part of the request.
-* The role ROLE_SAR_DATA_ACCESS is required
-* If the product uses the identifier type transmitted in the request, it can respond with its data and HTTP code 200
-* If the product uses the identifier type transmitted in the request but has no data to respond with, it should respond with HTTP code 204
-* If the product does not use the identifier type transmitted in the request, it should respond with HTTP code 209"
+      description(
+        [
+          '* A valid Bearer token must be supplied in the Authorization header.',
+          '* NOMIS Prison Number (PRN) must be provided as part of the request.',
+          '* The role ROLE_SAR_DATA_ACCESS is required',
+          '* If the product uses the identifier type transmitted in the request, it can respond with its data and HTTP code 200',
+          '* If the product uses the identifier type transmitted in the request but has no data to respond with, it should respond with HTTP code 204',
+          '* If the product does not use the identifier type transmitted in the request, it should respond with HTTP code 209'
+        ].join("\n")
+      )
 
       produces 'application/json'
       consumes 'application/json'
@@ -36,8 +43,14 @@ describe 'SAR API' do
         let(:Authorization) { nil }
 
         response '401', 'Request is not authorised' do
-          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/SarError'
+
+          example 'application/json', :error_example, {
+            developerMessage: 'Valid authorisation token required',
+            errorCode: 1,
+            status: 401,
+            userMessage: 'Valid authorisation token required',
+          }
 
           let(:crn) { nil }
           let(:prn) { 'A1111AA' }
@@ -54,8 +67,14 @@ describe 'SAR API' do
         end
 
         response '403', 'Invalid token role' do
-          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/SarError'
+
+          example 'application/json', :error_example, {
+            developerMessage: 'Invalid token role',
+            errorCode: 5,
+            status: 403,
+            userMessage: 'Invalid token role',
+          }
 
           let(:crn) { nil }
           let(:prn) { 'A1111AA' }
@@ -71,9 +90,15 @@ describe 'SAR API' do
           allow_any_instance_of(Api::SarController).to receive(:verify_token)
         end
 
-        response '400', 'Both PRN and CRN parameter passed' do
-          security [{ Bearer: [] }]
+        response '400', 'PRN and CRN parameters passed' do
           schema '$ref' => '#/components/schemas/SarError'
+
+          example 'application/json', :error_example, {
+            developerMessage: 'PRN and CRN parameters passed',
+            errorCode: 2,
+            status: 400,
+            userMessage: 'PRN and CRN parameters passed',
+          }
 
           let(:crn) { '123456' }
           let(:prn) { 'A1111AA' }
@@ -83,9 +108,15 @@ describe 'SAR API' do
           run_test!
         end
 
-        response '209', 'Just CRN parameter passed' do
-          security [{ Bearer: [] }]
+        response '209', 'CRN parameter not allowed' do
           schema '$ref' => '#/components/schemas/SarError'
+
+          example 'application/json', :error_example, {
+            developerMessage: 'CRN parameter not allowed',
+            errorCode: 3,
+            status: 209,
+            userMessage: 'CRN parameter not allowed',
+          }
 
           let(:crn) { '123456' }
           let(:prn) { nil }
@@ -96,8 +127,14 @@ describe 'SAR API' do
         end
 
         response '210', 'Invalid date format' do
-          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/SarError'
+
+          example 'application/json', :error_example, {
+            developerMessage: 'Invalid date format',
+            errorCode: 4,
+            status: 210,
+            userMessage: 'Invalid date format',
+          }
 
           let(:crn) { nil }
           let(:prn) { 'A1111AA' }
@@ -108,8 +145,6 @@ describe 'SAR API' do
         end
 
         response '204', 'Offender not found' do
-          security [{ Bearer: [] }]
-
           let(:crn) { nil }
           let(:prn) { 'A1111AA' }
           let(:fromDate) { nil }
@@ -119,7 +154,6 @@ describe 'SAR API' do
         end
 
         response '200', 'Offender found' do
-          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/SarOffenderData'
 
           before do

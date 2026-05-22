@@ -7,13 +7,27 @@ describe 'Handover API' do
 
   path '/api/handovers/{nomsNumber}' do
     get 'Retrieves the handover information for an offender' do
+      security [{ Bearer: [] }]
+
       tags 'Handovers'
+      description(
+        [
+          'Returns handover dates and the current responsibility split between prison and probation for the supplied prisoner.',
+          '',
+          'Authentication requirements:',
+          '* A valid Bearer token must be supplied in the Authorization header.',
+          '* The role ROLE_VIEW_POM_ALLOCATIONS is required.'
+        ].join("\n")
+      )
+
       produces 'application/json'
-      parameter name: :nomsNumber, in: :path, schema: { '$ref' => '#/components/schemas/NomsNumber' }
+      parameter name: :nomsNumber,
+                in: :path,
+                schema: { '$ref' => '#/components/schemas/NomsNumber' },
+                description: 'NOMIS Prison Number for the prisoner'
 
       describe 'when not authorised' do
         response '401', 'Request is not authorised' do
-          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }
@@ -39,7 +53,6 @@ describe 'Handover API' do
           end
 
           response '200', 'Handover information successfully found' do
-            security [{ Bearer: [] }]
             schema required: %w[nomsNumber handoverDate responsibility responsibleComName responsibleComEmail responsiblePomName responsiblePomNomisId],
                    type: :object,
                    properties: {
@@ -73,7 +86,6 @@ describe 'Handover API' do
         end
 
         response '404', 'Handover information for offender not found' do
-          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }
