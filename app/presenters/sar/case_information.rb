@@ -4,7 +4,7 @@ module Sar
   class CaseInformation < BaseSarPresenter
     class << self
       def omitted_attributes
-        [:ldu_code, :local_delivery_unit_id, :com_name, :com_email]
+        [:ldu_code, :local_delivery_unit_id, :com_name, :com_email, :rosh_start_date]
       end
 
       def additional_methods

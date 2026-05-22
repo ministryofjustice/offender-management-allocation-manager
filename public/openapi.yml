@@ -165,7 +165,6 @@ components:
       - activeVlo
       - enhancedResourcing
       - roshLevel
-      - roshStartDate
       - createdAt
       - updatedAt
       properties:
@@ -193,10 +192,6 @@ components:
           nullable: true
         roshLevel:
           type: string
-          nullable: true
-        roshStartDate:
-          type: string
-          format: date
           nullable: true
         createdAt:
           type: string
@@ -653,3 +648,32 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/SarOffenderData"
+  "/subject-access-request/template":
+    get:
+      summary: Retrieves the SAR Mustache template for this service
+      tags:
+      - Subject Access Request
+      description: |-
+        * The role ROLE_SAR_DATA_ACCESS is required
+        * Returns the plain-text Mustache template configured for the service
+      security:
+      - Bearer: []
+      responses:
+        '401':
+          description: Request is not authorised
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SarError"
+        '403':
+          description: Invalid token role
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SarError"
+        '200':
+          description: Template returned for SAR users
+          content:
+            text/plain:
+              schema:
+                type: string

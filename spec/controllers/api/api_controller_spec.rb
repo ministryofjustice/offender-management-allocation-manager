@@ -92,14 +92,7 @@ RSpec.describe Api::ApiController, type: :controller do
   end
 
   def request_header(payload = {})
-    allow(JwksDecoder).to receive(:decode_token).and_return(
-      [
-        {
-          scope: %w[read write],
-          exp: 4.hours.from_now.to_i,
-        }.merge(payload)
-      ]
-    )
+    stub_decoded_token(payload)
     request.headers['AUTHORIZATION'] = "Bearer xxxxxxx"
   end
 end

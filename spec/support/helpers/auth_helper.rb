@@ -29,6 +29,21 @@ module AuthHelper
       }.to_json)
   end
 
+  def stub_decoded_token(payload_overrides = nil, access_token: 'TEST_TOKEN', **keyword_overrides)
+    payload_overrides = (payload_overrides || {}).merge(keyword_overrides)
+
+    payload = {
+      'internal_user' => false,
+      'scope' => %w[read write],
+      'exp' => 4.hours.from_now.to_i,
+      'client_id' => 'offender-management-allocation-manager'
+    }.merge(payload_overrides.deep_stringify_keys)
+
+    allow(JwksDecoder).to receive(:decode_token).and_return([payload])
+
+    access_token
+  end
+
   def stub_sso_data(prison, username: 'user', staff_id: 754_732, first_name: 'MOIC', last_name: 'POM',
                     roles: [SsoIdentity::SPO_ROLE], email: '754732@example.com',
                     active_caseload: prison, caseloads: [prison], token: USER_ACCESS_TOKEN)

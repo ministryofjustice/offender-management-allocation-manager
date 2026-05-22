@@ -1,7 +1,10 @@
 module Api
   class SarController < Api::ApiController
     SAR_ROLE = 'ROLE_SAR_DATA_ACCESS'.freeze
-    MPC_ADMIN_ROLE = 'ROLE_MPC_ADMIN'.freeze
+
+    def template
+      render plain: SubjectAccessRequestTemplateService.content, content_type: 'text/plain'
+    end
 
     def show
       return render_error('PRN and CRN parameters passed', 2, 400) if parameter_conflict?
@@ -22,14 +25,15 @@ module Api
         return render_error('Valid authorisation token required', 1, 401)
       end
 
-      unless token.valid_token_with_scope?('read', role: SAR_ROLE) ||
-             token.valid_token_with_scope?('read', role: MPC_ADMIN_ROLE)
+      unless token.valid_token_with_scope?('read', role: SAR_ROLE)
         render_error('Invalid token role', 5, 403)
       end
     end
 
     # Overrides parent due to endpoint-specific error schema
     def render_error(msg, error_code, status)
+      Rails.logger.warn("event=subject_access_request_error|status=#{status}|error_code=#{error_code}|message=#{msg}")
+
       render json: {
         developerMessage: msg,
         errorCode: error_code,
@@ -62,8 +66,8 @@ module Api
         @from_date = nil
         @to_date = nil
       else
-        @from_date = Date.parse(params[:fromDate])
-        @to_date = Date.parse(params[:toDate])
+        @from_date = Date.parse(params[:fromDate].to_s)
+        @to_date = Date.parse(params[:toDate].to_s)
       end
 
       true
