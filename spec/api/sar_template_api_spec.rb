@@ -8,16 +8,32 @@ describe 'SAR template API' do
 
   path '/subject-access-request/template' do
     get 'Retrieves the SAR Mustache template for this service' do
+      security [{ Bearer: [] }]
+
       tags 'Subject Access Request'
-      description "* The role ROLE_SAR_DATA_ACCESS is required
-* Returns the plain-text Mustache template configured for the service"
+      description(
+        [
+          '* A valid Bearer token must be supplied in the Authorization header.',
+          '* The role ROLE_SAR_DATA_ACCESS is required',
+          '* Returns the plain-text Mustache template configured for the service'
+        ].join("\n")
+      )
 
       response '401', 'Request is not authorised' do
-        security [{ Bearer: [] }]
         metadata[:response][:schema] = { '$ref' => '#/components/schemas/SarError' }
         metadata[:response][:content] = {
           'application/json' => {
-            schema: { '$ref' => '#/components/schemas/SarError' }
+            schema: { '$ref' => '#/components/schemas/SarError' },
+            examples: {
+              error_example: {
+                value: {
+                  developerMessage: 'Valid authorisation token required',
+                  errorCode: 1,
+                  status: 401,
+                  userMessage: 'Valid authorisation token required'
+                }
+              }
+            }
           }
         }
 
@@ -27,11 +43,20 @@ describe 'SAR template API' do
       end
 
       response '403', 'Invalid token role' do
-        security [{ Bearer: [] }]
         metadata[:response][:schema] = { '$ref' => '#/components/schemas/SarError' }
         metadata[:response][:content] = {
           'application/json' => {
-            schema: { '$ref' => '#/components/schemas/SarError' }
+            schema: { '$ref' => '#/components/schemas/SarError' },
+            examples: {
+              error_example: {
+                value: {
+                  developerMessage: 'Invalid token role',
+                  errorCode: 5,
+                  status: 403,
+                  userMessage: 'Invalid token role'
+                }
+              }
+            }
           }
         }
 
@@ -42,8 +67,7 @@ describe 'SAR template API' do
         run_test!
       end
 
-      response '200', 'Template returned for SAR users' do
-        security [{ Bearer: [] }]
+      response '200', 'Template returned' do
         metadata[:response][:schema] = { type: :string }
         metadata[:response][:content] = {
           'text/plain' => {

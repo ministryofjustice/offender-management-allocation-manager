@@ -8,13 +8,27 @@ describe 'Allocation API' do
 
   path '/api/allocation/{nomsNumber}' do
     get 'Retrieves the current allocation for an offender' do
+      security [{ Bearer: [] }]
+
       tags 'Allocations'
+      description(
+        [
+          'Returns the current primary and secondary prison offender manager allocation for the supplied prisoner.',
+          '',
+          'Authentication requirements:',
+          '* A valid Bearer token must be supplied in the Authorization header.',
+          '* The role ROLE_VIEW_POM_ALLOCATIONS is required.'
+        ].join("\n")
+      )
+
       produces 'application/json'
-      parameter name: :nomsNumber, in: :path, schema: { '$ref' => '#/components/schemas/NomsNumber' }
+      parameter name: :nomsNumber,
+                in: :path,
+                schema: { '$ref' => '#/components/schemas/NomsNumber' },
+                description: 'NOMIS Prison Number for the prisoner'
 
       describe 'when not authorised' do
         response '401', 'Request is not authorised' do
-          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }
@@ -28,7 +42,6 @@ describe 'Allocation API' do
         end
 
         response '200', 'Offender is allocated' do
-          security [{ Bearer: [] }]
           schema required: %w[primary_pom secondary_pom],
                  type: :object,
                  properties: {
@@ -65,7 +78,6 @@ describe 'Allocation API' do
         end
 
         response '404', 'Allocation for offender not found' do
-          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }
@@ -77,13 +89,27 @@ describe 'Allocation API' do
 
   path '/api/allocation/{nomsNumber}/primary_pom' do
     get 'Retrieves the primary POM for an offender' do
+      security [{ Bearer: [] }]
+
       tags 'Allocations'
+      description(
+        [
+          'Returns the currently allocated primary prison offender manager for the supplied prisoner, including live manager details and prison code.',
+          '',
+          'Authentication requirements:',
+          '* A valid Bearer token must be supplied in the Authorization header.',
+          '* The role ROLE_VIEW_POM_ALLOCATIONS is required.'
+        ].join("\n")
+      )
+
       produces 'application/json'
-      parameter name: :nomsNumber, in: :path, schema: { '$ref' => '#/components/schemas/NomsNumber' }
+      parameter name: :nomsNumber,
+                in: :path,
+                schema: { '$ref' => '#/components/schemas/NomsNumber' },
+                description: 'NOMIS Prison Number for the prisoner'
 
       describe 'when not authorised' do
         response '401', 'Request is not authorised' do
-          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }
@@ -101,7 +127,6 @@ describe 'Allocation API' do
         end
 
         response '200', 'Offender is allocated' do
-          security [{ Bearer: [] }]
           schema required: %w[manager prison],
                  type: :object,
                  properties: {
@@ -141,7 +166,6 @@ describe 'Allocation API' do
         end
 
         response '404', 'Allocation for offender not found' do
-          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }

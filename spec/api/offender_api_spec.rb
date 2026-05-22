@@ -13,13 +13,27 @@ describe 'Offender Early Allocation API' do
 
   path '/api/offenders/{nomsNumber}' do
     get 'Retrieves information for a prisoner including early allocation status' do
+      security [{ Bearer: [] }]
+
       tags 'Offenders'
+      description(
+        [
+          'Returns prisoner information exposed by Manage POM Cases for the supplied prisoner number, including whether the prisoner currently has early allocation eligibility.',
+          '',
+          'Authentication requirements:',
+          '* A valid Bearer token must be supplied in the Authorization header.',
+          '* The role ROLE_VIEW_POM_ALLOCATIONS is required.'
+        ].join("\n")
+      )
+
       produces 'application/json'
-      parameter name: :nomsNumber, in: :path, schema: { '$ref' => '#/components/schemas/NomsNumber' }
+      parameter name: :nomsNumber,
+                in: :path,
+                schema: { '$ref' => '#/components/schemas/NomsNumber' },
+                description: 'NOMIS Prison Number for the prisoner'
 
       describe 'when not authorised' do
         response '401', 'Request is not authorised' do
-          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }
@@ -33,7 +47,6 @@ describe 'Offender Early Allocation API' do
         end
 
         response '200', 'Offender has an early allocation' do
-          security [{ Bearer: [] }]
           schema type: :object,
                  properties: {
                    offender_no: { '$ref' => '#/components/schemas/NomsNumber' },
@@ -57,7 +70,6 @@ describe 'Offender Early Allocation API' do
         end
 
         response '404', 'Offender not found' do
-          security [{ Bearer: [] }]
           schema '$ref' => '#/components/schemas/Status'
 
           let(:nomsNumber) { 'A1111AA' }
