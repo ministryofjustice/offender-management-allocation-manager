@@ -32,4 +32,19 @@ describe HmppsApi::Oauth::TokenService do
 
     expect(token_service.valid_token).to eq(unexpired_token)
   end
+
+  it 'can refresh the token explicitly' do
+    current_token = HmppsApi::Oauth::Token.new(access_token: 'xxxxxxxxxxxxxxxxxxxxxxxx', expires_in: 3600)
+    refreshed_token = HmppsApi::Oauth::Token.new(access_token: 'yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy', expires_in: 3600)
+
+    allow(HmppsApi::Oauth::Api)
+      .to receive(:fetch_new_auth_token)
+      .and_return(current_token, refreshed_token)
+
+    token_service = described_class.instance
+
+    expect(token_service.valid_token).to eq(current_token)
+    expect(token_service.refresh_token!).to eq(refreshed_token)
+    expect(token_service.valid_token).to eq(refreshed_token)
+  end
 end

@@ -6,12 +6,16 @@ module HmppsApi
       include Singleton
 
       class << self
-        delegate :valid_token, to: :instance
+        delegate :valid_token, :refresh_token!, to: :instance
       end
 
       def valid_token
         set_new_token if token.needs_refresh?
         token
+      end
+
+      def refresh_token!
+        set_new_token
       end
 
     private

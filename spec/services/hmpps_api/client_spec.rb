@@ -17,6 +17,8 @@ describe HmppsApi::Client do
 
   before do
     allow(token_service).to receive(:valid_token).and_return(valid_token)
+    allow(token_service).to receive(:refresh_token!).and_return(valid_token)
+    allow(Rails.logger).to receive(:warn)
   end
 
   describe 'with a valid request' do
@@ -47,6 +49,30 @@ describe HmppsApi::Client do
       it 'raises a HmppsApi::Error::Unauthorized error' do
         expect { client.get(route) }
           .to raise_error(HmppsApi::Error::Unauthorized, "the server responded with status #{status}")
+      end
+
+      context 'when a refreshed token resolves the request' do
+        let(:refreshed_access_token) { 'refreshed_access_token' }
+        let(:refreshed_token) { HmppsApi::Oauth::Token.new(access_token: refreshed_access_token) }
+
+        before do
+          allow(token_service).to receive(:valid_token).and_return(valid_token, refreshed_token)
+          allow(token_service).to receive(:refresh_token!).and_return(refreshed_token)
+          WebMock.stub_request(:get, api_host + route)
+            .to_return({ status: 401 }, { status: 200, body: '{}' })
+        end
+
+        it 'retries with a refreshed token' do
+          expect(client.get(route)).to eq({})
+          expect(token_service).to have_received(:refresh_token!).once
+          expect(Rails.logger).to have_received(:warn).with(
+            'event=hmpps_api_retry_refresh_token,method=GET,route=/api/endpoint,retries_remaining=2'
+          ).once
+          expect(WebMock).to have_requested(:get, api_host + route)
+            .with(headers: { 'Authorization' => "Bearer #{access_token}" }).once
+          expect(WebMock).to have_requested(:get, api_host + route)
+            .with(headers: { 'Authorization' => "Bearer #{refreshed_access_token}" }).once
+        end
       end
     end
 
