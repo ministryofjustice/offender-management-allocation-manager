@@ -5,17 +5,22 @@ require 'typhoeus/adapters/faraday'
 
 module HmppsApi
   class Client
-    def initialize(root, extra_retry_methods: [], user_token: nil)
+    def initialize(root, extra_retry_methods: [])
       @root = root
-      @user_token = user_token
       @connection = Faraday.new do |faraday|
-        faraday.request :retry, max: 3, interval: 0.05,
-                                interval_randomness: 0.5, backoff_factor: 2,
-                                # We appear to get occasional transient 5xx errors, so retry them
-                                retry_statuses: [500, 502],
-                                methods: Faraday::Request::Retry::IDEMPOTENT_METHODS + extra_retry_methods,
-                                # we get Faraday::ConnectionFailed (error in HTTP2 Framing Layer) sometimes
-                                exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed]
+        faraday.request(
+          :retry,
+          max: 3, interval: 0.05, interval_randomness: 0.5, backoff_factor: 2,
+          # We appear to get occasional transient 5xx errors
+          retry_statuses: [500, 502],
+          methods: Faraday::Request::Retry::IDEMPOTENT_METHODS + extra_retry_methods,
+          # For 401s we refresh the app token in the retry callback and
+          # update the retried request's Authorization header there
+          exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed, Faraday::UnauthorizedError],
+          retry_block: lambda { |env, _options, retries_remaining, exception|
+            refresh_token_on_retry(env, retries_remaining, exception)
+          },
+        )
 
         faraday.options.params_encoder = Faraday::FlatParamsEncoder
         faraday.request :instrumentation
@@ -112,11 +117,10 @@ module HmppsApi
 
     def send_request(method, route, queryparams:, extra_headers:, body:)
       url = @root + route
-      bearer = @user_token || token.access_token
 
       @connection.send(method) do |req|
         req.url(url)
-        req.headers['Authorization'] = "Bearer #{bearer}"
+        req.headers['Authorization'] = "Bearer #{token.access_token}"
         req.headers['Content-Type'] = 'application/json' unless body.nil?
         req.headers.merge!(extra_headers)
         req.params.update(queryparams)
@@ -148,6 +152,18 @@ module HmppsApi
 
     def token
       HmppsApi::Oauth::TokenService.valid_token
+    end
+
+    def refresh_token_on_retry(env, retries_remaining, exception)
+      return unless exception.is_a?(Faraday::UnauthorizedError)
+
+      Rails.logger.warn(
+        "event=hmpps_api_retry_refresh_token,method=#{env.method.to_s.upcase},route=#{env.url.path}," \
+        "retries_remaining=#{retries_remaining}"
+      )
+
+      refreshed_token = HmppsApi::Oauth::TokenService.refresh_token!
+      env.request_headers['Authorization'] = "Bearer #{refreshed_token.access_token}"
     end
 
     def response_cache

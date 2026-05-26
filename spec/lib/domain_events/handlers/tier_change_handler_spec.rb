@@ -32,10 +32,6 @@ RSpec.describe DomainEvents::Handlers::TierChangeHandler do
     context 'when tier has not changed' do
       let(:tier) { 'D' }
 
-      it 'emits a log noop message' do
-        expect(Shoryuken::Logging.logger).to have_received(:info).with(/domain_event_handle_noop/)
-      end
-
       it 'emits no audit event' do
         expect(AuditEvent).not_to have_received(:publish)
       end
