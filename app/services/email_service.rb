@@ -2,12 +2,12 @@
 
 class EmailService
   class << self
-    def send_email(message:, allocation:, pom_nomis_id:, further_info: {})
+    def send_email(message:, allocation:, pom_nomis_id:, further_info: {}, notify_previous_pom: true)
       pom = pom_for(allocation, pom_nomis_id)
       return if pom.email_address.blank?
 
-      send_deallocation_email pom: pom, allocation: allocation, further_info: further_info
-      deliver_new_allocation_email pom: pom, message: message, allocation: allocation, further_info: further_info
+      send_deallocation_email(pom:, allocation:, further_info:) if notify_previous_pom
+      deliver_new_allocation_email(pom:, message:, allocation:, further_info:)
     end
 
     def send_coworking_primary_email(message:, allocation:)

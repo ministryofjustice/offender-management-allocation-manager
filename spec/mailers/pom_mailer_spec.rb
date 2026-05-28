@@ -140,4 +140,110 @@ RSpec.describe PomMailer, type: :mailer do
           )
     end
   end
+
+  describe 'bulk_allocations_created' do
+    let(:params) do
+      {
+        pom_name: 'New Pom',
+        pom_email: 'new.pom@example.com',
+        old_pom_name: 'Old Pom',
+        message: 'Bulk move',
+        allocations: [
+          'Alice Zephyr (G1234AA) – responsible',
+          'Bob Amber (G5678BB) – supporting'
+        ],
+        url: 'http://example.com/prisons/LEI/staff/10002/caseload'
+      }
+    end
+
+    let(:mail) { described_class.with(**params).bulk_allocations_created }
+
+    it 'sets the template' do
+      expect(mail.govuk_notify_template)
+        .to eq '5516c944-2e2c-4227-b08f-2084b799d12a'
+    end
+
+    it 'sets the To address of the email using the provided user' do
+      expect(mail.to).to eq(['new.pom@example.com'])
+    end
+
+    it 'personalises the email' do
+      expect(mail.govuk_notify_personalisation)
+        .to eq(
+          pom_name: params[:pom_name],
+          old_pom_name: params[:old_pom_name],
+          message: 'Bulk move',
+          allocations: params[:allocations],
+          url: params[:url]
+        )
+    end
+
+    context 'when no optional message has been added to the email' do
+      it 'personalises the email with an empty message' do
+        params[:message] = ''
+
+        expect(mail.govuk_notify_personalisation)
+          .to eq(
+            pom_name: params[:pom_name],
+            old_pom_name: params[:old_pom_name],
+            message: '',
+            allocations: params[:allocations],
+            url: params[:url]
+          )
+      end
+    end
+  end
+
+  describe 'bulk_allocations_removed' do
+    let(:params) do
+      {
+        pom_name: 'Old Pom',
+        pom_email: 'old.pom@example.com',
+        new_pom_name: 'New Pom',
+        message: 'Bulk move',
+        allocations: [
+          'Alice Zephyr (G1234AA) – responsible',
+          'Bob Amber (G5678BB) – supporting'
+        ],
+        url: 'http://example.com/prisons/LEI/staff/10001/caseload'
+      }
+    end
+
+    let(:mail) { described_class.with(**params).bulk_allocations_removed }
+
+    it 'sets the template' do
+      expect(mail.govuk_notify_template)
+        .to eq '2c5b87eb-9e1e-4ca6-a011-3b9b01532a2f'
+    end
+
+    it 'sets the To address of the email using the provided user' do
+      expect(mail.to).to eq(['old.pom@example.com'])
+    end
+
+    it 'personalises the email' do
+      expect(mail.govuk_notify_personalisation)
+        .to eq(
+          pom_name: params[:pom_name],
+          new_pom_name: params[:new_pom_name],
+          message: 'Bulk move',
+          allocations: params[:allocations],
+          url: params[:url]
+        )
+    end
+
+    context 'when no optional message has been added to the email' do
+      it 'personalises the email with an empty message' do
+        params[:message] = ''
+
+        expect(mail.govuk_notify_personalisation)
+          .to eq(
+            pom_name: params[:pom_name],
+            new_pom_name: params[:new_pom_name],
+            message: '',
+            allocations: params[:allocations],
+            url: params[:url]
+          )
+      end
+    end
+  end
 end

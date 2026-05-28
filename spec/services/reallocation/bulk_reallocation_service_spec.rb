@@ -11,8 +11,6 @@ RSpec.describe Reallocation::BulkReallocationService do
       journey: journey,
       current_user: 'spo-user',
       email_context_builder: email_context_builder,
-      notifier: notifier,
-      notify_individually: notify_individually,
     )
   end
 
@@ -74,12 +72,14 @@ RSpec.describe Reallocation::BulkReallocationService do
   end
   let(:persisted_allocation) { instance_double(AllocationHistory, primary_pom_nomis_id: target_pom.staff_id) }
   let(:notifier) { instance_double(Reallocation::BulkReallocationNotifier, call: nil) }
-  let(:notify_individually) { true }
 
   let(:email_context_builder) do
     instance_double(
       Reallocation::EmailContextBuilder,
       build: {
+        offender_name: 'Zephyr, Alice',
+        prisoner_number: offender_no,
+        pom_role: 'Responsible',
         last_oasys_completed: 'No OASys information',
         handover_start_date: '01 Jan 2027',
         handover_completion_date: '01 Jan 2028',
@@ -100,6 +100,7 @@ RSpec.describe Reallocation::BulkReallocationService do
     allow(OffenderService).to receive(:get_offender).with(offender_no).and_return(offender)
     allow(AllocationService).to receive(:create_or_update).and_return(persisted_allocation)
     allow(StaffMember).to receive(:new).with(prison, source_pom.staff_id, nil).and_return(refreshed_source_pom)
+    allow(Reallocation::BulkReallocationNotifier).to receive(:new).with(prison:, source_pom:, target_pom:).and_return(notifier)
   end
 
   describe '#call' do
@@ -158,6 +159,14 @@ RSpec.describe Reallocation::BulkReallocationService do
       expect(result.to_confirmation[:selected_cases]).to eq([{ full_name: 'Zephyr, Alice', nomis_offender_id: offender_no }])
     end
 
+    it 'returns the allocations summary needed for the bulk email templates' do
+      result = service.call([selected_case], message: 'Moving cases')
+
+      expect(result.allocations_for_email).to eq([
+        'Zephyr, Alice (A1111AA) – responsible'
+      ])
+    end
+
     context 'when the allocation history does not exist (new allocation)' do
       before do
         AllocationHistory.where(nomis_offender_id: offender_no).delete_all
@@ -170,16 +179,6 @@ RSpec.describe Reallocation::BulkReallocationService do
           expect(attributes).to include(event: :allocate_primary_pom)
           expect(options).to include(notify: false)
         end
-      end
-    end
-
-    context 'when individual notifications are disabled' do
-      let(:notify_individually) { false }
-
-      it 'does not notify after persisting the batch' do
-        service.call([selected_case], message: 'Moving cases')
-
-        expect(notifier).not_to have_received(:call)
       end
     end
 
