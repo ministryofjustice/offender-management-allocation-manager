@@ -2,17 +2,16 @@
 
 module Reallocation
   class BulkReallocationService
+    attr_reader :prison, :source_pom, :target_pom, :journey, :current_user, :email_context_builder
+
     def initialize(prison:, source_pom:, target_pom:, journey:, current_user:,
-                   email_context_builder: EmailContextBuilder.new, notifier: BulkReallocationNotifier.new,
-                   notify_individually: true)
+                   email_context_builder: EmailContextBuilder.new)
       @prison = prison
       @source_pom = source_pom
       @target_pom = target_pom
       @journey = journey
       @current_user = current_user
       @email_context_builder = email_context_builder
-      @notifier = notifier
-      @notify_individually = notify_individually
     end
 
     # Reallocates every selected (non-excluded) case, then applies the current
@@ -27,15 +26,12 @@ module Reallocation
         remaining_cases_count:,
       )
 
-      notifier.call(result) if notify_individually
+      BulkReallocationNotifier.new(prison:, source_pom:, target_pom:).call(result)
 
       result
     end
 
   private
-
-    attr_reader :prison, :source_pom, :target_pom, :journey, :current_user,
-                :email_context_builder, :notifier, :notify_individually
 
     def build_reallocation_result_for(selected_case, message)
       offender = offender_for(selected_case.nomis_offender_id)
@@ -58,11 +54,15 @@ module Reallocation
         override_detail: override[:more_detail],
       }
 
-      notification_context = email_context_builder.build(
+      email_context = email_context_builder.build(
         offender: offender,
         pom: target_pom,
         prev_pom_name: source_pom.full_name_ordered,
-      ).slice(:last_oasys_completed, :handover_start_date, :handover_completion_date, :com_name, :com_email)
+      )
+
+      notification_context = email_context.slice(
+        :last_oasys_completed, :handover_start_date, :handover_completion_date, :com_name, :com_email
+      )
 
       persisted_allocation = AllocationService.create_or_update(allocation_attributes, notification_context, notify: false)
 
@@ -70,6 +70,7 @@ module Reallocation
         allocation: persisted_allocation,
         selected_case: selected_case,
         further_info: notification_context,
+        email_context: email_context,
       )
     end
 

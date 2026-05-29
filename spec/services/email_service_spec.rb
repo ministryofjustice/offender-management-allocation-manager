@@ -79,9 +79,16 @@ RSpec.describe EmailService do
   end
 
   context 'when queueing', :queueing do
-    it "Can send an allocation email"  do
+    it 'skips the deallocation email for bulk reallocations' do
+      allow(reallocation).to receive(:get_old_versions).and_return([original_allocation])
+
       expect {
-        described_class.send_email(allocation: allocation, message: "", pom_nomis_id: allocation.primary_pom_nomis_id)
+        described_class.send_email(
+          allocation: reallocation,
+          message: '',
+          pom_nomis_id: reallocation.primary_pom_nomis_id,
+          notify_previous_pom: false,
+        )
       }.to change(enqueued_jobs, :size).by(1)
     end
 

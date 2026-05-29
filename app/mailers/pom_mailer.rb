@@ -83,6 +83,20 @@ class PomMailer < ApplicationMailer
     mail(to: params[:previous_pom_email])
   end
 
+  def bulk_allocations_created
+    set_template('5516c944-2e2c-4227-b08f-2084b799d12a')
+    set_personalisation(**params.slice(:pom_name, :old_pom_name, :message, :allocations, :url))
+
+    mail(to: params[:pom_email])
+  end
+
+  def bulk_allocations_removed
+    set_template('2c5b87eb-9e1e-4ca6-a011-3b9b01532a2f')
+    set_personalisation(**params.slice(:pom_name, :new_pom_name, :message, :allocations, :url))
+
+    mail(to: params[:pom_email])
+  end
+
   def offender_deallocated
     set_template('1df51f52-512d-434b-9088-50eacaa47c59')
     set_personalisation(**params.slice(:pom_name, :offender_name, :nomis_offender_id, :prison_name, :url))
