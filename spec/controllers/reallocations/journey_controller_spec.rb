@@ -160,12 +160,13 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
       session[:bulk_reallocation_confirmation] = {
         source_pom_id: old_pom.staffId,
         target_pom_id: new_pom.staffId,
+        message: 'Bulk move',
         selected_cases: [
           { full_name: 'Zephyr, Alice', nomis_offender_id: offender_no },
           { full_name: 'Amber, Bob', nomis_offender_id: override_offender_no }
         ],
-        message: 'Bulk move',
-        remaining_cases_count: remaining_cases_count
+        failed_cases: [],
+        remaining_cases_count: remaining_cases_count,
       }
     end
 
@@ -192,6 +193,73 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
         expect(response).to be_successful
         expect(response.body).to include('Old Pom has no more cases and has been removed from this service.')
         expect(response.body).not_to include('Reallocate cases now')
+      end
+    end
+
+    context 'when there are failed cases' do
+      before do
+        session[:bulk_reallocation_confirmation] = {
+          source_pom_id: old_pom.staffId,
+          target_pom_id: new_pom.staffId,
+          message: 'Bulk move',
+          selected_cases: [
+            { full_name: 'Zephyr, Alice', nomis_offender_id: offender_no }
+          ],
+          failed_cases: [
+            { full_name: 'Amber, Bob', nomis_offender_id: override_offender_no, error_message: 'API timeout' }
+          ],
+          remaining_cases_count: 3,
+        }
+      end
+
+      it 'shows the error summary with the failed cases' do
+        get :confirmation, params: route_params
+
+        expect(response).to be_successful
+        expect(response.body).to include('One case could not be reallocated')
+        expect(response.body).to include("Amber, Bob (#{override_offender_no})")
+      end
+
+      it 'shows "Cases reallocated" as the panel title' do
+        get :confirmation, params: route_params
+
+        expect(response.body).to include('Cases reallocated')
+      end
+    end
+
+    context 'when all cases failed' do
+      before do
+        session[:bulk_reallocation_confirmation] = {
+          source_pom_id: old_pom.staffId,
+          target_pom_id: new_pom.staffId,
+          message: 'Bulk move',
+          selected_cases: [],
+          failed_cases: [
+            { full_name: 'Zephyr, Alice', nomis_offender_id: offender_no, error_message: 'API timeout' },
+            { full_name: 'Amber, Bob', nomis_offender_id: override_offender_no, error_message: 'Service down' }
+          ],
+          remaining_cases_count: 3,
+        }
+      end
+
+      it 'shows "Reallocation failed" as the panel title' do
+        get :confirmation, params: route_params
+
+        expect(response.body).to include('Reallocation failed')
+      end
+
+      it 'hides the "Update sent" section' do
+        get :confirmation, params: route_params
+
+        expect(response.body).not_to include('Update sent')
+      end
+
+      it 'lists all failed cases in the error summary' do
+        get :confirmation, params: route_params
+
+        expect(response.body).to include('Some cases could not be reallocated')
+        expect(response.body).to include("Zephyr, Alice (#{offender_no})")
+        expect(response.body).to include("Amber, Bob (#{override_offender_no})")
       end
     end
   end

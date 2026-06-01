@@ -45,6 +45,7 @@ RSpec.describe Reallocation::BulkReallocationNotifier do
       target_pom_id: target_pom.staff_id,
       message: 'Bulk move',
       reallocated_cases: [reallocated_case],
+      failed_cases: [],
       remaining_cases_count: 3,
     )
   end
