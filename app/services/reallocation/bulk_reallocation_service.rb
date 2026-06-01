@@ -18,20 +18,41 @@ module Reallocation
     # notification strategy. Returns a result object that can drive the
     # confirmation step and future batch email behaviour
     def call(selected_cases, message:)
-      result = BulkReallocationResult.new(
-        source_pom_id: source_pom.staff_id,
-        target_pom_id: target_pom.staff_id,
-        message: message,
-        reallocated_cases: selected_cases.map { build_reallocation_result_for(it, message) },
-        remaining_cases_count:,
-      )
+      reallocated_cases, failed_cases = reallocate_each(selected_cases, message)
 
-      BulkReallocationNotifier.new(prison:, source_pom:, target_pom:).call(result)
-
-      result
+      build_result(message, reallocated_cases, failed_cases).tap do |result|
+        BulkReallocationNotifier.new(prison:, source_pom:, target_pom:).call(result)
+      end
     end
 
   private
+
+    def reallocate_each(selected_cases, message)
+      reallocated_cases = []
+      failed_cases = []
+
+      selected_cases.each do |selected_case|
+        reallocated_cases << build_reallocation_result_for(selected_case, message)
+      rescue StandardError => e
+        Rails.logger.error(
+          "event=bulk_reallocation_case_failed,nomis_offender_id=#{selected_case.nomis_offender_id}|#{e.message}"
+        )
+        failed_cases << BulkReallocationResult::FailedCase.new(selected_case:, error: e)
+      end
+
+      [reallocated_cases, failed_cases]
+    end
+
+    def build_result(message, reallocated_cases, failed_cases)
+      BulkReallocationResult.new(
+        source_pom_id: source_pom.staff_id,
+        target_pom_id: target_pom.staff_id,
+        message:,
+        reallocated_cases:,
+        failed_cases:,
+        remaining_cases_count:,
+      )
+    end
 
     def build_reallocation_result_for(selected_case, message)
       offender = offender_for(selected_case.nomis_offender_id)
@@ -84,13 +105,13 @@ module Reallocation
 
     def offender_for(nomis_offender_id)
       @offenders_by_id ||= {}
-      @offenders_by_id[nomis_offender_id] ||= OffenderService.get_offender(nomis_offender_id)
+      @offenders_by_id[nomis_offender_id] ||= OffenderService.get_offender(
+        nomis_offender_id, fetch_categories: false, fetch_movements: false
+      )
     end
 
     def remaining_cases_count
-      # source_pom may already have cached allocations from earlier in the request,
-      # so we build a fresh StaffMember before reading the post-reallocation count
-      StaffMember.new(prison, source_pom.staff_id, nil).primary_allocations_count
+      AllocationHistory.active.for_primary_pom(source_pom.staff_id).at_prison(prison).count
     end
   end
 end

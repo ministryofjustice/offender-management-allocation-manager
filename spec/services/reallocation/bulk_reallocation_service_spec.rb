@@ -89,17 +89,13 @@ RSpec.describe Reallocation::BulkReallocationService do
     )
   end
 
-  let(:refreshed_source_pom) do
-    instance_double(StaffMember, primary_allocations_count: 5)
-  end
-
   before do
     stub_feature_flag(:rosh_recommendations, enabled: true)
     allocation # ensure it's created
 
-    allow(OffenderService).to receive(:get_offender).with(offender_no).and_return(offender)
+    allow(OffenderService).to receive(:get_offender)
+      .with(offender_no, fetch_categories: false, fetch_movements: false).and_return(offender)
     allow(AllocationService).to receive(:create_or_update).and_return(persisted_allocation)
-    allow(StaffMember).to receive(:new).with(prison, source_pom.staff_id, nil).and_return(refreshed_source_pom)
     allow(Reallocation::BulkReallocationNotifier).to receive(:new).with(prison:, source_pom:, target_pom:).and_return(notifier)
   end
 
@@ -150,13 +146,14 @@ RSpec.describe Reallocation::BulkReallocationService do
       result = service.call([selected_case], message: 'Moving cases')
 
       expect(result).to be_a(Reallocation::BulkReallocationResult)
-      expect(result.to_confirmation).to include(
+      expect(result.to_confirmation).to eq(
         source_pom_id: 10_001,
         target_pom_id: 10_002,
         message: 'Moving cases',
-        remaining_cases_count: 5,
+        selected_cases: [{ full_name: 'Zephyr, Alice', nomis_offender_id: offender_no }],
+        failed_cases: [],
+        remaining_cases_count: 1,
       )
-      expect(result.to_confirmation[:selected_cases]).to eq([{ full_name: 'Zephyr, Alice', nomis_offender_id: offender_no }])
     end
 
     it 'returns the allocations summary needed for the bulk email templates' do
@@ -193,6 +190,92 @@ RSpec.describe Reallocation::BulkReallocationService do
         expect(AllocationService).to have_received(:create_or_update) do |attributes, _further_info, **_options|
           expect(attributes[:allocated_at_rosh]).to be_nil
         end
+      end
+    end
+
+    context 'when a case fails during reallocation' do
+      let(:failing_offender_no) { 'B2222BB' }
+      let(:failing_selected_case) do
+        double('AllocatedOffender',
+               nomis_offender_id: failing_offender_no,
+               full_name: 'Broken, Case',
+               recommended_pom_type: 'probation')
+      end
+
+      before do
+        allow(OffenderService).to receive(:get_offender)
+          .with(failing_offender_no, fetch_categories: false, fetch_movements: false).and_raise(StandardError, 'API timeout')
+      end
+
+      it 'continues processing remaining cases after a failure' do
+        result = service.call([failing_selected_case, selected_case], message: 'Moving cases')
+
+        expect(result.reallocated_cases.size).to eq(1)
+        expect(result.failed_cases.size).to eq(1)
+        expect(AllocationService).to have_received(:create_or_update).once
+      end
+
+      it 'populates failed_cases with the error details' do
+        result = service.call([failing_selected_case], message: 'Moving cases')
+
+        expect(result.failed_cases.first.selected_case).to eq(failing_selected_case)
+        expect(result.failed_cases.first.error.message).to eq('API timeout')
+      end
+
+      it 'includes failed_cases in the confirmation payload' do
+        result = service.call([failing_selected_case], message: 'Moving cases')
+
+        confirmation = result.to_confirmation
+        expect(confirmation[:failed_cases]).to eq([
+          { full_name: 'Broken, Case', nomis_offender_id: failing_offender_no, error_message: 'API timeout' }
+        ])
+        expect(confirmation[:selected_cases]).to be_empty
+      end
+
+      it 'logs the failure' do
+        allow(Rails.logger).to receive(:error)
+
+        service.call([failing_selected_case], message: 'Moving cases')
+
+        expect(Rails.logger).to have_received(:error).with(
+          "event=bulk_reallocation_case_failed,nomis_offender_id=#{failing_offender_no}|API timeout"
+        )
+      end
+
+      it 'still sends notifications for successfully reallocated cases' do
+        service.call([failing_selected_case, selected_case], message: 'Moving cases')
+
+        expect(notifier).to have_received(:call) do |result|
+          expect(result.reallocated_cases.size).to eq(1)
+          expect(result.failed_cases.size).to eq(1)
+        end
+      end
+    end
+
+    context 'when all cases fail' do
+      let(:failing_selected_case) do
+        double('AllocatedOffender',
+               nomis_offender_id: 'C3333CC',
+               full_name: 'Broken, All',
+               recommended_pom_type: 'probation')
+      end
+
+      before do
+        allow(OffenderService).to receive(:get_offender)
+          .with('C3333CC', fetch_categories: false, fetch_movements: false).and_raise(StandardError, 'Service down')
+      end
+
+      it 'returns an empty reallocated_cases list' do
+        result = service.call([failing_selected_case], message: 'Moving cases')
+
+        expect(result.reallocated_cases).to be_empty
+        expect(result.failed_cases.size).to eq(1)
+      end
+
+      it 'still invokes the notifier (will short-circuit)' do
+        service.call([failing_selected_case], message: 'Moving cases')
+
+        expect(notifier).to have_received(:call)
       end
     end
   end

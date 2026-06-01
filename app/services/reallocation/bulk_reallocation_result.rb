@@ -2,6 +2,16 @@
 
 module Reallocation
   class BulkReallocationResult
+    FailedCase = Struct.new(:selected_case, :error, keyword_init: true) do
+      def confirmation_attributes
+        {
+          full_name: selected_case.full_name,
+          nomis_offender_id: selected_case.nomis_offender_id,
+          error_message: error.message,
+        }
+      end
+    end
+
     ReallocatedCase = Struct.new(:allocation, :selected_case, :further_info, :email_context, keyword_init: true) do
       def confirmation_attributes
         {
@@ -19,18 +29,15 @@ module Reallocation
       end
     end
 
-    attr_reader :source_pom_id, :target_pom_id, :message, :reallocated_cases, :remaining_cases_count
+    attr_reader :source_pom_id, :target_pom_id, :message, :reallocated_cases, :failed_cases, :remaining_cases_count
 
-    def initialize(source_pom_id:, target_pom_id:, message:, reallocated_cases:, remaining_cases_count:)
+    def initialize(source_pom_id:, target_pom_id:, message:, reallocated_cases:, failed_cases:, remaining_cases_count:)
       @source_pom_id = source_pom_id
       @target_pom_id = target_pom_id
       @message = message
       @reallocated_cases = reallocated_cases
+      @failed_cases = failed_cases
       @remaining_cases_count = remaining_cases_count
-    end
-
-    def selected_cases
-      reallocated_cases.map(&:confirmation_attributes)
     end
 
     def allocations_for_email
@@ -39,11 +46,12 @@ module Reallocation
 
     def to_confirmation
       {
-        source_pom_id: source_pom_id,
-        target_pom_id: target_pom_id,
-        selected_cases: selected_cases,
-        message: message,
-        remaining_cases_count: remaining_cases_count,
+        source_pom_id:,
+        target_pom_id:,
+        message:,
+        selected_cases: reallocated_cases.map(&:confirmation_attributes),
+        failed_cases: failed_cases.map(&:confirmation_attributes),
+        remaining_cases_count:,
       }
     end
   end

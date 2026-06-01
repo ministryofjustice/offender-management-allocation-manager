@@ -73,6 +73,7 @@ module Reallocations
 
       @message = confirmation[:message]
       @selected_cases = Array(confirmation[:selected_cases]).map(&:with_indifferent_access)
+      @failed_cases = Array(confirmation[:failed_cases]).map(&:with_indifferent_access)
       @remaining_cases_count = confirmation[:remaining_cases_count].to_i
     end
 
