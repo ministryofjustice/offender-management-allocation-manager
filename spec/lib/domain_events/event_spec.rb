@@ -187,5 +187,10 @@ RSpec.describe DomainEvents::Event, :enable_domain_event_publish do
       expect(basic_event.detail_url).to eq nil
       expect(full_event.detail_url).to eq('https://example.com/event_detail_url')
     end
+
+    it 'has #version', :aggregate_failures do
+      expect(basic_event.version).to eq 77
+      expect(full_event.version).to eq 8
+    end
   end
 end
