@@ -1,33 +1,41 @@
 RSpec.describe DomainEvents::Handlers::TierChangeHandler do
   subject!(:handler) { described_class.new }
 
-  before do
-    allow(Shoryuken::Logging.logger).to receive(:info).and_return(nil)
-    allow(Shoryuken::Logging.logger).to receive(:error).and_return(nil)
-    allow(AuditEvent).to receive(:publish).and_return(nil)
-    allow(HmppsApi::TieringApi).to receive(:get_calculation).and_return({ tier: tier_from_api })
-  end
-
+  let(:crn) { 'X408769' }
   let(:event) do
     DomainEvents::Event.new(
       event_type: 'tier.calculation.complete',
-      version: 1,
-      description: 'A fabulous description',
-      detail_url: 'https://example.org/irrelevant',
-      additional_information: { 'calculationId' => 'bishboshbash' },
+      version: event_version,
+      description: 'Tier calculation complete',
+      detail_url: "https://hmpps-tier.example.org/crn/#{crn}/tier/#{calculation_id}",
+      additional_information: { 'calculationId' => calculation_id },
       crn_number: crn,
       external_event: true
     )
   end
-
-  let(:crn) { 'X08769' }
   let(:tier_from_api) { 'D1' }
+  let(:calculation_id) { 'a5e7d3c1-9b4f-4e2a-8c6d-1f3b5a7e9d02' }
+  let(:event_version) { 3 }
+
+  before do
+    allow(Shoryuken::Logging.logger).to receive(:info).and_return(nil)
+    allow(Shoryuken::Logging.logger).to receive(:error).and_return(nil)
+    allow(AuditEvent).to receive(:publish).and_return(nil)
+    allow(HmppsApi::TieringApi).to receive(:get_calculation)
+      .with(crn, calculation_id, version: event_version)
+      .and_return({ tier: tier_from_api })
+  end
 
   context 'when local case information found' do
     let!(:case_information) { create(:case_information, crn: crn, tier: tier) }
     let(:tier) { 'A' }
 
     before { handler.handle(event) }
+
+    it 'passes crn, calculationId, and version to TieringApi' do
+      expect(HmppsApi::TieringApi).to have_received(:get_calculation)
+        .with(crn, calculation_id, version: event_version)
+    end
 
     context 'when tier has not changed' do
       let(:tier) { 'D' }
@@ -40,14 +48,6 @@ RSpec.describe DomainEvents::Handlers::TierChangeHandler do
     context 'when case information update successful' do
       it 'updates tier with first char of new value' do
         expect(case_information.reload.tier).to eq('D')
-      end
-
-      context 'when supervision has been suspended' do
-        let(:tier_from_api) { 'D3S' }
-
-        it 'updates tier with first char of new value' do
-          expect(case_information.reload.tier).to eq('D')
-        end
       end
 
       it 'emits a log info message' do

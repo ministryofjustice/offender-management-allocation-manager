@@ -50,6 +50,10 @@ class DomainEvents::Event
     @message['detailUrl']
   end
 
+  def version
+    @message['version']
+  end
+
   def publish(now: Time.zone.now.utc, job: nil)
     full_message = @message.merge('occurredAt' => now.iso8601)
     self.class.json_validate!(full_message)

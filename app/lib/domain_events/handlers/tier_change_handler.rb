@@ -2,13 +2,14 @@ module DomainEvents
   module Handlers
     class TierChangeHandler
       def handle(event, logger: Shoryuken::Logging.logger)
-        logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type},crn=#{event.crn_number}"
+        logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type}," \
+                      "version=#{event.version},crn=#{event.crn_number}"
 
         case_info = CaseInformation.find_by(crn: event.crn_number)
         return if case_info.nil?
 
         api_tier_info = HmppsApi::TieringApi.get_calculation(
-          event.crn_number, event.additional_information['calculationId']
+          event.crn_number, event.additional_information['calculationId'], version: event.version
         )
         return if api_tier_info.try(:[], :tier).nil?
 
@@ -31,10 +32,10 @@ module DomainEvents
           )
 
           logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type}," \
-                        "crn=#{event.crn_number},old_tier=#{old_tier},new_tier=#{new_tier}"
+                        "version=#{event.version},crn=#{event.crn_number},old_tier=#{old_tier},new_tier=#{new_tier}"
         else
           logger.error "event=domain_event_handle_failure,domain_event_type=#{event.event_type}," \
-            "crn=#{event.crn_number}|Error saving case information"
+            "version=#{event.version},crn=#{event.crn_number}|#{case_info.errors.full_messages.join(',')}"
         end
       end
     end
