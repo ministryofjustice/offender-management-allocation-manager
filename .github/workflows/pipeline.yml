@@ -63,9 +63,9 @@ jobs:
         options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Setup Ruby and install gems
-        uses: ruby/setup-ruby@97ecb7b512899eb71ab1bf2310a624c6f1589ac6 # v1.308.0
+        uses: ruby/setup-ruby@89f90524b88a01fe6e0b732220432cc6142926af # v1.313.0
         with:
           bundler-cache: true
       - name: Set up Node.js
@@ -134,14 +134,14 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       - name: Initialise database
         run: |
           export PGPASSWORD=schemaspy && \
           dropdb -U schemaspy -h localhost --if-exists mpc_schemaspy && \
           createdb -U schemaspy -h localhost mpc_schemaspy && \
           psql -U schemaspy -h localhost -d mpc_schemaspy < db/structure.sql
-      - uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/database_schema_report@cd5eb88ee6b73a22548a64b8c7358a3bedc9516f # v1.0.13
+      - uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/database_schema_report@c241b9febb7a4fc11e88d0e781cbdfcf8abd84a5 # v1.0.17
         with:
           database_name: mpc_schemaspy
           user: schemaspy
