@@ -1,0 +1,44 @@
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">Early allocation history</h2>
+  </div>
+  <div class="govuk-summary-card__content">
+    <% if early_allocations.any? %>
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Date</th>
+            <th scope="col" class="govuk-table__header">Outcome</th>
+            <th scope="col" class="govuk-table__header">Community decision</th>
+            <th scope="col" class="govuk-table__header">Within referral window?</th>
+            <th scope="col" class="govuk-table__header">Prison</th>
+            <th scope="col" class="govuk-table__header">Created by</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          <% early_allocations.each do |ea| %>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><%= ea.created_at.strftime('%d/%m/%Y') %></td>
+              <td class="govuk-table__cell"><%= ea.outcome&.humanize || 'Pending' %></td>
+              <td class="govuk-table__cell">
+                <% case ea.community_decision %>
+                <% when true %>
+                  Eligible
+                <% when false %>
+                  Ineligible
+                <% else %>
+                  Awaiting
+                <% end %>
+              </td>
+              <td class="govuk-table__cell"><%= humanized_bool ea.created_within_referral_window %></td>
+              <td class="govuk-table__cell"><%= ea.prison %></td>
+              <td class="govuk-table__cell"><%= "#{ea.created_by_firstname} #{ea.created_by_lastname}" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="govuk-body">No early allocation assessments recorded</p>
+    <% end %>
+  </div>
+</div>
