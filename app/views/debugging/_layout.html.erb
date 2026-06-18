@@ -13,22 +13,32 @@
 </div>
 
 <% if @nomis_id.present? %>
-  <nav class="moj-sub-navigation" aria-label="Sub navigation">
-    <ul class="moj-sub-navigation__list">
-      <li class="moj-sub-navigation__item">
-        <a class="moj-sub-navigation__link" <%= ("aria-current=page" if tab == 'overview') %> href="<%= prison_debugging_path(@prison.code, offender_no: @nomis_id) %>">
-          Overview
-        </a>
-      </li>
-      <li class="moj-sub-navigation__item">
-        <a class="moj-sub-navigation__link" <%= ("aria-current=page" if tab == 'timeline') %> href="<%= prison_debugging_timeline_path(@prison.code, offender_no: @nomis_id) %>">
-          Timeline
-        </a>
-      </li>
-    </ul>
-  </nav>
-  
-  <%= yield %>
+  <% if @known_offender %>
+    <nav class="moj-sub-navigation" aria-label="Sub navigation">
+      <ul class="moj-sub-navigation__list">
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" <%= ("aria-current=page" if tab == 'overview') %> href="<%= prison_debugging_path(@prison.code, offender_no: @nomis_id) %>">
+            Overview
+          </a>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" <%= ("aria-current=page" if tab == 'timeline') %> href="<%= prison_debugging_timeline_path(@prison.code, offender_no: @nomis_id) %>">
+            Timeline
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <%= yield %>
+  <% else %>
+    <div class="govuk-warning-text">
+      <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+      <strong class="govuk-warning-text__text">
+        <span class="govuk-visually-hidden">Warning</span>
+        This offender is not known to our system. We have no records for prisoner number <%= @nomis_id %>.
+      </strong>
+    </div>
+  <% end %>
 <% else %>
   <p class="govuk-body">Please enter a NOMIS Id for the offender</p>
 <% end %>

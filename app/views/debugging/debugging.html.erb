@@ -2,6 +2,12 @@
 
 <%= render 'debugging/layout', tab: 'overview', form_path: prison_debugging_path(@prison.code) do %>
 
+  <% if @offender && !@offender.inside_omic_policy? %>
+    <div class="govuk-inset-text">
+      This offender is outside OMiC policy. Live handover calculations are not applicable, but any previously recorded data is shown below.
+    </div>
+  <% end %>
+
   <%= render partial: "offender_details",
     locals: { oasys_assessment: @oasys_assessment } %>
 
@@ -22,6 +28,9 @@
 
   <%= render partial: "allocation",
     locals: { allocation: @allocation } %>
+
+  <%= render partial: "early_allocations",
+    locals: { early_allocations: @early_allocations } %>
 
   <%= render partial: "community",
     locals: { case_information: @case_information }  %>

@@ -11,9 +11,33 @@ RSpec.describe DebuggingController, type: :controller do
     stub_sso_data(prison_id, roles: [SsoIdentity::SPO_ROLE, SsoIdentity::ADMIN_ROLE])
   end
 
+  context 'when the offender is not known to the system' do
+    render_views
+
+    it 'shows a warning message on the debugging page' do
+      get :debugging, params: { prison_id: prison_id, offender_no: offender_no }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('not known to our system')
+      expect(assigns(:offender)).to be_nil
+    end
+
+    it 'shows a warning message on the timeline page' do
+      get :timeline, params: { prison_id: prison_id, offender_no: offender_no }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('not known to our system')
+      expect(assigns(:log)).to be_nil
+    end
+  end
+
   context 'when debugging an offender' do
     let(:pom_staff_id) { 543_453 }
     let(:primary_pom_name) { 'Jenae Sporer' }
+
+    before do
+      create(:offender, nomis_offender_id: offender_no)
+    end
 
     it 'can show debugging information for a specific offender' do
       stub_offender(build(:nomis_offender, prisonId: prison.code, sentence: attributes_for(:sentence_detail, :indeterminate), prisonerNumber: offender_no))
@@ -24,7 +48,7 @@ RSpec.describe DebuggingController, type: :controller do
                                                                  movementType: "TRN",
                                                                  directionCode: "IN")], movement_types: %w[ADM TRN REL]
 
-      create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
+      create(:case_information, offender: Offender.find_by(nomis_offender_id: offender_no))
       create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no, primary_pom_nomis_id: pom_staff_id, primary_pom_name: primary_pom_name)
 
       get :debugging, params: { prison_id: prison_id, offender_no: offender_no }
@@ -48,6 +72,25 @@ RSpec.describe DebuggingController, type: :controller do
       expect(movements.to_agency).to eq prison_id
     end
 
+    context 'when the offender is outside OMiC policy' do
+      render_views
+
+      it 'shows the page with an outside OMiC policy message' do
+        stub_offender(build(:nomis_offender, :outside_omic_policy, prisonId: prison.code, prisonerNumber: offender_no))
+
+        stub_movements_for offender_no, [attributes_for(:movement, offenderNo: offender_no,
+                                                                   fromAgency: 'LEI',
+                                                                   toAgency: prison_id,
+                                                                   movementType: 'TRN',
+                                                                   directionCode: 'IN')], movement_types: %w[ADM TRN REL]
+
+        get :debugging, params: { prison_id: prison_id, offender_no: offender_no }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('outside OMiC policy')
+      end
+    end
+
     context 'when rendering handover history comparisons' do
       render_views
 
@@ -60,7 +103,7 @@ RSpec.describe DebuggingController, type: :controller do
                                                                    movementType: 'TRN',
                                                                    directionCode: 'IN')], movement_types: %w[ADM TRN REL]
 
-        offender = create(:offender, nomis_offender_id: offender_no)
+        offender = Offender.find_by(nomis_offender_id: offender_no)
         create(:case_information, offender:)
         create(:allocation_history, prison: prison.code, nomis_offender_id: offender_no, primary_pom_nomis_id: pom_staff_id, primary_pom_name: primary_pom_name)
 
@@ -101,7 +144,7 @@ RSpec.describe DebuggingController, type: :controller do
 
   describe 'debugging the timeline of events' do
     before do
-      stub_offender(build(:nomis_offender, prisonId: prison.code, sentence: attributes_for(:sentence_detail, :indeterminate), prisonerNumber: offender_no))
+      create(:offender, nomis_offender_id: offender_no)
 
       create(:audit_event, nomis_offender_id: offender_no, created_at: 60.seconds.ago, tags: %w[event tag one])
       create(:audit_event, nomis_offender_id: offender_no, created_at: 30.seconds.ago, tags: %w[event tag two])

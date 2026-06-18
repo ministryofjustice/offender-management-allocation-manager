@@ -23,7 +23,11 @@
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">POM Role</dt>
             <dd class="govuk-summary-list__value">
-              <%= pom_responsibility_label(@offender) %>
+              <% if @offender.inside_omic_policy? %>
+                <%= pom_responsibility_label(@offender) %>
+              <% else %>
+                Outside OMiC policy
+              <% end %>
             </dd>
           </div>
         <% end %>
