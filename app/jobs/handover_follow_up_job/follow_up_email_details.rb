@@ -21,10 +21,20 @@ class HandoverFollowUpJob::FollowUpEmailDetails
       prison: prison.name,
       start_date: offender.handover_start_date,
       responsibility_handover_date: offender.handover_date,
-    }.merge(allocation.try(:active?) ? active_pom_details : no_active_pom_details)
+    }.merge(pom_details)
   end
 
 private
+
+  def pom_details
+    # If the offender has transferred but the allocation still references the old prison,
+    # treat as if there's no active POM to avoid sending stale contact info.
+    if allocation.try(:active?) && allocation.prison == prison.code
+      active_pom_details
+    else
+      no_active_pom_details
+    end
+  end
 
   def active_pom_details
     pom = prison.get_single_pom(allocation.primary_pom_nomis_id)

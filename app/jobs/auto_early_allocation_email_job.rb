@@ -15,6 +15,13 @@ class AutoEarlyAllocationEmailJob < ApplicationJob
     allocation = AllocationHistory.find_by(nomis_offender_id: offender_no)
     return if offender.nil? || allocation.nil?
 
+    # Skip if the offender has transferred but the allocation hasn't been updated yet
+    if allocation.prison != offender.prison_id
+      logger.info("job=auto_early_allocation_email_job,nomis_offender_id=#{offender_no}," \
+                  "event=skipped_transfer|Offender prison (#{offender.prison_id}) does not match allocation prison (#{allocation.prison})")
+      return
+    end
+
     pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
     pdf = Base64.decode64 encoded_pdf
     EarlyAllocationMailer.with(email: offender.ldu_email_address,
