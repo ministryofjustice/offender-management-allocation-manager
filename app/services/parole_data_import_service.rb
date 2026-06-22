@@ -34,20 +34,34 @@ class ParoleDataImportService
     latest_imported_date = ParoleReviewImport.maximum(:snapshot_date)
 
     dates_to_import = if latest_imported_date.nil?
-                        date
+                        [date]
                       elsif latest_imported_date < date
                         (latest_imported_date + 1..date)
+                      else
+                        []
                       end
 
-    dates_to_import.to_a.each do |dt|
+    total_import_count = 0
+    total_row_count = 0
+
+    dates_to_import.each do |dt|
       Rails.logger.info(format_log("Importing date #{dt}.", dt))
       import_from_s3_bucket(dt)
+      total_import_count += @csv_row_import_count
+      total_row_count += @csv_row_count
     end
 
-    [@csv_row_import_count, @csv_row_count]
+    if dates_to_import.any? && total_row_count.zero?
+      Rails.logger.error(format_log('No CSV files found for any of the dates attempted.', date))
+    end
+
+    [total_import_count, total_row_count]
   end
 
   def import_from_s3_bucket(date)
+    @csv_row_count = 0
+    @csv_row_import_count = 0
+
     prefix = [S3_OBJECT_PREFIX, date.strftime('%Y%m%d')].join('_')
     csv_files = S3::List.new(prefix:).call
 
@@ -74,9 +88,6 @@ class ParoleDataImportService
 private
 
   def import_from_rows(csv_rows, date)
-    @csv_row_count = 0
-    @csv_row_import_count = 0
-
     ApplicationRecord.transaction do # To improve performance. The index can cause drag
       csv_rows.each do |csv_row|
         @csv_row_count += 1
