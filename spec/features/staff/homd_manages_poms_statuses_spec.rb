@@ -20,13 +20,13 @@ describe 'HOMD manages POMS statuses' do
     visit prison_poms_path(prison)
     within('section', text: 'Inactive staff') { click_on 'Anette Pomme' }
     within('.govuk-summary-list__row', text: 'Status Inactive') { click_on 'Change' }
-    within('fieldset', text: 'Status') { choose 'Active' }
+    within('fieldset', text: 'Select status') { choose 'Active' }
     click_on 'Save'
 
     # Then I see the POM in the active staff section
     visit prison_poms_path(prison)
     within('section', text: 'Inactive staff') { expect(page).not_to have_content('Anette Pomme') }
-    within('section', text: 'Active prison officer POMs') { expect(page).to have_content('Anette Pomme') }
+    within('section', text: 'Available prison POMs') { expect(page).to have_content('Anette Pomme') }
   end
 
   specify 'HOMD making POM inactive de-allocates any allocated cases' do
@@ -42,15 +42,15 @@ describe 'HOMD manages POMS statuses' do
 
     # When I make the POM inactive
     visit prison_poms_path(prison)
-    within('section', text: 'Active prison officer POMs') { click_on 'Anette Pomme' }
+    within('section', text: 'Available prison POMs') { click_on 'Anette Pomme' }
     within('.govuk-summary-list__row', text: 'Status Active') { click_on 'Change' }
-    within('fieldset', text: 'Status') { choose 'Inactive' }
+    within('fieldset', text: 'Select status') { choose 'Inactive' }
     click_on 'Save'
 
     # Then they appear in the inactive staff section
     visit prison_poms_path(prison)
     within('section', text: 'Inactive staff') { expect(page).to have_content('Anette Pomme') }
-    within('section', text: 'Active prison officer POMs') { expect(page).not_to have_content('Anette Pomme') }
+    within('section', text: 'Available prison POMs') { expect(page).not_to have_content('Anette Pomme') }
 
     # And the previosly allocated cases are now on the unallocated cases screen
     visit unallocated_prison_prisoners_path(prison)

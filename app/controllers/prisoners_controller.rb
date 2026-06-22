@@ -4,6 +4,7 @@ class PrisonersController < PrisonsApplicationController
   before_action :ensure_spo_user, except: [:show, :image, :search]
 
   before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :search]
+  before_action :load_reallocation_alert, only: [:unallocated]
 
   def allocated
     retrieve_latest_allocation_details
@@ -130,5 +131,15 @@ private
   def search_term
     # defaults to an empty string if the key 'q' can't be found
     params.fetch('q', '').strip
+  end
+
+  def load_reallocation_alert
+    return unless FeatureFlags.limbo_bulk_reallocation.enabled?
+
+    poms = @prison.get_list_of_poms
+    @removed_poms = @prison.get_removed_poms(existing_poms: poms)
+  rescue StandardError => e
+    Rails.logger.error("event=load_reallocation_alert_failed|#{e.message}")
+    @removed_poms = []
   end
 end

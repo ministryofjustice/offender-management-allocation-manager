@@ -56,11 +56,11 @@ RSpec.describe ApplicationHelper do
     let(:fallback) { 'Support staff' }
 
     it 'returns long Probation Officer' do
-      expect(pom_level_long(po)).to eq('Probation Officer POM')
+      expect(pom_level_long(po)).to eq('Probation POM')
     end
 
     it 'returns long Prison Officer' do
-      expect(pom_level_long(pom)).to eq('Prison Officer POM')
+      expect(pom_level_long(pom)).to eq('Prison POM')
     end
 
     it 'returns the supplied fallback for staff members' do

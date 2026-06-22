@@ -18,12 +18,12 @@
   <ul class="govuk-tabs__list govuk-!-margin-top-9" role='tablist'>
     <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
       <a class="govuk-tabs__tab" href="#active_probation_poms">
-        Active probation officer POMs (<%= active_probation_poms(@poms).count %>)
+        Available probation POMs (<%= active_probation_poms(@poms).count %>)
       </a>
     </li>
     <li class="govuk-tabs__list-item">
       <a class="govuk-tabs__tab" href="#active_prison_poms">
-        Active prison officer POMs (<%= active_prison_poms(@poms).count %>)
+        Available prison POMs (<%= active_prison_poms(@poms).count %>)
       </a>
     </li>
     <li class="govuk-tabs__list-item">
@@ -46,7 +46,7 @@
   <section class="govuk-tabs__panel" id="active_probation_poms">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-        <h2 class="govuk-heading-l">Active probation officer POMs</h2>
+        <h2 class="govuk-heading-l">Available probation POMs</h2>
         <p class="govuk-body govuk-!-margin-bottom-8">
           If someone has left or will be absent for a while, make sure their status is set to inactive by selecting
           their name below. You will then need to reallocate any cases they have.
@@ -59,7 +59,7 @@
   <section class="govuk-tabs__panel" id="active_prison_poms">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-        <h2 class="govuk-heading-l">Active prison officer POMs</h2>
+        <h2 class="govuk-heading-l">Available prison POMs</h2>
         <p class="govuk-body govuk-!-margin-bottom-8">
           If someone has left or will be absent for a while, make sure their status is set to inactive by selecting
           their name below. You will then need to reallocate any cases they have.

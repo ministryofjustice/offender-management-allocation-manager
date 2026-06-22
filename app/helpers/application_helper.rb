@@ -29,8 +29,8 @@ module ApplicationHelper
 
   def pom_level_long(level, fallback: 'N/A')
     {
-      'PO' => 'Probation Officer POM',
-      'PRO' => 'Prison Officer POM',
+      'PO' => 'Probation POM',
+      'PRO' => 'Prison POM',
       'STAFF' => fallback
     }[level]
   end
