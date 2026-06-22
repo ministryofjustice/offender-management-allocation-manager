@@ -52,7 +52,10 @@ class ParoleDataImportService
     end
 
     if dates_to_import.any? && total_row_count.zero?
-      Rails.logger.error(format_log('No CSV files found for any of the dates attempted.', date))
+      Sentry.capture_message(
+        'No PPUD CSV files found in S3 for any of the dates attempted',
+        extra: { import_id: @import_id, latest_imported_date:, dates_attempted: dates_to_import.to_a }
+      )
     end
 
     [total_import_count, total_row_count]
