@@ -55,6 +55,23 @@ describe HandoverFollowUpJob::FollowUpEmailDetails do
       end
     end
 
+    context "when the offender has a POM allocated but has transferred to a different prison" do
+      let(:other_prison) { Prison.find_by(code: "MDI") || create(:prison, code: "MDI") }
+
+      before do
+        FactoryBot.create(:allocation_history, nomis_offender_id: offender.offender_no, prison: other_prison.code, primary_pom_nomis_id: "486154")
+      end
+
+      it "does not include active POM details to avoid sending stale info" do
+        details = described_class.for(offender:)
+
+        expect(details).to include(
+          pom_email: "n/a",
+          pom_name: "This offender does not have an allocated POM",
+        )
+      end
+    end
+
     context "when the offender has a POM allocated but is not included in the list of POMs for that prison" do
       before do
         FactoryBot.create(:allocation_history, nomis_offender_id: offender.offender_no, prison: prison.code, primary_pom_nomis_id: "9999")

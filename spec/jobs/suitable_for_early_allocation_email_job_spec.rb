@@ -38,6 +38,34 @@ RSpec.describe SuitableForEarlyAllocationEmailJob, type: :job do
       create(:allocation_history, prison: prison.code, nomis_offender_id: api_offender.offender_no, primary_pom_nomis_id: pom.staff_id, primary_pom_name: pom.full_name)
     end
 
+    context 'when offender has transferred but allocation has not been updated' do
+      let(:release_date) { Time.zone.today + 17.months }
+      let(:other_prison) { create(:prison) }
+
+      before do
+        # Simulate transfer: offender is now at a different prison than the allocation
+        transferred_api_offender = build(:hmpps_api_offender, prisonId: other_prison.code,
+                                                              sentence: attributes_for(:sentence_detail,
+                                                                                       :determinate,
+                                                                                       sentenceStartDate: Time.zone.today - 10.months,
+                                                                                       conditionalReleaseDate: release_date,
+                                                                                       automaticReleaseDate: release_date,
+                                                                                       releaseDate: release_date,
+                                                                                       tariffDate: nil))
+        case_info = CaseInformation.find_by(nomis_offender_id: api_offender.offender_no)
+        transferred_offender = build(:mpc_offender, prison: other_prison, offender: case_info.offender, prison_record: transferred_api_offender)
+        allow(OffenderService).to receive(:get_offender).and_return(transferred_offender)
+      end
+
+      it 'does not send email' do
+        create(:early_allocation, created_at: Time.zone.today - 9.months, updated_at: Time.zone.today - 9.months,
+                                  created_within_referral_window: false, nomis_offender_id: api_offender.offender_no)
+
+        expect_any_instance_of(EarlyAllocationMailer).not_to receive(:review_early_allocation)
+        described_class.perform_now(api_offender.offender_no)
+      end
+    end
+
     context 'when form created outside of the referral window (more than 18 months to release)' do
       context 'when form outcome is ineligible' do
         let(:release_date) { Time.zone.today + 28.months }

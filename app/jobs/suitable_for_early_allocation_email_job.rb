@@ -13,9 +13,16 @@ class SuitableForEarlyAllocationEmailJob < ApplicationJob
     return if allocation.nil?
 
     prisoner = OffenderService.get_offender(offender_no)
+    return if prisoner.nil?
 
-    if !prisoner.nil? && prisoner.within_early_allocation_window?
+    # Skip if the offender has transferred but the allocation hasn't been updated yet
+    if allocation.prison != prisoner.prison_id
+      logger.info("job=suitable_for_early_allocation_email_job,nomis_offender_id=#{offender_no}," \
+                  "event=skipped_transfer|Offender prison (#{prisoner.prison_id}) does not match allocation prison (#{allocation.prison})")
+      return
+    end
 
+    if prisoner.within_early_allocation_window?
       already_emailed = EmailHistory.sent_within_current_sentence(prisoner, EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION)
 
       if already_emailed.empty?
