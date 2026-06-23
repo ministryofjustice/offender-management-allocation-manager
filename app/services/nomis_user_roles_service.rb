@@ -51,7 +51,7 @@ class NomisUserRolesService
       nomis_staff_id, prison.code, event_trigger: AllocationHistory::INACTIVE_POM
     )
 
-    prison.pom_details.destroy_by(nomis_staff_id:)
+    prison.pom_details.find_by(nomis_staff_id:)&.deleted!
 
     pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(
       prison.code, staff_id: nomis_staff_id

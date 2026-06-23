@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe NomisUserRolesService do
-  let(:prison) { build(:prison) }
+  let(:prison) { create(:prison) }
   let(:nomis_staff_id) { 123_456 }
   let(:spo_username) { 'SPO_USER' }
   let(:pom) { build(:pom, staffId: nomis_staff_id) }
@@ -87,10 +87,9 @@ RSpec.describe NomisUserRolesService do
 
   describe '.remove_pom' do
     let(:event_trigger) { AllocationHistory::INACTIVE_POM }
+    let!(:pom_detail) { create(:pom_detail, :active, prison_code: prison.code, nomis_staff_id: nomis_staff_id) }
 
     before do
-      allow(prison.pom_details).to receive(:destroy_by)
-
       allow(AllocationHistory).to receive(:deallocate_primary_pom)
       allow(AllocationHistory).to receive(:deallocate_secondary_pom)
 
@@ -110,10 +109,10 @@ RSpec.describe NomisUserRolesService do
       )
     end
 
-    it 'removes the POM details' do
+    it 'soft-deletes the POM details' do
       described_class.remove_pom(prison, nomis_staff_id)
 
-      expect(prison.pom_details).to have_received(:destroy_by).with(nomis_staff_id: nomis_staff_id)
+      expect(pom_detail.reload).to be_deleted
     end
 
     it 'expires the staff role' do

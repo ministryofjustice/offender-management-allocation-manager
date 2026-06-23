@@ -137,7 +137,7 @@ feature "remove a POM no longer present in NOMIS" do
                                   href: unallocated_prison_prisoners_path(prison))
 
         pom_details = PomDetail.find_by(prison_code: prison.code, nomis_staff_id: removed_pom_staff_id)
-        expect(pom_details).to be_nil
+        expect(pom_details).to be_deleted
       end
     end
   end
