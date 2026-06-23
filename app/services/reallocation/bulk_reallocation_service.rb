@@ -20,6 +20,13 @@ module Reallocation
     def call(selected_cases, message:)
       reallocated_cases, failed_cases = reallocate_each(selected_cases, message)
 
+      # Deallocate any co-worker leftover cases
+      if remaining_cases_count.zero?
+        AllocationHistory.deallocate_secondary_pom(
+          source_pom.staff_id, prison.code, event_trigger: AllocationHistory::INACTIVE_POM
+        )
+      end
+
       build_result(message, reallocated_cases, failed_cases).tap do |result|
         BulkReallocationNotifier.new(prison:, source_pom:, target_pom:).call(result)
       end

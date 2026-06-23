@@ -278,5 +278,56 @@ RSpec.describe Reallocation::BulkReallocationService do
         expect(notifier).to have_received(:call)
       end
     end
+
+    context 'when no primary allocations remain after reallocation' do
+      before do
+        # Remove the primary allocation so remaining_cases_count is 0
+        allocation.update!(primary_pom_nomis_id: target_pom.staff_id)
+      end
+
+      let!(:coworking_allocation) do
+        create(:allocation_history,
+               prison: prison.code,
+               nomis_offender_id: 'D4444DD',
+               primary_pom_nomis_id: 99_999,
+               secondary_pom_nomis_id: source_pom.staff_id,
+               secondary_pom_name: 'Old, Pom')
+      end
+
+      it 'deallocates the source POM from all coworking allocations at that prison' do
+        service.call([selected_case], message: 'Moving cases')
+
+        coworking_allocation.reload
+        expect(coworking_allocation.secondary_pom_nomis_id).to be_nil
+        expect(coworking_allocation.secondary_pom_name).to be_nil
+        expect(coworking_allocation.event).to eq('deallocate_secondary_pom')
+        expect(coworking_allocation.event_trigger).to eq('inactive_pom')
+      end
+    end
+
+    context 'when primary allocations still remain after reallocation' do
+      let!(:another_primary_allocation) do
+        create(:allocation_history,
+               prison: prison.code,
+               nomis_offender_id: 'F6666FF',
+               primary_pom_nomis_id: source_pom.staff_id)
+      end
+
+      let!(:coworking_allocation) do
+        create(:allocation_history,
+               prison: prison.code,
+               nomis_offender_id: 'G7777GG',
+               primary_pom_nomis_id: 99_999,
+               secondary_pom_nomis_id: source_pom.staff_id,
+               secondary_pom_name: 'Old, Pom')
+      end
+
+      it 'does not deallocate coworking allocations' do
+        service.call([selected_case], message: 'Moving cases')
+
+        coworking_allocation.reload
+        expect(coworking_allocation.secondary_pom_nomis_id).to eq(source_pom.staff_id)
+      end
+    end
   end
 end

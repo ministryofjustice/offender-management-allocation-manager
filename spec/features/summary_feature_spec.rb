@@ -5,6 +5,7 @@ feature 'male prisoners summary navigation tabs' do
     signin_spo_user([prison.code, 'AGI'])
     stub_signin_spo(pom, [prison.code, 'AGI'])
     stub_offenders_for_prison(prison.code, offenders)
+    stub_poms(prison.code, [pom])
     stub_bank_holidays
 
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_ready_to_allocate.fetch(:prisonerNumber)))

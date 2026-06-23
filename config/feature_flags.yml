@@ -5,7 +5,7 @@ feature_flags:
   example_feature:
     staging: true
   limbo_bulk_reallocation:
-    staging: false
+    staging: true
   rosh_level:
     staging: true
   new_tiers:

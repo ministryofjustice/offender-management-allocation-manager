@@ -14,6 +14,7 @@ feature 'summary summary feature' do
     stub_bank_holidays
     stub_signin_spo(build(:pom), prison.code)
     stub_offenders_for_prison(prison.code, offenders)
+    stub_poms(prison.code, [])
   end
 
   describe 'awaiting summary table' do

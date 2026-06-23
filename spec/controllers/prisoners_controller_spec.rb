@@ -6,6 +6,7 @@ RSpec.describe PrisonersController, type: :controller do
 
     before do
       stub_offenders_for_prison(prison.code, offenders)
+      stub_poms(prison.code, [])
       stub_sso_data(prison.code)
     end
 
@@ -253,7 +254,10 @@ RSpec.describe PrisonersController, type: :controller do
   context 'with a mens prison' do
     let(:prison) { create(:prison).code }
 
-    before { stub_sso_data(prison) }
+    before do
+      stub_sso_data(prison)
+      stub_poms(prison, [])
+    end
 
     context 'with 4 offenders' do
       let(:today_plus_10_days) { (Time.zone.today + 10.days).to_s }
@@ -628,6 +632,69 @@ RSpec.describe PrisonersController, type: :controller do
       expect(response.status).to be(200)
       expect(assigns(:primary_pom_name)).to be_nil
       expect(assigns(:secondary_pom_name)).to eq('Secondary Pom')
+    end
+  end
+
+  describe 'reallocation alert banner' do
+    let(:prison) { create(:prison) }
+    let(:offender) { build(:nomis_offender) }
+    let(:pom_record) { build(:pom, staffId: 10_001) }
+    let(:removed_staff_id) { 99_999 }
+
+    before do
+      stub_sso_data(prison.code)
+      stub_offenders_for_prison(prison.code, [offender])
+      stub_poms(prison.code, [pom_record])
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
+      create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), prison: prison.code, primary_pom_nomis_id: pom_record.staff_id)
+    end
+
+    render_views
+
+    context 'when limbo_bulk_reallocation is enabled and there are removed POMs with cases' do
+      let(:removed_offender) { build(:nomis_offender) }
+
+      before do
+        stub_feature_flag(:limbo_bulk_reallocation, enabled: true)
+        stub_offenders_for_prison(prison.code, [offender, removed_offender])
+        create(:pom_detail, prison_code: prison.code, nomis_staff_id: removed_staff_id)
+        create(:case_information, offender: build(:offender, nomis_offender_id: removed_offender.fetch(:prisonerNumber)))
+        create(:allocation_history, nomis_offender_id: removed_offender.fetch(:prisonerNumber), prison: prison.code, primary_pom_nomis_id: removed_staff_id)
+
+        stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{removed_staff_id}")
+          .to_return(body: { staffId: removed_staff_id, lastName: 'Gone', firstName: 'Person' }.to_json)
+      end
+
+      it 'shows the reallocation alert on the unallocated page' do
+        get :unallocated, params: { prison_id: prison.code }
+
+        expect(response.body).to include('Cases to reallocate')
+        expect(response.body).to include('Go to the attention needed part of the staff section')
+      end
+    end
+
+    context 'when limbo_bulk_reallocation is disabled' do
+      before do
+        stub_feature_flag(:limbo_bulk_reallocation, enabled: false)
+      end
+
+      it 'does not show the reallocation alert' do
+        get :unallocated, params: { prison_id: prison.code }
+
+        expect(response.body).not_to include('Cases to reallocate')
+      end
+    end
+
+    context 'when there are no removed POMs with cases' do
+      before do
+        stub_feature_flag(:limbo_bulk_reallocation, enabled: true)
+      end
+
+      it 'does not show the reallocation alert' do
+        get :unallocated, params: { prison_id: prison.code }
+
+        expect(response.body).not_to include('Cases to reallocate')
+      end
     end
   end
 end
