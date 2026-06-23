@@ -217,6 +217,25 @@ RSpec.describe Prison do
         expect(result.first.staff_id).to eq(pom1.staff_id)
       end
     end
+
+    context 'when a POM has been soft-deleted' do
+      before do
+        create(:pom_detail, :deleted, prison: prison, nomis_staff_id: pom1.staff_id)
+      end
+
+      it 'excludes the soft-deleted POM by default' do
+        result = prison.get_list_of_poms
+
+        expect(result.map(&:staff_id)).not_to include(pom1.staff_id)
+        expect(result.map(&:staff_id)).to include(pom2.staff_id)
+      end
+
+      it 'includes the soft-deleted POM when include_deleted is true' do
+        result = prison.get_list_of_poms(include_deleted: true)
+
+        expect(result.map(&:staff_id)).to include(pom1.staff_id, pom2.staff_id)
+      end
+    end
   end
 
   describe '#get_removed_poms' do
@@ -274,6 +293,30 @@ RSpec.describe Prison do
       it 'does not return POMs without active primary allocations' do
         removed = prison.get_removed_poms(existing_poms: [pom1])
         expect(removed).to be_empty
+      end
+    end
+
+    context 'when POM is soft-deleted but still has active primary allocations' do
+      let!(:pom_detail2) { create(:pom_detail, :deleted, prison: prison, nomis_staff_id: pom2.staff_id) }
+
+      let!(:allocation) do
+        create(:allocation_history,
+               prison: prison.code,
+               primary_pom_nomis_id: pom2.staff_id,
+               nomis_offender_id: offender_no)
+      end
+
+      before do
+        allow(prison).to receive(:allocated).and_return(
+          [MpcOffender.new(prison:, offender:, prison_record:)]
+        )
+      end
+
+      it 'returns the soft-deleted POM so the SPO can re-enter the reallocation journey' do
+        removed = prison.get_removed_poms(existing_poms: [pom1])
+
+        expect(removed.size).to eq(1)
+        expect(removed.first.staff_id).to eq(pom2.staff_id)
       end
     end
   end

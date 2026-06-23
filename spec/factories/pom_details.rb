@@ -17,6 +17,10 @@ FactoryBot.define do
       status { 'unavailable' }
     end
 
+    trait :deleted do
+      status { 'deleted' }
+    end
+
     trait :part_time do
       working_pattern { 0.5 }
     end
