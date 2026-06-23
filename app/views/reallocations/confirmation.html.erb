@@ -18,7 +18,7 @@
 
     <p class="govuk-body">
       You have reallocated <%= pluralize(@selected_cases.size, 'case') %> from
-      <%= pom_level(@pom.position, titleize: false) %> <%= @pom.full_name_ordered %> to
+      <%= pom_level(@pom.position, titleize: false, fallback: '') %> <%= @pom.full_name_ordered %> to
       <%= pom_level(@new_pom.position, titleize: false) %> <%= @new_pom.full_name_ordered %>.
     </p>
 

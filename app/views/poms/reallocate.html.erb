@@ -13,8 +13,8 @@
         <br/>
         You can do this now or later.
       <% else %>
-        As <%= full_name_ordered(@pom) %> will be away from work, you can reallocate their cases or skip if their cases
-        do not need to be reallocated.
+        As <%= full_name_ordered(@pom) %> will be away from work, you can reallocate their cases or skip this if their
+        cases do not need to be reallocated.
         <br/>
         You can also reallocate their cases later.
       <% end %>
@@ -76,8 +76,14 @@
 
     <div class="govuk-button-group">
       <%= link_to 'Continue', prison_reallocation_path, role: 'button', class: 'govuk-button' %>
-      <%= link_to @pom.in_limbo? ? 'Reallocate cases later' : 'Skip this', prison_poms_path(anchor: 'attention_needed!top'),
-                  role: 'button', class: 'govuk-button govuk-button--secondary', data: { module: 'govuk-button--secondary' } %>
+
+      <% if @pom.in_limbo? %>
+        <%= link_to 'Reallocate cases later', prison_poms_path(anchor: 'attention_needed!top'),
+                    role: 'button', class: 'govuk-button govuk-button--secondary', data: { module: 'govuk-button--secondary' } %>
+      <% else %>
+        <%= link_to 'Skip this', prison_poms_path(anchor: 'inactive_poms!top'),
+                    role: 'button', class: 'govuk-button govuk-button--secondary', data: { module: 'govuk-button--secondary' } %>
+      <% end %>
     </div>
   </div>
 </div>

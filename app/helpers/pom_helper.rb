@@ -62,6 +62,6 @@ module PomHelper
   end
 
   def inactive_poms(poms)
-    poms.reject { |pom| %w[active unavailable].include? pom.status }
+    poms.select(&:inactive?)
   end
 end

@@ -93,6 +93,7 @@ RSpec.describe Reallocation::BulkReallocationService do
     stub_feature_flag(:rosh_recommendations, enabled: true)
     allocation # ensure it's created
 
+    allow(prison).to receive(:all_policy_offenders).and_return([double(offender_no: offender_no)])
     allow(OffenderService).to receive(:get_offender)
       .with(offender_no, fetch_categories: false, fetch_movements: false).and_return(offender)
     allow(AllocationService).to receive(:create_or_update).and_return(persisted_allocation)
@@ -167,6 +168,7 @@ RSpec.describe Reallocation::BulkReallocationService do
     context 'when the allocation history does not exist (new allocation)' do
       before do
         AllocationHistory.where(nomis_offender_id: offender_no).delete_all
+        allow(NomisUserRolesService).to receive(:remove_pom)
       end
 
       it 'uses allocate_primary_pom as the event' do
@@ -283,29 +285,21 @@ RSpec.describe Reallocation::BulkReallocationService do
       before do
         # Remove the primary allocation so remaining_cases_count is 0
         allocation.update!(primary_pom_nomis_id: target_pom.staff_id)
+        allow(NomisUserRolesService).to receive(:remove_pom)
       end
 
-      let!(:coworking_allocation) do
-        create(:allocation_history,
-               prison: prison.code,
-               nomis_offender_id: 'D4444DD',
-               primary_pom_nomis_id: 99_999,
-               secondary_pom_nomis_id: source_pom.staff_id,
-               secondary_pom_name: 'Old, Pom')
-      end
-
-      it 'deallocates the source POM from all coworking allocations at that prison' do
+      it 'removes the POM from the service' do
         service.call([selected_case], message: 'Moving cases')
 
-        coworking_allocation.reload
-        expect(coworking_allocation.secondary_pom_nomis_id).to be_nil
-        expect(coworking_allocation.secondary_pom_name).to be_nil
-        expect(coworking_allocation.event).to eq('deallocate_secondary_pom')
-        expect(coworking_allocation.event_trigger).to eq('inactive_pom')
+        expect(NomisUserRolesService).to have_received(:remove_pom).with(prison, source_pom.staff_id)
       end
     end
 
     context 'when primary allocations still remain after reallocation' do
+      before do
+        allow(NomisUserRolesService).to receive(:remove_pom)
+      end
+
       let!(:another_primary_allocation) do
         create(:allocation_history,
                prison: prison.code,
@@ -313,20 +307,10 @@ RSpec.describe Reallocation::BulkReallocationService do
                primary_pom_nomis_id: source_pom.staff_id)
       end
 
-      let!(:coworking_allocation) do
-        create(:allocation_history,
-               prison: prison.code,
-               nomis_offender_id: 'G7777GG',
-               primary_pom_nomis_id: 99_999,
-               secondary_pom_nomis_id: source_pom.staff_id,
-               secondary_pom_name: 'Old, Pom')
-      end
-
-      it 'does not deallocate coworking allocations' do
+      it 'does not remove the POM from the service' do
         service.call([selected_case], message: 'Moving cases')
 
-        coworking_allocation.reload
-        expect(coworking_allocation.secondary_pom_nomis_id).to eq(source_pom.staff_id)
+        expect(NomisUserRolesService).not_to have_received(:remove_pom)
       end
     end
   end

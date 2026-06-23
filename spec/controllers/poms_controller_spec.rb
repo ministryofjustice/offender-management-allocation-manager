@@ -55,7 +55,7 @@ RSpec.describe PomsController, type: :controller do
 
     let(:active_staff_id) { PomDetail.where(status: 'active').first!.nomis_staff_id }
     let(:unavailable_staff_id) { PomDetail.where(status: 'unavailable').first!.nomis_staff_id }
-    let(:inactive_poms) { assigns(:poms).reject { |pom| %w[active unavailable].include? pom.status } }
+    let(:inactive_poms) { assigns(:poms).select(&:inactive?) }
     let(:active_poms) { assigns(:poms).select { |pom| %w[active unavailable].include? pom.status } }
 
     it 'does omit the allocation which does not show up in Prison#offenders' do

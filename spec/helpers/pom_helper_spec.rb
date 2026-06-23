@@ -58,4 +58,24 @@ RSpec.describe PomHelper do
       expect(status(pom)).to eq('deleted')
     end
   end
+
+  describe '#inactive_poms' do
+    let(:active_pom) { double('PomWrapper', inactive?: false) }
+    let(:unavailable_pom) { double('PomWrapper', inactive?: false) }
+    let(:inactive_pom) { double('PomWrapper', inactive?: true) }
+    let(:deleted_pom) { double('PomWrapper', inactive?: false) }
+    let(:poms) { [active_pom, unavailable_pom, inactive_pom, deleted_pom] }
+
+    it 'returns only inactive POMs' do
+      expect(inactive_poms(poms)).to eq([inactive_pom])
+    end
+
+    it 'excludes deleted POMs' do
+      expect(inactive_poms(poms)).not_to include(deleted_pom)
+    end
+
+    it 'excludes active and unavailable POMs' do
+      expect(inactive_poms(poms)).not_to include(active_pom, unavailable_pom)
+    end
+  end
 end
