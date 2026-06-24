@@ -229,6 +229,35 @@ RSpec.describe AllocationHistory, :enable_domain_event_publish, type: :model do
           expect(allocation3.primary_pom_nomis_id).to eq(222)
         end
       end
+
+      context 'when deallocating a POM from all roles' do
+        it 'removes them as both primary and secondary from all allocations' do
+          described_class.deallocate_pom(222, prison, event_trigger: AllocationHistory::INACTIVE_POM)
+
+          allocation1.reload
+          allocation3.reload
+
+          # Should remove 222 as secondary from allocation1
+          expect(allocation1.secondary_pom_nomis_id).to be_nil
+          # Should NOT affect primary in allocation1
+          expect(allocation1.primary_pom_nomis_id).to eq(111)
+
+          # Should remove 222 as primary from allocation3
+          expect(allocation3.primary_pom_nomis_id).to be_nil
+          # Should NOT affect secondary in allocation3
+          expect(allocation3.secondary_pom_nomis_id).to eq(555)
+        end
+
+        it 'sets the event_trigger on affected allocations' do
+          described_class.deallocate_pom(222, prison, event_trigger: AllocationHistory::INACTIVE_POM)
+
+          allocation1.reload
+          allocation3.reload
+
+          expect(allocation1.event_trigger).to eq('inactive_pom')
+          expect(allocation3.event_trigger).to eq('inactive_pom')
+        end
+      end
     end
 
     describe 'when an offender moves prison'  do

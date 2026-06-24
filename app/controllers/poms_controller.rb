@@ -39,27 +39,35 @@ class PomsController < PrisonStaffApplicationController
   end
 
   def edit
-    @errors = {}
+    @edit_pom_form = PomProfileForm.new(
+      status: @pom.status,
+      description: @pom.working_pattern.to_s == '1.0' ? 'FT' : 'PT',
+      working_pattern: @pom.working_pattern.to_s,
+    )
   end
 
   def update
-    pom_detail = @prison.pom_details.find_by!(nomis_staff_id: nomis_staff_id)
-    pom_detail.working_pattern = working_pattern
-    pom_detail.status = edit_pom_params[:status] || pom.status
+    @edit_pom_form = PomProfileForm.new(edit_pom_params.to_h)
 
-    if pom_detail.save
+    if @edit_pom_form.valid?
+      pom_detail = @prison.pom_details.find_by!(nomis_staff_id:)
+      pom_detail.working_pattern = @edit_pom_form.working_pattern_ratio
+      pom_detail.status = @edit_pom_form.status
+      pom_detail.save!
+
       if pom_detail.inactive?
-        AllocationHistory.deallocate_primary_pom(
-          nomis_staff_id, active_prison_id, event_trigger: AllocationHistory::INACTIVE_POM
-        )
-        AllocationHistory.deallocate_secondary_pom(
-          nomis_staff_id, active_prison_id, event_trigger: AllocationHistory::INACTIVE_POM
-        )
+        if FeatureFlags.status_bulk_reallocation.enabled? && pom_detail.has_primary_allocations?
+          redirect_to reallocate_prison_pom_path(active_prison_id, nomis_staff_id:) and return
+        else
+          AllocationHistory.deallocate_pom(
+            nomis_staff_id, active_prison_id, event_trigger: AllocationHistory::INACTIVE_POM
+          )
+        end
       end
+
       redirect_to prison_pom_path(active_prison_id, id: nomis_staff_id),
                   notice: "Profile updated for #{helpers.full_name_ordered(@pom)}"
     else
-      @errors = pom_detail.errors
       render :edit
     end
   end
@@ -85,12 +93,6 @@ private
 
   def load_pom_staff_member
     @pom = StaffMember.new @prison, nomis_staff_id
-  end
-
-  def working_pattern
-    return '1.0' if edit_pom_params[:description] == 'FT'
-
-    edit_pom_params[:working_pattern]
   end
 
   def edit_pom_params

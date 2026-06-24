@@ -44,10 +44,7 @@ class NomisUserRolesService
   # @param [Prison] prison
   # @param [Integer] nomis_staff_id
   def self.remove_pom(prison, nomis_staff_id)
-    AllocationHistory.deallocate_primary_pom(
-      nomis_staff_id, prison.code, event_trigger: AllocationHistory::INACTIVE_POM
-    )
-    AllocationHistory.deallocate_secondary_pom(
+    AllocationHistory.deallocate_pom(
       nomis_staff_id, prison.code, event_trigger: AllocationHistory::INACTIVE_POM
     )
 

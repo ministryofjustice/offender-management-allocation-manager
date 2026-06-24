@@ -80,6 +80,15 @@ en:
               inclusion: Select full time or part time
             working_pattern:
               not_a_number: Select how many days they will work
+        pom_profile_form:
+          format: "%{message}"
+          attributes:
+            status:
+              inclusion: Select a status
+            description:
+              inclusion: Select full time or part time
+            working_pattern:
+              inclusion: Select how many days they will work
         early_allocation_date_form:
           format: "%{message}"
           attributes:

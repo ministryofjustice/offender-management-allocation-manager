@@ -154,6 +154,11 @@ class AllocationHistory < ApplicationRecord
     save!
   end
 
+  def self.deallocate_pom(nomis_staff_id, prison, event_trigger: USER)
+    deallocate_primary_pom(nomis_staff_id, prison, event_trigger:)
+    deallocate_secondary_pom(nomis_staff_id, prison, event_trigger:)
+  end
+
   def deallocate_offender_after_release
     deallocate_offender(
       event: AllocationHistory::DEALLOCATE_RELEASED_OFFENDER,

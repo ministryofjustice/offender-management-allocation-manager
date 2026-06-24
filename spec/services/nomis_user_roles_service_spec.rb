@@ -90,8 +90,7 @@ RSpec.describe NomisUserRolesService do
     let!(:pom_detail) { create(:pom_detail, :active, prison_code: prison.code, nomis_staff_id: nomis_staff_id) }
 
     before do
-      allow(AllocationHistory).to receive(:deallocate_primary_pom)
-      allow(AllocationHistory).to receive(:deallocate_secondary_pom)
+      allow(AllocationHistory).to receive(:deallocate_pom)
 
       allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:list).and_return(pom_list)
       allow(HmppsApi::PrisonApi::PrisonOffenderManagerApi).to receive(:expire_list_cache)
@@ -101,10 +100,7 @@ RSpec.describe NomisUserRolesService do
     it 'deallocates both primary and secondary POMs' do
       described_class.remove_pom(prison, nomis_staff_id)
 
-      expect(AllocationHistory).to have_received(:deallocate_primary_pom).with(
-        nomis_staff_id, prison.code, event_trigger:
-      )
-      expect(AllocationHistory).to have_received(:deallocate_secondary_pom).with(
+      expect(AllocationHistory).to have_received(:deallocate_pom).with(
         nomis_staff_id, prison.code, event_trigger:
       )
     end

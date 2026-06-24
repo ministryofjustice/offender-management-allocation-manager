@@ -20,10 +20,18 @@ module Reallocation
     def call(selected_cases, message:)
       reallocated_cases, failed_cases = reallocate_each(selected_cases, message)
 
-      # When no OMIC-eligible primary cases remain, fully remove the POM:
-      # deallocates all leftover allocations, soft-deletes the PomDetail,
-      # and removes their NOMIS role.
-      NomisUserRolesService.remove_pom(prison, source_pom.staff_id) if remaining_cases_count.zero?
+      if remaining_cases_count.zero?
+        if source_pom.in_limbo?
+          # Fully remove the POM: deallocates all leftover allocations,
+          # soft-deletes the PomDetail, and removes their NOMIS role
+          NomisUserRolesService.remove_pom(prison, source_pom.staff_id)
+        else
+          # Deallocate leftover allocations but keep the POM in the service
+          AllocationHistory.deallocate_pom(
+            source_pom.staff_id, prison.code, event_trigger: AllocationHistory::INACTIVE_POM
+          )
+        end
+      end
 
       build_result(message, reallocated_cases, failed_cases).tap do |result|
         BulkReallocationNotifier.new(prison:, source_pom:, target_pom:).call(result)

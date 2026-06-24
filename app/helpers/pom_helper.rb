@@ -40,15 +40,17 @@ module PomHelper
   end
 
   def status(pom)
-    # we are now displaying 'Available', instead of 'Active' which is stored in the database
-    pom.status == 'active' ? 'available' : pom.status
+    {
+      'active' => 'available',
+      'inactive' => 'away from work',
+    }.fetch(pom.status, pom.status)
   end
 
   def full_status(pom)
     {
-      active: 'Active: available for new allocations',
-      inactive: 'Inactive',
+      active: 'Available for new allocations',
       unavailable: 'Unavailable for new allocations',
+      inactive: 'Away from work',
       deleted: 'No longer recorded as a POM at this prison',
     }.fetch(pom.status.downcase.to_sym)
   end

@@ -28,7 +28,7 @@
     </li>
     <li class="govuk-tabs__list-item">
       <a class="govuk-tabs__tab" href="#inactive_poms">
-        Inactive staff (<%= inactive_poms(@poms).count %>)
+        Away from work (<%= inactive_poms(@poms).count %>)
       </a>
     </li>
     <% if @removed_poms.any? %>
@@ -70,7 +70,7 @@
   </section>
 
   <section class="govuk-tabs__panel" id="inactive_poms">
-    <h2 class="govuk-heading-l">Inactive staff</h2>
+    <h2 class="govuk-heading-l">Away from work</h2>
     <%= render "inactive_poms", poms: inactive_poms(@poms) %>
   </section>
 
