@@ -6,6 +6,8 @@ feature_flags:
     staging: true
   limbo_bulk_reallocation:
     staging: true
+  status_bulk_reallocation:
+    staging: true
   rosh_level:
     staging: true
   new_tiers:

@@ -18,7 +18,7 @@ RSpec.describe Reallocation::BulkReallocationService do
   let(:offender_no) { 'A1111AA' }
 
   let(:source_pom) do
-    instance_double(StaffMember, staff_id: 10_001, full_name_ordered: 'Old, Pom')
+    instance_double(StaffMember, staff_id: 10_001, full_name_ordered: 'Old, Pom', in_limbo?: false)
   end
 
   let(:target_pom) do
@@ -288,10 +288,35 @@ RSpec.describe Reallocation::BulkReallocationService do
         allow(NomisUserRolesService).to receive(:remove_pom)
       end
 
-      it 'removes the POM from the service' do
-        service.call([selected_case], message: 'Moving cases')
+      context 'when the source POM is in limbo' do
+        before { allow(source_pom).to receive(:in_limbo?).and_return(true) }
 
-        expect(NomisUserRolesService).to have_received(:remove_pom).with(prison, source_pom.staff_id)
+        it 'removes the POM from the service' do
+          service.call([selected_case], message: 'Moving cases')
+
+          expect(NomisUserRolesService).to have_received(:remove_pom).with(prison, source_pom.staff_id)
+        end
+      end
+
+      context 'when the source POM is not in limbo (e.g. inactive)' do
+        before do
+          allow(source_pom).to receive(:in_limbo?).and_return(false)
+          allow(AllocationHistory).to receive(:deallocate_pom)
+        end
+
+        it 'does not remove the POM from the service' do
+          service.call([selected_case], message: 'Moving cases')
+
+          expect(NomisUserRolesService).not_to have_received(:remove_pom)
+        end
+
+        it 'deallocates any leftover allocations' do
+          service.call([selected_case], message: 'Moving cases')
+
+          expect(AllocationHistory).to have_received(:deallocate_pom).with(
+            source_pom.staff_id, prison.code, event_trigger: AllocationHistory::INACTIVE_POM
+          )
+        end
       end
     end
 

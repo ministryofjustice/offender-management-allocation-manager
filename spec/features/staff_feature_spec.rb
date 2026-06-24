@@ -252,7 +252,7 @@ feature "staff pages" do
       expect(page).to have_content("Manage your staff")
       expect(page).to have_content("Available probation POMs")
       expect(page).to have_content("Available prison POMs")
-      expect(page).to have_content("Inactive staff")
+      expect(page).to have_content("Away from work")
     end
 
     it "can display active probation POMs case mix" do
@@ -285,7 +285,7 @@ feature "staff pages" do
     end
 
     it 'displays the inactive POMs' do
-      click_on('Inactive staff')
+      click_on('Away from work')
 
       expect(page).to have_content('POM')
       expect(page).to have_content('POM type')

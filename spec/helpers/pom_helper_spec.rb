@@ -43,9 +43,9 @@ RSpec.describe PomHelper do
       expect(status(pom)).to eq('available')
     end
 
-    it "does not rename 'inactive' status" do
+    it "renames 'inactive' status to away from work" do
       pom = build(:pom, staffId: 2005,  status: 'inactive')
-      expect(status(pom)).to eq('inactive')
+      expect(status(pom)).to eq('away from work')
     end
 
     it "does not rename 'unavailable' status" do

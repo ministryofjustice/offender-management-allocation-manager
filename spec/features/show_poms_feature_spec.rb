@@ -22,7 +22,7 @@ feature "get poms list", flaky: true do
     expect(page).to have_css(".govuk-tabs__list-item", count: 3)
     expect(page).to have_content("Available probation POMs")
     expect(page).to have_content("Available prison POMs")
-    expect(page).to have_content("Inactive staff")
+    expect(page).to have_content("Away from work")
   end
 
   # This example is a bit misleading. From what I can tell, this offender (G1247VX) _does_ have a valid sentence.

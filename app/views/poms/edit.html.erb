@@ -2,97 +2,46 @@
 
 <%= render :partial => "/shared/backlink", :locals => {:page => @referrer} %>
 
-<div>
-  <%= form_tag prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), method: :put, id: "edit_pom_form" do %>
-    <h1 class="govuk-heading-xl govuk-!-margin-top-4">Edit profile</h1>
-    <h2 class="govuk-heading-l"><%= @pom.first_name.titleize %> <%= @pom.last_name.titleize %></h2>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <%= form_for(@edit_pom_form, as: :edit_pom, url: prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), method: :put,
+                 builder: GOVUKDesignSystemFormBuilder::FormBuilder, html: { id: "edit_pom_form" }) do |f| %>
 
-    <div class='govuk-!-margin-top-6'>
-      <fieldset class="govuk-fieldset" aria-describedby="-edit_pom-conditional-hint">
-        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-          <h1 class="govuk-fieldset__heading">Select working pattern</h1>
-        </legend>
-        <div class="govuk-form-group <% if @errors[:working_pattern].present? %>govuk-form-group--error<% end %>">
-        <% if @errors[:working_pattern].present? %>
-          <span class="govuk-error-message">
-            <%= @errors[:working_pattern].first %>
-          </span>
+      <%= f.govuk_error_summary %>
+
+      <h1 class="govuk-heading-xl">Edit profile</h1>
+      <h2 class="govuk-heading-l"><%= @pom.full_name_ordered %></h2>
+
+      <div class='govuk-!-margin-top-7'>
+        <%= f.govuk_radio_buttons_fieldset(:description, legend: { text: 'Select working pattern', size: 's', tag: 'h3' }) do %>
+          <%= f.govuk_radio_button :description, 'FT', label: { text: 'Full time' }, link_errors: true %>
+          <%= f.govuk_radio_button :description, 'PT', label: { text: 'Part time' } do %>
+            <%= f.govuk_radio_buttons_fieldset(:working_pattern, legend: { size: 's', text: 'Select how many days per week they will work' }) do %>
+              <% 9.downto(1).each.with_index do |value, index| %>
+                <%= f.govuk_radio_button :working_pattern, "0.#{value}", label: { text: working_pattern_to_days(value) }, link_errors: index.zero? %>
+              <% end %>
+            <% end %>
+          <% end %>
         <% end %>
-
-          <div class="govuk-radios" data-module="govuk-radios">
-            <div class="govuk-form-group">
-              <div class="govuk-radios__item">
-                <%= radio_button_tag("edit_pom[description]", "FT", @pom.working_pattern.to_s == '1.0', id: "working_pattern-ft", class: "govuk-radios__input") %>
-                <%= label_tag "working_pattern-ft", "Full time", class: "govuk-label govuk-radios__label" %>
-              </div>
-              <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                <div class="govuk-radios__item">
-                  <input class="govuk-radios__input" id="part-time-conditional-1" name="edit_pom[description]" type="radio" value="PT" data-aria-controls="conditional-part-time-conditional-1" <%= 'checked="checked"' if @pom.working_pattern.to_s != '1.0'%>>
-                  <label class="govuk-label govuk-radios__label" for="part-time-conditional-1">
-                    Part time
-                  </label>
-                </div>
-                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-part-time-conditional-1">
-                  <fieldset class="govuk-fieldset">
-                  <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Select how many days per week they will work</legend>
-                  <% 9.downto(1).each do |value| %>
-                    <div class="govuk-radios__item">
-                      <%= radio_button_tag("edit_pom[working_pattern]", "0.#{value}", @pom.working_pattern.to_s == "0.#{value}", id: "working_pattern-#{value}", class: "govuk-radios__input") %>
-                      <%= label_tag "working_pattern-#{value}", working_pattern_to_days(value), class: "govuk-label govuk-radios__label" %>
-                    </div>
-                  <% end %>
-                  </fieldset>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </fieldset>
-    </div>
-
-    <div class='govuk-!-margin-top-6'>
-      <div class="govuk-form-group">
-        <fieldset class="govuk-fieldset" aria-describedby="-edit_pom-conditional-hint">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-            <h3 class="govuk-fieldset__heading">Select status</h3>
-          </legend>
-          <div class="govuk-radios" data-module="govuk-radios">
-            <div class="govuk-radios__item">
-              <%= radio_button_tag("edit_pom[status]", "active", @pom.active?, id: "status-active", class: "govuk-radios__input") %>
-              <%= label_tag "status-active", "Active", class: "govuk-label govuk-radios__label" %>
-            </div>
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="status-conditional-unavailable" name="edit_pom[status]" type="radio" value="unavailable" data-aria-controls="status-2" <%= 'checked' if @pom.unavailable? %>>
-              <label class="govuk-label govuk-radios__label"
-                     for="status-conditional-unavailable">Active but unavailable for new cases</label>
-            </div>
-            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="status-2">
-              <h4 class="govuk-heading-s">To allocate to this POM you will need to change their status to active.</h4>
-            </div>
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="status-conditional-inactive" name="edit_pom[status]" type="radio" value="inactive" data-aria-controls="status-3"  <%= 'checked' if @pom.inactive? %>>
-              <label class="govuk-label govuk-radios__label"
-                     for="status-conditional-inactive">Inactive</label>
-            </div>
-            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="status-3">
-              <div class="govuk-warning-text">
-                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                <strong class="govuk-warning-text__text">
-                  <span class="govuk-visually-hidden">Warning</span>
-                  If this POMs status becomes inactive their cases will need to be reallocated.
-                </strong>
-              </div>
-            </div>
-          </div>
-        </fieldset>
       </div>
-    </div>
 
-    <div class="govuk-form-group">
-      <button type="submit" class="govuk-button">Save</button>
-      <%= link_to 'Cancel', @referrer, class: 'govuk-link app-cancel-link' %>
-    </div>
+      <div class='govuk-!-margin-top-6'>
+        <%= f.govuk_radio_buttons_fieldset(:status, legend: { text: 'Select status', size: 's', tag: 'h3' }) do %>
+          <%= f.govuk_radio_button :status, :active,
+                label: { text: 'Available for new cases' }, link_errors: true %>
+          <%= f.govuk_radio_button :status, :unavailable,
+                label: { text: 'Unavailable for new cases' },
+                hint: { text: 'Use if this POM is too busy. They will be removed from the list of people you can allocate to.' } %>
+          <%= f.govuk_radio_button :status, :inactive,
+                label: { text: 'Away from work' },
+                hint: { text: 'Use for longer periods of absence. This will remove the POM from the list of people you can allocate to. You will be able to reallocate their cases.' } %>
+        <% end %>
+      </div>
 
-    </form>
-  <% end %>
+      <div class="govuk-form-group">
+        <%= f.govuk_submit 'Save' %>
+        <%= link_to 'Cancel', @referrer, class: 'govuk-link app-cancel-link' %>
+      </div>
+    <% end %>
+  </div>
 </div>
