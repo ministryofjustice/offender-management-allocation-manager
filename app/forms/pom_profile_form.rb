@@ -22,4 +22,8 @@ class PomProfileForm
   def working_pattern_ratio
     part_time? ? working_pattern : '1.0'
   end
+
+  def deleting?
+    status == 'deleted'
+  end
 end

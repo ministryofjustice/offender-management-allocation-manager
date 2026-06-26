@@ -1,0 +1,23 @@
+<% content_for :title, 'Confirm POM removal – Digital Prison Services' %>
+
+<%= link_to 'Back', edit_prison_pom_path(@prison.code, @pom.staff_id),
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <%= form_for(@confirm_delete_form, as: :confirm_delete_pom,
+                 url: prison_pom_path(@prison.code, @pom.staff_id),
+                 method: :delete,
+                 builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+
+      <%= f.govuk_error_summary %>
+
+      <%= f.govuk_collection_radio_buttons :confirmation,
+            [OpenStruct.new(value: 'yes', label: 'Yes'), OpenStruct.new(value: 'no', label: 'No')],
+            :value, :label, inline: true, include_hidden: true,
+            legend: { text: "Are you sure you want to remove #{@pom.full_name_ordered} from this service?", size: 'l', tag: 'h1' } %>
+
+      <%= f.govuk_submit 'Continue' %>
+    <% end %>
+  </div>
+</div>

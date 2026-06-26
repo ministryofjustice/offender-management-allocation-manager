@@ -85,7 +85,7 @@ feature "remove a POM no longer present in NOMIS" do
           expect(page).to have_css('td.govuk-table__cell[aria-label="POM"]', text: 'John Doe')
           expect(page).to have_css('td.govuk-table__cell[aria-label="Last case allocated"]', text: '22 June 2025')
           expect(page).to have_css('td.govuk-table__cell[aria-label="Total cases"]', text: '1')
-          expect(page).to have_link('Reallocate cases', href: confirm_removal_prison_pom_path(prison.code, removed_pom_staff_id, from: :attention_needed))
+          expect(page).to have_link('Reallocate cases', href: confirm_removal_prison_pom_path(prison.code, removed_pom_staff_id))
           expect(page).not_to have_button('Remove POM')
         end
       end
@@ -97,6 +97,36 @@ feature "remove a POM no longer present in NOMIS" do
 
         expect(page).to have_css('h1.govuk-heading-l', text: 'Confirm John Doe can be removed from this service')
         expect(page).to have_link('Continue', href: reallocate_prison_pom_path(prison.code, removed_pom_staff_id))
+      end
+    end
+
+    context 'when a POM with a role is marked as deleted and has cases' do
+      let(:deleted_pom_staff_id) { 789_012 }
+      let(:deleted_pom) { build(:pom, :prison_officer, staffId: deleted_pom_staff_id, firstName: 'JANE', lastName: 'SMITH') }
+      let(:offenders_in_prison) { build_list(:nomis_offender, 1, prisonId: prison.code) }
+
+      before do
+        create(:pom_detail, :deleted, prison_code: prison.code, nomis_staff_id: deleted_pom_staff_id, working_pattern: 1.0)
+
+        stub_poms(prison.code, probation_poms + [deleted_pom])
+        stub_offenders_for_prison(prison.code, offenders_in_prison)
+
+        offenders_in_prison.each do |offender|
+          nomis_offender_id = offender[:prisonerNumber]
+          offender_record = create(:offender, nomis_offender_id:)
+          create(:allocation_history, :primary, prison: prison.code, nomis_offender_id:, primary_pom_nomis_id: deleted_pom_staff_id)
+          create(:case_information, offender: offender_record)
+        end
+
+        visit prison_poms_path(prison_id: prison.code)
+      end
+
+      it 'links directly to the reallocation summary page' do
+        click_link 'Attention needed'
+
+        within('section#attention_needed') do
+          expect(page).to have_link('Reallocate cases', href: reallocate_prison_pom_path(prison.code, deleted_pom_staff_id))
+        end
       end
     end
   end

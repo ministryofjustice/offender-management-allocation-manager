@@ -133,4 +133,12 @@ RSpec.describe PomProfileForm, type: :model do
       end
     end
   end
+
+  describe '#deleting?' do
+    context 'when status is deleted' do
+      let(:status) { 'deleted' }
+
+      it { is_expected.to be_deleting }
+    end
+  end
 end

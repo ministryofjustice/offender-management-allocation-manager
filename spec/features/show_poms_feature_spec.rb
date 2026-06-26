@@ -116,9 +116,24 @@ feature "get poms list", flaky: true do
     visit "/prisons/LEI/poms/#{moic_pom_id}/edit"
 
     expect(page).to have_css(".govuk-button", count: 1)
-    expect(page).to have_css(".govuk-radios__item", count: 14)
     expect(page).to have_content("Edit profile")
-    expect(page).to have_content("Working pattern")
-    expect(page).to have_content("Status")
+
+    within('fieldset', text: 'Select working pattern') do
+      expect(page).to have_css(".govuk-radios__item", count: 2)
+      expect(page).to have_content("Full time")
+      expect(page).to have_content("Part time")
+    end
+
+    within('fieldset', text: 'Select how many days per week they will work') do
+      expect(page).to have_css(".govuk-radios__item", count: 9)
+    end
+
+    within('fieldset', text: 'Select status') do
+      expect(page).to have_css(".govuk-radios__item", count: 4)
+      expect(page).to have_content("Available for new cases")
+      expect(page).to have_content("Unavailable for new cases")
+      expect(page).to have_content("Away from work")
+      expect(page).to have_content("No longer at")
+    end
   end
 end
