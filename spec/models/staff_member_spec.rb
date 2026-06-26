@@ -177,6 +177,58 @@ RSpec.describe StaffMember, type: :model do
     end
   end
 
+  describe '#in_limbo?' do
+    before do
+      allow(user).to receive(:pom).and_return(pom)
+    end
+
+    context 'when POM has a role and is not deleted' do
+      let(:pom) { double(:pom) }
+
+      it { expect(user).not_to be_in_limbo }
+    end
+
+    context 'when POM is deleted' do
+      let(:pom) { double(:pom) }
+
+      before { allow(user).to receive(:deleted?).and_return(true) }
+
+      it { expect(user).to be_in_limbo }
+    end
+
+    context 'when POM has no role' do
+      let(:pom) { nil }
+
+      it { expect(user).to be_in_limbo }
+    end
+  end
+
+  describe '#editable?' do
+    before do
+      allow(user).to receive(:pom).and_return(pom)
+    end
+
+    context 'when POM has a role and is not deleted' do
+      let(:pom) { double(:pom) }
+
+      it { expect(user).to be_editable }
+    end
+
+    context 'when POM is deleted' do
+      let(:pom) { double(:pom) }
+
+      before { allow(user).to receive(:deleted?).and_return(true) }
+
+      it { expect(user).not_to be_editable }
+    end
+
+    context 'when POM has no role' do
+      let(:pom) { nil }
+
+      it { expect(user).not_to be_editable }
+    end
+  end
+
   describe '#position' do
     before do
       allow(user).to receive(:pom).and_return(pom)

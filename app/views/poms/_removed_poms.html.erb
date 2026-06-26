@@ -21,12 +21,17 @@
         </td>
         <td aria-label="Action" class="govuk-table__cell">
           <% if FeatureFlags.limbo_bulk_reallocation.enabled? %>
-            <%= link_to 'Reallocate cases',
-                        confirm_removal_prison_pom_path(@prison.code, pom.staff_id, from: :attention_needed),
-                        class: 'govuk-link govuk-!-font-size-19' %>
+            <% if pom.has_pom_role? %>
+              <%= link_to 'Reallocate cases',
+                          reallocate_prison_pom_path(@prison.code, pom.staff_id),
+                          class: 'govuk-link govuk-!-font-size-19' %>
+            <% else %>
+              <%= link_to 'Reallocate cases',
+                          confirm_removal_prison_pom_path(@prison.code, pom.staff_id),
+                          class: 'govuk-link govuk-!-font-size-19' %>
+            <% end %>
           <% else %>
             <%= form_for(:remove_pom, url: prison_pom_path(@prison.code, pom.staff_id), method: :delete) do |f| %>
-              <%= hidden_field_tag :from, :attention_needed %>
               <%= f.button 'Remove POM', type: 'submit', class: 'app-button--link govuk-link govuk-!-font-size-19' %>
             <% end %>
           <% end %>

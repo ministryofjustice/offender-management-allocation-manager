@@ -50,12 +50,12 @@
             <%= render 'govuk_summary_list_row',
                        key: 'Working pattern',
                        value: format_working_pattern(@pom.working_pattern),
-                       actions: link_to('Change', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: 'govuk-link pull-right')
+                       actions: @pom.editable? ? link_to('Change', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: 'govuk-link pull-right') : ''
             %>
             <%= render 'govuk_summary_list_row',
                        key: 'Status',
                        value: full_status(@pom),
-                       actions: link_to('Change', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: 'govuk-link pull-right')
+                       actions: @pom.editable? ? link_to('Change', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: 'govuk-link pull-right') : ''
             %>
           </dl>
         </div>

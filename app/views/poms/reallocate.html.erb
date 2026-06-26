@@ -1,6 +1,6 @@
 <% content_for :title, "Reallocation summary – Digital Prison Services" %>
 
-<%= link_to 'Back', 'javascript:history.back()',
+<%= link_to 'Back', prison_poms_path(anchor: @pom.in_limbo? ? 'attention_needed!top' : 'inactive_poms!top'),
             class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
 
 <div class="govuk-grid-row">

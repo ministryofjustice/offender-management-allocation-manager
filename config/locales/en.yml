@@ -89,6 +89,11 @@ en:
               inclusion: Select full time or part time
             working_pattern:
               inclusion: Select how many days they will work
+        confirm_delete_pom_form:
+          format: "%{message}"
+          attributes:
+            confirmation:
+              inclusion: Select yes if you want to remove this POM
         early_allocation_date_form:
           format: "%{message}"
           attributes:

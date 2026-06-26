@@ -38,6 +38,10 @@ class StaffMember
     staff_detail&.email_address
   end
 
+  def editable?
+    !in_limbo?
+  end
+
   def in_limbo?
     deleted? || !has_pom_role?
   end
