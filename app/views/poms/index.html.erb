@@ -77,7 +77,7 @@
   <% if @removed_poms.any? %>
   <section class="govuk-tabs__panel" id="attention_needed">
     <h2 class="govuk-heading-l">Attention needed</h2>
-    <% if FeatureFlags.limbo_bulk_reallocation.enabled? %>
+    <% if FeatureFlags.bulk_reallocation.enabled? %>
       <p>
         These staff members' cases need reallocating so they can be removed from this service.
       </p>

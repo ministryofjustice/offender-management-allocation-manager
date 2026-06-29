@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 feature "remove a POM no longer present in NOMIS" do
-  let(:limbo_bulk_reallocation_enabled) { true }
+  let(:bulk_reallocation_enabled) { true }
   let!(:prison) { Prison.find_by(code: "LEI") || create(:prison, code: "LEI") }
   let(:spo) { build(:pom) }
   let(:probation_poms) do
@@ -14,7 +14,7 @@ feature "remove a POM no longer present in NOMIS" do
   end
 
   before do
-    stub_feature_flag(:limbo_bulk_reallocation, enabled: limbo_bulk_reallocation_enabled)
+    stub_feature_flag(:bulk_reallocation, enabled: bulk_reallocation_enabled)
 
     stub_pom(spo)
     stub_signin_spo(spo, [prison.code])
@@ -67,7 +67,7 @@ feature "remove a POM no longer present in NOMIS" do
   end
 
   context 'when limbo bulk reallocation is enabled' do
-    let(:limbo_bulk_reallocation_enabled) { true }
+    let(:bulk_reallocation_enabled) { true }
 
     context 'when there are no POMs with cases in limbo' do
       include_examples 'without an attention needed tab'
@@ -132,7 +132,7 @@ feature "remove a POM no longer present in NOMIS" do
   end
 
   context 'when limbo bulk reallocation is disabled' do
-    let(:limbo_bulk_reallocation_enabled) { false }
+    let(:bulk_reallocation_enabled) { false }
 
     context 'when there are no POMs with cases in limbo' do
       include_examples 'without an attention needed tab'
