@@ -59,7 +59,7 @@ class PomsController < PrisonStaffApplicationController
       pom_detail.save!
 
       if pom_detail.inactive?
-        if FeatureFlags.status_bulk_reallocation.enabled? && pom_detail.has_primary_allocations?
+        if FeatureFlags.bulk_reallocation.enabled? && pom_detail.has_primary_allocations?
           redirect_to reallocate_prison_pom_path(active_prison_id, nomis_staff_id:) and return
         else
           AllocationHistory.deallocate_pom(

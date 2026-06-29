@@ -36,7 +36,7 @@
           <%= f.govuk_radio_button :status, :inactive,
                 label: { text: 'Away from work' },
                 hint: { text: 'Use for longer periods of absence. This will remove the POM from the list of people you can allocate to. You will be able to reallocate their cases.' } %>
-          <% if FeatureFlags.status_bulk_reallocation.enabled? %>
+          <% if FeatureFlags.bulk_reallocation.enabled? %>
             <%= f.govuk_radio_button :status, :deleted,
                   label: { text: "No longer at #{@prison.name}" },
                   hint: { text: 'Once you have reallocated any cases they have, they will be removed from this service.' } %>

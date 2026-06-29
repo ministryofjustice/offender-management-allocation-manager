@@ -29,8 +29,8 @@ describe 'HOMD manages POMS statuses' do
     within('section', text: 'Available prison POMs') { expect(page).to have_content('Anette Pomme') }
   end
 
-  context 'when status_bulk_reallocation is enabled' do
-    before { stub_feature_flag(:status_bulk_reallocation, enabled: true) }
+  context 'when bulk_reallocation is enabled' do
+    before { stub_feature_flag(:bulk_reallocation, enabled: true) }
 
     specify 'HOMD making POM inactive redirects to reallocation journey' do
       # Given the POM is active
@@ -95,8 +95,8 @@ describe 'HOMD manages POMS statuses' do
     end
   end
 
-  context 'when status_bulk_reallocation is disabled' do
-    before { stub_feature_flag(:status_bulk_reallocation, enabled: false) }
+  context 'when bulk_reallocation is disabled' do
+    before { stub_feature_flag(:bulk_reallocation, enabled: false) }
 
     specify 'edit page does not show "No longer at prison" option' do
       # Given the POM is active
