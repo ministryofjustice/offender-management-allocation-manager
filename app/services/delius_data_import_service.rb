@@ -131,7 +131,7 @@ private
       import_errors = []
       case_info.errors.each do |error|
         DeliusImportError.create!(nomis_offender_id:, error_type: error_type(error.attribute))
-        import_errors << error.attribute
+        import_errors << "#{error.attribute}/#{case_info.send(error.attribute).inspect}"
       end
 
       logger.error(

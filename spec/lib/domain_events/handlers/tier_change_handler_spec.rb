@@ -4,9 +4,9 @@ RSpec.describe DomainEvents::Handlers::TierChangeHandler do
   let(:crn) { 'X408769' }
   let(:event) do
     DomainEvents::Event.new(
-      event_type: 'tier.calculation.complete',
+      event_type: 'tier.calculation.changed',
       version: event_version,
-      description: 'Tier calculation complete',
+      description: 'Tier calculation changed',
       detail_url: "https://hmpps-tier.example.org/crn/#{crn}/tier/#{calculation_id}",
       additional_information: { 'calculationId' => calculation_id },
       crn_number: crn,
@@ -40,6 +40,10 @@ RSpec.describe DomainEvents::Handlers::TierChangeHandler do
     context 'when tier has not changed' do
       let(:tier) { 'D' }
 
+      it 'does not update the record' do
+        expect(case_information.reload.tier).to eq('D')
+      end
+
       it 'emits no audit event' do
         expect(AuditEvent).not_to have_received(:publish)
       end
@@ -50,12 +54,44 @@ RSpec.describe DomainEvents::Handlers::TierChangeHandler do
         expect(case_information.reload.tier).to eq('D')
       end
 
+      it 'sets manual_entry to false' do
+        expect(case_information.reload.manual_entry).to be(false)
+      end
+
       it 'emits a log info message' do
         expect(Shoryuken::Logging.logger).to have_received(:info).at_least(2).times
       end
 
-      it 'emits an audit event' do
-        expect(AuditEvent).to have_received(:publish).once
+      it 'emits an audit event with before and after state' do
+        expect(AuditEvent).to have_received(:publish).once.with(
+          nomis_offender_id: case_information.nomis_offender_id,
+          tags: %w[handler case_information tier changed],
+          system_event: true,
+          data: {
+            'before' => { 'tier' => 'A' },
+            'after' => { 'tier' => 'D' }
+          }
+        )
+      end
+
+      context 'when manual_entry was true' do
+        let!(:case_information) { create(:case_information, :manual_entry, crn: crn, tier: tier) }
+
+        it 'sets manual_entry to false' do
+          expect(case_information.reload.manual_entry).to be(false)
+        end
+
+        it 'includes manual_entry in the audit event' do
+          expect(AuditEvent).to have_received(:publish).once.with(
+            nomis_offender_id: case_information.nomis_offender_id,
+            tags: %w[handler case_information tier changed],
+            system_event: true,
+            data: {
+              'before' => { 'tier' => 'A', 'manual_entry' => true },
+              'after' => { 'tier' => 'D', 'manual_entry' => false }
+            }
+          )
+        end
       end
     end
 
