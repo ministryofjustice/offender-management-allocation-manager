@@ -5,9 +5,11 @@ module HmppsApi
       HmppsApi::Client.new(host)
     end
 
+    # NOTE: cache is disabled because the `calculation_id` are unique UUIDs
+    # that never get reused, so is wasteful to be caching these responses
     def self.get_calculation(crn, calculation_id, version:)
       route = "/v#{version}/crn/#{crn}/tier/#{calculation_id}"
-      response = client.get(route)
+      response = client.get(route, cache: false)
 
       {
         tier: response.fetch('tierScore'),
