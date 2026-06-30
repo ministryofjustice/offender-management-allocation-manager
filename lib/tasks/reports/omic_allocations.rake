@@ -4,7 +4,7 @@ require 'rake'
 
 namespace :reports do
   desc 'Rolling last 12 months allocations report'
-  task allocations: :environment do
+  task omic_allocations: :environment do
     require 'csv'
 
     Reports::TaskLogger.configure!
