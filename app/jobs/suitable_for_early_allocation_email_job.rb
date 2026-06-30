@@ -9,25 +9,28 @@ class SuitableForEarlyAllocationEmailJob < ApplicationJob
   EQUIP_URL = 'https://equip-portal.rocstac.com/CtrlWebIsapi.dll/?__id=webDiagram.show&map=0%3A9A63E167DE4B400EA07F81A9271E1944&dgm=4F984B45CBC447B1A304B2FFECABB777'
 
   def perform(offender_no)
-    allocation = AllocationHistory.where(nomis_offender_id: offender_no).first
+    allocation = AllocationHistory.active.find_by(nomis_offender_id: offender_no)
     return if allocation.nil?
 
-    prisoner = OffenderService.get_offender(offender_no)
+    prisoner = OffenderService.get_offender(
+      offender_no, fetch_complexities: false, fetch_categories: false, fetch_movements: false
+    )
     return if prisoner.nil?
-
-    # Skip if the offender has transferred but the allocation hasn't been updated yet
-    if allocation.prison != prisoner.prison_id
-      logger.info("job=suitable_for_early_allocation_email_job,nomis_offender_id=#{offender_no}," \
-                  "event=skipped_transfer|Offender prison (#{prisoner.prison_id}) does not match allocation prison (#{allocation.prison})")
-      return
-    end
 
     if prisoner.within_early_allocation_window?
       already_emailed = EmailHistory.sent_within_current_sentence(prisoner, EmailHistory::SUITABLE_FOR_EARLY_ALLOCATION)
 
       if already_emailed.empty?
+        # Skip if the offender has transferred but the allocation hasn't been updated yet
+        if allocation.prison != prisoner.prison_id
+          logger.info("job=suitable_for_early_allocation_email_job,nomis_offender_id=#{offender_no}," \
+                        "event=skipped_transfer|Offender prison (#{prisoner.prison_id}) does not match allocation prison (#{allocation.prison})")
+          return
+        end
+
         prison = Prison.find(prisoner.prison_id)
         pom = prison.get_single_pom(allocation.primary_pom_nomis_id)
+
         EarlyAllocationMailer.with(
           email: pom.email_address,
           prisoner_name: prisoner.full_name,
