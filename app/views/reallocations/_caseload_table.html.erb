@@ -35,6 +35,7 @@
   </thead>
   <tbody class="govuk-table__body">
     <% collection.each_with_index do |allocation, allocation_counter| %>
+      <% coworker_conflict = (allocation.secondary_pom_nomis_id == target_pom.staff_id) %>
       <tr class="govuk-table__row offender_row_<%= allocation_counter %>">
         <td aria-label="Select case" class="govuk-table__cell govuk-!-padding-top-2 reallocation-cases-table__select-cell reallocation-cases-table__select-column">
           <fieldset class="govuk-fieldset">
@@ -42,9 +43,16 @@
               <div class="govuk-checkboxes__item reallocation-cases-table__select-checkbox">
                 <%= check_box_tag 'nomis_offender_ids[]', allocation.nomis_offender_id, false,
                                   id: "case-#{allocation.nomis_offender_id}",
-                                  class: 'govuk-checkboxes__input', data: { reallocation_case_checkbox: true } %>
+                                  class: 'govuk-checkboxes__input', disabled: coworker_conflict,
+                                  data: { reallocation_case_checkbox: (true unless coworker_conflict) } %>
                 <%= label_tag "case-#{allocation.nomis_offender_id}", '', class: 'govuk-label govuk-checkboxes__label' do %>
-                  <span class="govuk-visually-hidden">Select <%= allocation.full_name %> to reallocate</span>
+                  <span class="govuk-visually-hidden">
+                    <% if coworker_conflict %>
+                      Cannot select <%= allocation.full_name %>: <%= target_pom.first_name %> already allocated as co-working POM
+                    <% else %>
+                      Select <%= allocation.full_name %> to reallocate
+                    <% end %>
+                  </span>
                 <% end %>
               </div>
             </div>
@@ -62,8 +70,10 @@
             <%= allocation.nomis_offender_id %>
           </span>
         </td>
-        <td aria-label="Recommended POM type" class="govuk-table__cell">
-          <%= allocation.recommended_pom_type == RecommendationService::PRISON_POM ? 'Prison POM' : 'Probation POM' %>
+        <td aria-label="Recommended POM type" class="govuk-table__cell reallocation-cases-table__recommended-column">
+          <%= highlight_conditionally('alert', "#{target_pom.first_name} already allocated as co-working POM", -> { coworker_conflict }) do %>
+            <%= allocation.recommended_pom_type == RecommendationService::PRISON_POM ? 'Prison POM' : 'Probation POM' %>
+          <% end %>
         </td>
         <td aria-label="POM role needed" class="govuk-table__cell">
           <%= pom_responsibility_label(allocation) %>

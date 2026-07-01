@@ -91,6 +91,10 @@ $purble: govuk-colour("purple");
 
 // Reallocation cases table
 //
+.reallocation-cases-table__recommended-column {
+  max-width: 180px;
+}
+
 .reallocation-cases-table__select-column {
   width: 50px;
 }
