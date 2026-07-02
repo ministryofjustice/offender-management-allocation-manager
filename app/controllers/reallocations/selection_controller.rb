@@ -68,7 +68,9 @@ module Reallocations
 
     def selected_cases_from_params
       offender_ids = Array(params[:nomis_offender_ids]).compact_blank
-      primary_allocations.select { offender_ids.include?(it.nomis_offender_id) }
+      primary_allocations
+        .select { offender_ids.include?(it.nomis_offender_id) }
+        .reject { it.secondary_pom_nomis_id == @new_pom.staff_id }
     end
   end
 end

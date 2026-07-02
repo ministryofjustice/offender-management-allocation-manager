@@ -159,6 +159,61 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
         expect(response.body).to include('Complexity level')
       end
     end
+
+    context 'when the target POM is already the co-working POM on a case' do
+      let(:coworker_offender_no) { 'G9999CC' }
+      let(:coworker_offender) do
+        build(
+          :nomis_offender,
+          :inside_omic_policy,
+          prisonId: prison.code,
+          prisonerNumber: coworker_offender_no,
+          firstName: 'Charlie',
+          lastName: 'Brown',
+          sentence: attributes_for(:sentence_detail, conditionalReleaseDate: '2028-06-01', releaseDate: '2029-06-01')
+        )
+      end
+      let(:offenders_in_prison) { [offender, coworker_offender] }
+
+      before do
+        create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: coworker_offender_no))
+        create(
+          :allocation_history,
+          prison: prison.code,
+          nomis_offender_id: coworker_offender_no,
+          primary_pom_nomis_id: old_pom.staffId,
+          primary_pom_name: old_pom.full_name,
+          secondary_pom_nomis_id: new_pom.staffId,
+          secondary_pom_name: new_pom.full_name
+        )
+        stub_oasys_assessments(coworker_offender_no)
+      end
+
+      it 'renders a disabled checkbox for the conflicting case' do
+        perform_request
+
+        page = Nokogiri::HTML(response.body)
+        conflicting_checkbox = page.at_css("#case-#{coworker_offender_no}")
+        normal_checkbox = page.at_css("#case-#{offender_no}")
+
+        expect(conflicting_checkbox).not_to be_nil
+        expect(conflicting_checkbox['disabled']).to eq('disabled')
+        expect(normal_checkbox).not_to be_nil
+        expect(normal_checkbox['disabled']).to be_nil
+      end
+
+      it 'shows the "already allocated as co-working POM" highlight for the conflicting case' do
+        perform_request
+
+        expect(response.body).to include('already allocated as co-working POM')
+      end
+
+      it 'adjusts the select-all count to exclude the conflicting case' do
+        perform_request
+
+        expect(response.body).to include('Select all cases (1)')
+      end
+    end
   end
 
   describe '#create' do
@@ -199,6 +254,44 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
         post :create, params: params
 
         expect(response).to redirect_to(override_prison_reallocation_path(prison, old_pom.staffId, new_pom.staffId, override_offender_no))
+      end
+    end
+
+    context 'when a selected case has the target POM as co-worker (form manipulation)' do
+      let(:coworker_offender_no) { 'G9999CC' }
+      let(:coworker_offender) do
+        build(
+          :nomis_offender,
+          :inside_omic_policy,
+          prisonId: prison.code,
+          prisonerNumber: coworker_offender_no,
+          firstName: 'Charlie',
+          lastName: 'Brown',
+          sentence: attributes_for(:sentence_detail, conditionalReleaseDate: '2028-06-01', releaseDate: '2029-06-01')
+        )
+      end
+      let(:offenders_in_prison) { [offender, coworker_offender] }
+      let(:nomis_offender_ids) { [coworker_offender_no] }
+
+      before do
+        create(:case_information, tier: 'B', offender: build(:offender, nomis_offender_id: coworker_offender_no))
+        create(
+          :allocation_history,
+          prison: prison.code,
+          nomis_offender_id: coworker_offender_no,
+          primary_pom_nomis_id: old_pom.staffId,
+          primary_pom_name: old_pom.full_name,
+          secondary_pom_nomis_id: new_pom.staffId,
+          secondary_pom_name: new_pom.full_name
+        )
+        stub_oasys_assessments(coworker_offender_no)
+      end
+
+      it 'rejects the conflicting case and redirects with an alert' do
+        post :create, params: params
+
+        expect(response).to redirect_to(caseload_prison_reallocation_path(prison, old_pom.staffId, new_pom.staffId))
+        expect(flash[:alert]).to eq('Choose at least one case to reallocate.')
       end
     end
   end
