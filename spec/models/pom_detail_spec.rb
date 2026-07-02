@@ -64,4 +64,39 @@ RSpec.describe PomDetail, type: :model do
       expect(pom_detail.has_primary_allocations?).to be false
     end
   end
+
+  describe '#save_audit_event' do
+    before do
+      PaperTrail.request.whodunnit = 'SPO_USER'
+    end
+
+    after do
+      PaperTrail.request.whodunnit = nil
+    end
+
+    it 'publishes an audit event with correct tags and additional data' do
+      pom_detail = create(:pom_detail, prison: prison)
+
+      audit = AuditEvent.order(:created_at).last
+      aggregate_failures do
+        expect(audit.nomis_offender_id).to be_nil
+        expect(audit.tags).to eq(%w[record pom_detail changed])
+        expect(audit.data['nomis_staff_id']).to eq(pom_detail.nomis_staff_id)
+        expect(audit.data['prison_code']).to eq(prison.code)
+      end
+    end
+
+    it 'records before and after changes on update' do
+      pom_detail = create(:pom_detail, prison: prison, status: 'active', working_pattern: 1.0)
+      last_audit = AuditEvent.order(:created_at).last
+
+      pom_detail.update!(status: 'inactive', working_pattern: 0.8)
+
+      audit = AuditEvent.where.not(id: last_audit.id).order(:created_at).last
+      aggregate_failures do
+        expect(audit.data['before']).to include('status' => 'active', 'working_pattern' => 1.0)
+        expect(audit.data['after']).to include('status' => 'inactive', 'working_pattern' => 0.8)
+      end
+    end
+  end
 end

@@ -4,7 +4,7 @@
   <td class="govuk-table__cell" style="display: flex; flex-direction: column; margin-bottom: -1px;">
     <span>
       <strong class="govuk-tag govuk-tag--purple">audit event</strong>
-      <span><%= audit_event.tags.join(' ') %></span>
+      <span><%= audit_event.tags.join(' &middot; ').html_safe %></span>
     </span>
 
     <details class="govuk-details govuk-!-margin-top-3 govuk-!-margin-bottom-2">
@@ -18,11 +18,11 @@
             <dd class="govuk-summary-list__value"><%= audit_event.system_event %></dd>
           </div>
           <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Username / Name</dt>
-            <dd class="govuk-summary-list__value"><%= audit_event.username %> / <%= audit_event.user_human_name %></dd>
+            <dt class="govuk-summary-list__key">Username</dt>
+            <dd class="govuk-summary-list__value"><%= audit_event.username %></dd>
           </div>
         </dl>
-        <pre><%= JSON.pretty_generate(audit_event.data) %></pre>
+        <pre><%= audit_event.data.to_yaml %></pre>
       </div>
     </details>
   </td>

@@ -179,4 +179,40 @@ RSpec.describe EarlyAllocation, type: :model do
       end
     end
   end
+
+  describe '#save_audit_event' do
+    before do
+      PaperTrail.request.whodunnit = 'SPO_USER'
+    end
+
+    after do
+      PaperTrail.request.whodunnit = nil
+    end
+
+    it 'publishes an audit event on create with correct tags and outcome' do
+      expect { create(:early_allocation) }.to change(AuditEvent, :count).by(1)
+
+      audit = AuditEvent.order(:created_at).last
+      aggregate_failures do
+        expect(audit.tags).to eq(%w[record early_allocation changed])
+        expect(audit.data['after']).to include('outcome' => 'eligible')
+      end
+    end
+
+    it 'records community decision changes on update' do
+      early_allocation = create(:early_allocation, :discretionary)
+      last_audit = AuditEvent.order(:created_at).last
+
+      early_allocation.update!(community_decision: true,
+                               updated_by_firstname: 'Jane',
+                               updated_by_lastname: 'Smith')
+
+      audit = AuditEvent.where.not(id: last_audit.id).order(:created_at).last
+      aggregate_failures do
+        expect(audit.nomis_offender_id).to eq(early_allocation.nomis_offender_id)
+        expect(audit.data['before']).to include('community_decision' => nil)
+        expect(audit.data['after']).to include('community_decision' => true)
+      end
+    end
+  end
 end

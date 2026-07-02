@@ -1,14 +1,18 @@
 # frozen_string_literal: true
 
 class CaseInformation < ApplicationRecord
+  include Auditable
+
   self.table_name = 'case_information'
+
+  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   MAPPA_LEVELS = [0, 1, 2, 3].freeze
   TIER_LEVELS = %w[A B C D].freeze
   EXTENDED_TIER_LEVELS = %w[E F G].freeze
   ROSH_LEVELS = %w[VERY_HIGH HIGH MEDIUM LOW].freeze
 
-  has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
+  after_commit :save_audit_event, if: :manual_entry?
 
   belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :case_information
 
@@ -49,5 +53,13 @@ private
 
   def rosh_level_feature_enabled?
     FeatureFlags.rosh_level.enabled?
+  end
+
+  def audit_event_tags
+    %w[record case_information changed].freeze
+  end
+
+  def audit_excluded_keys
+    %w[id nomis_offender_id].freeze
   end
 end

@@ -41,6 +41,29 @@ RSpec.describe CaseInformationController, type: :controller do
       end
     end
 
+    it 'publishes an audit event on successful create' do
+      allow(AuditEvent).to receive(:publish).and_call_original
+
+      post :create, params: {
+        prison_id: prison.code,
+        prisoner_id: offender_no,
+        commit: 'Save',
+        case_information: {
+          tier: 'A',
+          rosh_level: 'HIGH',
+          enhanced_resourcing: 'true'
+        }
+      }
+
+      expect(AuditEvent).to have_received(:publish).once.with(
+        hash_including(
+          nomis_offender_id: offender_no,
+          tags: %w[record case_information changed],
+          system_event: false
+        )
+      )
+    end
+
     it 'redirects to the review-case page when saving and allocating' do
       post :create, params: {
         prison_id: prison.code,
@@ -297,6 +320,33 @@ RSpec.describe CaseInformationController, type: :controller do
                tier: 'B',
                rosh_level: 'LOW',
                enhanced_resourcing: false)
+      end
+
+      it 'publishes an audit event on successful update' do
+        allow(AuditEvent).to receive(:publish).and_call_original
+
+        put :update, params: {
+          prison_id: prison.code,
+          prisoner_id: offender_no,
+          from: 'review_case',
+          case_information: {
+            tier: 'A',
+            rosh_level: 'HIGH',
+            enhanced_resourcing: 'true'
+          }
+        }
+
+        expect(AuditEvent).to have_received(:publish).once.with(
+          hash_including(
+            nomis_offender_id: offender_no,
+            tags: %w[record case_information changed],
+            system_event: false,
+            data: hash_including(
+              'before' => hash_including('tier' => 'B', 'rosh_level' => 'LOW'),
+              'after' => hash_including('tier' => 'A', 'rosh_level' => 'HIGH')
+            )
+          )
+        )
       end
 
       it 'redirects back to review case details when from is review_case' do

@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
 class EarlyAllocation < ApplicationRecord
+  include Auditable
+
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   before_save :record_outcome
+  after_commit :save_audit_event
 
   belongs_to :offender,
              primary_key: :nomis_offender_id,
@@ -95,5 +98,13 @@ private
     return self.outcome = 'ineligible' if ineligible?
 
     self.outcome = 'discretionary'
+  end
+
+  def audit_event_tags
+    %w[record early_allocation changed].freeze
+  end
+
+  def audit_excluded_keys
+    %w[id nomis_offender_id reason other_reason].freeze
   end
 end
