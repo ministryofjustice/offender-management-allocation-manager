@@ -3,6 +3,7 @@
 class PrisonersController < PrisonsApplicationController
   before_action :ensure_spo_user, except: [:show, :image, :search]
 
+  before_action :load_prisoner_or_redirect, only: [:show, :review_case_details]
   before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :search]
   before_action :load_reallocation_alert, only: [:unallocated]
 
@@ -30,10 +31,6 @@ class PrisonersController < PrisonsApplicationController
   end
 
   def review_case_details
-    @prisoner = OffenderService.get_offender(params[:prisoner_id])
-
-    return redirect_to '/404' if @prisoner.nil?
-
     @alerts = @prisoner.active_alert_labels
     @mappa = @prisoner.mappa_details
     @rosh = @prisoner.rosh_summary
@@ -60,12 +57,6 @@ class PrisonersController < PrisonsApplicationController
   end
 
   def show
-    @prisoner = OffenderService.get_offender(params[:id])
-
-    return redirect_to '/404' if @prisoner.nil?
-
-    return render 'show_outside_omic_policy' unless @prisoner.inside_omic_policy?
-
     @tasks = @prisoner.pom_tasks
 
     if (allocation = AllocationHistory.find_by(nomis_offender_id: @prisoner.offender_no))
@@ -93,6 +84,18 @@ class PrisonersController < PrisonsApplicationController
   end
 
 private
+
+  def load_prisoner_or_redirect
+    offender_id = params[:prisoner_id] || params[:id]
+    @prisoner = OffenderService.get_offender(offender_id)
+
+    if @prisoner.nil?
+      redirect_to '/404'
+    elsif !@prisoner.inside_omic_policy?
+      Rails.logger.warn("event=outside_omic_policy,nomis_offender_id=#{offender_id},prison_id=#{@prison.code}")
+      render 'show_outside_omic_policy'
+    end
+  end
 
   def load_all_offenders
     @missing_info = @prison.missing_info

@@ -697,4 +697,58 @@ RSpec.describe PrisonersController, type: :controller do
       end
     end
   end
+
+  describe '#load_prisoner_or_redirect' do
+    let(:prison) { create(:prison) }
+
+    before do
+      stub_sso_data(prison.code)
+    end
+
+    describe '#show' do
+      context 'when the offender does not exist' do
+        before { stub_nil_offender }
+
+        it 'redirects to 404' do
+          get :show, params: { prison_id: prison.code, id: 'NONEXIST' }
+          expect(response).to redirect_to('/404')
+        end
+      end
+
+      context 'when the offender is outside OMIC policy' do
+        let(:offender) { build(:nomis_offender, :outside_omic_policy, prisonId: prison.code) }
+        let(:offender_no) { offender.fetch(:prisonerNumber) }
+
+        before { stub_offender(offender) }
+
+        it 'renders the outside OMIC policy page' do
+          get :show, params: { prison_id: prison.code, id: offender_no }
+          expect(response).to render_template('show_outside_omic_policy')
+        end
+      end
+    end
+
+    describe '#review_case_details' do
+      context 'when the offender does not exist' do
+        before { stub_nil_offender }
+
+        it 'redirects to 404' do
+          get :review_case_details, params: { prison_id: prison.code, prisoner_id: 'NONEXIST' }
+          expect(response).to redirect_to('/404')
+        end
+      end
+
+      context 'when the offender is outside OMIC policy' do
+        let(:offender) { build(:nomis_offender, :outside_omic_policy, prisonId: prison.code) }
+        let(:offender_no) { offender.fetch(:prisonerNumber) }
+
+        before { stub_offender(offender) }
+
+        it 'renders the outside OMIC policy page' do
+          get :review_case_details, params: { prison_id: prison.code, prisoner_id: offender_no }
+          expect(response).to render_template('show_outside_omic_policy')
+        end
+      end
+    end
+  end
 end

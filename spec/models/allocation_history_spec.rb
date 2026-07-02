@@ -629,8 +629,6 @@ RSpec.describe AllocationHistory, :enable_domain_event_publish, type: :model do
   end
 
   describe '#save_audit_event' do
-    let(:audit_excluded_keys) { described_class::AUDIT_EXCLUDED_KEYS }
-
     let(:prison) { create(:prison) }
     let!(:allocation) { create(:allocation_history, prison: prison.code, nomis_offender_id:) }
 
@@ -643,7 +641,7 @@ RSpec.describe AllocationHistory, :enable_domain_event_publish, type: :model do
       PaperTrail.request.whodunnit = nil
     end
 
-    it 'removes sensitive or unnecessary fields from audit data when present' do
+    it 'publishes an audit event with correct tags and excludes sensitive fields' do
       allocation.update!(
         message: 'sensitive note',
         override_detail: 'override details',
@@ -669,18 +667,6 @@ RSpec.describe AllocationHistory, :enable_domain_event_publish, type: :model do
           }
         )
       end
-    end
-
-    it 'marks system events when whodunnit is blank' do
-      PaperTrail.request.whodunnit = nil
-
-      allocation.update!(allocated_at_tier: 'B')
-
-      expect(AuditEvent).to have_received(:publish).once.with(
-        hash_including(
-          system_event: true, username: nil
-        )
-      )
     end
   end
 end

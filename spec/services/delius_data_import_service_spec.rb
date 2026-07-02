@@ -61,12 +61,12 @@ RSpec.describe DeliusDataImportService do
   end
 
   shared_examples 'audit event' do
-    let(:audit_event) { AuditEvent.last }
+    let(:audit_event) { AuditEvent.tags('process_delius_data_job').order(:created_at).last }
 
     it 'creates an audit event with the expected data and tags' do
       expect {
         service.process(nomis_offender_id)
-      }.to change(AuditEvent, :count).by(1)
+      }.to change { AuditEvent.tags('process_delius_data_job').count }.by(1)
 
       expect(audit_event.data['before']).to eq(expected_data['before'])
       expect(audit_event.data['after']).to eq(expected_data['after'])

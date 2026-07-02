@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
 class PomDetail < ApplicationRecord
+  include Auditable
+
   has_paper_trail
 
   FULL_TIME_HOURS_PER_WEEK = 37.5
+
+  after_commit :save_audit_event
 
   enum :status, {
     active: 'active',
@@ -41,5 +45,15 @@ class PomDetail < ApplicationRecord
 
   def hours_per_week
     working_pattern * FULL_TIME_HOURS_PER_WEEK
+  end
+
+private
+
+  def audit_event_tags
+    %w[record pom_detail changed].freeze
+  end
+
+  def audit_additional_data
+    { 'nomis_staff_id' => nomis_staff_id, 'prison_code' => prison_code }
   end
 end

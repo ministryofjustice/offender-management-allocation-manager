@@ -47,7 +47,7 @@
           <% if audit_event.system_event? %>
             <em>System</em>
           <% else %>
-            <%= audit_event.user_human_name %> (<%= audit_event.username %>)
+            <%= audit_event.username %>
           <% end %>
         </td>
         <td class="govuk-table__cell">

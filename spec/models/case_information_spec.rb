@@ -204,4 +204,51 @@ describe CaseInformation do
       expect(build(:case_information, tier: nil, rosh_level: 'HIGH').complete_for_allocation?).to be(false)
     end
   end
+
+  describe '#save_audit_event' do
+    before do
+      PaperTrail.request.whodunnit = 'SPO_USER'
+    end
+
+    after do
+      PaperTrail.request.whodunnit = nil
+    end
+
+    context 'when the record is a manual entry' do
+      let(:case_info) { create(:case_information, :manual_entry, tier: 'B', rosh_level: 'LOW', enhanced_resourcing: false) }
+
+      it 'publishes an audit event with the correct tags and offender id' do
+        expect { case_info }.to change(AuditEvent, :count).by(1)
+
+        audit = AuditEvent.order(:created_at).last
+        aggregate_failures do
+          expect(audit.nomis_offender_id).to eq(case_info.nomis_offender_id)
+          expect(audit.tags).to eq(%w[record case_information changed])
+        end
+      end
+
+      it 'records before and after changes on update' do
+        case_info
+        last_audit = AuditEvent.order(:created_at).last
+
+        case_info.update!(tier: 'A', rosh_level: 'HIGH')
+
+        audit = AuditEvent.where.not(id: last_audit.id).order(:created_at).last
+        aggregate_failures do
+          expect(audit.data['before']).to include('tier' => 'B', 'rosh_level' => 'LOW')
+          expect(audit.data['after']).to include('tier' => 'A', 'rosh_level' => 'HIGH')
+        end
+      end
+    end
+
+    context 'when the record is not a manual entry' do
+      let(:case_info) { create(:case_information, manual_entry: false, tier: 'B') }
+
+      it 'does not publish an audit event' do
+        case_info
+
+        expect { case_info.update!(tier: 'A') }.not_to change(AuditEvent, :count)
+      end
+    end
+  end
 end
