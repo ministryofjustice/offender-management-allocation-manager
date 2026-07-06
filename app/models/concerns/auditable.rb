@@ -3,6 +3,8 @@
 module Auditable
   extend ActiveSupport::Concern
 
+  AUDIT_EXCLUDED_KEYS = %w[id nomis_offender_id].freeze
+
 private
 
   def save_audit_event
@@ -12,7 +14,7 @@ private
     after_changes  = previous_changes.transform_values(&:last)
 
     [before_changes, after_changes].each do |changes_hash|
-      audit_excluded_keys.each { changes_hash.delete(it) }
+      (AUDIT_EXCLUDED_KEYS + audit_excluded_keys).each { changes_hash.delete(it) }
     end
 
     AuditEvent.publish(

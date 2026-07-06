@@ -58,8 +58,4 @@ private
   def audit_event_tags
     %w[record case_information changed].freeze
   end
-
-  def audit_excluded_keys
-    %w[id nomis_offender_id].freeze
-  end
 end

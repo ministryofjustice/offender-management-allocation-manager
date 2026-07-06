@@ -147,4 +147,40 @@ RSpec.describe HandoverProgressChecklist do
       end
     end
   end
+
+  describe '#save_audit_event' do
+    let(:offender) { create(:offender) }
+
+    before do
+      PaperTrail.request.whodunnit = 'POM_USER'
+      allow_any_instance_of(described_class).to receive(:handover_type).and_return('enhanced')
+    end
+
+    after do
+      PaperTrail.request.whodunnit = nil
+    end
+
+    it 'publishes an audit event with correct tags and offender id on create' do
+      checklist = described_class.create!(offender: offender, reviewed_oasys: true, contacted_com: true)
+
+      audit = AuditEvent.order(:created_at).last
+      aggregate_failures do
+        expect(audit.nomis_offender_id).to eq(checklist.nomis_offender_id)
+        expect(audit.tags).to eq(%w[record handover_progress_checklist changed])
+      end
+    end
+
+    it 'records before and after changes on update' do
+      checklist = described_class.create!(offender: offender)
+      last_audit = AuditEvent.order(:created_at).last
+
+      checklist.update!(contacted_com: true)
+
+      audit = AuditEvent.where.not(id: last_audit.id).order(:created_at).last
+      aggregate_failures do
+        expect(audit.data['before']).to include('contacted_com' => false)
+        expect(audit.data['after']).to include('contacted_com' => true)
+      end
+    end
+  end
 end
