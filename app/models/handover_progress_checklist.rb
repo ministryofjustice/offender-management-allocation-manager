@@ -1,9 +1,13 @@
 class HandoverProgressChecklist < ApplicationRecord
+  include Auditable
+
   SIMPLIFIED_ENHANCED_HANDOVER_TASK_FIELDS = %w[reviewed_oasys contacted_com].freeze
   ENHANCED_HANDOVER_TASK_FIELDS = %w[reviewed_oasys contacted_com attended_handover_meeting].freeze
   STANDARD_HANDOVER_TASK_FIELDS = %w[contacted_com sent_handover_report].freeze
 
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
+
+  after_commit :save_audit_event
 
   belongs_to :offender, foreign_key: :nomis_offender_id
 
@@ -44,5 +48,9 @@ private
 
   def completed_task_attributes
     task_attributes.count { |_, v| v == true }
+  end
+
+  def audit_event_tags
+    %w[record handover_progress_checklist changed].freeze
   end
 end

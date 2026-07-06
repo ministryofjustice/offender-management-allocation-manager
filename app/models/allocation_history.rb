@@ -238,7 +238,7 @@ private
   end
 
   def audit_excluded_keys
-    %w[id nomis_offender_id message override_detail suitability_detail].freeze
+    %w[message override_detail suitability_detail].freeze
   end
 
   def publish_allocation_changed_event

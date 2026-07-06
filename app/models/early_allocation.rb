@@ -105,6 +105,6 @@ private
   end
 
   def audit_excluded_keys
-    %w[id nomis_offender_id reason other_reason].freeze
+    %w[reason other_reason].freeze
   end
 end
