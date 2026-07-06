@@ -1,12 +1,21 @@
 class HandoverProgressChecklist < ApplicationRecord
+  SIMPLIFIED_ENHANCED_HANDOVER_TASK_FIELDS = %w[reviewed_oasys contacted_com].freeze
   ENHANCED_HANDOVER_TASK_FIELDS = %w[reviewed_oasys contacted_com attended_handover_meeting].freeze
-  NORMAL_HANDOVER_TASK_FIELD = %w[contacted_com sent_handover_report].freeze
+  STANDARD_HANDOVER_TASK_FIELDS = %w[contacted_com sent_handover_report].freeze
 
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   belongs_to :offender, foreign_key: :nomis_offender_id
 
   delegate :handover_type, to: :offender
+
+  def self.permitted_task_fields(handover_type:, simplified_enhanced_handover: FeatureFlags.simplified_enhanced_handover.enabled?)
+    if handover_type == 'enhanced'
+      simplified_enhanced_handover ? SIMPLIFIED_ENHANCED_HANDOVER_TASK_FIELDS : ENHANCED_HANDOVER_TASK_FIELDS
+    else
+      STANDARD_HANDOVER_TASK_FIELDS
+    end.map(&:to_sym)
+  end
 
   def progress_data
     {
@@ -26,7 +35,7 @@ class HandoverProgressChecklist < ApplicationRecord
 private
 
   def task_fields
-    handover_type == 'enhanced' ? ENHANCED_HANDOVER_TASK_FIELDS : NORMAL_HANDOVER_TASK_FIELD
+    self.class.permitted_task_fields(handover_type:).map(&:to_s)
   end
 
   def task_attributes

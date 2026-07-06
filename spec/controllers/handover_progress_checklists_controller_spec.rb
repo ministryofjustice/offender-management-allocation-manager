@@ -10,11 +10,27 @@ RSpec.describe HandoverProgressChecklistsController do
     allow(current_pom).to receive(:has_allocation?).with(nomis_offender_id).and_return true
     allow(OffenderService).to receive(:get_offender).and_return(nil)
     allow(controller.helpers).to receive(:last_handovers_url).and_return '/last'
+
+    # Ensure the handover gate passes (offender is in handover-in-progress state)
+    offender_record = Offender.find_or_create_by!(nomis_offender_id:)
+    FactoryBot.create(:calculated_handover_date, :after_handover, offender: offender_record) unless offender_record.calculated_handover_date
   end
 
   describe '#edit' do
     describe 'when offender exists' do
-      let!(:offender) { stub_mpc_offender(offender_no: nomis_offender_id) }
+      let!(:offender) { stub_mpc_offender(offender_no: nomis_offender_id, handover_type: 'enhanced') }
+
+      describe 'when current POM is not the allocated POM' do
+        before do
+          allow(current_pom).to receive(:has_allocation?).with(nomis_offender_id).and_return false
+        end
+
+        it 'responds with unauthorized error' do
+          get :edit, params: default_params
+
+          expect(response).to redirect_to('/401')
+        end
+      end
 
       it 'assigns the offender' do
         get :edit, params: default_params
@@ -50,11 +66,30 @@ RSpec.describe HandoverProgressChecklistsController do
         expect(response).to redirect_to('/404')
       end
     end
+
+    describe 'when handover is not in progress or upcoming' do
+      let!(:offender) { stub_mpc_offender(offender_no: nomis_offender_id, handover_type: 'enhanced') }
+
+      before do
+        # Override the handover date to be POM-only with no upcoming window
+        chd = CalculatedHandoverDate.find_by(nomis_offender_id:)
+        chd.update!(responsibility: CalculatedHandoverDate::CUSTODY_ONLY, handover_date: 1.year.from_now.to_date)
+      end
+
+      it 'responds with unauthorized error' do
+        get :edit, params: default_params
+        expect(response).to redirect_to('/401')
+      end
+    end
   end
 
   describe '#update' do
     describe 'when offender exists' do
-      let!(:offender) { stub_mpc_offender(offender_no: nomis_offender_id) }
+      let!(:offender) { stub_mpc_offender(offender_no: nomis_offender_id, handover_type: 'enhanced') }
+
+      before do
+        stub_feature_flag(:simplified_enhanced_handover, enabled: false)
+      end
 
       describe 'when current POM is not the allocated POM' do
         before do
@@ -78,12 +113,12 @@ RSpec.describe HandoverProgressChecklistsController do
         end
 
         it 'creates new checklist with correct data' do
-          model = HandoverProgressChecklist.find_by(nomis_offender_id: nomis_offender_id)
-          aggregate_failures do
-            expect(model.reviewed_oasys).to eq true
-            expect(model.contacted_com).to eq true
-            expect(model.attended_handover_meeting).to eq true
-          end
+          model = HandoverProgressChecklist.find_by!(nomis_offender_id: nomis_offender_id)
+          expect(model).to have_attributes(
+            reviewed_oasys: true,
+            contacted_com: true,
+            attended_handover_meeting: true,
+          )
         end
 
         it 'redirects to the correct handovers url' do
@@ -106,16 +141,60 @@ RSpec.describe HandoverProgressChecklistsController do
         end
 
         it 'updates checklist with correct data' do
-          model = HandoverProgressChecklist.find_by(nomis_offender_id: nomis_offender_id)
-          aggregate_failures do
-            expect(model.reviewed_oasys).to eq false
-            expect(model.contacted_com).to eq true
-            expect(model.attended_handover_meeting).to eq false
-          end
+          model = HandoverProgressChecklist.find_by!(nomis_offender_id: nomis_offender_id)
+          expect(model).to have_attributes(
+            reviewed_oasys: false,
+            contacted_com: true,
+            attended_handover_meeting: false,
+          )
         end
 
         it 'redirects to the correct handovers url' do
           expect(response).to redirect_to('/last')
+        end
+      end
+
+      describe 'when handover type is standard' do
+        let!(:offender) { stub_mpc_offender(offender_no: nomis_offender_id, handover_type: 'standard') }
+
+        it 'filters out enhanced-only task params' do
+          tasks = {
+            contacted_com: true,
+            sent_handover_report: true,
+          }
+
+          put :update, params: default_params.merge(handover_progress_checklist: tasks)
+
+          model = HandoverProgressChecklist.find_by!(nomis_offender_id: nomis_offender_id)
+          aggregate_failures do
+            expect(model.contacted_com).to eq true
+            expect(model.sent_handover_report).to eq true
+            expect(model.attended_handover_meeting).to eq false
+            expect(model.reviewed_oasys).to eq false
+          end
+        end
+      end
+
+      describe 'when simplified_enhanced_handover feature flag is enabled' do
+        before do
+          stub_feature_flag(:simplified_enhanced_handover, enabled: true)
+        end
+
+        it 'persists only the standardised task fields' do
+          tasks = {
+            reviewed_oasys: true,
+            contacted_com: true,
+          }
+
+          put :update, params: default_params.merge(handover_progress_checklist: tasks)
+
+          model = HandoverProgressChecklist.find_by!(nomis_offender_id: nomis_offender_id)
+          aggregate_failures do
+            expect(model.reviewed_oasys).to eq true
+            expect(model.contacted_com).to eq true
+            expect(model.attended_handover_meeting).to eq false
+            expect(model.sent_handover_report).to eq false
+          end
         end
       end
     end

@@ -14,6 +14,7 @@ module HighLevelMockingAndStubbingHelper
       date_of_birth: Faker::Date.backward,
       allocated_com_name: Faker::Name.name,
       allocated_com_email: Faker::Internet.email,
+      earliest_release_date: nil,
     }.merge(mpc_offender_attributes)
 
     mock_offender = instance_double(MpcOffender, **mpc_offender_attributes)
