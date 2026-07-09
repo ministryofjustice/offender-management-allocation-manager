@@ -4,21 +4,34 @@ class RecalculateHandoverDateJob < ApplicationJob
   queue_as :default
 
   def perform(nomis_offender_id)
-    offender = OffenderService.get_offender(nomis_offender_id)
-    if offender&.inside_omic_policy?
-      recalculate_dates_for(offender)
-    end
+    @nomis_offender = OffenderService.get_offender(nomis_offender_id)
+    return unless nomis_offender&.inside_omic_policy?
+
+    recalculate_dates_for_offender
   end
 
 private
 
-  def recalculate_dates_for(nomis_offender)
+  attr_reader :nomis_offender, :db_offender, :record, :com_email_eligible
+
+  def recalculate_dates_for_offender
+    save_handover_calculation
+
+    # Side effects that depend on the committed state but should not
+    # prevent the core recalculation from persisting. Each runs independently
+    # so a failure in one does not block the others.
+    safely { publish_event }
+    safely { maybe_reset_handover_checklist }
+    safely { request_supporting_com }
+    safely { assign_com_email }
+  end
+
+  # The only DB-mutating part: saves the recalculated handover date and audit event atomically.
+  def save_handover_calculation
     ApplicationRecord.transaction do
-      # we have to go direct to handover data to avoid being blocked when COM is responsible
       handover = HandoverDateService.handover(nomis_offender)
-      db_offender = Offender.find_by! nomis_offender_id: nomis_offender.offender_no
-      case_info = db_offender.case_information
-      record = db_offender.calculated_handover_date.presence || db_offender.build_calculated_handover_date
+      @db_offender = Offender.find_by! nomis_offender_id: nomis_offender.offender_no
+      @record = db_offender.calculated_handover_date.presence || db_offender.build_calculated_handover_date
       handover_before = record.attributes.except('id', 'created_at', 'updated_at')
       record.assign_attributes(
         responsibility: handover.responsibility,
@@ -26,13 +39,6 @@ private
         handover_date: handover.handover_date,
         reason: handover.reason,
       )
-      if handover.community_responsible? &&
-        handover.reason.to_sym == :determinate_short &&
-        nomis_offender.ldu_email_address.present? &&
-        nomis_offender.allocated_com_name.blank?
-
-        assign_com_email(db_offender:, nomis_offender:, case_info:)
-      end
 
       if record.changed?
         record.offender_attributes_to_archive = nomis_offender.attributes_to_archive
@@ -52,43 +58,70 @@ private
         )
       end
 
-      publish_event(record)
-
-      request_supporting_com record, nomis_offender
+      @com_email_eligible = handover.community_responsible? &&
+                            handover.reason.to_sym == :determinate_short &&
+                            nomis_offender.ldu_email_address.present? &&
+                            nomis_offender.allocated_com_name.blank?
     end
   end
 
-  def publish_event(record)
-    # Don't push if the dates haven't changed
-    if record.saved_change_to_start_date? || record.saved_change_to_handover_date?
-      event = DomainEvents::EventFactory.build_handover_event(host: Rails.configuration.allocation_manager_host,
-                                                              noms_number: record.nomis_offender_id)
-      event.publish(job: 'recalculate_handover_date')
+  def publish_event
+    return unless record.saved_change_to_start_date? || record.saved_change_to_handover_date?
+
+    event = DomainEvents::EventFactory.build_handover_event(
+      host: Rails.configuration.allocation_manager_host,
+      noms_number: record.nomis_offender_id
+    )
+    event.publish(job: 'recalculate_handover_date')
+  end
+
+  # Reset all checklist tasks if the case has moved out of the handover window.
+  # This ensures that if the case re-enters the window later, the POM starts fresh.
+  def maybe_reset_handover_checklist
+    return unless record.saved_change_to_responsibility? || record.saved_change_to_handover_date?
+
+    checklist = HandoverProgressChecklist.find_by(nomis_offender_id: record.nomis_offender_id)
+    return unless checklist
+
+    return if CalculatedHandoverDate.in_handover_window?(record.nomis_offender_id)
+
+    # Blank whodunnit so both PaperTrail and Auditable record this as system-initiated,
+    # even when the job runs synchronously within a user request (e.g. parole review).
+    PaperTrail.request(whodunnit: nil) do
+      checklist.update!(
+        reviewed_oasys: false,
+        contacted_com: false,
+        attended_handover_meeting: false,
+        sent_handover_report: false
+      )
     end
   end
 
-  def request_supporting_com(record, nomis_offender)
+  def request_supporting_com
     reason_change = %w[indeterminate indeterminate_open]
     responsibility_change = [CalculatedHandoverDate::CUSTODY_ONLY, CalculatedHandoverDate::CUSTODY_WITH_COM]
 
-    if record.saved_change_to_reason == reason_change &&
+    return unless record.saved_change_to_reason == reason_change &&
       record.saved_change_to_responsibility == responsibility_change &&
       nomis_offender.ldu_email_address.present? &&
       nomis_offender.allocated_com_name.blank?
 
-      CommunityMailer.with(
-        prisoner_name: nomis_offender.full_name,
-        prisoner_number: nomis_offender.offender_no,
-        prisoner_crn: nomis_offender.crn,
-        prison_name: PrisonService.name_for(nomis_offender.prison_id),
-        ldu_email: nomis_offender.ldu_email_address,
-        email_history_name: nomis_offender.ldu_name
-      ).open_prison_supporting_com_needed.deliver_later
-    end
+    CommunityMailer.with(
+      prisoner_name: nomis_offender.full_name,
+      prisoner_number: nomis_offender.offender_no,
+      prisoner_crn: nomis_offender.crn,
+      prison_name: PrisonService.name_for(nomis_offender.prison_id),
+      ldu_email: nomis_offender.ldu_email_address,
+      email_history_name: nomis_offender.ldu_name
+    ).open_prison_supporting_com_needed.deliver_later
   end
 
-  # TODO: This should probably be a shceduled job - we are effectivly using this like a cron every 2 days
-  def assign_com_email(db_offender:, nomis_offender:, case_info:)
+  # TODO: This should probably be a scheduled job — we are effectively using this like a cron every 2 days
+  def assign_com_email
+    return unless com_email_eligible
+
+    case_info = db_offender.case_information
+
     # There is frequently bad data on staging/dev, thus this check
     return if case_info.nil? || case_info.crn.blank?
 
@@ -105,5 +138,15 @@ private
         crn_number: case_info.crn,
       ).assign_com_less_than_10_months.deliver_later
     end
+  end
+
+  def safely
+    yield
+  rescue StandardError => e
+    Rails.logger.error(
+      'event=recalculate_handover_side_effect_failed,' \
+      "nomis_offender_id=#{nomis_offender.offender_no}," \
+      "error=#{e.class}|#{e.message}"
+    )
   end
 end

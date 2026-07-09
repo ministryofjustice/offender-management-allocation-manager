@@ -139,6 +139,11 @@ class CalculatedHandoverDate < ApplicationRecord
         .where.not(handover_date: nil)
     end
 
+    def in_handover_window?(nomis_offender_id)
+      by_handover_in_progress(offender_ids: [nomis_offender_id]).exists? ||
+        by_upcoming_handover(offender_ids: [nomis_offender_id]).exists?
+    end
+
     def by_com_allocation_overdue(offender_ids:, relative_to_date: Time.zone.now.to_date)
       relation
         .by_handover_in_progress(offender_ids: offender_ids)
