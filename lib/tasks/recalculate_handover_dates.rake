@@ -6,11 +6,16 @@ task recalculate_handover_dates: :environment do
 
   Rails.logger.info('Queueing RecalculateHandoverDateJob for all offenders')
 
-  Prison.all.find_each do |prison|
-    prison.offenders.each do |offender|
-      RecalculateHandoverDateJob.perform_later(offender.offender_no)
-    end
-    Rails.logger.info("RecalculateHandoverDateJob #{prison.name} Queued #{prison.offenders.count} Jobs")
+  Prison.active.find_each do |prison|
+    offender_ids = prison.offenders.map(&:offender_no)
+
+    ActiveJob.perform_all_later(
+      offender_ids.map { RecalculateHandoverDateJob.new(it) }
+    )
+
+    Rails.logger.info(
+      "event=recalculate_handover_dates,prison=#{prison.code},queued=#{offender_ids.size}"
+    )
   end
 
   Rails.logger.info('RecalculateHandoverDateJob all done')

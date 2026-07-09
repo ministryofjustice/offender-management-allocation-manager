@@ -30,9 +30,7 @@ private
 
   def ensure_handover_in_progress
     return redirect_to('/401') if offender_released?
-
-    return if CalculatedHandoverDate.by_handover_in_progress(offender_ids: [nomis_offender_id]).exists?
-    return if CalculatedHandoverDate.by_upcoming_handover(offender_ids: [nomis_offender_id]).exists?
+    return if CalculatedHandoverDate.in_handover_window?(nomis_offender_id)
 
     redirect_to '/401'
   end
