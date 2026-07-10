@@ -125,6 +125,16 @@ RSpec.describe EmailService do
                                                        secondary_pom_name: coworking_allocation.secondary_pom_name)
       }.not_to change(enqueued_jobs, :size)
     end
+
+    it "does not crash when the primary POM cannot be found at the prison" do
+      stub_inexistent_filtered_pom(prison_code, coworking_deallocation.primary_pom_nomis_id)
+
+      expect {
+        described_class.send_cowork_deallocation_email(allocation: coworking_deallocation,
+                                                       pom_nomis_id: coworking_deallocation.primary_pom_nomis_id,
+                                                       secondary_pom_name: coworking_allocation.secondary_pom_name)
+      }.not_to change(enqueued_jobs, :size)
+    end
   end
 
   context 'when offender has been released' do

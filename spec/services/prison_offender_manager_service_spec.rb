@@ -57,6 +57,15 @@ describe PrisonOffenderManagerService do
           prison.get_single_pom(1234)
         }.to raise_exception(StandardError, /^Failed to find POM/)
       end
+
+      context 'with safe: true' do
+        it "returns nil and logs a warning" do
+          allow(Rails.logger).to receive(:warn)
+
+          expect(prison.get_single_pom(1234, safe: true)).to be_nil
+          expect(Rails.logger).to have_received(:warn).with(/event=pom_not_found,staff_id=1234,prison=LEI/)
+        end
+      end
     end
   end
 
