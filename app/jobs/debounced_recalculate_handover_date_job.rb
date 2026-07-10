@@ -20,7 +20,10 @@ private
 
   def debounce_token_match?(nomis_offender_id, debounce_key, debounce_token)
     cached_token = Rails.cache.read(debounce_key)
-    cached_token.nil? || cached_token == debounce_token
+    return true if cached_token.nil? || cached_token == debounce_token
+
+    logger.info("job=debounced_recalculate_handover_date_job,event=skipped,nomis_offender_id=#{nomis_offender_id}")
+    false
   rescue StandardError => e
     # If cache is unavailable for whatever reason, skip rather than risk running
     # without debounce protection, as the daily sweep will catch up within 24h
