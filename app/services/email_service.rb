@@ -73,7 +73,7 @@ class EmailService
     end
 
     def pom_for(allocation, pom_nomis_id)
-      Prison.find(allocation.prison).find_pom(pom_nomis_id)
+      Prison.find(allocation.prison).get_single_pom(pom_nomis_id, safe: true)
     end
 
     def current_responsibility(offender)

@@ -57,34 +57,14 @@ describe PrisonOffenderManagerService do
           prison.get_single_pom(1234)
         }.to raise_exception(StandardError, /^Failed to find POM/)
       end
-    end
-  end
 
-  describe '#find_pom' do
-    context 'when the POM exists' do
-      before(:each) do
-        stub_filtered_pom(prison.code, poms.first)
-      end
+      context 'with safe: true' do
+        it "returns nil and logs a warning" do
+          allow(Rails.logger).to receive(:warn)
 
-      it 'returns the POM' do
-        pom = prison.find_pom(staff_id)
-        expect(pom.staff_id).to eq(staff_id)
-      end
-    end
-
-    context 'when the POM does not exist' do
-      before(:each) do
-        stub_inexistent_filtered_pom(prison.code, 1234)
-      end
-
-      it 'returns nil' do
-        expect(prison.find_pom(1234)).to be_nil
-      end
-    end
-
-    context 'when given nil' do
-      it 'returns nil' do
-        expect(prison.find_pom(nil)).to be_nil
+          expect(prison.get_single_pom(1234, safe: true)).to be_nil
+          expect(Rails.logger).to have_received(:warn).with(/event=pom_not_found,staff_id=1234,prison=LEI/)
+        end
       end
     end
   end

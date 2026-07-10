@@ -21,23 +21,19 @@ class Prison < ApplicationRecord
     include_deleted ? result : result.reject(&:deleted?)
   end
 
-  def get_single_pom(nomis_staff_id)
+  def get_single_pom(nomis_staff_id, safe: false)
     raise ArgumentError, 'Prison#get_single_pom(nil)' if nomis_staff_id.nil?
 
-    pom = find_pom(nomis_staff_id)
+    pom = get_list_of_poms(staff_id: nomis_staff_id, include_deleted: true).first
     if pom.nil?
-      raise StandardError, "Failed to find POM ##{nomis_staff_id} at #{code}"
+      if safe
+        Rails.logger.warn("event=pom_not_found,staff_id=#{nomis_staff_id},prison=#{code}")
+      else
+        raise StandardError, "Failed to find POM ##{nomis_staff_id} at #{code}"
+      end
     end
 
     pom
-  end
-
-  # Like get_single_pom but returns nil instead of raising when the POM
-  # cannot be found (e.g. they have left the prison or lost their role).
-  def find_pom(nomis_staff_id)
-    return nil if nomis_staff_id.nil?
-
-    get_list_of_poms(staff_id: nomis_staff_id, include_deleted: true).first
   end
 
   def get_removed_poms(existing_poms:)

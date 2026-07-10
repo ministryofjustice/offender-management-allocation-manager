@@ -45,7 +45,7 @@ class CoworkingController < PrisonsApplicationController
     @prisoner = offender(@allocation.nomis_offender_id)
 
     if @allocation.primary_pom_nomis_id
-      @primary_pom = @prison.find_pom(@allocation.primary_pom_nomis_id)
+      @primary_pom = @prison.get_single_pom(@allocation.primary_pom_nomis_id, safe: true)
     end
   end
 
