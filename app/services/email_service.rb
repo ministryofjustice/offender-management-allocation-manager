@@ -4,7 +4,7 @@ class EmailService
   class << self
     def send_email(message:, allocation:, pom_nomis_id:, further_info: {}, notify_previous_pom: true)
       pom = pom_for(allocation, pom_nomis_id)
-      return if pom.email_address.blank?
+      return if pom.nil? || pom.email_address.blank?
 
       send_deallocation_email(pom:, allocation:, further_info:) if notify_previous_pom
       deliver_new_allocation_email(pom:, message:, allocation:, further_info:)
@@ -13,6 +13,8 @@ class EmailService
     def send_coworking_primary_email(message:, allocation:)
       pom_nomis_id = allocation.primary_pom_nomis_id
       pom = pom_for(allocation, pom_nomis_id)
+      return if pom.nil?
+
       offender = offender_for allocation
       coworking_pom_name = allocation.secondary_pom_name
       if pom.email_address.present?
@@ -30,6 +32,8 @@ class EmailService
 
     def send_secondary_email(pom_firstname:, pom_nomis_id:, message:, allocation:)
       pom = pom_for(allocation, pom_nomis_id)
+      return if pom.nil?
+
       offender = offender_for allocation
 
       if pom.email_address.present?
@@ -48,7 +52,7 @@ class EmailService
 
     def send_cowork_deallocation_email(allocation:, pom_nomis_id:, secondary_pom_name:)
       pom = pom_for(allocation, pom_nomis_id)
-      return if pom.email_address.blank?
+      return if pom.nil? || pom.email_address.blank?
 
       offender = offender_for allocation
 
@@ -69,7 +73,7 @@ class EmailService
     end
 
     def pom_for(allocation, pom_nomis_id)
-      Prison.find(allocation.prison).get_single_pom(pom_nomis_id)
+      Prison.find(allocation.prison).find_pom(pom_nomis_id)
     end
 
     def current_responsibility(offender)
