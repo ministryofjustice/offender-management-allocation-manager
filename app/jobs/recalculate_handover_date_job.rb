@@ -22,6 +22,7 @@ private
     # so a failure in one does not block the others.
     safely { publish_event }
     safely { maybe_reset_handover_checklist }
+    safely { maybe_stamp_handover_episode }
     safely { request_supporting_com }
     safely { assign_com_email }
   end
@@ -75,15 +76,21 @@ private
     event.publish(job: 'recalculate_handover_date')
   end
 
-  # Reset all checklist tasks if the case has moved out of the handover window.
-  # This ensures that if the case re-enters the window later, the POM starts fresh.
+  # Reset all checklist tasks when the handover episode has ended, meaning either:
+  # - responsibility reverted to custody-only (e.g. sentence recalculation), or
+  # - a date change moved the case off all handover lists while already custody-only.
+  # Does not trigger on date adjustments that keep the case on a handover list,
+  # and does not trigger when responsibility moves forward (e.g. upcoming -> in-progress).
   def maybe_reset_handover_checklist
-    return unless record.saved_change_to_responsibility? || record.saved_change_to_handover_date?
+    responsibility_reverted = record.saved_change_to_responsibility? && record.responsibility == CalculatedHandoverDate::CUSTODY_ONLY
+    dates_moved_off_lists = record.saved_change_to_handover_date? &&
+                            record.responsibility == CalculatedHandoverDate::CUSTODY_ONLY &&
+                            !CalculatedHandoverDate.in_handover_window?(record.nomis_offender_id)
+
+    return unless responsibility_reverted || dates_moved_off_lists
 
     checklist = HandoverProgressChecklist.find_by(nomis_offender_id: record.nomis_offender_id)
     return unless checklist
-
-    return if CalculatedHandoverDate.in_handover_window?(record.nomis_offender_id)
 
     # Blank whodunnit so both PaperTrail and Auditable record this as system-initiated,
     # even when the job runs synchronously within a user request (e.g. parole review).
@@ -92,8 +99,32 @@ private
         reviewed_oasys: false,
         contacted_com: false,
         attended_handover_meeting: false,
-        sent_handover_report: false
+        sent_handover_report: false,
+        handover_episode_started_at: nil,
       )
+    end
+  end
+
+  # Stamp the handover episode start date when responsibility shifts away from
+  # custody-only (i.e. the handover has formally begun). This date is frozen for
+  # the duration of the episode and used to determine which task version applies.
+  def maybe_stamp_handover_episode
+    return if record.responsibility == CalculatedHandoverDate::CUSTODY_ONLY
+    return if record.handover_date.nil?
+
+    # Blank whodunnit so both PaperTrail and Auditable record this as system-initiated,
+    # even when the job runs synchronously within a user request (e.g. parole review).
+    PaperTrail.request(whodunnit: nil) do
+      checklist = HandoverProgressChecklist.find_by(nomis_offender_id: record.nomis_offender_id)
+
+      if checklist
+        checklist.update!(handover_episode_started_at: Date.current) if checklist.handover_episode_started_at.nil?
+      else
+        HandoverProgressChecklist.create!(
+          nomis_offender_id: record.nomis_offender_id,
+          handover_episode_started_at: Date.current,
+        )
+      end
     end
   end
 
