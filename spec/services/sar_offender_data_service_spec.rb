@@ -250,6 +250,14 @@ RSpec.describe SarOffenderDataService do
           end
         end
 
+        context 'with handover progress checklist' do
+          let(:handover_progress_checklist) { result[:handoverProgressChecklist] }
+
+          it 'omits some attributes' do
+            expect(handover_progress_checklist.keys).not_to include('handoverEpisodeStartedAt')
+          end
+        end
+
         context 'with early allocation' do
           let(:early_allocation) { result[:earlyAllocations].last }
 

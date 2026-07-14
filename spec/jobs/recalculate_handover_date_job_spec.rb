@@ -241,7 +241,7 @@ describe RecalculateHandoverDateJob do
   end
 
   describe 'handover checklist reset' do
-    context 'when responsibility changes and the case leaves the handover window' do
+    context 'when responsibility reverts to custody-only and the case leaves the window entirely' do
       before do
         the_responsibility_is_recorded_as(
           CalculatedHandoverDate.new(
@@ -263,13 +263,14 @@ describe RecalculateHandoverDateJob do
         )
       end
 
-      it 'resets all checklist tasks to false' do
+      it 'resets all checklist tasks to false and clears handover_episode_started_at' do
         checklist = HandoverProgressChecklist.create!(
           nomis_offender_id: offender.nomis_offender_id,
           reviewed_oasys: true,
           contacted_com: true,
           attended_handover_meeting: true,
-          sent_handover_report: false
+          sent_handover_report: false,
+          handover_episode_started_at: 2.weeks.ago.to_date
         )
 
         recalculate_handover_dates
@@ -279,7 +280,8 @@ describe RecalculateHandoverDateJob do
           reviewed_oasys: false,
           contacted_com: false,
           attended_handover_meeting: false,
-          sent_handover_report: false
+          sent_handover_report: false,
+          handover_episode_started_at: nil
         )
       end
 
@@ -386,6 +388,131 @@ describe RecalculateHandoverDateJob do
       end
     end
 
+    context 'when responsibility reverts to custody-only but the case lands in upcoming' do
+      before do
+        the_responsibility_is_recorded_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+            reason: :determinate,
+            handover_date: 2.weeks.ago.to_date,
+            start_date: 6.weeks.ago.to_date,
+            last_calculated_at: 1.day.ago
+          )
+        )
+        # Recalculation moves responsibility back to custody, but new handover_date is within 56 days
+        the_responsibility_will_be_calculated_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            reason: :determinate,
+            handover_date: 4.weeks.from_now.to_date,
+            start_date: 4.weeks.from_now.to_date
+          )
+        )
+      end
+
+      it 'resets checklist tasks and clears handover_episode_started_at' do
+        checklist = HandoverProgressChecklist.create!(
+          nomis_offender_id: offender.nomis_offender_id,
+          reviewed_oasys: true,
+          contacted_com: true,
+          attended_handover_meeting: true,
+          handover_episode_started_at: 6.weeks.ago.to_date
+        )
+
+        recalculate_handover_dates
+
+        checklist.reload
+        expect(checklist).to have_attributes(
+          reviewed_oasys: false,
+          contacted_com: false,
+          attended_handover_meeting: false,
+          sent_handover_report: false,
+          handover_episode_started_at: nil
+        )
+      end
+    end
+
+    context 'when a date change moves a case in upcoming off all lists (still custody-only)' do
+      before do
+        the_responsibility_is_recorded_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            reason: :determinate,
+            handover_date: 3.weeks.from_now.to_date,
+            start_date: 3.weeks.from_now.to_date,
+            last_calculated_at: 1.day.ago
+          )
+        )
+        # Recalculation pushes handover_date far into the future (beyond 56 days)
+        the_responsibility_will_be_calculated_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            reason: :determinate,
+            handover_date: 1.year.from_now.to_date,
+            start_date: 10.months.from_now.to_date
+          )
+        )
+      end
+
+      it 'resets checklist tasks and clears handover_episode_started_at' do
+        checklist = HandoverProgressChecklist.create!(
+          nomis_offender_id: offender.nomis_offender_id,
+          reviewed_oasys: true,
+          contacted_com: true
+        )
+
+        recalculate_handover_dates
+
+        checklist.reload
+        expect(checklist).to have_attributes(
+          reviewed_oasys: false,
+          contacted_com: false,
+          attended_handover_meeting: false,
+          sent_handover_report: false,
+          handover_episode_started_at: nil
+        )
+      end
+    end
+
+    context 'when a date change keeps the case in upcoming (still custody-only)' do
+      before do
+        the_responsibility_is_recorded_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            reason: :determinate,
+            handover_date: 3.weeks.from_now.to_date,
+            start_date: 3.weeks.from_now.to_date,
+            last_calculated_at: 1.day.ago
+          )
+        )
+        # Recalculation shifts handover_date slightly but still within 56 days
+        the_responsibility_will_be_calculated_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            reason: :determinate,
+            handover_date: 5.weeks.from_now.to_date,
+            start_date: 5.weeks.from_now.to_date
+          )
+        )
+      end
+
+      it 'does not reset checklist tasks' do
+        checklist = HandoverProgressChecklist.create!(
+          nomis_offender_id: offender.nomis_offender_id,
+          reviewed_oasys: true,
+          contacted_com: true
+        )
+
+        recalculate_handover_dates
+
+        checklist.reload
+        expect(checklist).to have_attributes(
+          reviewed_oasys: true,
+          contacted_com: true
+        )
+      end
+    end
+
     context 'when there is no change to responsibility or handover date' do
       before do
         the_responsibility_is_recorded_as(
@@ -421,6 +548,270 @@ describe RecalculateHandoverDateJob do
           reviewed_oasys: true,
           contacted_com: true
         )
+      end
+    end
+
+    context 'when in-progress and only handover_date shifts slightly (responsibility unchanged)' do
+      before do
+        the_responsibility_is_recorded_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+            reason: :determinate,
+            handover_date: 2.weeks.ago.to_date,
+            start_date: 6.weeks.ago.to_date,
+            last_calculated_at: 1.day.ago
+          )
+        )
+        the_responsibility_will_be_calculated_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+            reason: :determinate,
+            handover_date: 1.week.ago.to_date,
+            start_date: 5.weeks.ago.to_date
+          )
+        )
+      end
+
+      it 'does not reset checklist tasks' do
+        checklist = HandoverProgressChecklist.create!(
+          nomis_offender_id: offender.nomis_offender_id,
+          reviewed_oasys: true,
+          contacted_com: true,
+          handover_episode_started_at: 6.weeks.ago.to_date
+        )
+
+        recalculate_handover_dates
+
+        checklist.reload
+        expect(checklist).to have_attributes(
+          reviewed_oasys: true,
+          contacted_com: true,
+          handover_episode_started_at: 6.weeks.ago.to_date
+        )
+      end
+    end
+
+    context 'when in upcoming and nothing changes (stable)' do
+      before do
+        the_responsibility_is_recorded_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            reason: :determinate,
+            handover_date: 3.weeks.from_now.to_date,
+            start_date: 3.weeks.from_now.to_date,
+            last_calculated_at: 1.day.ago
+          )
+        )
+        the_responsibility_will_be_calculated_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            reason: :determinate,
+            handover_date: 3.weeks.from_now.to_date,
+            start_date: 3.weeks.from_now.to_date
+          )
+        )
+      end
+
+      it 'does not reset checklist tasks' do
+        checklist = HandoverProgressChecklist.create!(
+          nomis_offender_id: offender.nomis_offender_id,
+          reviewed_oasys: true,
+          contacted_com: true
+        )
+
+        recalculate_handover_dates
+
+        checklist.reload
+        expect(checklist).to have_attributes(
+          reviewed_oasys: true,
+          contacted_com: true
+        )
+      end
+    end
+  end
+
+  describe 'handover episode stamping' do
+    context 'when responsibility shifts and no checklist exists' do
+      before do
+        the_responsibility_will_be_calculated_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+            reason: :determinate,
+            handover_date: 2.weeks.ago.to_date,
+            start_date: 6.weeks.ago.to_date
+          )
+        )
+      end
+
+      it 'creates a checklist and stamps handover_episode_started_at with today' do
+        recalculate_handover_dates
+
+        checklist = HandoverProgressChecklist.find_by(nomis_offender_id: offender.nomis_offender_id)
+        expect(checklist).to be_present
+        expect(checklist.handover_episode_started_at).to eq(Date.current)
+      end
+
+      it 'creates a PaperTrail version for the stamp' do
+        expect { recalculate_handover_dates }
+          .to change { PaperTrail::Version.where(item_type: 'HandoverProgressChecklist').count }.by(1)
+
+        version = PaperTrail::Version.where(item_type: 'HandoverProgressChecklist').last
+        expect(version.whodunnit).to be_nil
+      end
+
+      it 'publishes a system audit event for the stamp' do
+        expect(handover_change_event).to receive(:publish).with(
+          hash_including(
+            nomis_offender_id: offender.nomis_offender_id,
+            system_event: true,
+            tags: %w[record handover_progress_checklist changed]
+          )
+        )
+
+        recalculate_handover_dates
+      end
+
+      it 'records as system-initiated even when triggered within a user session' do
+        PaperTrail.request.whodunnit = 'SOME_USER'
+
+        recalculate_handover_dates
+
+        version = PaperTrail::Version.where(item_type: 'HandoverProgressChecklist').last
+        expect(version.whodunnit).to be_nil
+      end
+    end
+
+    context 'when responsibility has shifted and checklist already has a stamp' do
+      before do
+        the_responsibility_is_recorded_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+            reason: :determinate,
+            handover_date: 2.weeks.ago.to_date,
+            start_date: 6.weeks.ago.to_date,
+            last_calculated_at: 1.day.ago
+          )
+        )
+        the_responsibility_will_be_calculated_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+            reason: :determinate,
+            handover_date: 2.weeks.ago.to_date,
+            start_date: 6.weeks.ago.to_date
+          )
+        )
+      end
+
+      it 'does not overwrite the existing stamp' do
+        original_date = 3.weeks.ago.to_date
+        HandoverProgressChecklist.create!(
+          nomis_offender_id: offender.nomis_offender_id,
+          handover_episode_started_at: original_date
+        )
+
+        recalculate_handover_dates
+
+        checklist = HandoverProgressChecklist.find_by(nomis_offender_id: offender.nomis_offender_id)
+        expect(checklist.handover_episode_started_at).to eq(original_date)
+      end
+    end
+
+    context 'when responsibility is still custody-only' do
+      before do
+        the_responsibility_will_be_calculated_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            reason: :determinate,
+            handover_date: 1.year.from_now.to_date,
+            start_date: 10.months.from_now.to_date
+          )
+        )
+      end
+
+      it 'does not stamp the checklist' do
+        HandoverProgressChecklist.create!(
+          nomis_offender_id: offender.nomis_offender_id,
+          handover_episode_started_at: nil
+        )
+
+        recalculate_handover_dates
+
+        checklist = HandoverProgressChecklist.find_by(nomis_offender_id: offender.nomis_offender_id)
+        expect(checklist.handover_episode_started_at).to be_nil
+      end
+    end
+
+    context 'when case is in upcoming handover window but responsibility has not yet shifted' do
+      before do
+        the_responsibility_will_be_calculated_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            reason: :determinate,
+            handover_date: 3.weeks.from_now.to_date,
+            start_date: 3.weeks.from_now.to_date
+          )
+        )
+      end
+
+      it 'does not stamp the checklist' do
+        HandoverProgressChecklist.create!(
+          nomis_offender_id: offender.nomis_offender_id,
+          handover_episode_started_at: nil
+        )
+
+        recalculate_handover_dates
+
+        checklist = HandoverProgressChecklist.find_by(nomis_offender_id: offender.nomis_offender_id)
+        expect(checklist.handover_episode_started_at).to be_nil
+      end
+    end
+
+    context 'when a case exits the window and re-enters' do
+      it 'gets a new stamp on re-entry' do
+        # Case is in the window with an existing stamp
+        the_responsibility_is_recorded_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+            reason: :determinate,
+            handover_date: 2.weeks.ago.to_date,
+            start_date: 6.weeks.ago.to_date,
+            last_calculated_at: 1.day.ago
+          )
+        )
+
+        HandoverProgressChecklist.create!(
+          nomis_offender_id: offender.nomis_offender_id,
+          reviewed_oasys: true,
+          handover_episode_started_at: 6.weeks.ago.to_date
+        )
+
+        # Recalculate to move out of window
+        the_responsibility_will_be_calculated_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::CUSTODY_ONLY,
+            reason: :determinate,
+            handover_date: 1.year.from_now.to_date,
+            start_date: 10.months.from_now.to_date
+          )
+        )
+        recalculate_handover_dates
+
+        checklist = HandoverProgressChecklist.find_by(nomis_offender_id: offender.nomis_offender_id)
+        expect(checklist.handover_episode_started_at).to be_nil
+
+        # Recalculate to re-enter the window
+        the_responsibility_will_be_calculated_as(
+          CalculatedHandoverDate.new(
+            responsibility: CalculatedHandoverDate::COMMUNITY_RESPONSIBLE,
+            reason: :determinate,
+            handover_date: 1.week.ago.to_date,
+            start_date: 5.weeks.ago.to_date
+          )
+        )
+        recalculate_handover_dates
+
+        checklist.reload
+        expect(checklist.handover_episode_started_at).to eq(Date.current)
       end
     end
   end
