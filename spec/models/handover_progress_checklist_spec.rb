@@ -1,39 +1,58 @@
 RSpec.describe HandoverProgressChecklist do
   subject(:checklist) { described_class.new offender: FactoryBot.build(:offender) }
 
+  let(:cutoff_date) { Rails.configuration.x.simplified_handover_cutoff_date }
+
   before do
     allow(checklist.offender).to receive_messages(handover_type: 'enhanced')
   end
 
   describe '.permitted_task_fields' do
-    it 'returns enhanced fields when enhanced and feature disabled' do
-      expect(described_class.permitted_task_fields(handover_type: 'enhanced', simplified_enhanced_handover: false)).to eq(
-        %i[reviewed_oasys contacted_com attended_handover_meeting]
-      )
+    context 'with enhanced handover' do
+      it 'returns 3-task fields when handover_date is on or before the cutoff' do
+        expect(described_class.permitted_task_fields(
+                 handover_type: 'enhanced',
+                 handover_date: cutoff_date,
+               )).to eq(%i[reviewed_oasys contacted_com attended_handover_meeting])
+      end
+
+      it 'returns 2-task fields when handover_date is after the cutoff' do
+        expect(described_class.permitted_task_fields(
+                 handover_type: 'enhanced',
+                 handover_date: cutoff_date + 1.day,
+               )).to eq(%i[reviewed_oasys contacted_com])
+      end
+
+      it 'returns 3-task fields when handover_date is nil (default)' do
+        expect(described_class.permitted_task_fields(
+                 handover_type: 'enhanced',
+                 handover_date: nil,
+               )).to eq(%i[reviewed_oasys contacted_com attended_handover_meeting])
+      end
+
+      it 'returns 3-task fields when simplified_enhanced_handover feature flag is disabled' do
+        stub_feature_flag(:simplified_enhanced_handover, enabled: false)
+
+        expect(described_class.permitted_task_fields(
+                 handover_type: 'enhanced',
+                 handover_date: cutoff_date + 1.day,
+               )).to eq(%i[reviewed_oasys contacted_com attended_handover_meeting])
+      end
     end
 
-    it 'returns standard fields when standard and feature disabled' do
-      expect(described_class.permitted_task_fields(handover_type: 'standard', simplified_enhanced_handover: false)).to eq(
-        %i[contacted_com sent_handover_report]
-      )
-    end
-
-    it 'returns simplified enhanced fields when feature enabled' do
-      expect(described_class.permitted_task_fields(handover_type: 'enhanced', simplified_enhanced_handover: true)).to eq(
-        %i[reviewed_oasys contacted_com]
-      )
-    end
-
-    it 'returns standard fields unchanged when feature enabled' do
-      expect(described_class.permitted_task_fields(handover_type: 'standard', simplified_enhanced_handover: true)).to eq(
-        %i[contacted_com sent_handover_report]
-      )
+    context 'with standard handover' do
+      it 'returns standard fields regardless of dates' do
+        expect(described_class.permitted_task_fields(
+                 handover_type: 'standard',
+                 handover_date: cutoff_date + 1.day,
+               )).to eq(%i[contacted_com sent_handover_report])
+      end
     end
   end
 
-  context 'when simplified_enhanced_handover feature flag is disabled' do
+  context 'when enhanced handover date is on or before the cutoff (3-task version)' do
     before do
-      stub_feature_flag(:simplified_enhanced_handover, enabled: false)
+      allow(checklist.offender).to receive_messages(handover_date: cutoff_date)
     end
 
     describe '#progress_data' do
@@ -104,9 +123,9 @@ RSpec.describe HandoverProgressChecklist do
     end
   end
 
-  context 'when simplified_enhanced_handover feature flag is enabled' do
+  context 'when enhanced handover date is after the cutoff (2-task version)' do
     before do
-      stub_feature_flag(:simplified_enhanced_handover, enabled: true)
+      allow(checklist.offender).to receive_messages(handover_date: cutoff_date + 1.day)
     end
 
     describe '#progress_data' do

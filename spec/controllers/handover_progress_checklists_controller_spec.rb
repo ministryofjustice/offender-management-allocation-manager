@@ -84,14 +84,12 @@ RSpec.describe HandoverProgressChecklistsController do
   end
 
   describe '#update' do
+    let(:cutoff_date) { Rails.configuration.x.simplified_handover_cutoff_date }
+
     describe 'when offender exists' do
-      let!(:offender) { stub_mpc_offender(offender_no: nomis_offender_id, handover_type: 'enhanced') }
-
-      before do
-        stub_feature_flag(:simplified_enhanced_handover, enabled: false)
-      end
-
       describe 'when current POM is not the allocated POM' do
+        let!(:offender) { stub_mpc_offender(offender_no: nomis_offender_id, handover_type: 'enhanced') }
+
         before do
           allow(current_pom).to receive(:has_allocation?).with(nomis_offender_id).and_return false
           put :update, params: default_params.merge(handover_progress_checklist: { empty: true })
@@ -102,55 +100,62 @@ RSpec.describe HandoverProgressChecklistsController do
         end
       end
 
-      describe 'when checklist does not exist' do
-        before do
-          tasks = {
-            reviewed_oasys: true,
-            contacted_com: true,
-            attended_handover_meeting: true,
-          }
-          put :update, params: default_params.merge(handover_progress_checklist: tasks)
+      describe 'when handover started before cutoff (3-task version)' do
+        let!(:offender) do
+          stub_mpc_offender(offender_no: nomis_offender_id, handover_type: 'enhanced',
+                            model: double(handover_date: cutoff_date))
         end
 
-        it 'creates new checklist with correct data' do
-          model = HandoverProgressChecklist.find_by!(nomis_offender_id: nomis_offender_id)
-          expect(model).to have_attributes(
-            reviewed_oasys: true,
-            contacted_com: true,
-            attended_handover_meeting: true,
-          )
+        describe 'when checklist does not exist' do
+          before do
+            tasks = {
+              reviewed_oasys: true,
+              contacted_com: true,
+              attended_handover_meeting: true,
+            }
+            put :update, params: default_params.merge(handover_progress_checklist: tasks)
+          end
+
+          it 'creates new checklist with correct data' do
+            model = HandoverProgressChecklist.find_by!(nomis_offender_id: nomis_offender_id)
+            expect(model).to have_attributes(
+              reviewed_oasys: true,
+              contacted_com: true,
+              attended_handover_meeting: true,
+            )
+          end
+
+          it 'redirects to the correct handovers url' do
+            expect(response).to redirect_to('/last')
+          end
         end
 
-        it 'redirects to the correct handovers url' do
-          expect(response).to redirect_to('/last')
-        end
-      end
+        describe 'when checklist already exists' do
+          before do
+            FactoryBot.create :handover_progress_checklist, nomis_offender_id: nomis_offender_id,
+                                                            reviewed_oasys: true,
+                                                            contacted_com: false,
+                                                            attended_handover_meeting: true
+            tasks = {
+              reviewed_oasys: false,
+              contacted_com: true,
+              attended_handover_meeting: false,
+            }
+            put :update, params: default_params.merge(handover_progress_checklist: tasks)
+          end
 
-      describe 'when checklist already exists' do
-        before do
-          FactoryBot.create :handover_progress_checklist, nomis_offender_id: nomis_offender_id,
-                                                          reviewed_oasys: true,
-                                                          contacted_com: false,
-                                                          attended_handover_meeting: true
-          tasks = {
-            reviewed_oasys: false,
-            contacted_com: true,
-            attended_handover_meeting: false,
-          }
-          put :update, params: default_params.merge(handover_progress_checklist: tasks)
-        end
+          it 'updates checklist with correct data' do
+            model = HandoverProgressChecklist.find_by!(nomis_offender_id: nomis_offender_id)
+            expect(model).to have_attributes(
+              reviewed_oasys: false,
+              contacted_com: true,
+              attended_handover_meeting: false,
+            )
+          end
 
-        it 'updates checklist with correct data' do
-          model = HandoverProgressChecklist.find_by!(nomis_offender_id: nomis_offender_id)
-          expect(model).to have_attributes(
-            reviewed_oasys: false,
-            contacted_com: true,
-            attended_handover_meeting: false,
-          )
-        end
-
-        it 'redirects to the correct handovers url' do
-          expect(response).to redirect_to('/last')
+          it 'redirects to the correct handovers url' do
+            expect(response).to redirect_to('/last')
+          end
         end
       end
 
@@ -175,12 +180,13 @@ RSpec.describe HandoverProgressChecklistsController do
         end
       end
 
-      describe 'when simplified_enhanced_handover feature flag is enabled' do
-        before do
-          stub_feature_flag(:simplified_enhanced_handover, enabled: true)
+      describe 'when handover started after cutoff (2-task version)' do
+        let!(:offender) do
+          stub_mpc_offender(offender_no: nomis_offender_id, handover_type: 'enhanced',
+                            model: double(handover_date: cutoff_date + 1.day))
         end
 
-        it 'persists only the standardised task fields' do
+        it 'persists only the simplified task fields' do
           tasks = {
             reviewed_oasys: true,
             contacted_com: true,
