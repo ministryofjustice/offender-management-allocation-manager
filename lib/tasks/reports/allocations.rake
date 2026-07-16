@@ -19,10 +19,21 @@ namespace :reports do
         'Allocation Date',
         'Establishment',
         'NOMIS Offender ID',
+        'NOMIS Booking ID',
+        'Restricted Patient',
         'CRD',
+        'PRRD',
+        'PED',
+        'TED',
         'Tier',
         'RoSH Level',
         'RoSH Start Date',
+        'LDU Code',
+        'LDU Name',
+        'Handover Date',
+        'Handover Type',
+        'Recall',
+        'Sentence Start Date',
         'SED/SLED',
         'Sentence Remaining',
         'Current POM Responsible Type', # If this allocation was for a Responsible POM, what type - could be probation/prison/blank
@@ -129,16 +140,28 @@ namespace :reports do
         responsibility = current_responsibility_for(offender[:offender], offender[:calculated_handover_date])
         case_information = offender[:offender].case_information
         allocation = offender[:allocation]
+        mpc = offender[:offender]
 
         [
           format_date(allocation_date),
           prison.code,
-          offender[:offender].offender_no,
-          format_date(offender[:offender].conditional_release_date),
+          mpc.offender_no,
+          mpc.booking_id,
+          mpc.restricted_patient?,
+          format_date(mpc.conditional_release_date),
+          format_date(mpc.post_recall_release_date),
+          format_date(mpc.parole_eligibility_date),
+          format_date(mpc.tariff_date),
           case_information.tier,
           case_information.rosh_level.presence,
           case_information.rosh_start_date.presence,
-          format_date(offender[:offender].licence_expiry_date),
+          case_information.ldu_code,
+          case_information.local_delivery_unit&.name,
+          format_date(mpc.handover_date),
+          mpc.handover_type,
+          mpc.recalled?,
+          format_date(mpc.sentence_start_date),
+          format_date(mpc.licence_expiry_date),
           sentence_remaining_for(offender),
           *pom_type_columns(pom_types, allocation, responsibility),
         ]
