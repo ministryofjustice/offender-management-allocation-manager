@@ -66,6 +66,10 @@ module OffenderManagementAllocationClient
 
     config.cache_expiry = (ENV['CACHE_TIMEOUT']&.strip || 60.minutes).to_i
 
+    config.x.simplified_handover_cutoff_date = Date.parse(
+      ENV.fetch('SIMPLIFIED_HANDOVER_CUTOFF_DATE', '2026-09-01')
+    )
+
     config.time_zone = 'London'
 
     # overriding the normal wrapping in a div with class 'field-with-errors' seems to be

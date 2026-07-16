@@ -371,8 +371,7 @@ CREATE TABLE public.handover_progress_checklists (
     attended_handover_meeting boolean DEFAULT false NOT NULL,
     created_at timestamp(6) without time zone,
     updated_at timestamp(6) without time zone,
-    sent_handover_report boolean DEFAULT false NOT NULL,
-    handover_episode_started_at date
+    sent_handover_report boolean DEFAULT false NOT NULL
 );
 
 
@@ -1347,6 +1346,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260714160140'),
 ('20260713120000'),
 ('20260409113634'),
 ('20260217152514'),

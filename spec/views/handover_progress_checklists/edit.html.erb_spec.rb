@@ -2,6 +2,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
   let(:prison_code) { 'PRI' }
   let(:prison) { instance_double Prison, code: prison_code }
   let(:nomis_offender_id) { FactoryBot.generate(:nomis_offender_id) }
+  let(:cutoff_date) { Rails.configuration.x.simplified_handover_cutoff_date }
   let(:offender) do
     stub_mpc_offender(
       offender_no: nomis_offender_id,
@@ -20,12 +21,12 @@ RSpec.describe 'handover_progress_checklists/edit' do
       contacted_com: false,
       sent_handover_report: false)
     allow(model).to receive_messages(handover_type: 'enhanced')
+    allow(model.offender).to receive_messages(handover_date: cutoff_date) if model.offender
     model
   end
   let(:page) { Capybara::Node::Simple.new(rendered) }
 
   before do
-    stub_feature_flag(:simplified_enhanced_handover, enabled: false)
     offender # instantiate and stub
 
     assign(:prison, prison)
@@ -120,9 +121,9 @@ RSpec.describe 'handover_progress_checklists/edit' do
     end
   end
 
-  describe 'when simplified_enhanced_handover feature flag is enabled' do
+  describe 'when handover date is after the cutoff (2-task version)' do
     before do
-      stub_feature_flag(:simplified_enhanced_handover, enabled: true)
+      allow(handover_progress_checklist.offender).to receive_messages(handover_date: cutoff_date + 1.day) if handover_progress_checklist.offender
     end
 
     context 'with enhanced handover' do

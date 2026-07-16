@@ -44,7 +44,10 @@ private
   end
 
   def handover_progress_checklist_params(offender)
-    fields = HandoverProgressChecklist.permitted_task_fields(handover_type: offender.handover_type)
+    fields = HandoverProgressChecklist.permitted_task_fields(
+      handover_type: offender.handover_type,
+      handover_date: offender.model.handover_date,
+    )
     params.require(:handover_progress_checklist).permit(*fields)
   end
 end

@@ -11,13 +11,17 @@ class HandoverProgressChecklist < ApplicationRecord
 
   belongs_to :offender, foreign_key: :nomis_offender_id
 
-  delegate :handover_type, to: :offender
+  delegate :handover_type, :handover_date, to: :offender
 
-  def self.permitted_task_fields(handover_type:, simplified_enhanced_handover: FeatureFlags.simplified_enhanced_handover.enabled?)
-    if handover_type == 'enhanced'
-      simplified_enhanced_handover ? SIMPLIFIED_ENHANCED_HANDOVER_TASK_FIELDS : ENHANCED_HANDOVER_TASK_FIELDS
-    else
+  def self.permitted_task_fields(handover_type:, handover_date:)
+    cutoff = Rails.configuration.x.simplified_handover_cutoff_date
+
+    if handover_type != 'enhanced'
       STANDARD_HANDOVER_TASK_FIELDS
+    elsif FeatureFlags.simplified_enhanced_handover.enabled? && handover_date.present? && handover_date > cutoff
+      SIMPLIFIED_ENHANCED_HANDOVER_TASK_FIELDS
+    else
+      ENHANCED_HANDOVER_TASK_FIELDS
     end.map(&:to_sym)
   end
 
@@ -39,7 +43,7 @@ class HandoverProgressChecklist < ApplicationRecord
 private
 
   def task_fields
-    self.class.permitted_task_fields(handover_type:).map(&:to_s)
+    self.class.permitted_task_fields(handover_type:, handover_date:).map(&:to_s)
   end
 
   def task_attributes
