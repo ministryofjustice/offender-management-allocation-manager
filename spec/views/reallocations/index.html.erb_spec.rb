@@ -57,6 +57,17 @@ RSpec.describe 'reallocations/index', type: :view do
     end
   end
 
+  it 'sorts by POM name column by default because there is no recommendation' do
+    render
+
+    headers = page.all('#available-poms thead th[aria-sort]')
+    pom_name_header = headers[0]
+    pom_type_header = headers[1]
+
+    expect(pom_name_header[:'aria-sort']).to eq('ascending')
+    expect(pom_type_header[:'aria-sort']).to eq('none')
+  end
+
   context 'when there is a selection error' do
     before do
       flash[:alert] = 'Choose at least one POM to compare workloads'

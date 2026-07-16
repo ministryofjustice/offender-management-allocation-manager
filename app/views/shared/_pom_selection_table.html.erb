@@ -21,10 +21,10 @@
   <caption class="govuk-visually-hidden">Available POMs to allocate</caption>
   <thead class="govuk-table__head">
     <tr>
-      <th class="govuk-table__header" scope="col" aria-sort="ascending" style="width: 200px;">
+      <th class="govuk-table__header" scope="col" aria-sort="<%= recommended_pom_type.nil? ? 'ascending' : 'none' %>" style="width: 200px;">
         POM
       </th>
-      <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 200px;">
+      <th class="govuk-table__header" scope="col" aria-sort="<%= recommended_pom_type.nil? ? 'none' : 'ascending' %>" style="width: 200px;">
         POM type
       </th>
       <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 140px;">
@@ -68,7 +68,7 @@
             <br/><span class="govuk-!-font-weight-bold">Previously allocated</span>
           <% end %>
         </td>
-        <td aria-label="POM role" class="govuk-table__cell" data-sort-value="<%= grade(pom) %>">
+        <td aria-label="POM role" class="govuk-table__cell" data-sort-value="<%= sortable_grade(pom, recommended_pom_type) %>">
           <%= highlight_conditionally('notice', 'recommended', -> { recommended_pom_type == pom.position }) do %>
             <%= grade(pom) %>
           <% end %>

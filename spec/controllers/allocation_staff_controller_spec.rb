@@ -114,11 +114,11 @@ RSpec.describe AllocationStaffController, type: :controller do
             expect(response.body).to include('Unavailable POMs')
           end
 
-          it 'renders the shared client-side sortable POM table' do
+          it 'renders the shared client-side sortable POM table sorted by POM type when a recommendation exists' do
             expect(response_body).to include('data-module="moj-sortable-table"')
             expect(page.css('#available-poms thead th a')).to be_empty
             expect(sortable_headers.map { |header| header['aria-sort'] }).to eq(
-              %w[ascending none none none none none none none]
+              %w[none ascending none none none none none none]
             )
             expect(response_body).to include(alice.full_name_ordered)
             expect(page.at_css("a[href='#{new_prison_prisoner_staff_build_allocation_path(prison_code, offender_no, alice.staff_id)}']").text)

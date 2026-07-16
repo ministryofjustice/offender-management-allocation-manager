@@ -59,6 +59,42 @@ RSpec.describe PomHelper do
     end
   end
 
+  describe '#sortable_grade' do
+    let(:prison_pom) { double('POM', position_description: 'Prison Officer', position: RecommendationService::PRISON_POM) }
+    let(:probation_pom) { double('POM', position_description: 'Probation Officer', position: RecommendationService::PROBATION_POM) }
+
+    context 'when there is no recommendation' do
+      it 'returns the plain grade' do
+        expect(sortable_grade(prison_pom, nil)).to eq('Prison POM')
+        expect(sortable_grade(probation_pom, nil)).to eq('Probation POM')
+      end
+    end
+
+    context 'when prison POM is recommended' do
+      let(:recommended_pom_type) { RecommendationService::PRISON_POM }
+
+      it 'prefixes 0 for matching POMs' do
+        expect(sortable_grade(prison_pom, recommended_pom_type)).to eq('0 Prison POM')
+      end
+
+      it 'prefixes 1 for non-matching POMs' do
+        expect(sortable_grade(probation_pom, recommended_pom_type)).to eq('1 Probation POM')
+      end
+    end
+
+    context 'when probation POM is recommended' do
+      let(:recommended_pom_type) { RecommendationService::PROBATION_POM }
+
+      it 'prefixes 0 for matching POMs' do
+        expect(sortable_grade(probation_pom, recommended_pom_type)).to eq('0 Probation POM')
+      end
+
+      it 'prefixes 1 for non-matching POMs' do
+        expect(sortable_grade(prison_pom, recommended_pom_type)).to eq('1 Prison POM')
+      end
+    end
+  end
+
   describe '#inactive_poms' do
     let(:active_pom) { double('PomWrapper', inactive?: false) }
     let(:unavailable_pom) { double('PomWrapper', inactive?: false) }

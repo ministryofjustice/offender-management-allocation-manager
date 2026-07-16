@@ -48,6 +48,47 @@ RSpec.describe "allocation_staff/index", type: :view do
     end
   end
 
+  it 'sorts by POM type column by default when a recommendation exists' do
+    headers = page.all('#available-poms thead th[aria-sort]')
+    pom_name_header = headers[0]
+    pom_type_header = headers[1]
+
+    expect(pom_name_header[:'aria-sort']).to eq('none')
+    expect(pom_type_header[:'aria-sort']).to eq('ascending')
+  end
+
+  it 'assigns data-sort-value that puts recommended POM type first' do
+    pom_type_cells = page.all('#available-poms tbody td[aria-label="POM role"]')
+    sort_values = pom_type_cells.map { |cell| cell[:'data-sort-value'] }
+
+    expect(sort_values).to all(match(/\A[01] /))
+  end
+
+  context 'when there is no recommendation' do
+    before do
+      allow(RecommendationService).to receive(:recommended_pom_type).and_return(nil)
+    end
+
+    it 'sorts by POM name column by default' do
+      headers = page.all('#available-poms thead th[aria-sort]')
+      pom_name_header = headers[0]
+      pom_type_header = headers[1]
+
+      expect(pom_name_header[:'aria-sort']).to eq('ascending')
+      expect(pom_type_header[:'aria-sort']).to eq('none')
+    end
+
+    it 'assigns plain grade as data-sort-value without prefix' do
+      pom_type_cells = page.all('#available-poms tbody td[aria-label="POM role"]')
+      sort_values = pom_type_cells.map { |cell| cell[:'data-sort-value'] }
+
+      sort_values.each do |value|
+        expect(value).not_to match(/\A[01] /)
+        expect(value).to match(/POM\z/)
+      end
+    end
+  end
+
   context 'when a prison POM is recommended' do
     before do
       allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PRISON_POM)
