@@ -248,7 +248,7 @@ RSpec.describe DeliusDataImportService do
       end
     end
 
-    context 'when the existing rosh level is already present' do
+    context 'when the existing rosh level is already present and manual_entry is true' do
       let!(:c1) do
         create(:case_information, :manual_entry,
                offender: build(:offender, nomis_offender_id: nomis_offender_id),
@@ -259,10 +259,16 @@ RSpec.describe DeliusDataImportService do
       context 'when probation rosh is nil' do
         let(:rosh_level) { nil }
 
-        it 'preserves the existing rosh level' do
+        it 'preserves the existing rosh level during the transition' do
           service.process(nomis_offender_id)
 
           expect(c1.reload.rosh_level).to eq('LOW')
+        end
+
+        it 'clears manual_entry because the nDelius link now exists' do
+          service.process(nomis_offender_id)
+
+          expect(c1.reload.manual_entry).to be(false)
         end
       end
 
@@ -273,6 +279,32 @@ RSpec.describe DeliusDataImportService do
           service.process(nomis_offender_id)
 
           expect(c1.reload.rosh_level).to eq('HIGH')
+        end
+
+        it 'clears manual_entry' do
+          service.process(nomis_offender_id)
+
+          expect(c1.reload.manual_entry).to be(false)
+        end
+      end
+    end
+
+    context 'when the existing rosh level is present and manual_entry is false' do
+      let!(:c1) do
+        create(:case_information,
+               offender: build(:offender, nomis_offender_id: nomis_offender_id),
+               manual_entry: false,
+               tier: 'B',
+               rosh_level: 'LOW')
+      end
+
+      context 'when probation rosh is nil' do
+        let(:rosh_level) { nil }
+
+        it 'clears the rosh level to avoid drifting from nDelius' do
+          service.process(nomis_offender_id)
+
+          expect(c1.reload.rosh_level).to be_nil
         end
       end
     end
