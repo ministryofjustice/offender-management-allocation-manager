@@ -41,6 +41,7 @@
   </div>
 </div>
 
+<% unless @coworking %>
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     <h2 class="govuk-heading-m govuk-!-margin-top-5">
@@ -51,6 +52,7 @@
     </div>
   </div>
 </div>
+<% end %>
 
 <div class="govuk-grid-row govuk-!-margin-bottom-5">
   <div class="govuk-grid-column-two-thirds">
@@ -81,7 +83,8 @@
       Choose a POM
     </h2>
     <p class="govuk-body">
-      <%= t(@prisoner.recommended_pom_type, scope: 'recommendation_service.guidance', name: @prisoner.full_name_ordered) %>
+      <%= t(@coworking ? 'NOREC' : @prisoner.recommended_pom_type,
+            scope: 'recommendation_service.guidance', name: @prisoner.full_name_ordered) %>
     </p>
   </div>
 </div>
@@ -90,7 +93,7 @@
   <%= render 'shared/pom_selection_table',
              journey: :allocation,
              available_poms: @available_poms,
-             recommended_pom_type: @prisoner.recommended_pom_type,
+             recommended_pom_type: (@prisoner.recommended_pom_type unless @coworking),
              current_pom_id: @current_pom&.staff_id,
              previous_pom_ids: @previous_poms.map(&:staff_id),
              coworking: @coworking %>

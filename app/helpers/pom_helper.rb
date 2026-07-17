@@ -39,6 +39,13 @@ module PomHelper
     "#{pom.position_description.split(' ').first} POM"
   end
 
+  def sortable_grade(pom, recommended_pom_type)
+    return grade(pom) unless recommended_pom_type
+
+    prefix = recommended_pom_type == pom.position ? '0' : '1'
+    "#{prefix} #{grade(pom)}"
+  end
+
   def status(pom)
     {
       'active' => 'available',

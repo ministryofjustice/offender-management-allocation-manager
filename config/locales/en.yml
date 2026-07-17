@@ -300,3 +300,4 @@ en:
     guidance:
       PRO: "You can choose an available prison POM below or allocate to a probation POM, for example if a particular POM has worked with %{name} before."
       PO: "You can choose an available probation POM below or allocate to a prison POM, for example if a particular POM has worked with %{name} before."
+      NOREC: "Choose an available POM below."

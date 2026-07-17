@@ -114,11 +114,11 @@ RSpec.describe AllocationStaffController, type: :controller do
             expect(response.body).to include('Unavailable POMs')
           end
 
-          it 'renders the shared client-side sortable POM table' do
+          it 'renders the shared client-side sortable POM table sorted by POM type when a recommendation exists' do
             expect(response_body).to include('data-module="moj-sortable-table"')
             expect(page.css('#available-poms thead th a')).to be_empty
             expect(sortable_headers.map { |header| header['aria-sort'] }).to eq(
-              %w[ascending none none none none none none none]
+              %w[none ascending none none none none none none]
             )
             expect(response_body).to include(alice.full_name_ordered)
             expect(page.at_css("a[href='#{new_prison_prisoner_staff_build_allocation_path(prison_code, offender_no, alice.staff_id)}']").text)
@@ -137,6 +137,9 @@ RSpec.describe AllocationStaffController, type: :controller do
         context 'when choosing a co-working POM' do
           render_views
           let(:tier) { 'B' }
+          let(:response_body) { response.body }
+          let(:page) { Nokogiri::HTML(response_body) }
+          let(:sortable_headers) { page.css('#available-poms thead th[aria-sort]') }
 
           before do
             create(:allocation_history,
@@ -149,11 +152,25 @@ RSpec.describe AllocationStaffController, type: :controller do
           end
 
           it 'links each POM name to the co-working confirmation page' do
-            page = Nokogiri::HTML(response.body)
-
             expect(response).to be_successful
             expect(page.at_css("a[href='#{prison_confirm_coworking_allocation_path(prison_code, offender_no, poms.last.staff_id, poms.first.staff_id)}']").text)
               .to eq(poms.first.full_name_ordered)
+          end
+
+          it 'sorts by POM name rather than POM type because co-working has no recommendation' do
+            expect(sortable_headers.map { it['aria-sort'] }).to eq(
+              %w[ascending none none none none none none none]
+            )
+          end
+
+          it 'does not show the recommendation section' do
+            expect(response_body).not_to include('POM recommended')
+          end
+
+          it 'shows the generic guidance without a POM type recommendation' do
+            expect(response_body).to include(
+              I18n.t('NOREC', scope: 'recommendation_service.guidance', name: assigns(:prisoner).full_name_ordered)
+            )
           end
         end
 
