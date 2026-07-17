@@ -149,6 +149,11 @@ private
     # updated by `TierChangeHandler` (leaving both updates causes a race condition)
     tier = case_info.persisted? ? case_info.tier : map_tier(probation_record.fetch(:tier))
 
+    # Preserve manually-entered rosh for one import cycle, then let blank
+    # nDelius rosh clear it to avoid drift
+    rosh_level = probation_record.dig(:rosh, :level).presence ||
+                  (case_info.manual_entry? ? case_info.rosh_level : nil)
+
     case_info.tap do |ci|
       ci.assign_attributes(
         manual_entry: false,
@@ -163,7 +168,7 @@ private
         probation_service: ldu_record&.country || 'England',
         active_vlo: probation_record.fetch(:vlo_assigned),
         mappa_level: probation_record.fetch(:mappa_level),
-        rosh_level: probation_record.dig(:rosh, :level).presence || case_info.rosh_level,
+        rosh_level: rosh_level,
         rosh_start_date: probation_record.dig(:rosh, :start_date),
       )
     end
