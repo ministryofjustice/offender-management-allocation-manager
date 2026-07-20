@@ -142,6 +142,9 @@ describe MovementService, type: :feature do
   describe "processing an offender release" do
     let!(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G7266VD')) }
     let!(:allocation) { create(:allocation_history, prison: 'LEI', nomis_offender_id: 'G7266VD') }
+    let!(:calculated_handover_date) { create(:calculated_handover_date, offender: case_info.offender) }
+    let!(:handover_progress_checklist) { create(:handover_progress_checklist, offender: case_info.offender) }
+    let!(:responsibility) { create(:responsibility, offender: case_info.offender) }
 
     def pom_tester(valid_release)
       mailer = double(:mailer)
@@ -173,16 +176,20 @@ describe MovementService, type: :feature do
           expect(HmppsApi::ComplexityApi).not_to receive(:inactivate).with(valid_release.offender_no)
           expect(processed).to be true
           expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
+          expect(CalculatedHandoverDate.where(nomis_offender_id: valid_release.offender_no)).to be_empty
+          expect(HandoverProgressChecklist.where(nomis_offender_id: valid_release.offender_no)).to be_empty
+          expect(Responsibility.where(nomis_offender_id: valid_release.offender_no)).to be_empty
           expect(updated_allocation.event_trigger).to eq 'offender_released'
           expect(updated_allocation.prison).to eq 'LEI'
         end
 
-        it 'deallocates before destroying case information so destroy failures do not block the release update' do
+        it 'continues processing even if a destroy fails' do
           allow_any_instance_of(CaseInformation).to receive(:destroy!).and_raise(ActiveRecord::StatementInvalid, 'boom')
 
-          expect { processed }.to raise_error(ActiveRecord::StatementInvalid, 'boom')
+          expect { processed }.not_to raise_error
           expect(updated_allocation.reload.event_trigger).to eq 'offender_released'
           expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).not_to be_empty
+          expect(CalculatedHandoverDate.where(nomis_offender_id: valid_release.offender_no)).to be_empty
         end
       end
 
