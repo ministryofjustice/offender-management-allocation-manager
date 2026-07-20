@@ -83,28 +83,22 @@ private
     true
   end
 
-  def self.release_offender(offender_no, from_agency)
-    Rails.logger.info("[MOVEMENT] Processing release for #{offender_no}")
+  def self.release_offender(nomis_offender_id, from_agency)
+    Rails.logger.info("[MOVEMENT] Processing release for #{nomis_offender_id}")
 
-    alloc = AllocationHistory.active.find_by(nomis_offender_id: offender_no)
+    alloc = AllocationHistory.active.find_by(nomis_offender_id:)
     alloc.deallocate_offender_after_release if alloc
 
-    destroy_case_information(offender_no)
+    destroy_offender_stint_data(nomis_offender_id)
 
-    HmppsApi::ComplexityApi.inactivate(offender_no) if PrisonService.womens_prison?(from_agency)
+    HmppsApi::ComplexityApi.inactivate(nomis_offender_id) if PrisonService.womens_prison?(from_agency)
   end
 
-private
-
-  def self.destroy_case_information(offender_no)
-    case_information = CaseInformation.find_by(nomis_offender_id: offender_no)
-    return unless case_information
-
-    # Preserve destroy callbacks and PaperTrail history for case information.
-    # Use a savepoint if an outer transaction exists so a failed destroy rolls
-    # back cleanly rather than leaving that wider transaction unusable.
-    CaseInformation.transaction(requires_new: true) do
-      case_information.destroy!
+  def self.destroy_offender_stint_data(nomis_offender_id)
+    [CaseInformation, CalculatedHandoverDate, HandoverProgressChecklist, Responsibility].each do |model|
+      model.find_by(nomis_offender_id:)&.destroy!
+    rescue StandardError => e
+      Rails.logger.error("[MOVEMENT] Failed to destroy #{model} for #{nomis_offender_id}: #{e.class} - #{e.message}")
     end
   end
 

@@ -39,7 +39,7 @@ class Offender < ApplicationRecord
 
   has_many :victim_liaison_officers, foreign_key: :nomis_offender_id, inverse_of: :offender, dependent: :destroy
 
-  has_one :handover_progress_checklist, foreign_key: :nomis_offender_id
+  has_one :handover_progress_checklist, foreign_key: :nomis_offender_id, dependent: :destroy
 
   delegate :handover_progress_complete?, to: :handover_progress_checklist, allow_nil: true
 
