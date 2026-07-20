@@ -5,7 +5,9 @@ class RecalculateHandoverDateJob < ApplicationJob
 
   def perform(nomis_offender_id)
     @nomis_offender = OffenderService.get_offender(nomis_offender_id)
-    return unless nomis_offender&.inside_omic_policy?
+
+    return if nomis_offender.nil?
+    return if nomis_offender.case_information.nil? || !nomis_offender.inside_omic_policy?
 
     recalculate_dates_for_offender
   end

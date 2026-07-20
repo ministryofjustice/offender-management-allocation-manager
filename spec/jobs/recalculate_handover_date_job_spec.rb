@@ -220,20 +220,39 @@ describe RecalculateHandoverDateJob do
     end
   end
 
-  context 'when offender details are valid but case info is unusable for COM assignment' do
+  context 'when the offender has no case information' do
+    before do
+      the_responsibility_is_recorded_as(CalculatedHandoverDate.com(reason: :determinate_short))
+      the_responsibility_will_be_calculated_as(CalculatedHandoverDate.com(reason: :determinate_short))
+      CaseInformation.find_by(nomis_offender_id: offender.nomis_offender_id).destroy!
+    end
+
+    it 'does not recalculate handover dates' do
+      expect { recalculate_handover_dates }.not_to(
+        change { CalculatedHandoverDate.find_by(nomis_offender_id: offender.nomis_offender_id)&.updated_at }
+      )
+    end
+
+    it 'does not send any emails' do
+      recalculate_handover_dates
+      expect(request_supporting_com_email).not_to have_received(:deliver_later)
+      expect(assign_com_email).not_to have_received(:deliver_later)
+    end
+
+    it 'does not emit any events' do
+      recalculate_handover_dates
+      expect(handover_event).not_to have_received(:publish)
+      expect(handover_change_event).not_to have_received(:publish)
+    end
+  end
+
+  context 'when offender details are valid but case info CRN is blank' do
     before do
       the_responsibility_is_recorded_as(CalculatedHandoverDate.com(reason: :determinate_short))
       the_responsibility_will_be_calculated_as(CalculatedHandoverDate.com(reason: :determinate_short))
     end
 
-    it 'does not send an assign COM email if case info is nil' do
-      the_case_information_is(local_delivery_unit: build(:local_delivery_unit, email_address: 'ldu@email.com'))
-      CaseInformation.find_by(nomis_offender_id: offender.nomis_offender_id).destroy!
-      recalculate_handover_dates
-      expect(assign_com_email).not_to have_received(:deliver_later)
-    end
-
-    it 'does not send an assign COM email if case info CRN is blank' do
+    it 'does not send an assign COM email' do
       the_case_information_is(crn: '', local_delivery_unit: build(:local_delivery_unit, email_address: 'ldu@email.com'))
       recalculate_handover_dates
       expect(assign_com_email).not_to have_received(:deliver_later)
