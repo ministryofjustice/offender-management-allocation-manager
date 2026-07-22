@@ -80,7 +80,7 @@ RSpec.describe PomDetail, type: :model do
       audit = AuditEvent.order(:created_at).last
       aggregate_failures do
         expect(audit.nomis_offender_id).to be_nil
-        expect(audit.tags).to eq(%w[record pom_detail changed])
+        expect(audit.tags).to eq(%w[record pom_detail changed active])
         expect(audit.data['nomis_staff_id']).to eq(pom_detail.nomis_staff_id)
         expect(audit.data['prison_code']).to eq(prison.code)
       end

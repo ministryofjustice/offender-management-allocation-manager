@@ -3,8 +3,9 @@
 class RecalculateHandoverDateJob < ApplicationJob
   queue_as :default
 
-  def perform(nomis_offender_id)
+  def perform(nomis_offender_id, trigger_method: 'manual')
     @nomis_offender = OffenderService.get_offender(nomis_offender_id)
+    @trigger_method = trigger_method
 
     return if nomis_offender.nil?
     return if nomis_offender.case_information.nil? || !nomis_offender.inside_omic_policy?
@@ -14,7 +15,7 @@ class RecalculateHandoverDateJob < ApplicationJob
 
 private
 
-  attr_reader :nomis_offender, :db_offender, :record, :com_email_eligible
+  attr_reader :nomis_offender, :db_offender, :record, :com_email_eligible, :trigger_method
 
   def recalculate_dates_for_offender
     save_handover_calculation
@@ -50,7 +51,7 @@ private
 
         AuditEvent.publish(
           nomis_offender_id: handover_after['nomis_offender_id'],
-          tags: %w[job recalculate_handover_date handover changed],
+          tags: ['job', 'recalculate_handover_date', 'handover', 'changed', trigger_method],
           system_event: true,
           data: {
             'before' => handover_before,

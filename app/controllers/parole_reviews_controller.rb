@@ -9,7 +9,7 @@ class ParoleReviewsController < PrisonsApplicationController
     @parole_review.update(parole_review_params)
 
     if @parole_review.valid?(:manual_update)
-      RecalculateHandoverDateJob.perform_now(@offender.offender_no)
+      RecalculateHandoverDateJob.perform_now(@offender.offender_no, trigger_method: 'parole_review')
       redirect_to prison_prisoner_path(prison: @prison, id: @offender.offender_no)
     else
       render :edit

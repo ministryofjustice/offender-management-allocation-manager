@@ -9,7 +9,7 @@ class DebouncedRecalculateHandoverDateJob < ApplicationJob
   def perform(nomis_offender_id, debounce_key:, debounce_token:)
     return unless debounce_token_match?(nomis_offender_id, debounce_key, debounce_token)
 
-    job = RecalculateHandoverDateJob.perform_later(nomis_offender_id)
+    job = RecalculateHandoverDateJob.perform_later(nomis_offender_id, trigger_method: 'event')
 
     logger.info(
       "job=debounced_recalculate_handover_date_job,event=enqueued,nomis_offender_id=#{nomis_offender_id},job_id=#{job.job_id}"

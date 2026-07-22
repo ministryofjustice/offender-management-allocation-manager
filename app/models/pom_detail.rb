@@ -50,7 +50,7 @@ class PomDetail < ApplicationRecord
 private
 
   def audit_event_tags
-    %w[record pom_detail changed].freeze
+    ['record', 'pom_detail', 'changed', status].freeze
   end
 
   def audit_additional_data

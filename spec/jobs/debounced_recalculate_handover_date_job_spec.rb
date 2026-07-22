@@ -18,7 +18,7 @@ RSpec.describe DebouncedRecalculateHandoverDateJob, type: :job do
 
     described_class.perform_now(nomis_offender_id, debounce_key:, debounce_token:)
 
-    expect(RecalculateHandoverDateJob).to have_received(:perform_later).with(nomis_offender_id)
+    expect(RecalculateHandoverDateJob).to have_received(:perform_later).with(nomis_offender_id, trigger_method: 'event')
     expect(job_logger).to have_received(:info).with(
       "job=debounced_recalculate_handover_date_job,event=enqueued,nomis_offender_id=#{nomis_offender_id},job_id=job-123"
     )
@@ -29,7 +29,7 @@ RSpec.describe DebouncedRecalculateHandoverDateJob, type: :job do
 
     described_class.perform_now(nomis_offender_id, debounce_key:, debounce_token:)
 
-    expect(RecalculateHandoverDateJob).to have_received(:perform_later).with(nomis_offender_id)
+    expect(RecalculateHandoverDateJob).to have_received(:perform_later).with(nomis_offender_id, trigger_method: 'event')
     expect(job_logger).to have_received(:info).with(
       "job=debounced_recalculate_handover_date_job,event=enqueued,nomis_offender_id=#{nomis_offender_id},job_id=job-123"
     )

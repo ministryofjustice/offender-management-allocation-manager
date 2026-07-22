@@ -101,7 +101,7 @@ private
   end
 
   def audit_event_tags
-    %w[record early_allocation changed].freeze
+    ['record', 'early_allocation', 'changed', outcome].freeze
   end
 
   def audit_excluded_keys

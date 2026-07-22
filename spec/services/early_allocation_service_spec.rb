@@ -63,7 +63,7 @@ describe EarlyAllocationService do
       end
 
       it 'invokes job to recalculate handover date in case that changed too' do
-        expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id)
+        expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id, trigger_method: 'early_allocation')
       end
 
       it 'audits the change', :aggregate_failures do
@@ -88,7 +88,7 @@ describe EarlyAllocationService do
       end
 
       it 'invokes job to recalculate handover date in case that changed too' do
-        expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id)
+        expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id, trigger_method: 'early_allocation')
       end
 
       it 'audits the change', :aggregate_failures do

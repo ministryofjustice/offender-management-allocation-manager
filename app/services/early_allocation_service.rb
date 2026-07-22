@@ -48,7 +48,7 @@ class EarlyAllocationService
             }
           )
         end
-        RecalculateHandoverDateJob.perform_now(offender.nomis_offender_id)
+        RecalculateHandoverDateJob.perform_now(offender.nomis_offender_id, trigger_method: 'early_allocation')
       end
     end
 
