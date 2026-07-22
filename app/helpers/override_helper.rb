@@ -2,14 +2,12 @@
 
 module OverrideHelper
   def display_override_pom(allocation)
-    if allocation.recommended_pom_type &&
-      allocation.recommended_pom_type == 'prison'
+    if allocation.recommended_pom_type == 'prison'
       'Probation POM allocated instead of recommended prison POM'
-    elsif allocation.recommended_pom_type &&
-      allocation.recommended_pom_type == 'probation'
+    elsif allocation.recommended_pom_type == 'probation'
       'Prison POM allocated instead of recommended probation POM'
     else
-      'Prisoner not allocated to recommended POM'
+      'POM allocated without a recommendation'
     end
   end
 
@@ -33,19 +31,17 @@ private
     if allocation.recommended_pom_type.present?
       tag.p("- No available #{allocation.recommended_pom_type} POMs")
     else
-      tag.p('- No available recommended POMs')
+      tag.p('- No available POMs of the other type')
     end
   end
 
   def suitability_detail(allocation)
-    if allocation.recommended_pom_type.present?
-      if allocation.recommended_pom_type == 'prison'
-        tag.p('- Assessed as not suitable for a prison POM')
-      else
-        tag.p('- Assessed as suitable for a prison POM despite probation POM recommendation')
-      end
+    if allocation.recommended_pom_type == 'prison'
+      tag.p('- Assessed as not suitable for a prison POM')
+    elsif allocation.recommended_pom_type == 'probation'
+      tag.p('- Assessed as not suitable for a probation POM')
     else
-      tag.p('- Assessed as suitable for allocated POM despite recommendation')
+      tag.p('- Assessed as suitable for the allocated POM type')
     end + tag.p(allocation.suitability_detail, class: 'app-override-reason--detail')
   end
 end

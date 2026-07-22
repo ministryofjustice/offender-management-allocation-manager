@@ -113,7 +113,7 @@ module Reallocation
     end
 
     def recommended_pom_type_for(offender)
-      offender.recommended_pom_type == RecommendationService::PRISON_POM ? 'prison' : 'probation'
+      RecommendationService::POM_TYPE_LABELS.fetch(offender.recommended_pom_type)
     end
 
     def offender_for(nomis_offender_id)

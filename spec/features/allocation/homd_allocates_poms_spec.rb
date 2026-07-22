@@ -48,7 +48,7 @@ describe 'HOMD allocates cases to POMS' do
     click_on 'Continue'
 
     within('.govuk-error-summary') do
-      expect(page).to have_content('Select one or more reasons for not accepting the recommendation')
+      expect(page).to have_content('Select at least one reason')
     end
   end
 

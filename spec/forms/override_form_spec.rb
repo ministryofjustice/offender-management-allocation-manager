@@ -14,7 +14,7 @@ describe OverrideForm do
   it 'a reason for overriding must be given' do
     override = described_class.new(override_reasons: nil)
     expect(override).not_to be_valid
-    expect(override.errors[:override_reasons]).to match_array(['Select one or more reasons for not accepting the recommendation'])
+    expect(override.errors[:override_reasons]).to match_array(['Select at least one reason'])
   end
 
   it 'more details must be given when overriding due to another reason' do

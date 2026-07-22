@@ -93,45 +93,6 @@ RSpec.describe OffenderHelper do
     end
   end
 
-  describe '#recommended_pom_type_label' do
-    it "returns 'Prison' if RecommendService is PRISON_POM" do
-      allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PRISON_POM)
-      offender = OpenStruct.new(immigration_case?: true, nps_case?: false, responsibility: nil)
-
-      expect(helper.recommended_pom_type_label(offender)).to eq('Prison')
-    end
-
-    it "returns 'Probation' if RecommendService is PROBATION_POM" do
-      allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PROBATION_POM)
-      offender = OpenStruct.new(immigration_case?: false, nps_case?: true, tier: 'A', responsibility: nil)
-
-      expect(helper.recommended_pom_type_label(offender)).to eq('Probation')
-    end
-  end
-
-  describe '#complex_reason_label' do
-    context 'when a prison POM' do
-      # we need to set up this test to return a Prison POM recommendation; we are using an
-      # Immigration case as they are always recommended to Prison POMs
-      let(:offender) { OpenStruct.new(immigration_case?: true, nps_case?: false) }
-
-      it "can get for a prison owned offender" do
-        expect(helper.complex_reason_label(offender)).to eq('Assessed as not suitable for a prison POM')
-      end
-    end
-
-    context 'when a probation POM' do
-      let(:api_offender) { build(:hmpps_api_offender, sentence: attributes_for(:sentence_detail, :indeterminate)) }
-      let(:offender) do
-        build(:mpc_offender, prison: prison, prison_record: api_offender, offender: build(:case_information, tier: 'A').offender)
-      end
-
-      it "can get for a probation owned offender" do
-        expect(helper.complex_reason_label(offender)).to eq('Assessed as suitable for a prison POM despite probation POM recommendation')
-      end
-    end
-  end
-
   describe '#format_allocation' do
     subject do
       helper.format_allocation(offender: offender, pom: pom, view_context: view_context)

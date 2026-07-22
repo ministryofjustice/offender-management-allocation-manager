@@ -33,8 +33,8 @@ RSpec.describe OverrideHelper do
       expect(display_override_pom(allocation_one)).to eq('Probation POM allocated instead of recommended prison POM')
     end
 
-    it 'displays generic message if POM type not present' do
-      expect(display_override_pom(allocation_two)).to eq('Prisoner not allocated to recommended POM')
+    it 'displays message when no recommendation was available' do
+      expect(display_override_pom(allocation_two)).to eq('POM allocated without a recommendation')
     end
   end
 
@@ -44,7 +44,7 @@ RSpec.describe OverrideHelper do
     end
 
     it 'displays a generic message if reason is POM type not available, and the POM type is not present' do
-      expect(display_override_details("no_staff", allocation_two)).to include('No available recommended POMs')
+      expect(display_override_details("no_staff", allocation_two)).to include('No available POMs of the other type')
     end
 
     it 'displays that the prisoner was not suitable for a prison POM when prison was recommended' do
@@ -54,14 +54,14 @@ RSpec.describe OverrideHelper do
     end
 
     it 'displays that the prisoner was suitable for a prison POM when probation was recommended' do
-      expect(display_override_details("suitability", allocation_three)).to match(/Assessed as suitable for a prison POM\s+despite probation POM recommendation/)
+      expect(display_override_details("suitability", allocation_three)).to match(/Assessed as not suitable for a probation POM/)
       expect(display_override_details("suitability", allocation_three)).to include('Needs continuity')
     end
 
-    it 'displays a generic suitability message for the allocated POM if the recommendation is not present' do
+    it 'displays a generic suitability message when no recommendation was available' do
       allocation_two.suitability_detail = 'Needs continuity'
 
-      expect(display_override_details("suitability", allocation_two)).to match(/Assessed as suitable for allocated POM despite recommendation/)
+      expect(display_override_details("suitability", allocation_two)).to match(/Assessed as suitable for the allocated POM type/)
       expect(display_override_details("suitability", allocation_two)).to include('Needs continuity')
     end
 

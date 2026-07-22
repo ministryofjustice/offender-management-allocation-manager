@@ -8,7 +8,7 @@ RSpec.describe 'build_allocations/override', type: :view do
     OverrideForm.new(override_reasons: ['other']).tap(&:valid?)
   end
   let(:pom) do
-    instance_double(StaffMember, full_name_ordered: 'Jessica King', position: 'PO')
+    instance_double(StaffMember, full_name_ordered: 'Jessica King', position: 'PO', probation_officer?: true)
   end
   let(:prisoner) do
     instance_double(

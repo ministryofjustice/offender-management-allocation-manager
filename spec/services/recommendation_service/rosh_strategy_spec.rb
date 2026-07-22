@@ -62,12 +62,25 @@ describe RecommendationService::RoshStrategy do
   context 'with no ROSH level' do
     let(:rosh_level) { nil }
 
-    it 'recommends a prison POM' do
-      expect(described_class.recommended_pom_type(offender)).to eq(RecommendationService::PRISON_POM)
+    it 'returns NO_RECOMMENDATION' do
+      expect(described_class.recommended_pom_type(offender)).to eq(RecommendationService::NO_RECOMMENDATION)
     end
 
-    it 'gives the reason with N/A' do
-      expect(described_class.recommended_pom_type_reason(offender)).to include('has a N/A ROSH', 'prison POM')
+    it 'gives the missing RoSH reason' do
+      expect(described_class.recommended_pom_type_reason(offender)).to include('Check their risk on NDelius')
+    end
+  end
+
+  context 'with no ROSH level but tier A' do
+    let(:rosh_level) { nil }
+    let(:tier) { 'A' }
+
+    it 'still recommends a probation POM' do
+      expect(described_class.recommended_pom_type(offender)).to eq(RecommendationService::PROBATION_POM)
+    end
+
+    it 'gives the tier A reason' do
+      expect(described_class.recommended_pom_type_reason(offender)).to include('tier A')
     end
   end
 

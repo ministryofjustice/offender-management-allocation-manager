@@ -42,13 +42,20 @@
 </div>
 
 <% unless @coworking %>
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
-    <h2 class="govuk-heading-m govuk-!-margin-top-5">
-      <%= recommended_pom_type_label(@prisoner) %> POM recommended
-    </h2>
-    <div class="govuk-inset-text">
-      <p><%= RecommendationService.recommended_pom_type_reason(@prisoner) %>.</p>
+<div class="govuk-grid-row govuk-!-margin-top-2">
+  <div class="govuk-grid-column-two-thirds">
+    <% if @recommended_pom_type %>
+      <h2 class="govuk-heading-m">
+        <%= pom_level(@recommended_pom_type) %> recommended
+      </h2>
+    <% else %>
+      <h2 class="govuk-heading-m">
+        No POM type recommendation
+      </h2>
+      <p>We cannot recommend which POM type should be allocated to work with this person because they have no ROSH on NDelius.</p>
+    <% end %>
+    <div class="govuk-inset-text govuk-!-margin-top-0">
+      <p><%= RecommendationService.recommended_pom_type_reason(@prisoner) %></p>
     </div>
   </div>
 </div>
@@ -79,11 +86,11 @@
       </div>
     <% end %>
 
-    <h2 class="govuk-heading-m govuk-!-margin-top-6">
+    <h2 class="govuk-heading-m govuk-!-margin-top-4">
       Choose a POM
     </h2>
     <p class="govuk-body">
-      <%= t(@coworking ? 'NOREC' : @prisoner.recommended_pom_type,
+      <%= t(@recommended_pom_type || RecommendationService::NO_RECOMMENDATION,
             scope: 'recommendation_service.guidance', name: @prisoner.full_name_ordered) %>
     </p>
   </div>
@@ -93,7 +100,7 @@
   <%= render 'shared/pom_selection_table',
              journey: :allocation,
              available_poms: @available_poms,
-             recommended_pom_type: (@prisoner.recommended_pom_type unless @coworking),
+             recommended_pom_type: @recommended_pom_type,
              current_pom_id: @current_pom&.staff_id,
              previous_pom_ids: @previous_poms.map(&:staff_id),
              coworking: @coworking %>
