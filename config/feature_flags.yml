@@ -8,11 +8,13 @@ feature_flags:
     staging: true
   rosh_level:
     staging: true
+    preprod: true
   new_tiers:
     staging: true
     preprod: true
   rosh_recommendations:
     staging: true
+    preprod: true
   simplified_enhanced_handover:
     staging: true
     preprod: true
