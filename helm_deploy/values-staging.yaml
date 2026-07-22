@@ -29,7 +29,6 @@ generic-service:
     ENV_NAME: staging
     SENTRY_CURRENT_ENV: staging
     CACHE_TIMEOUT: "600" # seconds
-    SIMPLIFIED_HANDOVER_CUTOFF_DATE: "2026-08-01"
     ALLOCATION_MANAGER_HOST: https://dev.moic.service.justice.gov.uk
     PRISON_API_HOST: https://prison-api-dev.prison.service.justice.gov.uk
     PRISONER_SEARCH_HOST: https://prisoner-search-dev.prison.service.justice.gov.uk
