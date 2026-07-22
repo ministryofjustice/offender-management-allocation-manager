@@ -81,7 +81,7 @@ RSpec.describe 'case_history/allocation primary POM partials', type: :view do
       expect(page).to have_css('.moj-timeline__description', text: 'Prisoner reallocated to John Smith')
       expect(page).to have_css('.moj-timeline__description', text: '(email address not found)')
       expect(page).to have_css('.moj-timeline__description', text: 'Tier: B')
-      expect(page).not_to have_css('.moj-timeline__description', text: 'ROSH:')
+      expect(page).to have_css('.moj-timeline__description', text: 'ROSH: N/A')
       expect(page).not_to have_css('.app-override-reasons')
     end
   end

@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 class RecommendationService
-  # yes this looks backwards. However the string 'PRO' already existed in NOMIS for 'PRISON_OFFICER'
-  # so 'PO' was chosen for 'Probation Officer'
   PRISON_POM = 'PRO'
   PROBATION_POM = 'PO'
+  NO_RECOMMENDATION = 'NOREC'
 
   POM_TYPE_LABELS = {
     PRISON_POM => 'prison',
     PROBATION_POM => 'probation',
+    NO_RECOMMENDATION => nil,
   }.freeze
 
   class << self
@@ -21,6 +21,10 @@ class RecommendationService
       strategy.recommended_pom_type_reason(offender)
     end
     # rubocop:enable Rails/Delegate
+
+    def recommendation_available?(offender)
+      recommended_pom_type(offender) != NO_RECOMMENDATION
+    end
 
     def reason(key, **options)
       I18n.t(key, scope: 'recommendation_service.reasons', **options).html_safe

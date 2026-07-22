@@ -9,7 +9,7 @@ class OverrideForm
   attribute :suitability_detail, :string
 
   validates :override_reasons,
-            presence: { message: 'Select one or more reasons for not accepting the recommendation' }
+            presence: { message: 'Select at least one reason' }
 
   validates :more_detail,
             presence: { message: 'Please provide extra detail when Other is selected' },

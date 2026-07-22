@@ -19,7 +19,9 @@ class AllocationStaffController < PrisonsApplicationController
     @current_pom = poms[allocation&.primary_pom_nomis_id]
     @current_coworker = poms[allocation&.secondary_pom_nomis_id]
     @recent_pom_history = AllocationService.recent_pom_history(allocation)
+
     @coworking = coworking?
+    @recommended_pom_type = recommended_pom_type
 
     @available_poms = available_poms.sort_by(&:full_name_ordered)
   end
@@ -104,6 +106,10 @@ private
 
   def coworking?
     params[:coworking].present? && params[:coworking] == 'true'
+  end
+
+  def recommended_pom_type
+    @prisoner.recommended_pom_type unless @coworking || !RecommendationService.recommendation_available?(@prisoner)
   end
 
   def check_compare_success_route

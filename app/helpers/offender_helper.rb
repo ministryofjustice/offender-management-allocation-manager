@@ -55,22 +55,6 @@ module OffenderHelper
     end
   end
 
-  def recommended_pom_type_label(offender)
-    if RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM
-      'Prison'
-    else
-      'Probation'
-    end
-  end
-
-  def complex_reason_label(offender)
-    if RecommendationService.recommended_pom_type(offender) == RecommendationService::PRISON_POM
-      'Assessed as not suitable for a prison POM'
-    else
-      'Assessed as suitable for a prison POM despite probation POM recommendation'
-    end
-  end
-
   def probation_field(offender, field)
     offender.public_send field if offender.probation_record.present?
   end

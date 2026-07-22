@@ -169,7 +169,7 @@ RSpec.describe AllocationStaffController, type: :controller do
 
           it 'shows the generic guidance without a POM type recommendation' do
             expect(response_body).to include(
-              I18n.t('NOREC', scope: 'recommendation_service.guidance', name: assigns(:prisoner).full_name_ordered)
+              I18n.t(RecommendationService::NO_RECOMMENDATION, scope: 'recommendation_service.guidance', name: assigns(:prisoner).full_name_ordered)
             )
           end
         end

@@ -42,7 +42,7 @@ RSpec.describe Reallocation::BulkReallocationService do
       offender_no: offender_no,
       tier: 'A',
       rosh_level: 'HIGH',
-      recommended_pom_type: 'probation',
+      recommended_pom_type: RecommendationService::PROBATION_POM,
       full_name_ordered: 'Zephyr, Alice',
       pom_responsible?: true,
       com_responsible?: false,

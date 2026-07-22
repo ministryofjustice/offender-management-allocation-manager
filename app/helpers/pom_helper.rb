@@ -39,6 +39,10 @@ module PomHelper
     "#{pom.position_description.split(' ').first} POM"
   end
 
+  def opposite_pom_type(pom)
+    pom.probation_officer? ? 'prison' : 'probation'
+  end
+
   def sortable_grade(pom, recommended_pom_type)
     return grade(pom) unless recommended_pom_type
 

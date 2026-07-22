@@ -32,6 +32,7 @@ RSpec.describe "allocation_staff/index", type: :view do
     assign(:available_poms, poms.map { |p| StaffMember.new(prison, p.staff_id) })
     assign(:prison_poms, [])
     assign(:recent_pom_history, recent_pom_history)
+    assign(:recommended_pom_type, offender.recommended_pom_type)
   end
 
   it 'renders the allocation-specific wrapper around the shared POM selection table' do
@@ -67,6 +68,7 @@ RSpec.describe "allocation_staff/index", type: :view do
   context 'when there is no recommendation' do
     before do
       allow(RecommendationService).to receive(:recommended_pom_type).and_return(nil)
+      assign(:recommended_pom_type, nil)
     end
 
     it 'sorts by POM name column by default' do
@@ -92,6 +94,7 @@ RSpec.describe "allocation_staff/index", type: :view do
   context 'when a prison POM is recommended' do
     before do
       allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PRISON_POM)
+      assign(:recommended_pom_type, RecommendationService::PRISON_POM)
     end
 
     it 'shows the correct guidance' do
@@ -104,6 +107,7 @@ RSpec.describe "allocation_staff/index", type: :view do
   context 'when a probation POM is recommended' do
     before do
       allow(RecommendationService).to receive(:recommended_pom_type).and_return(RecommendationService::PROBATION_POM)
+      assign(:recommended_pom_type, RecommendationService::PROBATION_POM)
     end
 
     it 'shows the correct guidance' do

@@ -57,7 +57,7 @@ class BuildAllocationsController < PrisonsApplicationController
         created_by_username: current_user,
         allocated_at_tier: @prisoner.tier,
         allocated_at_rosh: FeatureFlags.rosh_recommendations.enabled? ? @prisoner.rosh_level : nil,
-        recommended_pom_type: recommended_pom_type_code == RecommendationService::PRISON_POM ? 'prison' : 'probation',
+        recommended_pom_type: RecommendationService::POM_TYPE_LABELS.fetch(recommended_pom_type_code),
         prison: @prison.code,
         message: allocation_params[:message],
         override_reasons: override.override_reasons.presence,
@@ -122,7 +122,8 @@ private
 
   def override_needed?
     recommended_pom_type_code == RecommendationService::PRISON_POM && @pom.probation_officer? ||
-      recommended_pom_type_code == RecommendationService::PROBATION_POM && @pom.prison_officer?
+      recommended_pom_type_code == RecommendationService::PROBATION_POM && @pom.prison_officer? ||
+      recommended_pom_type_code == RecommendationService::NO_RECOMMENDATION
   end
 
   def recommended_pom_type_code

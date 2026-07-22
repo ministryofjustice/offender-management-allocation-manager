@@ -171,10 +171,10 @@ RSpec.describe BuildAllocationsController, type: :controller do
         }
       end
 
-      it 're-renders the override step successfully' do
+      it 're-renders the override step with validation errors' do
         expect(response).to have_http_status(:ok)
         expect(assigns(:pom)).to be_present
-        expect(assigns(:override).errors[:override_reasons]).to include('Select one or more reasons for not accepting the recommendation')
+        expect(assigns(:override).errors[:override_reasons]).to be_present
       end
     end
 
@@ -239,6 +239,41 @@ RSpec.describe BuildAllocationsController, type: :controller do
           allocation = AllocationHistory.find_by!(nomis_offender_id: offender_no)
 
           expect(allocation.allocated_at_rosh).to be_nil
+        end
+      end
+
+      context 'when RoSH is missing and tier is not A' do
+        before do
+          CaseInformation.find_by(nomis_offender_id: offender_no).update!(rosh_level: nil, tier: 'B')
+          AllocationHistory.where(nomis_offender_id: offender_no).delete_all
+        end
+
+        it 'requires the override step' do
+          get :new, params: {
+            prison_id: prison.code,
+            prisoner_id: offender_no,
+            staff_id: pom.staffId
+          }
+
+          expect(response).to redirect_to(
+            prison_prisoner_staff_build_allocation_path(prison.code, offender_no, pom.staffId, 'override')
+          )
+        end
+
+        it 'stores nil recommended_pom_type' do
+          stub_user('user', pom.staffId)
+          session[:allocation_override] = { override_reasons: ['suitability'], suitability_detail: 'Reason given' }
+
+          put :update, params: {
+            allocation_form: { message: notes },
+            prison_id: prison.code,
+            prisoner_id: offender_no,
+            staff_id: pom.staffId,
+            id: 'allocate'
+          }
+
+          allocation = AllocationHistory.find_by!(nomis_offender_id: offender_no)
+          expect(allocation.recommended_pom_type).to be_nil
         end
       end
     end

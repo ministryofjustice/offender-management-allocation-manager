@@ -1,12 +1,12 @@
 <%= form.govuk_check_boxes_fieldset :override_reasons, multiple: false, legend: nil,
                                     hint: { text: 'Choose all that apply' } do %>
   <%= form.govuk_check_box :override_reasons, 'suitability', link_errors: true,
-                           label: { text: complex_reason_label(offender) } do %>
+                           label: { text: "Assessed as not suitable for a #{opposite_pom_type(pom)} POM" } do %>
     <%= form.govuk_text_area :suitability_detail, link_errors: true, rows: 2,
                              label: { text: 'Enter reason' } %>
   <% end %>
   <%= form.govuk_check_box :override_reasons, 'no_staff',
-                           label: { text: "No available #{recommended_pom_type_label(offender).downcase} POMs" } %>
+                           label: { text: "No available #{opposite_pom_type(pom)} POMs" } %>
   <%= form.govuk_check_box :override_reasons, 'continuity',
                            label: { text: "#{pom.full_name_ordered} has worked with #{offender.full_name_ordered} before" } %>
   <%= form.govuk_check_box :override_reasons, 'other',

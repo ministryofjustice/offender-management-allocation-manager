@@ -32,5 +32,19 @@ describe RecommendationService do
       expect(described_class::RoshStrategy).to receive(:recommended_pom_type_reason).with(offender).and_call_original
       described_class.recommended_pom_type_reason(offender)
     end
+
+    describe '.recommendation_available?' do
+      it 'returns true when a recommendation exists' do
+        expect(described_class.recommendation_available?(offender)).to be(true)
+      end
+
+      context 'when RoSH is missing and tier is not A' do
+        let(:case_info) { build(:case_information, tier: 'B', rosh_level: nil) }
+
+        it 'returns false' do
+          expect(described_class.recommendation_available?(offender)).to be(false)
+        end
+      end
+    end
   end
 end

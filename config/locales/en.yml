@@ -293,10 +293,11 @@ en:
 
   recommendation_service:
     reasons:
-      immigration_case: "This is an immigration case, so should be given to a <strong>prison POM</strong>"
-      supporting_role: "%{name} needs a POM in a supporting role, so should be allocated to a <strong>prison POM</strong>"
-      tier_based: "%{name} is tier %{tier}, so we recommend allocating to a <strong>%{pom_type} POM</strong>"
-      rosh_based: "%{name} has a %{rosh_level} ROSH, so we recommend allocating to a <strong>%{pom_type} POM</strong>"
+      immigration_case: "This is an immigration case, so should be given to a <strong>prison POM</strong>."
+      supporting_role: "%{name} needs a POM in a supporting role, so should be allocated to a <strong>prison POM</strong>."
+      tier_based: "%{name} is tier %{tier}, so we recommend allocating to a <strong>%{pom_type} POM</strong>."
+      rosh_based: "%{name} has a %{rosh_level} ROSH, so we recommend allocating to a <strong>%{pom_type} POM</strong>."
+      missing_rosh: "Check their risk on NDelius and OASys and then allocate to the appropriate POM. You will be asked to record a reason for selecting the POM type you choose."
     guidance:
       PRO: "You can choose an available prison POM below or allocate to a probation POM, for example if a particular POM has worked with %{name} before."
       PO: "You can choose an available probation POM below or allocate to a prison POM, for example if a particular POM has worked with %{name} before."

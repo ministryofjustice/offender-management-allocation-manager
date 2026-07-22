@@ -71,7 +71,7 @@ RSpec.describe 'reallocations/override', type: :view do
       expect(page).to have_css('.govuk-error-summary')
       expect(page).to have_css('.govuk-hint', text: 'Choose all that apply')
       expect(page).to have_link(
-        'Select one or more reasons for not accepting the recommendation',
+        'Select at least one reason',
         href: '#override-form-override-reasons-field-error'
       )
       expect(page).to have_css('input#override-form-override-reasons-field-error')
