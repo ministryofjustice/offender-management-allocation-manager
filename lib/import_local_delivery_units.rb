@@ -81,7 +81,17 @@ class ImportLocalDeliveryUnits
 
     if existing_ldu_codes.any?
       log("LDUs to be removed (#{existing_ldu_codes.size}): #{existing_ldu_codes.join(', ')}")
-      destroys_count = LocalDeliveryUnit.where(code: existing_ldu_codes).destroy_all.size unless dry_run
+
+      unless dry_run
+        LocalDeliveryUnit.where(code: existing_ldu_codes).find_each do |ldu|
+          ldu.destroy!
+          destroys_count += 1
+        rescue ActiveRecord::DeleteRestrictionError => e
+          log("Failed to remove LDU: #{ldu.code} - #{e.message}")
+          failure_count += 1
+          failed_codes << ldu.code
+        end
+      end
     else
       log('No LDUs need to be removed')
     end
