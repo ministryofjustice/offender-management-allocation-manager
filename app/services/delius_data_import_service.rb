@@ -107,6 +107,7 @@ private
     # producing thousands of log traces daily saying "no change" which is pointless
     return unless case_info.changed?
 
+    new_record = case_info.new_record?
     case_info_attrs_before = case_info.changed_attributes
 
     if case_info.save
@@ -127,6 +128,11 @@ private
       logger.info(
         "nomis_offender_id=#{nomis_offender_id},trigger_method=#{trigger_method},job=process_delius_data_job,event=case_information_changed"
       )
+
+      # On first import the probation-record tier may be stale, or a wrong tier
+      # version. Enqueue a job to fetch the authoritative tier from the Tier
+      # API, which will correct it asynchronously if it differs
+      FetchTierJob.perform_later(case_info.crn, trigger_method:) if new_record && case_info.crn.present?
     else
       import_errors = []
       case_info.errors.each do |error|
@@ -146,7 +152,9 @@ private
     ldu_record = LocalDeliveryUnit.find_by(code: ldu_code)
 
     # We only populate tier if it's a new record because this is subsequently
-    # updated by `TierChangeHandler` (leaving both updates causes a race condition)
+    # updated by `TierChangeHandler` (leaving both updates causes a race condition).
+    # For new records, the probation tier is used as a fallback. `FetchTierJob`
+    # fetches the authoritative tier from the Tier API shortly after.
     tier = case_info.persisted? ? case_info.tier : map_tier(probation_record.fetch(:tier))
 
     # Preserve manually-entered rosh for one import cycle, then let blank

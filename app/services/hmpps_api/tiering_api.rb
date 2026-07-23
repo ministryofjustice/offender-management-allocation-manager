@@ -5,8 +5,21 @@ module HmppsApi
       HmppsApi::Client.new(host)
     end
 
-    # NOTE: cache is disabled because the `calculation_id` are unique UUIDs
-    # that never get reused, so is wasteful to be caching these responses
+    # See: https://hmpps-tier-dev.hmpps.service.justice.gov.uk/swagger-ui/index.html#/V3/getLatestTierCalculation
+    def self.get_tier(crn, version:)
+      route = "/v#{version}/crn/#{crn}/tier"
+      response = client.get(route, cache: false)
+
+      {
+        tier: response.fetch('tierScore'),
+        calculation_date: response.fetch('calculationDate').to_date
+      }
+    rescue Faraday::Error => e
+      Rails.logger.error("event=tiering_get_tier,route=#{route}|#{e.message}")
+      nil
+    end
+
+    # See: https://hmpps-tier-dev.hmpps.service.justice.gov.uk/swagger-ui/index.html#/V3/getTierCalculationById
     def self.get_calculation(crn, calculation_id, version:)
       route = "/v#{version}/crn/#{crn}/tier/#{calculation_id}"
       response = client.get(route, cache: false)

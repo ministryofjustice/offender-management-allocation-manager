@@ -100,6 +100,33 @@ RSpec.describe "allocations/show", type: :view do
       stub_template 'shared/_vlo_information.html.erb' => ''
     end
 
+    context 'when case information is not editable (nDelius import)' do
+      before { render }
+
+      it 'does not show a Change link on the tier row' do
+        expect(page.at_css('tr#tier-row')).not_to have_text('Change')
+      end
+
+      it 'does not show a Change link on the service provider row' do
+        expect(page.at_css('tr#service-provider-row')).not_to have_text('Change')
+      end
+    end
+
+    context 'when case information is editable (manual entry)' do
+      before do
+        allow(offender).to receive(:manual_entry?).and_return(true)
+        render
+      end
+
+      it 'shows a Change link on the tier row' do
+        expect(page.at_css('tr#tier-row')).to have_css('a', text: 'Change')
+      end
+
+      it 'shows a Change link on the service provider row' do
+        expect(page.at_css('tr#service-provider-row')).to have_css('a', text: 'Change')
+      end
+    end
+
     context 'when the rosh feature flag is enabled' do
       before do
         stub_feature_flag(:rosh_level, enabled: true)
