@@ -33,7 +33,7 @@ RSpec.describe ParoleReviewsController, type: :controller do
       end
 
       it 'enqueues the job and redirects to the offender' do
-        expect(RecalculateHandoverDateJob).to receive(:perform_now).with(offender.offender_no)
+        expect(RecalculateHandoverDateJob).to receive(:perform_now).with(offender.offender_no, trigger_method: 'parole_review')
         patch :update, params: {
           prison_id: prison, prisoner_id: offender.offender_no, id: parole_review.review_id, parole_review: valid_params
         }

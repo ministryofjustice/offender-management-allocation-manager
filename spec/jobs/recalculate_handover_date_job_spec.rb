@@ -79,7 +79,7 @@ describe RecalculateHandoverDateJob do
         {
           nomis_offender_id: offender.nomis_offender_id,
           system_event: true,
-          tags: %w[job recalculate_handover_date handover changed],
+          tags: %w[job recalculate_handover_date handover changed manual],
           data: {
             'before' => {
               'handover_date' => nil,

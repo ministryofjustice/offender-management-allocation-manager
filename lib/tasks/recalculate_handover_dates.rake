@@ -10,7 +10,7 @@ task recalculate_handover_dates: :environment do
     offender_ids = prison.offenders.map(&:offender_no)
 
     ActiveJob.perform_all_later(
-      offender_ids.map { RecalculateHandoverDateJob.new(it) }
+      offender_ids.map { RecalculateHandoverDateJob.new(it, trigger_method: 'batch') }
     )
 
     Rails.logger.info(

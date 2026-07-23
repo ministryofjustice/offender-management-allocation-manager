@@ -128,7 +128,7 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
 
             expect(EarlyAllocationService).to have_received(:send_early_allocation).with(
               CalculatedEarlyAllocationStatus.find_by_nomis_offender_id(nomis_offender_id))
-            expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id)
+            expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id, trigger_method: 'early_allocation')
           end
 
           scenario 'displaying the PDF' do

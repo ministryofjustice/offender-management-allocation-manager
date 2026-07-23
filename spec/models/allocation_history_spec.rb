@@ -652,7 +652,7 @@ RSpec.describe AllocationHistory, :enable_domain_event_publish, type: :model do
       expect(AuditEvent).to have_received(:publish).once do |payload|
         expect(payload).to include(
           nomis_offender_id: allocation.nomis_offender_id,
-          tags: %w[record allocation changed],
+          tags: %w[record allocation changed allocate_primary_pom],
           system_event: false,
           username: 'HOMD_USER',
           data: {
