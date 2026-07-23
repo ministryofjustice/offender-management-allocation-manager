@@ -18,7 +18,7 @@ class HandoverProgressChecklist < ApplicationRecord
 
     if handover_type != 'enhanced'
       STANDARD_HANDOVER_TASK_FIELDS
-    elsif FeatureFlags.simplified_enhanced_handover.enabled? && handover_date.present? && handover_date > cutoff
+    elsif FeatureFlags.simplified_enhanced_handover.enabled? && handover_date.present? && handover_date >= cutoff
       SIMPLIFIED_ENHANCED_HANDOVER_TASK_FIELDS
     else
       ENHANCED_HANDOVER_TASK_FIELDS
