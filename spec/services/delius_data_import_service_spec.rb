@@ -58,6 +58,7 @@ RSpec.describe DeliusDataImportService do
   before do
     allow(OffenderService).to receive(:get_probation_record).with(nomis_offender_id)
       .and_return(mock_probation_record)
+    allow(HmppsApi::TieringApi).to receive(:get_tier).and_return(nil)
   end
 
   shared_examples 'audit event' do
@@ -85,6 +86,12 @@ RSpec.describe DeliusDataImportService do
           :created_at, :id, :updated_at, :target_hearing_date, :prisoner_id, :welsh_offender, :active_vlo
         )
       ).to eq(new_case_information_attributes)
+    end
+
+    it 'enqueues FetchTierJob with the CRN and trigger_method', :queueing do
+      expect {
+        service.process(nomis_offender_id)
+      }.to have_enqueued_job(FetchTierJob).with(crn, trigger_method: :batch)
     end
 
     include_examples 'audit event' do
@@ -228,6 +235,12 @@ RSpec.describe DeliusDataImportService do
       service.process(nomis_offender_id)
 
       expect(c1.reload.tier).to eq('B')
+    end
+
+    it 'does not enqueue FetchTierJob', :queueing do
+      expect {
+        service.process(nomis_offender_id)
+      }.not_to have_enqueued_job(FetchTierJob)
     end
 
     it 'updates other attributes' do
