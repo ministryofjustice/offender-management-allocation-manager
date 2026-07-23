@@ -21,7 +21,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
       contacted_com: false,
       sent_handover_report: false)
     allow(model).to receive_messages(handover_type: 'enhanced')
-    allow(model.offender).to receive_messages(handover_date: cutoff_date) if model.offender
+    allow(model.offender).to receive_messages(handover_date: cutoff_date - 1.day) if model.offender
     model
   end
   let(:page) { Capybara::Node::Simple.new(rendered) }
@@ -121,9 +121,9 @@ RSpec.describe 'handover_progress_checklists/edit' do
     end
   end
 
-  describe 'when handover date is after the cutoff (2-task version)' do
+  describe 'when handover date is on or after the cutoff (2-task version)' do
     before do
-      allow(handover_progress_checklist.offender).to receive_messages(handover_date: cutoff_date + 1.day) if handover_progress_checklist.offender
+      allow(handover_progress_checklist.offender).to receive_messages(handover_date: cutoff_date) if handover_progress_checklist.offender
     end
 
     context 'with enhanced handover' do

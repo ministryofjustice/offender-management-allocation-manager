@@ -9,17 +9,17 @@ RSpec.describe HandoverProgressChecklist do
 
   describe '.permitted_task_fields' do
     context 'with enhanced handover' do
-      it 'returns 3-task fields when handover_date is on or before the cutoff' do
+      it 'returns 3-task fields when handover_date is before the cutoff' do
         expect(described_class.permitted_task_fields(
                  handover_type: 'enhanced',
-                 handover_date: cutoff_date,
+                 handover_date: cutoff_date - 1.day,
                )).to eq(%i[reviewed_oasys contacted_com attended_handover_meeting])
       end
 
-      it 'returns 2-task fields when handover_date is after the cutoff' do
+      it 'returns 2-task fields when handover_date is on or after the cutoff' do
         expect(described_class.permitted_task_fields(
                  handover_type: 'enhanced',
-                 handover_date: cutoff_date + 1.day,
+                 handover_date: cutoff_date,
                )).to eq(%i[reviewed_oasys contacted_com])
       end
 
@@ -50,9 +50,9 @@ RSpec.describe HandoverProgressChecklist do
     end
   end
 
-  context 'when enhanced handover date is on or before the cutoff (3-task version)' do
+  context 'when enhanced handover date is before the cutoff (3-task version)' do
     before do
-      allow(checklist.offender).to receive_messages(handover_date: cutoff_date)
+      allow(checklist.offender).to receive_messages(handover_date: cutoff_date - 1.day)
     end
 
     describe '#progress_data' do
@@ -123,9 +123,9 @@ RSpec.describe HandoverProgressChecklist do
     end
   end
 
-  context 'when enhanced handover date is after the cutoff (2-task version)' do
+  context 'when enhanced handover date is on or after the cutoff (2-task version)' do
     before do
-      allow(checklist.offender).to receive_messages(handover_date: cutoff_date + 1.day)
+      allow(checklist.offender).to receive_messages(handover_date: cutoff_date)
     end
 
     describe '#progress_data' do

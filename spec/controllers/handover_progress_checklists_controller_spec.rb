@@ -103,7 +103,7 @@ RSpec.describe HandoverProgressChecklistsController do
       describe 'when handover started before cutoff (3-task version)' do
         let!(:offender) do
           stub_mpc_offender(offender_no: nomis_offender_id, handover_type: 'enhanced',
-                            model: double(handover_date: cutoff_date))
+                            model: double(handover_date: cutoff_date - 1.day))
         end
 
         describe 'when checklist does not exist' do
@@ -180,10 +180,10 @@ RSpec.describe HandoverProgressChecklistsController do
         end
       end
 
-      describe 'when handover started after cutoff (2-task version)' do
+      describe 'when handover started on or after cutoff (2-task version)' do
         let!(:offender) do
           stub_mpc_offender(offender_no: nomis_offender_id, handover_type: 'enhanced',
-                            model: double(handover_date: cutoff_date + 1.day))
+                            model: double(handover_date: cutoff_date))
         end
 
         it 'persists only the simplified task fields' do
