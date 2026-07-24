@@ -8,7 +8,6 @@ RSpec.describe Reallocation::BulkReallocationNotifier do
       prison: prison,
       source_pom: source_pom,
       target_pom: target_pom,
-      email_service: email_service,
       mailer: mailer,
     )
   end
@@ -20,7 +19,6 @@ RSpec.describe Reallocation::BulkReallocationNotifier do
   let(:target_pom) do
     instance_double(StaffMember, staff_id: 10_002, full_name_ordered: 'New Pom', email_address: 'new.pom@example.com')
   end
-  let(:email_service) { class_double(EmailService, send_email: nil) }
   let(:mailer) { class_double(PomMailer) }
   let(:created_email) { instance_double(ActionMailer::MessageDelivery, deliver_later: true) }
   let(:removed_email) { instance_double(ActionMailer::MessageDelivery, deliver_later: true) }
@@ -30,7 +28,6 @@ RSpec.describe Reallocation::BulkReallocationNotifier do
     Reallocation::BulkReallocationResult::ReallocatedCase.new(
       allocation: allocation,
       selected_case: instance_double(AllocatedOffender, full_name: 'Zephyr, Alice', nomis_offender_id: 'G1234AA'),
-      further_info: { com_name: 'John Smith' },
       email_context: {
         offender_name: 'Alice Zephyr',
         prisoner_number: 'G1234AA',
@@ -71,13 +68,6 @@ RSpec.describe Reallocation::BulkReallocationNotifier do
 
     notifier.call(result)
 
-    expect(email_service).to have_received(:send_email).with(
-      allocation: allocation,
-      message: 'Bulk move',
-      pom_nomis_id: target_pom.staff_id,
-      further_info: { com_name: 'John Smith' },
-      notify_previous_pom: false,
-    )
     expect(created_email).to have_received(:deliver_later).with(no_args)
     expect(removed_email).to have_received(:deliver_later).with(no_args)
   end

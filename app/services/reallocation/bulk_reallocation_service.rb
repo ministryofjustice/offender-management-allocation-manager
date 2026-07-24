@@ -103,7 +103,6 @@ module Reallocation
       BulkReallocationResult::ReallocatedCase.new(
         allocation: persisted_allocation,
         selected_case: selected_case,
-        further_info: notification_context,
         email_context: email_context,
       )
     end
