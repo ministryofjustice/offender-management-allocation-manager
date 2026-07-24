@@ -1,6 +1,6 @@
 <% content_for :title, "Reallocation summary – Digital Prison Services" %>
 
-<%= link_to 'Back', prison_poms_path(anchor: @pom.in_limbo? ? 'attention_needed!top' : 'inactive_poms!top'),
+<%= link_to 'Back', pom_staff_list_tab_path(@pom),
             class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
 
 <div class="govuk-grid-row">
@@ -78,10 +78,10 @@
       <%= link_to 'Continue', prison_reallocation_path, role: 'button', class: 'govuk-button' %>
 
       <% if @pom.in_limbo? %>
-        <%= link_to 'Reallocate cases later', prison_poms_path(anchor: 'attention_needed!top'),
+        <%= link_to 'Reallocate cases later', pom_staff_list_tab_path(@pom),
                     role: 'button', class: 'govuk-button govuk-button--secondary', data: { module: 'govuk-button--secondary' } %>
       <% else %>
-        <%= link_to 'Skip this', prison_poms_path(anchor: 'inactive_poms!top'),
+        <%= link_to 'Skip this', pom_staff_list_tab_path(@pom),
                     role: 'button', class: 'govuk-button govuk-button--secondary', data: { module: 'govuk-button--secondary' } %>
       <% end %>
     </div>

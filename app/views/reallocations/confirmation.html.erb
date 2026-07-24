@@ -65,15 +65,15 @@
       </p>
 
       <div class="govuk-button-group">
-        <%= link_to 'Reallocate cases now', prison_reallocation_path, class: 'govuk-button' %>
-        <%= link_to 'Back to staff list', prison_poms_path(@prison.code, anchor: 'attention_needed!top'), class: 'govuk-button govuk-button--secondary' %>
+        <%= link_to 'Reallocate cases now', prison_reallocation_path(from: 'tab'), class: 'govuk-button' %>
+        <%= link_to 'Back to staff list', pom_staff_list_tab_path(@pom, @prison.code), class: 'govuk-button govuk-button--secondary' %>
       </div>
     <% else %>
       <p class="govuk-body">
         <%= @pom.full_name_ordered %> has no more cases and has been removed from this service.
       </p>
 
-      <%= link_to 'Back to staff list', prison_poms_path(@prison.code, anchor: 'attention_needed!top'), class: 'govuk-button' %>
+      <%= link_to 'Back to staff list', pom_staff_list_tab_path(@pom, @prison.code), class: 'govuk-button' %>
     <% end %>
   </div>
 </div>
