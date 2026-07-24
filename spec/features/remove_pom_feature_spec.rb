@@ -121,11 +121,11 @@ feature "remove a POM no longer present in NOMIS" do
         visit prison_poms_path(prison_id: prison.code)
       end
 
-      it 'links directly to the reallocation summary page' do
+      it 'links directly to the POM selection page, skipping the summary' do
         click_link 'Attention needed'
 
         within('section#attention_needed') do
-          expect(page).to have_link('Reallocate cases', href: reallocate_prison_pom_path(prison.code, deleted_pom_staff_id))
+          expect(page).to have_link('Reallocate cases', href: prison_reallocation_path(prison.code, deleted_pom_staff_id, from: 'tab'))
         end
       end
     end

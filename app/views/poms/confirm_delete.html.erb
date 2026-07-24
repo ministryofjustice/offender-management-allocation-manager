@@ -15,7 +15,8 @@
       <%= f.govuk_collection_radio_buttons :confirmation,
             [OpenStruct.new(value: 'yes', label: 'Yes'), OpenStruct.new(value: 'no', label: 'No')],
             :value, :label, inline: true, include_hidden: true,
-            legend: { text: "Are you sure you want to remove #{@pom.full_name_ordered} from this service?", size: 'l', tag: 'h1' } %>
+            legend: { text: "Are you sure you want to remove #{@pom.full_name_ordered} from this service?", size: 'l', tag: 'h1' },
+            hint: { text: 'If you choose yes, you will have the option to reallocate their cases in bulk.' } %>
 
       <%= f.govuk_submit 'Continue' %>
     <% end %>

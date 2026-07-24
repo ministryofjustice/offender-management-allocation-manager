@@ -1,6 +1,6 @@
 <% content_for :title, "Choose a POM – Digital Prison Services" %>
 
-<%= link_to 'Back', reallocate_prison_pom_path,
+<%= link_to 'Back', @from_tab ? pom_staff_list_tab_path(@pom) : reallocate_prison_pom_path,
             class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
 
 <div class="govuk-grid-row">
