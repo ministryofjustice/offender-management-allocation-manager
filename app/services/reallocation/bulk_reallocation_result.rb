@@ -12,7 +12,7 @@ module Reallocation
       end
     end
 
-    ReallocatedCase = Struct.new(:allocation, :selected_case, :further_info, :email_context, keyword_init: true) do
+    ReallocatedCase = Struct.new(:allocation, :selected_case, :email_context, keyword_init: true) do
       def confirmation_attributes
         {
           full_name: selected_case.full_name,

@@ -2,37 +2,23 @@
 
 module Reallocation
   class BulkReallocationNotifier
-    attr_reader :prison, :source_pom, :target_pom, :email_service, :mailer
+    attr_reader :prison, :source_pom, :target_pom, :mailer
 
-    def initialize(prison:, source_pom:, target_pom:, email_service: EmailService, mailer: PomMailer)
+    def initialize(prison:, source_pom:, target_pom:, mailer: PomMailer)
       @prison = prison
       @source_pom = source_pom
       @target_pom = target_pom
-      @email_service = email_service
       @mailer = mailer
     end
 
     def call(result)
       return if result.reallocated_cases.empty?
 
-      deliver_individual_emails(result)
       deliver_allocations_created_email(result)
       deliver_allocations_removed_email(result)
     end
 
   private
-
-    def deliver_individual_emails(result)
-      result.reallocated_cases.each do |reallocated_case|
-        email_service.send_email(
-          allocation: reallocated_case.allocation,
-          message: result.message,
-          pom_nomis_id: reallocated_case.allocation.primary_pom_nomis_id,
-          further_info: reallocated_case.further_info,
-          notify_previous_pom: false,
-        )
-      end
-    end
 
     def deliver_allocations_created_email(result)
       return if target_pom.email_address.blank?
