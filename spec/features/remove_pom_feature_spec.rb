@@ -96,7 +96,7 @@ feature "remove a POM no longer present in NOMIS" do
         end
 
         expect(page).to have_css('h1.govuk-heading-l', text: 'Confirm John Doe can be removed from this service')
-        expect(page).to have_link('Continue', href: reallocate_prison_pom_path(prison.code, removed_pom_staff_id))
+        expect(page).to have_link('Continue', href: prison_reallocation_path(prison.code, removed_pom_staff_id, from: 'tab'))
       end
     end
 
