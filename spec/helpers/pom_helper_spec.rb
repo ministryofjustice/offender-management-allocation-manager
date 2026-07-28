@@ -114,4 +114,16 @@ RSpec.describe PomHelper do
       expect(inactive_poms(poms)).not_to include(active_pom, unavailable_pom)
     end
   end
+
+  describe '#pom_staff_list_tab_path' do
+    it 'returns the inactive POMs tab for a non-limbo POM' do
+      pom = double('POM', in_limbo?: false)
+      expect(pom_staff_list_tab_path(pom, 'LEI')).to eq(prison_poms_path('LEI', anchor: 'inactive_poms!top'))
+    end
+
+    it 'returns the attention needed tab for a limbo POM' do
+      pom = double('POM', in_limbo?: true)
+      expect(pom_staff_list_tab_path(pom, 'LEI')).to eq(prison_poms_path('LEI', anchor: 'attention_needed!top'))
+    end
+  end
 end

@@ -21,6 +21,7 @@ RSpec.describe 'reallocations/index', type: :view do
   let(:all_pom_records) { [source_pom_record] + available_pom_records }
   let(:source_pom) { StaffMember.new(prison, source_pom_record.staff_id) }
   let(:available_poms) { available_pom_records.map { |pom| StaffMember.new(prison, pom.staff_id) } }
+  let(:from_tab) { false }
 
   before do
     stub_poms(prison.code, all_pom_records)
@@ -36,6 +37,7 @@ RSpec.describe 'reallocations/index', type: :view do
     assign(:available_poms, available_poms)
     assign(:prison_poms, available_poms.select(&:prison_officer?))
     assign(:probation_poms, available_poms.select(&:probation_officer?))
+    assign(:from_tab, from_tab)
   end
 
   it 'renders the reallocation-specific wrapper around the shared POM selection table' do
@@ -93,6 +95,20 @@ RSpec.describe 'reallocations/index', type: :view do
         expect(page).to have_css('#pom-selection-error')
         expect(page).to have_link('Choose at least one POM to compare workloads', href: '#pom-selection-error')
       end
+    end
+  end
+
+  context 'when navigated from a tab link' do
+    let(:from_tab) { true }
+
+    before do
+      PomDetail.find_by!(prison_code: prison.code, nomis_staff_id: source_pom.staff_id).update!(status: 'inactive')
+    end
+
+    it 'renders the back link to the POM list tabs instead of the summary page' do
+      render
+
+      expect(page).to have_link('Back', href: prison_poms_path(prison.code, anchor: 'inactive_poms!top'))
     end
   end
 end

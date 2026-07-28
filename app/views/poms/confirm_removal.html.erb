@@ -1,6 +1,6 @@
 <% content_for :title, 'Confirm POM removal – Digital Prison Services' %>
 
-<%= link_to 'Back', prison_poms_path(anchor: 'attention_needed!top'),
+<%= link_to 'Back', pom_staff_list_tab_path(@pom),
             class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
 
 <div class="govuk-grid-row">
@@ -15,12 +15,13 @@
     </p>
 
     <p class="govuk-body govuk-!-margin-bottom-6">
-      Choose continue to confirm they can be removed from this service once their cases have been reallocated.
+      Choose continue to confirm they can be removed from this service. You will then have the option to reallocate
+      their cases in bulk.
     </p>
 
     <div class="govuk-button-group">
-      <%= link_to 'Continue', reallocate_prison_pom_path(@prison.code, @pom.staff_id), role: 'button', class: 'govuk-button' %>
-      <%= link_to 'Cancel', prison_poms_path(anchor: 'attention_needed!top'), class: 'govuk-link' %>
+      <%= link_to 'Continue', prison_reallocation_path(@prison.code, @pom.staff_id, from: 'tab'), role: 'button', class: 'govuk-button' %>
+      <%= link_to 'Cancel', pom_staff_list_tab_path(@pom), class: 'govuk-link' %>
     </div>
   </div>
 </div>

@@ -12,6 +12,7 @@ module Reallocations
 
     def index
       @available_poms = active_poms.sort_by(&:full_name_ordered)
+      @from_tab = params[:from] == 'tab'
     end
 
     # NOTE: do not remove this override, it is here for explicitness

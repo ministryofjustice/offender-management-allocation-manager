@@ -77,4 +77,14 @@ module PomHelper
   def inactive_poms(poms)
     poms.select(&:inactive?)
   end
+
+  def pom_staff_list_tab_path(pom, prison_code = nil)
+    anchor = pom.in_limbo? ? 'attention_needed!top' : 'inactive_poms!top'
+
+    if prison_code
+      prison_poms_path(prison_code, anchor:)
+    else
+      prison_poms_path(anchor:)
+    end
+  end
 end
