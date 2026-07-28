@@ -59,8 +59,8 @@ module PomHelper
 
   def full_status(pom)
     {
-      active: 'Available for new allocations',
-      unavailable: 'Unavailable for new allocations',
+      active: 'Available for new cases',
+      unavailable: 'Unavailable for new cases',
       inactive: 'Away from work',
       deleted: 'No longer recorded as a POM at this prison',
     }.fetch(pom.status.downcase.to_sym)

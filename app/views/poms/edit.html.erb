@@ -14,7 +14,7 @@
       <h2 class="govuk-heading-l"><%= @pom.full_name_ordered %></h2>
 
       <div class='govuk-!-margin-top-7'>
-        <%= f.govuk_radio_buttons_fieldset(:description, legend: { text: 'Select working pattern', size: 's', tag: 'h3' }) do %>
+        <%= f.govuk_radio_buttons_fieldset(:description, legend: { text: 'Select working pattern', size: 'm', tag: 'h3' }) do %>
           <%= f.govuk_radio_button :description, 'FT', label: { text: 'Full time' }, link_errors: true %>
           <%= f.govuk_radio_button :description, 'PT', label: { text: 'Part time' } do %>
             <%= f.govuk_radio_buttons_fieldset(:working_pattern, legend: { size: 's', text: 'Select how many days per week they will work' }) do %>
@@ -26,8 +26,11 @@
         <% end %>
       </div>
 
-      <div class='govuk-!-margin-top-6'>
-        <%= f.govuk_radio_buttons_fieldset(:status, legend: { text: 'Select status', size: 's', tag: 'h3' }) do %>
+      <div class='govuk-!-margin-top-6' id="status">
+        <%= f.govuk_radio_buttons_fieldset(:status, legend: { text: 'Select status', size: 'm', tag: 'h3' }) do %>
+          <% if FeatureFlags.bulk_reallocation.enabled? %>
+            <p>To reallocate this POM's cases in bulk, first change their status to either away from work or no longer at <%= @prison.name %>.</p>
+          <% end %>
           <%= f.govuk_radio_button :status, :active,
                 label: { text: 'Available for new cases' }, link_errors: true %>
           <%= f.govuk_radio_button :status, :unavailable,
@@ -39,7 +42,7 @@
           <% if FeatureFlags.bulk_reallocation.enabled? %>
             <%= f.govuk_radio_button :status, :deleted,
                   label: { text: "No longer at #{@prison.name}" },
-                  hint: { text: 'Once you have reallocated any cases they have, they will be removed from this service.' } %>
+                  hint: { text: 'Once you have reallocated any cases this POM has, they will be removed from this service.' } %>
           <% end %>
         <% end %>
       </div>

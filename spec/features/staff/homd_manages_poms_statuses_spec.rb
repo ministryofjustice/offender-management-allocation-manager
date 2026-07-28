@@ -26,7 +26,7 @@ describe 'HOMD manages POMS statuses' do
     # Then I see the POM in the active staff section
     visit prison_poms_path(prison)
     within('section', text: 'Away from work') { expect(page).not_to have_content('Anette Pomme') }
-    within('section', text: 'Available prison POMs') { expect(page).to have_content('Anette Pomme') }
+    within('section', text: 'Prison POMs') { expect(page).to have_content('Anette Pomme') }
   end
 
   context 'when bulk_reallocation is enabled' do
@@ -45,8 +45,8 @@ describe 'HOMD manages POMS statuses' do
 
       # When I make the POM inactive
       visit prison_poms_path(prison)
-      within('section', text: 'Available prison POMs') { click_on 'Anette Pomme' }
-      within('.govuk-summary-list__row', text: 'Status Available for new allocations') { click_on 'Change' }
+      within('section', text: 'Prison POMs') { click_on 'Anette Pomme' }
+      within('.govuk-summary-list__row', text: 'Status Available for new cases') { click_on 'Change' }
       within('fieldset', text: 'Select status') { choose 'Away from work' }
       click_on 'Save'
 
@@ -61,8 +61,8 @@ describe 'HOMD manages POMS statuses' do
 
       def navigate_to_confirm_delete
         visit prison_poms_path(prison)
-        within('section', text: 'Available prison POMs') { click_on 'Anette Pomme' }
-        within('.govuk-summary-list__row', text: 'Status Available for new allocations') { click_on 'Change' }
+        within('section', text: 'Prison POMs') { click_on 'Anette Pomme' }
+        within('.govuk-summary-list__row', text: 'Status Available for new cases') { click_on 'Change' }
         within('fieldset', text: 'Select status') { choose "No longer at #{prison.name}" }
         click_on 'Save'
       end
@@ -104,8 +104,8 @@ describe 'HOMD manages POMS statuses' do
 
       # When I visit the edit page
       visit prison_poms_path(prison)
-      within('section', text: 'Available prison POMs') { click_on 'Anette Pomme' }
-      within('.govuk-summary-list__row', text: 'Status Available for new allocations') { click_on 'Change' }
+      within('section', text: 'Prison POMs') { click_on 'Anette Pomme' }
+      within('.govuk-summary-list__row', text: 'Status Available for new cases') { click_on 'Change' }
 
       # Then I do not see the deleted option
       within('fieldset', text: 'Select status') do
@@ -129,15 +129,15 @@ describe 'HOMD manages POMS statuses' do
 
       # When I make the POM inactive
       visit prison_poms_path(prison)
-      within('section', text: 'Available prison POMs') { click_on 'Anette Pomme' }
-      within('.govuk-summary-list__row', text: 'Status Available for new allocations') { click_on 'Change' }
+      within('section', text: 'Prison POMs') { click_on 'Anette Pomme' }
+      within('.govuk-summary-list__row', text: 'Status Available for new cases') { click_on 'Change' }
       within('fieldset', text: 'Select status') { choose 'Away from work' }
       click_on 'Save'
 
       # Then they appear in the away from work section
       visit prison_poms_path(prison)
       within('section', text: 'Away from work') { expect(page).to have_content('Anette Pomme') }
-      within('section', text: 'Available prison POMs') { expect(page).not_to have_content('Anette Pomme') }
+      within('section', text: 'Prison POMs') { expect(page).not_to have_content('Anette Pomme') }
 
       # And the previously allocated cases are now on the unallocated cases screen
       visit unallocated_prison_prisoners_path(prison)
