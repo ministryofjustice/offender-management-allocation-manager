@@ -113,7 +113,7 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
     let(:select_case_cell) { page.at_css('td[aria-label="Select case"]') }
     let(:case_cell) { page.at_css('td[aria-label="Case"]') }
     let(:earliest_release_date_cell) { page.at_css('td[aria-label="Earliest release date"]') }
-    let(:select_all_label) { page.at_css('label[for="nomis-offender-ids-all"]') }
+    let(:select_all_labels) { page.css('.reallocation-cases-table__select-all label') }
     let(:select_all_wrapper) { page.at_css('.reallocation-cases-table__select-all') }
     let(:continue_button) { page.at_css('[data-reallocation-continue-button="true"]') }
 
@@ -123,11 +123,8 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
       expect(response).to be_successful
       expect(assigns(:allocations).map(&:nomis_offender_id)).to eq([offender_no])
       expect(response_body).to include('name="nomis_offender_ids[]"')
-      expect(response_body).to include('data-reallocation-select-all="true"')
-      expect(response_body).to include('Select all cases (1)')
       expect(response_body).to include('data-module="moj-sortable-table"')
-      expect(response_body).to include('aria-sort="ascending">')
-      expect(select_all_label).not_to be_nil
+      expect(page.at_css('#reallocation-cases th[aria-sort="ascending"]').text.strip).to eq('Earliest release date')
       expect(select_all_wrapper).not_to be_nil
       expect(continue_button).not_to be_nil
       expect(select_case_cell['class']).to include('reallocation-cases-table__select-cell')
@@ -135,6 +132,17 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
       expect(earliest_release_date_cell['data-sort-value']).to eq('2028-04-01')
       expect(response_body).to include('Recommended POM')
       expect(response_body).to include('Additional')
+    end
+
+    it 'renders select-all checkboxes at both top and bottom of the table' do
+      perform_request
+
+      select_all_checkboxes = page.css('[data-reallocation-select-all="true"]')
+      expect(select_all_checkboxes.size).to eq(2)
+      expect(page.at_css('#nomis-offender-ids-all-top')).not_to be_nil
+      expect(page.at_css('#nomis-offender-ids-all-bottom')).not_to be_nil
+      expect(select_all_labels.size).to eq(2)
+      expect(select_all_labels.map(&:text).uniq.first).to include('Select all cases (1)')
     end
 
     context 'when the destination POM is not active' do

@@ -1,0 +1,13 @@
+<fieldset class="govuk-fieldset">
+  <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+    <div class="govuk-checkboxes__item">
+      <%= check_box_tag "select_all_cases_#{position}", '1', false,
+                        id: "nomis-offender-ids-all-#{position}",
+                        class: 'govuk-checkboxes__input',
+                        data: { reallocation_select_all: true } %>
+      <%= label_tag "nomis-offender-ids-all-#{position}",
+                    "Select all cases (#{selectable_count})",
+                    class: 'govuk-label govuk-checkboxes__label govuk-!-font-weight-bold' %>
+    </div>
+  </div>
+</fieldset>

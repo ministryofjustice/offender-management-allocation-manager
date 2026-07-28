@@ -3,12 +3,12 @@
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
       <th class="govuk-table__header reallocation-cases-table__select-column" scope="col">
-        Select case
-      </th>
-      <th class="govuk-table__header" scope="col" aria-sort="ascending">
-        Case
+        <span class="govuk-visually-hidden">Select case</span>
       </th>
       <th class="govuk-table__header" scope="col" aria-sort="none">
+        Case
+      </th>
+      <th class="govuk-table__header" scope="col" aria-sort="none" style="width: 160px;">
         Recommended POM type
       </th>
       <th class="govuk-table__header" scope="col" aria-sort="none">
@@ -22,7 +22,7 @@
         Complexity level
       </th>
       <% end %>
-      <th class="govuk-table__header" scope="col" aria-sort="none">
+      <th class="govuk-table__header" scope="col" aria-sort="ascending">
         Earliest release date
       </th>
       <th class="govuk-table__header" scope="col" aria-sort="none">
@@ -38,25 +38,23 @@
       <% coworker_conflict = (allocation.secondary_pom_nomis_id == target_pom.staff_id) %>
       <tr class="govuk-table__row offender_row_<%= allocation_counter %>">
         <td aria-label="Select case" class="govuk-table__cell govuk-!-padding-top-2 reallocation-cases-table__select-cell reallocation-cases-table__select-column">
-          <fieldset class="govuk-fieldset">
-            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-              <div class="govuk-checkboxes__item reallocation-cases-table__select-checkbox">
-                <%= check_box_tag 'nomis_offender_ids[]', allocation.nomis_offender_id, false,
-                                  id: "case-#{allocation.nomis_offender_id}",
-                                  class: 'govuk-checkboxes__input', disabled: coworker_conflict,
-                                  data: { reallocation_case_checkbox: (true unless coworker_conflict) } %>
-                <%= label_tag "case-#{allocation.nomis_offender_id}", '', class: 'govuk-label govuk-checkboxes__label' do %>
-                  <span class="govuk-visually-hidden">
-                    <% if coworker_conflict %>
-                      Cannot select <%= allocation.full_name %>: <%= target_pom.first_name %> already allocated as co-working POM
-                    <% else %>
-                      Select <%= allocation.full_name %> to reallocate
-                    <% end %>
-                  </span>
-                <% end %>
-              </div>
+          <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+            <div class="govuk-checkboxes__item reallocation-cases-table__select-checkbox">
+              <%= check_box_tag 'nomis_offender_ids[]', allocation.nomis_offender_id, false,
+                                id: "case-#{allocation.nomis_offender_id}",
+                                class: 'govuk-checkboxes__input', disabled: coworker_conflict,
+                                data: { reallocation_case_checkbox: (true unless coworker_conflict) } %>
+              <%= label_tag "case-#{allocation.nomis_offender_id}", '', class: 'govuk-label govuk-checkboxes__label' do %>
+                <span class="govuk-visually-hidden">
+                  <% if coworker_conflict %>
+                    Cannot select <%= allocation.full_name %>: <%= target_pom.first_name %> already allocated as co-working POM
+                  <% else %>
+                    Select <%= allocation.full_name %> to reallocate
+                  <% end %>
+                </span>
+              <% end %>
             </div>
-          </fieldset>
+          </div>
         </td>
         <td aria-label="Case" class="govuk-table__cell" data-sort-value="<%= allocation.full_name %>">
           <span class="prisoner-name">
@@ -93,16 +91,16 @@
         <td aria-label="Earliest release date" class="govuk-table__cell"
             data-sort-value="<%= allocation.earliest_release&.dig(:date)&.strftime('%Y-%m-%d') || '9999-12-31' %>">
           <% if allocation.earliest_release.present? %>
-            <%= allocation.earliest_release[:type] %>: <%= format_date(allocation.earliest_release[:date], replacement: 'Unknown') %>
+            <%= allocation.earliest_release[:type] %>:<br/><%= format_date(allocation.earliest_release[:date], replacement: 'Unknown') %>
           <% else %>
             Unknown
           <% end %>
         </td>
         <td aria-label="Tier" class="govuk-table__cell tier">
-          <strong><%= allocation.tier %></strong>
+          <%= allocation.tier %>
         </td>
         <td aria-label="Additional information" class="govuk-table__cell">
-          <%= simple_format(allocation.additional_information.join("\n"), {}, wrapper_tag: nil) %>
+          <%= simple_format(allocation.additional_information.join("\n"), class: 'govuk-!-margin-bottom-0', wrapper_tag: nil) %>
         </td>
       </tr>
     <% end %>
