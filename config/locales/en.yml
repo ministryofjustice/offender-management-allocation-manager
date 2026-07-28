@@ -170,9 +170,9 @@ en:
     unavailable_poms:
       title: Unavailable POMs
       body:
-        zero: There are no POMs unavailable for new allocations
-        one: There is 1 POM unavailable for new allocations
-        other: There are %{count} POMs unavailable for new allocations
+        zero: There are no POMs unavailable for new cases
+        one: There is 1 POM unavailable for new cases
+        other: There are %{count} POMs unavailable for new cases
       headers:
         pom: POM
         status: Status

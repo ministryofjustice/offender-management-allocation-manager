@@ -250,8 +250,8 @@ feature "staff pages" do
 
     it 'shows the POM staff page' do
       expect(page).to have_content("Manage your staff")
-      expect(page).to have_content("Available probation POMs")
-      expect(page).to have_content("Available prison POMs")
+      expect(page).to have_content("Probation POMs")
+      expect(page).to have_content("Prison POMs")
       expect(page).to have_content("Away from work")
     end
 
@@ -270,7 +270,7 @@ feature "staff pages" do
     end
 
     it 'can display active prison POMs case mix' do
-      click_on('Available prison POMs')
+      click_on('Prison POMs')
 
       pom_row = find('td', text: poms.last.full_name_ordered).ancestor('tr')
 

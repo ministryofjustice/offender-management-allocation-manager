@@ -55,7 +55,7 @@
             <%= render 'govuk_summary_list_row',
                        key: 'Status',
                        value: full_status(@pom),
-                       actions: @pom.editable? ? link_to('Change', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: 'govuk-link pull-right') : ''
+                       actions: @pom.editable? ? link_to('Change', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id, anchor: 'status'), class: 'govuk-link pull-right') : ''
             %>
           </dl>
         </div>

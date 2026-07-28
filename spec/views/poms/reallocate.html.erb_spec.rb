@@ -50,8 +50,8 @@ RSpec.describe 'poms/reallocate', type: :view do
       render
     end
 
-    it 'shows the coworker cases count' do
-      expect(rendered).to include('Coworker cases')
+    it 'shows the co-working cases count' do
+      expect(rendered).to include('Co-working cases')
       expect(rendered).to include('1')
     end
   end
@@ -69,8 +69,8 @@ RSpec.describe 'poms/reallocate', type: :view do
       render
     end
 
-    it 'shows the coworker cases row with zero' do
-      expect(rendered).to include('Coworker cases')
+    it 'shows the co-working cases row with zero' do
+      expect(rendered).to include('Co-working cases')
     end
   end
 end
