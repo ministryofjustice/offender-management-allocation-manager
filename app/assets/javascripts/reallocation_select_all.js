@@ -2,7 +2,6 @@ document.addEventListener('turbolinks:load', function() {
   document.querySelectorAll('[data-reallocation-case-selection]').forEach(function(form) {
     const selectAllCheckboxes = Array.from(form.querySelectorAll('[data-reallocation-select-all]'));
     const checkboxes = Array.from(form.querySelectorAll('[data-reallocation-case-checkbox]:not(:disabled)'));
-    const continueButton = form.querySelector('[data-reallocation-continue-button]');
 
     if (selectAllCheckboxes.length === 0 || checkboxes.length === 0) {
       return;
@@ -16,10 +15,6 @@ document.addEventListener('turbolinks:load', function() {
         selectAll.checked = allChecked;
         selectAll.indeterminate = anyChecked && !allChecked;
       });
-
-      if (continueButton) {
-        continueButton.disabled = !anyChecked;
-      }
     }
 
     selectAllCheckboxes.forEach(function(selectAll) {

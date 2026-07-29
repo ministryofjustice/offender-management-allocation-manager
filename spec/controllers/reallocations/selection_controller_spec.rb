@@ -115,7 +115,7 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
     let(:earliest_release_date_cell) { page.at_css('td[aria-label="Earliest release date"]') }
     let(:select_all_labels) { page.css('.reallocation-cases-table__select-all label') }
     let(:select_all_wrapper) { page.at_css('.reallocation-cases-table__select-all') }
-    let(:continue_button) { page.at_css('[data-reallocation-continue-button="true"]') }
+    let(:continue_button) { page.at_css('input[type="submit"][value="Continue"]') }
 
     it 'renders the dedicated case selection table' do
       perform_request
@@ -315,7 +315,7 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
         post :create, params: params
 
         expect(response).to redirect_to(caseload_prison_reallocation_path(prison, old_pom.staffId, new_pom.staffId))
-        expect(flash[:alert]).to eq('Choose at least one case to reallocate.')
+        expect(flash[:alert]).to eq('Select at least one case to reallocate')
       end
     end
 
@@ -378,7 +378,7 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
         post :create, params: params
 
         expect(response).to redirect_to(caseload_prison_reallocation_path(prison, old_pom.staffId, new_pom.staffId))
-        expect(flash[:alert]).to eq('Choose at least one case to reallocate.')
+        expect(flash[:alert]).to eq('Select at least one case to reallocate')
       end
     end
   end
