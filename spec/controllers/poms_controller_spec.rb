@@ -63,6 +63,8 @@ RSpec.describe PomsController, type: :controller do
       expect(response).to be_successful
 
       expect(inactive_poms.count).to eq(1)
+      expect(response.body).not_to include('No POMs away from work.')
+
       active_poms_list = active_poms.map do |pom|
         {
           staff_id: pom.staff_id,
@@ -101,6 +103,19 @@ RSpec.describe PomsController, type: :controller do
                                                                 "C",
                                                                 "C",
                                                                 "D"])
+    end
+  end
+
+  context 'when there are no inactive POMs' do
+    before do
+      PomDetail.where(status: 'inactive').destroy_all
+      stub_offenders_for_prison(prison.code, a_offenders + b_offenders + c_offenders + d_offenders)
+    end
+
+    it 'shows the empty state message in the away from work tab' do
+      get :index, params: { prison_id: prison.code }
+      expect(response).to be_successful
+      expect(response.body).to include('No POMs away from work.')
     end
   end
 

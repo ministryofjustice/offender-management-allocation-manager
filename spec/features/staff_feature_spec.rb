@@ -284,12 +284,18 @@ feature "staff pages" do
       end
     end
 
-    it 'displays the inactive POMs' do
+    it 'displays inactive POMs in the Away from work tab' do
+      PomDetail.find_by!(nomis_staff_id: prison_poms.first.staffId).update!(status: 'inactive')
+
+      visit prison_poms_path(female_prison)
       click_on('Away from work')
 
-      expect(page).to have_content('POM')
-      expect(page).to have_content('POM type')
-      expect(page).to have_content('Total cases')
+      within('#inactive_poms') do
+        expect(page).to have_content('POM')
+        expect(page).to have_content('POM type')
+        expect(page).to have_content('Total cases')
+        expect(page).to have_content(prison_poms.first.full_name_ordered)
+      end
     end
 
     it 'can view a POM' do
