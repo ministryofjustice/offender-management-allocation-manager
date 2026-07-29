@@ -46,6 +46,11 @@
   font-weight: bold;
 }
 
+.app-error-summary__text {
+  color: govuk-functional-colour("error");
+  font-weight: bold;
+}
+
 .app-sidebar-panel {
   border-top: 10px solid govuk-functional-colour("brand");
   padding-top: 10px;

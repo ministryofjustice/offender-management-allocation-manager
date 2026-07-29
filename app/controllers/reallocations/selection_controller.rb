@@ -34,7 +34,7 @@ module Reallocations
 
       if selected_cases.empty?
         redirect_to caseload_prison_reallocation_path(**reallocation_route_params),
-                    alert: 'Choose at least one case to reallocate.' and return
+                    alert: 'Select at least one case to reallocate' and return
       end
 
       clear_bulk_reallocation_confirmation!

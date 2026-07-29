@@ -119,7 +119,7 @@ module Reallocations
       return if @selected_cases.any?
 
       clear_bulk_reallocation_state!
-      redirect_to caseload_path, alert: 'Choose at least one case to reallocate.'
+      redirect_to caseload_path, alert: 'Select at least one case to reallocate'
     end
 
     def prepare_override_page(form)

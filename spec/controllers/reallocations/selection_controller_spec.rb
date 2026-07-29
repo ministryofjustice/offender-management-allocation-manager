@@ -113,9 +113,9 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
     let(:select_case_cell) { page.at_css('td[aria-label="Select case"]') }
     let(:case_cell) { page.at_css('td[aria-label="Case"]') }
     let(:earliest_release_date_cell) { page.at_css('td[aria-label="Earliest release date"]') }
-    let(:select_all_label) { page.at_css('label[for="nomis-offender-ids-all"]') }
+    let(:select_all_labels) { page.css('.reallocation-cases-table__select-all label') }
     let(:select_all_wrapper) { page.at_css('.reallocation-cases-table__select-all') }
-    let(:continue_button) { page.at_css('[data-reallocation-continue-button="true"]') }
+    let(:continue_button) { page.at_css('input[type="submit"][value="Continue"]') }
 
     it 'renders the dedicated case selection table' do
       perform_request
@@ -123,11 +123,8 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
       expect(response).to be_successful
       expect(assigns(:allocations).map(&:nomis_offender_id)).to eq([offender_no])
       expect(response_body).to include('name="nomis_offender_ids[]"')
-      expect(response_body).to include('data-reallocation-select-all="true"')
-      expect(response_body).to include('Select all cases (1)')
       expect(response_body).to include('data-module="moj-sortable-table"')
-      expect(response_body).to include('aria-sort="ascending">')
-      expect(select_all_label).not_to be_nil
+      expect(page.at_css('#reallocation-cases th[aria-sort="ascending"]').text.strip).to eq('Earliest release date')
       expect(select_all_wrapper).not_to be_nil
       expect(continue_button).not_to be_nil
       expect(select_case_cell['class']).to include('reallocation-cases-table__select-cell')
@@ -135,6 +132,17 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
       expect(earliest_release_date_cell['data-sort-value']).to eq('2028-04-01')
       expect(response_body).to include('Recommended POM')
       expect(response_body).to include('Additional')
+    end
+
+    it 'renders select-all checkboxes at both top and bottom of the table' do
+      perform_request
+
+      select_all_checkboxes = page.css('[data-reallocation-select-all="true"]')
+      expect(select_all_checkboxes.size).to eq(2)
+      expect(page.at_css('#nomis-offender-ids-all-top')).not_to be_nil
+      expect(page.at_css('#nomis-offender-ids-all-bottom')).not_to be_nil
+      expect(select_all_labels.size).to eq(2)
+      expect(select_all_labels.map(&:text).uniq.first).to include('Select all cases (1)')
     end
 
     context 'when the destination POM is not active' do
@@ -157,6 +165,57 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
 
         expect(response).to be_successful
         expect(response.body).to include('Complexity level')
+      end
+    end
+
+    describe 'Recommended POM type cell' do
+      def recommended_cell_for(noms_id)
+        page.at_css("#case-#{noms_id}")&.ancestors('tr')&.first&.at_css('td[aria-label="Recommended POM type"]')
+      end
+
+      context 'when a recommendation is available' do
+        it 'shows the recommendation as plain text without a highlight' do
+          perform_request
+
+          cell = recommended_cell_for(offender_no)
+          expect(cell.text.strip).to eq('Probation POM')
+          expect(cell.at_css('.highlight-primary')).to be_nil
+          expect(cell.at_css('.highlight-secondary')).to be_nil
+        end
+      end
+
+      context 'when there is no recommendation (missing ROSH)' do
+        let(:no_rec_offender_no) { 'G7777NR' }
+        let(:no_rec_offender) do
+          build(
+            :nomis_offender,
+            :inside_omic_policy,
+            prisonId: prison.code,
+            prisonerNumber: no_rec_offender_no,
+            firstName: 'Dana',
+            lastName: 'NoRosh',
+            sentence: attributes_for(:sentence_detail, conditionalReleaseDate: '2028-07-01', releaseDate: '2029-07-01')
+          )
+        end
+        let(:offenders_in_prison) { [no_rec_offender] }
+
+        before do
+          AllocationHistory.find_by(nomis_offender_id: offender_no)&.destroy
+          CaseInformation.joins(:offender).where(offender: { nomis_offender_id: offender_no }).destroy_all
+          create_reallocation_case(no_rec_offender_no, tier: 'B', rosh_level: nil)
+          stub_oasys_assessments(no_rec_offender_no)
+        end
+
+        it 'shows alert-highlighted "No POM type recommendation" with "Missing ROSH"' do
+          perform_request
+
+          cell = recommended_cell_for(no_rec_offender_no)
+          primary = cell.at_css('.highlight-primary.highlight-alert')
+          secondary = cell.at_css('.highlight-secondary.highlight-alert')
+
+          expect(primary.text.strip).to eq('No POM type recommendation')
+          expect(secondary.text.strip).to eq('Missing ROSH')
+        end
       end
     end
 
@@ -202,16 +261,44 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
         expect(normal_checkbox['disabled']).to be_nil
       end
 
-      it 'shows the "already allocated as co-working POM" highlight for the conflicting case' do
+      it 'shows neutral-highlighted recommendation with "already allocated as co-working POM"' do
         perform_request
 
-        expect(response.body).to include('already allocated as co-working POM')
+        page = Nokogiri::HTML(response.body)
+        coworker_row = page.at_css("#case-#{coworker_offender_no}")&.ancestors('tr')&.first
+        cell = coworker_row.at_css('td[aria-label="Recommended POM type"]')
+        primary = cell.at_css('.highlight-primary.highlight-neutral')
+        secondary = cell.at_css('.highlight-secondary.highlight-neutral')
+
+        expect(primary.text.strip).to eq('Probation POM')
+        expect(secondary.text).to include('already allocated as co-working POM')
       end
 
       it 'adjusts the select-all count to exclude the conflicting case' do
         perform_request
 
         expect(response.body).to include('Select all cases (1)')
+      end
+
+      context 'when the co-working case also has no recommendation (missing ROSH)' do
+        before do
+          CaseInformation.joins(:offender)
+                         .where(offender: { nomis_offender_id: coworker_offender_no })
+                         .update_all(rosh_level: nil)
+        end
+
+        it 'shows neutral highlight (co-worker conflict takes priority over alert)' do
+          perform_request
+
+          page = Nokogiri::HTML(response.body)
+          coworker_row = page.at_css("#case-#{coworker_offender_no}")&.ancestors('tr')&.first
+          cell = coworker_row.at_css('td[aria-label="Recommended POM type"]')
+          primary = cell.at_css('.highlight-primary.highlight-neutral')
+          secondary = cell.at_css('.highlight-secondary.highlight-neutral')
+
+          expect(primary.text.strip).to eq('No POM type recommendation')
+          expect(secondary.text).to include('already allocated as co-working POM')
+        end
       end
     end
   end
@@ -228,7 +315,7 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
         post :create, params: params
 
         expect(response).to redirect_to(caseload_prison_reallocation_path(prison, old_pom.staffId, new_pom.staffId))
-        expect(flash[:alert]).to eq('Choose at least one case to reallocate.')
+        expect(flash[:alert]).to eq('Select at least one case to reallocate')
       end
     end
 
@@ -291,7 +378,7 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
         post :create, params: params
 
         expect(response).to redirect_to(caseload_prison_reallocation_path(prison, old_pom.staffId, new_pom.staffId))
-        expect(flash[:alert]).to eq('Choose at least one case to reallocate.')
+        expect(flash[:alert]).to eq('Select at least one case to reallocate')
       end
     end
   end

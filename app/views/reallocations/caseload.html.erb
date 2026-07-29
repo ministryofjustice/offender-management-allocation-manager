@@ -8,14 +8,15 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <% if flash[:alert] %>
-      <div class="govuk-error-summary govuk-!-margin-bottom-6" aria-labelledby="reallocation-error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+      <div class="govuk-error-summary govuk-!-margin-bottom-8" aria-labelledby="reallocation-error-summary-title"
+           role="alert" tabindex="-1" data-module="govuk-error-summary">
         <h2 id="reallocation-error-summary-title" class="govuk-error-summary__title">
           There is a problem
         </h2>
 
         <div class="govuk-error-summary__body">
           <ul class="govuk-list govuk-error-summary__list">
-            <li><%= flash[:alert] %></li>
+            <li><span class="app-error-summary__text"><%= flash[:alert] %></span></li>
           </ul>
         </div>
       </div>
@@ -27,26 +28,21 @@
 
   <% selectable_count = @allocations.count { it.secondary_pom_nomis_id != @new_pom.staff_id } %>
 
-  <div class="govuk-grid-column-full govuk-!-margin-top-6">
+  <div class="govuk-grid-column-full govuk-!-margin-top-2">
     <%= form_tag(caseload_prison_reallocation_path(@prison.code, @pom.staff_id, @new_pom.staff_id),
                  method: :post, data: { reallocation_case_selection: true }) do %>
-      <%= render 'caseload_table', collection: @allocations, target_pom: @new_pom %>
 
-      <div class="govuk-form-group govuk-!-margin-top-6 govuk-!-margin-bottom-6 reallocation-cases-table__select-all">
-        <fieldset class="govuk-fieldset">
-          <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-            <div class="govuk-checkboxes__item">
-              <%= check_box_tag :select_all_cases, '1', false, id: 'nomis-offender-ids-all',
-                                class: 'govuk-checkboxes__input', data: { reallocation_select_all: true } %>
-              <%= label_tag 'nomis-offender-ids-all',
-                            "Select all cases (#{selectable_count})",
-                            class: 'govuk-label govuk-checkboxes__label govuk-!-font-weight-bold' %>
-            </div>
-          </div>
-        </fieldset>
+      <div class="govuk-form-group govuk-!-padding-left-3 govuk-!-margin-bottom-2 reallocation-cases-table__select-all">
+        <%= render 'select_all_cases', selectable_count:, position: 'top' %>
       </div>
 
-      <%= submit_tag 'Continue', class: 'govuk-button', data: { module: 'govuk-button', reallocation_continue_button: true } %>
+      <%= render 'caseload_table', collection: @allocations, target_pom: @new_pom %>
+
+      <div class="govuk-form-group govuk-!-padding-left-3 govuk-!-margin-bottom-7 reallocation-cases-table__select-all">
+        <%= render 'select_all_cases', selectable_count:, position: 'bottom' %>
+      </div>
+
+      <%= submit_tag 'Continue', class: 'govuk-button', data: { module: 'govuk-button' } %>
     <% end %>
   </div>
 </div>
