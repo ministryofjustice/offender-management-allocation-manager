@@ -319,5 +319,101 @@ RSpec.describe Prison do
         expect(removed.first.staff_id).to eq(pom2.staff_id)
       end
     end
+
+    context 'when a ghost POM has allocations but no PomDetail record' do
+      let(:ghost_staff_id) { 999_999 }
+
+      let!(:allocation) do
+        create(:allocation_history,
+               prison: prison.code,
+               primary_pom_nomis_id: ghost_staff_id,
+               nomis_offender_id: offender_no)
+      end
+
+      before do
+        allow(prison).to receive(:allocated).and_return(
+          [MpcOffender.new(prison:, offender:, prison_record:)]
+        )
+      end
+
+      it 'returns the ghost POM as needing attention' do
+        removed = prison.get_removed_poms(existing_poms: [pom1, pom2])
+
+        expect(removed.size).to eq(1)
+        expect(removed.first).to be_a(StaffMember)
+        expect(removed.first.staff_id).to eq(ghost_staff_id)
+      end
+
+      it 'creates a PomDetail with deleted status for the ghost POM' do
+        expect { prison.get_removed_poms(existing_poms: [pom1, pom2]) }
+          .to change { PomDetail.where(prison_code: prison.code, nomis_staff_id: ghost_staff_id).count }.from(0).to(1)
+
+        pom_detail = PomDetail.find_by(prison_code: prison.code, nomis_staff_id: ghost_staff_id)
+        expect(pom_detail.status).to eq('deleted')
+        expect(pom_detail.working_pattern).to eq(0.0)
+      end
+
+      it 'does not create duplicate PomDetails on repeated calls' do
+        prison.get_removed_poms(existing_poms: [pom1, pom2])
+        expect { prison.get_removed_poms(existing_poms: [pom1, pom2]) }
+          .not_to(change { PomDetail.where(prison_code: prison.code, nomis_staff_id: ghost_staff_id).count })
+      end
+    end
+
+    context 'when a ghost POM has allocations but the offender has left the prison' do
+      let(:ghost_staff_id) { 999_999 }
+
+      let!(:allocation) do
+        create(:allocation_history,
+               prison: prison.code,
+               primary_pom_nomis_id: ghost_staff_id,
+               nomis_offender_id: offender_no)
+      end
+
+      before do
+        # No offenders at the prison
+        allow(prison).to receive(:allocated).and_return([])
+      end
+
+      it 'does not return the ghost POM because their cases are no longer at this prison' do
+        removed = prison.get_removed_poms(existing_poms: [pom1, pom2])
+        expect(removed).to be_empty
+      end
+    end
+
+    context 'when both removed and ghost POMs have allocations' do
+      let(:ghost_staff_id) { 999_999 }
+      let(:offender_no_2) { 'T0000B' }
+      let(:offender_2) { double(offender_no: offender_no_2) }
+      let(:prison_record_2) { double(offender_no: offender_no_2) }
+
+      let!(:allocation_removed) do
+        create(:allocation_history,
+               prison: prison.code,
+               primary_pom_nomis_id: pom2.staff_id,
+               nomis_offender_id: offender_no)
+      end
+
+      let!(:allocation_ghost) do
+        create(:allocation_history,
+               prison: prison.code,
+               primary_pom_nomis_id: ghost_staff_id,
+               nomis_offender_id: offender_no_2)
+      end
+
+      before do
+        allow(prison).to receive(:allocated).and_return([
+          MpcOffender.new(prison:, offender:, prison_record:),
+          MpcOffender.new(prison:, offender: offender_2, prison_record: prison_record_2),
+        ])
+      end
+
+      it 'returns both removed and ghost POMs without duplicates' do
+        removed = prison.get_removed_poms(existing_poms: [pom1])
+
+        expect(removed.size).to eq(2)
+        expect(removed.map(&:staff_id)).to contain_exactly(pom2.staff_id, ghost_staff_id)
+      end
+    end
   end
 end
