@@ -37,11 +37,28 @@ class Prison < ApplicationRecord
   end
 
   def get_removed_poms(existing_poms:)
-    removed_poms = pom_details.where.not(nomis_staff_id: existing_poms.map(&:staff_id))
+    existing_pom_ids = existing_poms.map(&:staff_id)
 
-    removed_poms.filter(&:has_primary_allocations?).map do |pom_detail|
-      StaffMember.new(self, pom_detail.nomis_staff_id, pom_detail)
-    end
+    relevant_allocations = limbo_allocations_for(existing_pom_ids)
+    return [] if relevant_allocations.none?
+
+    # POMs that have a `PomDetail` but are no longer in NOMIS
+    removed_pom_details = pom_details.where.not(nomis_staff_id: existing_pom_ids)
+    staff_ids_with_allocations = relevant_allocations
+      .where(primary_pom_nomis_id: removed_pom_details.select(:nomis_staff_id))
+      .distinct.pluck(:primary_pom_nomis_id)
+
+    removed_poms = removed_pom_details
+      .where(nomis_staff_id: staff_ids_with_allocations)
+      .map { StaffMember.new(self, it.nomis_staff_id, it) }
+
+    # "Ghost" POMs: have active allocations but no `PomDetail` record
+    known_pom_ids = existing_pom_ids + pom_details.pluck(:nomis_staff_id)
+    ghost_pom_ids = relevant_allocations
+      .where.not(primary_pom_nomis_id: known_pom_ids)
+      .distinct.pluck(:primary_pom_nomis_id)
+
+    removed_poms + ghost_pom_ids.map { find_or_create_ghost_pom(it) }
   end
 
   def active?
@@ -97,11 +114,31 @@ private
     @summary ||= AllocationsSummary.new(self)
   end
 
+  # Returns allocations for POMs not in the active list, scoped to offenders
+  # still at this prison. Returns an empty relation if there are no candidates
+  # (avoids the expensive `allocated` call when unnecessary)
+  def limbo_allocations_for(existing_pom_ids)
+    candidates = AllocationHistory.active_allocations_for_prison(code)
+      .where.not(primary_pom_nomis_id: existing_pom_ids)
+
+    return AllocationHistory.none unless candidates.exists?
+
+    candidates.where(nomis_offender_id: allocated.map(&:offender_no))
+  end
+
+  # Creates a deleted `PomDetail` so existing flows (bulk reallocation,
+  # NomisUserRolesService.remove_pom) work seamlessly
+  def find_or_create_ghost_pom(staff_id)
+    pom_detail = PomDetail.find_or_create_as_system!(
+      prison_code: code, nomis_staff_id: staff_id, status: 'deleted'
+    )
+    Rails.logger.info("event=ghost_pom_created,staff_id=#{staff_id},prison=#{code}") if pom_detail.previously_new_record?
+
+    StaffMember.new(self, staff_id, pom_detail)
+  end
+
   def get_pom_detail(details, pom)
-    details.detect { |d| d.nomis_staff_id == pom.staff_id } ||
-      PomDetail.find_or_create_by!(prison_code: code, nomis_staff_id: pom.staff_id) do |pd|
-        pd.hours_per_week = 0 # TODO: decide if we want to use `pom.hours_per_week` (NOMIS hours)
-        pd.status = 'active'
-      end
+    details.detect { it.nomis_staff_id == pom.staff_id } ||
+      PomDetail.find_or_create_as_system!(prison_code: code, nomis_staff_id: pom.staff_id)
   end
 end

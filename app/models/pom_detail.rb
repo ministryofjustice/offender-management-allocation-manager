@@ -23,6 +23,18 @@ class PomDetail < ApplicationRecord
 
   belongs_to :prison, foreign_key: :prison_code, inverse_of: :pom_details
 
+  def self.find_or_create_as_system!(prison_code:, nomis_staff_id:, status: 'active', working_pattern: 0.0)
+    find_by(prison_code:, nomis_staff_id:) ||
+      PaperTrail.request(whodunnit: nil) do
+        find_or_create_by!(prison_code:, nomis_staff_id:) do |pd|
+          pd.working_pattern = working_pattern
+          pd.status = status
+        end
+      end
+  rescue ActiveRecord::RecordNotUnique
+    find_by!(prison_code:, nomis_staff_id:)
+  end
+
   # @return [Array<MpcOffender>] Allocated offenders for this POM
   def allocations
     @allocations ||= begin
