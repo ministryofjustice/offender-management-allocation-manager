@@ -168,6 +168,57 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
       end
     end
 
+    describe 'Recommended POM type cell' do
+      def recommended_cell_for(noms_id)
+        page.at_css("#case-#{noms_id}")&.ancestors('tr')&.first&.at_css('td[aria-label="Recommended POM type"]')
+      end
+
+      context 'when a recommendation is available' do
+        it 'shows the recommendation as plain text without a highlight' do
+          perform_request
+
+          cell = recommended_cell_for(offender_no)
+          expect(cell.text.strip).to eq('Probation POM')
+          expect(cell.at_css('.highlight-primary')).to be_nil
+          expect(cell.at_css('.highlight-secondary')).to be_nil
+        end
+      end
+
+      context 'when there is no recommendation (missing ROSH)' do
+        let(:no_rec_offender_no) { 'G7777NR' }
+        let(:no_rec_offender) do
+          build(
+            :nomis_offender,
+            :inside_omic_policy,
+            prisonId: prison.code,
+            prisonerNumber: no_rec_offender_no,
+            firstName: 'Dana',
+            lastName: 'NoRosh',
+            sentence: attributes_for(:sentence_detail, conditionalReleaseDate: '2028-07-01', releaseDate: '2029-07-01')
+          )
+        end
+        let(:offenders_in_prison) { [no_rec_offender] }
+
+        before do
+          AllocationHistory.find_by(nomis_offender_id: offender_no)&.destroy
+          CaseInformation.joins(:offender).where(offender: { nomis_offender_id: offender_no }).destroy_all
+          create_reallocation_case(no_rec_offender_no, tier: 'B', rosh_level: nil)
+          stub_oasys_assessments(no_rec_offender_no)
+        end
+
+        it 'shows alert-highlighted "No POM type recommendation" with "Missing ROSH"' do
+          perform_request
+
+          cell = recommended_cell_for(no_rec_offender_no)
+          primary = cell.at_css('.highlight-primary.highlight-alert')
+          secondary = cell.at_css('.highlight-secondary.highlight-alert')
+
+          expect(primary.text.strip).to eq('No POM type recommendation')
+          expect(secondary.text.strip).to eq('Missing ROSH')
+        end
+      end
+    end
+
     context 'when the target POM is already the co-working POM on a case' do
       let(:coworker_offender_no) { 'G9999CC' }
       let(:coworker_offender) do
@@ -210,16 +261,44 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
         expect(normal_checkbox['disabled']).to be_nil
       end
 
-      it 'shows the "already allocated as co-working POM" highlight for the conflicting case' do
+      it 'shows neutral-highlighted recommendation with "already allocated as co-working POM"' do
         perform_request
 
-        expect(response.body).to include('already allocated as co-working POM')
+        page = Nokogiri::HTML(response.body)
+        coworker_row = page.at_css("#case-#{coworker_offender_no}")&.ancestors('tr')&.first
+        cell = coworker_row.at_css('td[aria-label="Recommended POM type"]')
+        primary = cell.at_css('.highlight-primary.highlight-neutral')
+        secondary = cell.at_css('.highlight-secondary.highlight-neutral')
+
+        expect(primary.text.strip).to eq('Probation POM')
+        expect(secondary.text).to include('already allocated as co-working POM')
       end
 
       it 'adjusts the select-all count to exclude the conflicting case' do
         perform_request
 
         expect(response.body).to include('Select all cases (1)')
+      end
+
+      context 'when the co-working case also has no recommendation (missing ROSH)' do
+        before do
+          CaseInformation.joins(:offender)
+                         .where(offender: { nomis_offender_id: coworker_offender_no })
+                         .update_all(rosh_level: nil)
+        end
+
+        it 'shows neutral highlight (co-worker conflict takes priority over alert)' do
+          perform_request
+
+          page = Nokogiri::HTML(response.body)
+          coworker_row = page.at_css("#case-#{coworker_offender_no}")&.ancestors('tr')&.first
+          cell = coworker_row.at_css('td[aria-label="Recommended POM type"]')
+          primary = cell.at_css('.highlight-primary.highlight-neutral')
+          secondary = cell.at_css('.highlight-secondary.highlight-neutral')
+
+          expect(primary.text.strip).to eq('No POM type recommendation')
+          expect(secondary.text).to include('already allocated as co-working POM')
+        end
       end
     end
   end

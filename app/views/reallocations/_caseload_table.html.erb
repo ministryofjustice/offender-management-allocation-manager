@@ -69,12 +69,18 @@
           </span>
         </td>
         <td aria-label="Recommended POM type" class="govuk-table__cell reallocation-cases-table__recommended-column">
-          <%= highlight_conditionally('alert', "#{target_pom.first_name} already allocated as co-working POM", -> { coworker_conflict }) do %>
-            <%= case allocation.recommended_pom_type
-                when RecommendationService::PRISON_POM then 'Prison POM'
-                when RecommendationService::PROBATION_POM then 'Probation POM'
-                else safe_join(['No POM type', tag.br, 'recommendation', tag.br, '– missing ROSH'])
-                end %>
+          <% if allocation.recommended_pom_type == RecommendationService::NO_RECOMMENDATION %>
+            <% if coworker_conflict %>
+              <%= highlight_tag('primary', 'neutral') { 'No POM type recommendation' } %>
+              <%= highlight_tag('secondary', 'neutral', "#{target_pom.first_name} already allocated as co-working POM") %>
+            <% else %>
+              <%= highlight_tag('primary', 'alert') { 'No POM type recommendation' } %>
+              <%= highlight_tag('secondary', 'alert', 'Missing ROSH') %>
+            <% end %>
+          <% else %>
+            <%= highlight_conditionally('neutral', "#{target_pom.first_name} already allocated as co-working POM", -> { coworker_conflict }) do %>
+              <%= allocation.recommended_pom_type == RecommendationService::PRISON_POM ? 'Prison POM' : 'Probation POM' %>
+            <% end %>
           <% end %>
         </td>
         <td aria-label="POM role needed" class="govuk-table__cell">

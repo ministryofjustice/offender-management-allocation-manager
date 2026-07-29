@@ -2,7 +2,7 @@ module Components
   module HighlightsHelper
     def highlight_tag(type, level, text_content = nil, more_classes: [], &block_content)
       raise ArgumentError, 'Invalid type' unless %w[primary secondary].include?(type)
-      raise ArgumentError, 'Invalid level' unless %w[notice alert].include?(level)
+      raise ArgumentError, 'Invalid level' unless %w[notice alert neutral].include?(level)
 
       classes_list = ["highlight-#{type}", "highlight-#{level}"] + more_classes
       if text_content.present?

@@ -1,8 +1,9 @@
 @use "gov_uk" as *;
 
 $bright-red: govuk-colour("red");
-$mid-gray: govuk-functional-colour("border");
-$purble: govuk-colour("purple");
+$light-grey: govuk-colour("black", $variant: "tint-80");
+$mid-grey: govuk-colour("black", $variant: "tint-50");
+$purple: govuk-colour("purple");
 
 @media screen and (max-width: 768px) {
   table.responsive thead {
@@ -10,12 +11,12 @@ $purble: govuk-colour("purple");
   }
 
   table.responsive tr {
-    border-bottom: 2px solid $mid-gray;
+    border-bottom: 2px solid $light-grey;
     display: block;
   }
 
   table.responsive td {
-    border-bottom: 1px solid $mid-gray;
+    border-bottom: 1px solid $light-grey;
     display: block;
     text-align: right;
     &:last-child {
@@ -56,15 +57,19 @@ $purble: govuk-colour("purple");
   }
 
   .highlight-notice {
-    border-left: 5px solid $purble;
+    border-left: 5px solid $purple;
   }
 
   .highlight-alert {
     border-left: 5px solid $bright-red;
   }
 
+  .highlight-neutral {
+    border-left: 5px solid $mid-grey;
+  }
+
   .highlight-cell {
-    border-left: 5px solid $purble;
+    border-left: 5px solid $purple;
     padding-left: 5px;
   }
 }
