@@ -65,6 +65,45 @@ RSpec.describe PomDetail, type: :model do
     end
   end
 
+  describe '.find_or_create_as_system!' do
+    let(:nomis_staff_id) { 555_555 }
+
+    it 'creates a PomDetail with default attributes' do
+      pom_detail = described_class.find_or_create_as_system!(prison_code: prison.code, nomis_staff_id:)
+
+      expect(pom_detail).to be_persisted
+      expect(pom_detail.status).to eq('active')
+      expect(pom_detail.working_pattern).to eq(0.0)
+    end
+
+    it 'accepts custom status and working_pattern' do
+      pom_detail = described_class.find_or_create_as_system!(prison_code: prison.code, nomis_staff_id:, status: 'deleted', working_pattern: 0.5)
+
+      expect(pom_detail.status).to eq('deleted')
+      expect(pom_detail.working_pattern).to eq(0.5)
+    end
+
+    it 'returns the existing record if one already exists' do
+      existing = create(:pom_detail, prison:, nomis_staff_id:, status: 'active')
+
+      result = described_class.find_or_create_as_system!(prison_code: prison.code, nomis_staff_id:, status: 'deleted')
+
+      expect(result.id).to eq(existing.id)
+      expect(result.status).to eq('active')
+    end
+
+    it 'records as system-initiated even during a user session' do
+      PaperTrail.request.whodunnit = 'SPO_USER'
+
+      described_class.find_or_create_as_system!(prison_code: prison.code, nomis_staff_id:)
+
+      version = PaperTrail::Version.where(item_type: 'PomDetail').last
+      expect(version.whodunnit).to be_nil
+    ensure
+      PaperTrail.request.whodunnit = nil
+    end
+  end
+
   describe '#save_audit_event' do
     before do
       PaperTrail.request.whodunnit = 'SPO_USER'

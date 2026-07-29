@@ -125,7 +125,7 @@ private
 
   # Attempt to forward-populate the PomDetail table for new records
   def default_pom_detail(prison, staff_id)
-    prison.pom_details.find_by(nomis_staff_id: staff_id) || prison.pom_details.create!(working_pattern: 0.0, status: 'active', nomis_staff_id: staff_id)
+    PomDetail.find_or_create_as_system!(prison_code: prison.code, nomis_staff_id: staff_id)
   end
 
   # This may raise a 404 for no longer existing NOMIS accounts (should be rare).

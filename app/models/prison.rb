@@ -128,22 +128,17 @@ private
 
   # Creates a deleted `PomDetail` so existing flows (bulk reallocation,
   # NomisUserRolesService.remove_pom) work seamlessly
-  def find_or_create_ghost_pom(nomis_staff_id)
-    pom_detail = pom_details.find_or_create_by!(nomis_staff_id:) do |pd|
-      pd.working_pattern = 0.0
-      pd.status = 'deleted'
-      Rails.logger.info("event=ghost_pom_created,staff_id=#{nomis_staff_id},prison=#{code}")
-    end
-    StaffMember.new(self, nomis_staff_id, pom_detail)
-  rescue ActiveRecord::RecordNotUnique
-    StaffMember.new(self, nomis_staff_id, pom_details.find_by!(nomis_staff_id:))
+  def find_or_create_ghost_pom(staff_id)
+    pom_detail = PomDetail.find_or_create_as_system!(
+      prison_code: code, nomis_staff_id: staff_id, status: 'deleted'
+    )
+    Rails.logger.info("event=ghost_pom_created,staff_id=#{staff_id},prison=#{code}") if pom_detail.previously_new_record?
+
+    StaffMember.new(self, staff_id, pom_detail)
   end
 
   def get_pom_detail(details, pom)
-    details.detect { |d| d.nomis_staff_id == pom.staff_id } ||
-      PomDetail.find_or_create_by!(prison_code: code, nomis_staff_id: pom.staff_id) do |pd|
-        pd.hours_per_week = 0 # TODO: decide if we want to use `pom.hours_per_week` (NOMIS hours)
-        pd.status = 'active'
-      end
+    details.detect { it.nomis_staff_id == pom.staff_id } ||
+      PomDetail.find_or_create_as_system!(prison_code: code, nomis_staff_id: pom.staff_id)
   end
 end
