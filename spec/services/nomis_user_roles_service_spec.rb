@@ -42,6 +42,44 @@ RSpec.describe NomisUserRolesService do
       expect(total).to eq(2)
     end
 
+    context 'when a POM has been soft-deleted but still has their NOMIS role' do
+      before do
+        # POM 333 is soft-deleted locally but their NOMIS role has not yet been
+        # expired (e.g. cases still pending reallocation). They should still be
+        # excluded from the search results to prevent re-onboarding mid-removal
+        allow(prison).to receive(:get_list_of_poms)
+          .with(include_deleted: true)
+          .and_return([double(staff_id: 222), double(staff_id: 333)])
+      end
+
+      it 'excludes the soft-deleted POM from results' do
+        results, total = described_class.search_staff(prison, filter)
+
+        expect(results).to contain_exactly({ 'staffId' => 111 })
+        expect(total).to eq(1)
+      end
+    end
+
+    context 'when a POM has been fully removed (role expired in NOMIS)' do
+      before do
+        # POM 222 was previously removed and their NOMIS role has been expired,
+        # so `get_list_of_poms` no longer returns them. They will appear in the
+        # search results so they can be re-onboarded
+        allow(prison).to receive(:get_list_of_poms)
+          .with(include_deleted: true)
+          .and_return([])
+      end
+
+      it 'includes the fully removed POM in results' do
+        results, total = described_class.search_staff(prison, filter)
+
+        expect(results).to contain_exactly(
+          { 'staffId' => 111 }, { 'staffId' => 222 }, { 'staffId' => 333 }
+        )
+        expect(total).to eq(3)
+      end
+    end
+
     context 'when API returns empty results' do
       let(:api_response) { {} }
 
