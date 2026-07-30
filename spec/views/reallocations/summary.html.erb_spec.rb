@@ -26,7 +26,8 @@ RSpec.describe 'reallocations/summary', type: :view do
     instance_double(
       AllocatedOffender,
       full_name: 'Bob Amber',
-      nomis_offender_id: 'G5678BB'
+      nomis_offender_id: 'G5678BB',
+      allocated_pom_role: 'Responsible'
     )
   end
 
@@ -44,6 +45,46 @@ RSpec.describe 'reallocations/summary', type: :view do
     assign(:selected_cases, [selected_case])
     assign(:cases_remaining, 4)
     assign(:back_path, '/back')
+  end
+
+  context 'when both POMs have email addresses' do
+    before do
+      assign(:allocation, AllocationForm.new)
+      render
+    end
+
+    it 'displays both emails in bold joined by "and"' do
+      expect(rendered).to include(
+        "<strong>#{source_pom.email_address}</strong> and <strong>#{target_pom.email_address}</strong>"
+      )
+    end
+
+    it 'lists each selected case with name, NOMIS ID, and role' do
+      expect(page).to have_css('li', text: 'Bob Amber (G5678BB) – responsible')
+    end
+  end
+
+  context 'when only one POM has an email address' do
+    let(:target_pom_record) do
+      build(:pom,
+            :probation_officer,
+            staffId: 10_002,
+            firstName: 'Target',
+            lastName: 'Pom',
+            primaryEmail: nil,
+            emails: [])
+    end
+
+    before do
+      assign(:allocation, AllocationForm.new)
+      render
+    end
+
+    it 'displays only the available email in bold' do
+      expect(page).to have_css('strong', text: source_pom.email_address, count: 1)
+      expect(page).to have_css('strong', count: 1)
+      expect(rendered).not_to include(' and ')
+    end
   end
 
   context 'when the allocation form has errors' do

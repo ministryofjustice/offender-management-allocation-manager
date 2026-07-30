@@ -35,6 +35,7 @@ module Reallocation
 
       build_result(message, reallocated_cases, failed_cases).tap do |result|
         BulkReallocationNotifier.new(prison:, source_pom:, target_pom:).call(result)
+        publish_audit_event(result)
       end
     end
 
@@ -125,6 +126,30 @@ module Reallocation
     def remaining_cases_count
       AllocationHistory.active.for_primary_pom(source_pom.staff_id).at_prison(prison)
         .where(nomis_offender_id: prison.all_policy_offenders.map(&:offender_no)).count
+    end
+
+    def publish_audit_event(result)
+      AuditEvent.publish(
+        tags: ['bulk_reallocation', "source_pom_#{source_pom.status}"],
+        username: PaperTrail.request.whodunnit,
+        system_event: false,
+        data: {
+          prison_code: prison.code,
+          source_pom_id: source_pom.staff_id,
+          source_pom_name: source_pom.full_name,
+          source_pom_position: source_pom.position,
+          source_pom_status: source_pom.status,
+          target_pom_id: target_pom.staff_id,
+          target_pom_name: target_pom.full_name,
+          target_pom_position: target_pom.position,
+          reallocated_count: result.reallocated_cases.size,
+          override_count: journey.override_offender_ids.size,
+          failed_count: result.failed_cases.size,
+          remaining_count: result.remaining_cases_count,
+          reallocated_offender_ids: result.reallocated_cases.map { it.selected_case.nomis_offender_id },
+          failed_offender_ids: result.failed_cases.map { it.selected_case.nomis_offender_id },
+        },
+      )
     end
   end
 end

@@ -48,7 +48,19 @@
         </summary>
 
         <div class="govuk-details__text">
-          <%= render partial: 'confirmation_copy_details', locals: { selected_cases: @selected_cases, message: @message } %>
+          <div id="bulk-reallocation-text-to-copy">
+            <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+              <% @selected_cases.each do |selected_case| %>
+                <li><%= selected_case.fetch(:full_name) %> (<%= selected_case.fetch(:nomis_offender_id) %>) &ndash; <%= selected_case.fetch(:allocated_pom_role).downcase %></li>
+              <% end %>
+            </ul>
+
+            <% if @message.present? %>
+              <p class="govuk-body govuk-!-margin-bottom-6">
+                <strong>Additional notes:</strong> <%= @message %>
+              </p>
+            <% end %>
+          </div>
 
           <button onclick="copyToClipboard('bulk-reallocation-text-to-copy')" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">
             Copy this information
