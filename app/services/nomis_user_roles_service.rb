@@ -12,7 +12,7 @@ class NomisUserRolesService
     total_elements = response.fetch('totalElements', 0)
 
     # We remove existing POMs from the search results
-    existing_pom_ids = prison.get_list_of_poms.map(&:staff_id)
+    existing_pom_ids = prison.get_list_of_poms(include_deleted: true).map(&:staff_id)
     filtered_results = results.reject { |result| existing_pom_ids.include?(result['staffId']) }
     total_elements -= (results.size - filtered_results.size)
 
