@@ -18,12 +18,13 @@ RSpec.describe Reallocation::BulkReallocationService do
   let(:offender_no) { 'A1111AA' }
 
   let(:source_pom) do
-    instance_double(StaffMember, staff_id: 10_001, full_name_ordered: 'Old, Pom', in_limbo?: false)
+    instance_double(StaffMember, staff_id: 10_001, full_name_ordered: 'Old, Pom', full_name: 'Pom, Old',
+                                 status: 'inactive', position: 'PRO', in_limbo?: false)
   end
 
   let(:target_pom) do
-    instance_double(StaffMember, staff_id: 10_002, full_name_ordered: 'New, Pom', position: 'PO',
-                                 first_name: 'New', last_name: 'Pom')
+    instance_double(StaffMember, staff_id: 10_002, full_name_ordered: 'New, Pom', full_name: 'Pom, New',
+                                 status: 'active', position: 'PO', first_name: 'New', last_name: 'Pom')
   end
 
   let(:journey) do
@@ -337,6 +338,67 @@ RSpec.describe Reallocation::BulkReallocationService do
         service.call([selected_case], message: 'Moving cases')
 
         expect(NomisUserRolesService).not_to have_received(:remove_pom)
+      end
+    end
+
+    describe 'audit event' do
+      before do
+        PaperTrail.request.whodunnit = 'SPO_USER'
+      end
+
+      it 'publishes a bulk_reallocation audit event with the expected data' do
+        service.call([selected_case], message: 'Moving cases')
+
+        audit_event = AuditEvent.tags('bulk_reallocation').last
+        expect(audit_event).to have_attributes(
+          system_event: false,
+          username: 'SPO_USER',
+          tags: %w[bulk_reallocation source_pom_inactive],
+        )
+        expect(audit_event.data).to eq(
+          'prison_code' => prison.code,
+          'source_pom_id' => 10_001,
+          'source_pom_name' => 'Pom, Old',
+          'source_pom_position' => 'PRO',
+          'source_pom_status' => 'inactive',
+          'target_pom_id' => 10_002,
+          'target_pom_name' => 'Pom, New',
+          'target_pom_position' => 'PO',
+          'reallocated_count' => 1,
+          'override_count' => 0,
+          'failed_count' => 0,
+          'remaining_count' => 1,
+          'reallocated_offender_ids' => [offender_no],
+          'failed_offender_ids' => [],
+        )
+      end
+
+      context 'when some cases fail' do
+        let(:failing_offender_no) { 'D4444DD' }
+        let(:failing_selected_case) do
+          double('AllocatedOffender',
+                 nomis_offender_id: failing_offender_no,
+                 full_name: 'Broken, Case',
+                 recommended_pom_type: 'probation')
+        end
+
+        before do
+          allow(OffenderService).to receive(:get_offender)
+            .with(failing_offender_no, fetch_categories: false, fetch_movements: false)
+            .and_raise(StandardError, 'API timeout')
+        end
+
+        it 'includes failed offender IDs in the audit data' do
+          service.call([failing_selected_case, selected_case], message: 'Moving cases')
+
+          audit_event = AuditEvent.tags('bulk_reallocation').last
+          expect(audit_event.data).to include(
+            'reallocated_count' => 1,
+            'failed_count' => 1,
+            'reallocated_offender_ids' => [offender_no],
+            'failed_offender_ids' => [failing_offender_no],
+          )
+        end
       end
     end
   end
