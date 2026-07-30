@@ -17,6 +17,7 @@ module Reallocation
         {
           full_name: selected_case.full_name,
           nomis_offender_id: selected_case.nomis_offender_id,
+          allocated_pom_role: selected_case.allocated_pom_role,
         }
       end
 

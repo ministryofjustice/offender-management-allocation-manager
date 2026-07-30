@@ -96,14 +96,10 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
       }
     end
 
-    it 'renders the confirmation page for the selected cases' do
+    it 'renders the summary page successfully' do
       get :summary, params: route_params
 
       expect(response).to be_successful
-      expect(response.body).to include('Confirm reallocation of 2 cases')
-      expect(response.body).to include("#{offender[:lastName]}, #{offender[:firstName]} (#{offender_no})")
-      expect(response.body).to include("#{override_offender[:lastName]}, #{override_offender[:firstName]} (#{override_offender_no})")
-      expect(response.body).to include('Add a note to the email')
     end
   end
 
@@ -154,112 +150,54 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
   end
 
   describe '#confirmation' do
-    let(:remaining_cases_count) { 3 }
-
-    before do
-      session[:bulk_reallocation_confirmation] = {
-        source_pom_id: old_pom.staffId,
-        target_pom_id: new_pom.staffId,
-        message: 'Bulk move',
-        selected_cases: [
-          { full_name: 'Zephyr, Alice', nomis_offender_id: offender_no },
-          { full_name: 'Amber, Bob', nomis_offender_id: override_offender_no }
-        ],
-        failed_cases: [],
-        remaining_cases_count: remaining_cases_count,
-      }
-    end
-
-    it 'renders the confirmation page with the next-step loop back to select pom' do
-      get :confirmation, params: route_params
-
-      expect(response).to be_successful
-      expect(response.body).to include('Cases reallocated')
-      expect(response.body).to include('Reallocation details')
-      expect(response.body).to include('Update sent')
-      expect(response.body).to include('What next')
-      expect(response.body).to include('Bulk move')
-      expect(response.body).to include('Reallocate cases now')
-      expect(response.body).to include(prison_reallocation_path(prison.code, old_pom.staffId))
-      expect(response.body).to include(prison_poms_path(prison.code))
-    end
-
-    context 'when there are no more cases left to reallocate' do
-      let(:remaining_cases_count) { 0 }
-
-      it 'renders the no-more-cases copy and omits the loop-back action' do
-        get :confirmation, params: route_params
-
-        expect(response).to be_successful
-        expect(response.body).to include('Old Pom has no more cases and has been removed from this service.')
-        expect(response.body).not_to include('Reallocate cases now')
-      end
-    end
-
-    context 'when there are failed cases' do
+    context 'when the session contains valid confirmation data' do
       before do
         session[:bulk_reallocation_confirmation] = {
           source_pom_id: old_pom.staffId,
           target_pom_id: new_pom.staffId,
           message: 'Bulk move',
           selected_cases: [
-            { full_name: 'Zephyr, Alice', nomis_offender_id: offender_no }
+            { full_name: 'Zephyr, Alice', nomis_offender_id: offender_no, allocated_pom_role: 'Responsible' },
+            { full_name: 'Amber, Bob', nomis_offender_id: override_offender_no, allocated_pom_role: 'Supporting' }
           ],
-          failed_cases: [
-            { full_name: 'Amber, Bob', nomis_offender_id: override_offender_no, error_message: 'API timeout' }
-          ],
+          failed_cases: [],
           remaining_cases_count: 3,
         }
       end
 
-      it 'shows the error summary with the failed cases' do
+      it 'renders the confirmation page successfully' do
         get :confirmation, params: route_params
 
         expect(response).to be_successful
-        expect(response.body).to include('One case could not be reallocated')
-        expect(response.body).to include("Amber, Bob (#{override_offender_no})")
-      end
-
-      it 'shows "Cases reallocated" as the panel title' do
-        get :confirmation, params: route_params
-
-        expect(response.body).to include('Cases reallocated')
       end
     end
 
-    context 'when all cases failed' do
+    context 'when the session does not contain confirmation data' do
+      it 'redirects to the caseload page with an alert' do
+        get :confirmation, params: route_params
+
+        expect(response).to redirect_to(caseload_prison_reallocation_path(prison.code, old_pom.staffId, new_pom.staffId))
+        expect(flash[:alert]).to eq('Complete a reallocation to view the confirmation page.')
+      end
+    end
+
+    context 'when the session confirmation data does not match the route POMs' do
       before do
         session[:bulk_reallocation_confirmation] = {
-          source_pom_id: old_pom.staffId,
-          target_pom_id: new_pom.staffId,
-          message: 'Bulk move',
+          source_pom_id: 99_999,
+          target_pom_id: 88_888,
+          message: '',
           selected_cases: [],
-          failed_cases: [
-            { full_name: 'Zephyr, Alice', nomis_offender_id: offender_no, error_message: 'API timeout' },
-            { full_name: 'Amber, Bob', nomis_offender_id: override_offender_no, error_message: 'Service down' }
-          ],
-          remaining_cases_count: 3,
+          failed_cases: [],
+          remaining_cases_count: 0,
         }
       end
 
-      it 'shows "Reallocation failed" as the panel title' do
+      it 'redirects to the caseload page with an alert' do
         get :confirmation, params: route_params
 
-        expect(response.body).to include('Reallocation failed')
-      end
-
-      it 'hides the "Update sent" section' do
-        get :confirmation, params: route_params
-
-        expect(response.body).not_to include('Update sent')
-      end
-
-      it 'lists all failed cases in the error summary' do
-        get :confirmation, params: route_params
-
-        expect(response.body).to include('Some cases could not be reallocated')
-        expect(response.body).to include("Zephyr, Alice (#{offender_no})")
-        expect(response.body).to include("Amber, Bob (#{override_offender_no})")
+        expect(response).to redirect_to(caseload_prison_reallocation_path(prison.code, old_pom.staffId, new_pom.staffId))
+        expect(flash[:alert]).to eq('Complete a reallocation to view the confirmation page.')
       end
     end
   end

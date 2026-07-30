@@ -68,6 +68,7 @@ RSpec.describe Reallocation::BulkReallocationService do
     double('AllocatedOffender',
            nomis_offender_id: offender_no,
            full_name: 'Zephyr, Alice',
+           allocated_pom_role: 'Responsible',
            recommended_pom_type: 'probation')
   end
   let(:persisted_allocation) { instance_double(AllocationHistory, primary_pom_nomis_id: target_pom.staff_id) }
@@ -151,7 +152,7 @@ RSpec.describe Reallocation::BulkReallocationService do
         source_pom_id: 10_001,
         target_pom_id: 10_002,
         message: 'Moving cases',
-        selected_cases: [{ full_name: 'Zephyr, Alice', nomis_offender_id: offender_no }],
+        selected_cases: [{ full_name: 'Zephyr, Alice', nomis_offender_id: offender_no, allocated_pom_role: 'Responsible' }],
         failed_cases: [],
         remaining_cases_count: 1,
       )

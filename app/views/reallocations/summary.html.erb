@@ -22,13 +22,14 @@
                  } %>
 
       <p class="govuk-body">
-        We will send the information below to <strong><%= @new_pom.email_address %></strong>
+        We will send details of these cases
+        to <%= safe_join([@pom.email_address, @new_pom.email_address].compact_blank.map { tag.strong(it) }, ' and ') %>
       </p>
 
       <div class="govuk-inset-text">
         <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
           <% @selected_cases.each do |selected_case| %>
-            <li><%= selected_case.full_name %> (<%= selected_case.nomis_offender_id %>)</li>
+            <li><%= selected_case.full_name %> (<%= selected_case.nomis_offender_id %>) &ndash; <%= selected_case.allocated_pom_role.downcase %></li>
           <% end %>
         </ul>
 
@@ -38,7 +39,7 @@
       </div>
 
       <div class="govuk-button-group">
-        <%= form.submit 'Complete allocation', class: 'govuk-button', data: { module: 'govuk-button' } %>
+        <%= form.submit 'Complete reallocation', class: 'govuk-button', data: { module: 'govuk-button' } %>
         <%= link_to 'Cancel', caseload_prison_reallocation_path(@prison.code, @pom.staff_id, @new_pom.staff_id),
                     class: 'govuk-link govuk-link--no-visited-state' %>
       </div>
