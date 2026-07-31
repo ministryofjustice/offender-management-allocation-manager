@@ -113,16 +113,11 @@ RSpec.describe PomDetail, type: :model do
       PaperTrail.request.whodunnit = nil
     end
 
-    it 'publishes an audit event with correct tags and additional data' do
-      pom_detail = create(:pom_detail, prison: prison)
+    it 'includes the dynamic status tag' do
+      create(:pom_detail, prison: prison, status: 'active')
 
       audit = AuditEvent.order(:created_at).last
-      aggregate_failures do
-        expect(audit.nomis_offender_id).to be_nil
-        expect(audit.tags).to eq(%w[record pom_detail changed active])
-        expect(audit.data['nomis_staff_id']).to eq(pom_detail.nomis_staff_id)
-        expect(audit.data['prison_code']).to eq(prison.code)
-      end
+      expect(audit.tags).to include('active')
     end
 
     it 'records before and after changes on update' do

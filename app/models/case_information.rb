@@ -12,7 +12,9 @@ class CaseInformation < ApplicationRecord
   EXTENDED_TIER_LEVELS = %w[E F G].freeze
   ROSH_LEVELS = %w[VERY_HIGH HIGH MEDIUM LOW].freeze
 
-  after_commit :save_audit_event, if: :manual_entry?
+  # Create/update audit events for non-manual records are published ad-hoc
+  # in `DeliusDataImportService`. Destroys always need auditing regardless
+  after_commit :save_audit_event, if: -> { manual_entry? || destroyed? }
 
   belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :case_information
 
@@ -56,6 +58,6 @@ private
   end
 
   def audit_event_tags
-    %w[record case_information changed].freeze
+    %w[record case_information].freeze
   end
 end

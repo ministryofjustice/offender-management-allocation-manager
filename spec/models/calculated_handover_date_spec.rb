@@ -215,4 +215,28 @@ RSpec.describe CalculatedHandoverDate do
       end
     end
   end
+
+  describe '#save_audit_event' do
+    before { PaperTrail.request.whodunnit = nil }
+
+    let!(:record) { create(:calculated_handover_date, offender: offender) }
+
+    it 'publishes an audit event on destroy' do
+      expect { record.destroy! }.to change(AuditEvent, :count).by(1)
+
+      audit = AuditEvent.order(:created_at).last
+      aggregate_failures do
+        expect(audit.tags).to include('destroyed')
+        expect(audit.data['before']).to include('responsibility' => record.responsibility, 'reason' => record.reason)
+        expect(audit.data['after']).to eq({})
+      end
+    end
+
+    it 'does not publish an audit event on create or update' do
+      expect(AuditEvent.where(tags: '{record,calculated_handover_date,changed}')).to be_empty
+
+      record.update!(reason: 'determinate')
+      expect(AuditEvent.where(tags: '{record,calculated_handover_date,changed}')).to be_empty
+    end
+  end
 end

@@ -8,18 +8,27 @@ module Auditable
 private
 
   def save_audit_event
-    return unless previous_changes.any?
+    excluded = AUDIT_EXCLUDED_KEYS + audit_excluded_keys
 
-    before_changes = previous_changes.transform_values(&:first)
-    after_changes  = previous_changes.transform_values(&:last)
+    if destroyed?
+      before_changes = attributes.except(*excluded)
+      after_changes  = {}
+    else
+      return unless previous_changes.any?
 
-    [before_changes, after_changes].each do |changes_hash|
-      (AUDIT_EXCLUDED_KEYS + audit_excluded_keys).each { changes_hash.delete(it) }
+      before_changes = previous_changes.transform_values(&:first)
+      after_changes  = previous_changes.transform_values(&:last)
+
+      [before_changes, after_changes].each do |changes_hash|
+        excluded.each { changes_hash.delete(it) }
+      end
     end
+
+    action_tag = destroyed? ? 'destroyed' : 'changed'
 
     AuditEvent.publish(
       nomis_offender_id: (nomis_offender_id if has_attribute?(:nomis_offender_id)),
-      tags: audit_event_tags,
+      tags: [*audit_event_tags, action_tag],
       system_event: PaperTrail.request.whodunnit.blank?,
       username: PaperTrail.request.whodunnit,
       data: audit_additional_data.merge(

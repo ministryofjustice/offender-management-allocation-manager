@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class CalculatedHandoverDate < ApplicationRecord
+  include Auditable
+
   CUSTODY_ONLY = 'CustodyOnly'
   CUSTODY_WITH_COM = 'CustodyWithCom'
   COMMUNITY_RESPONSIBLE = 'Community'
@@ -43,6 +45,10 @@ class CalculatedHandoverDate < ApplicationRecord
   }.stringify_keys.freeze
 
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id, offender_attributes_to_archive: :offender_attributes_to_archive }
+
+  # Create/update audit events are published ad-hoc in `RecalculateHandoverDateJob`
+  # with richer context (e.g. nomis_offender_state). Only destroy needs the concern
+  after_commit :save_audit_event, on: :destroy
 
   belongs_to :offender,
              primary_key: :nomis_offender_id,
@@ -155,5 +161,11 @@ class CalculatedHandoverDate < ApplicationRecord
 
   def history
     History.new(self)
+  end
+
+private
+
+  def audit_event_tags
+    %w[record calculated_handover_date].freeze
   end
 end

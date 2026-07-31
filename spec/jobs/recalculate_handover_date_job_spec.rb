@@ -242,7 +242,7 @@ describe RecalculateHandoverDateJob do
     it 'does not emit any events' do
       recalculate_handover_dates
       expect(handover_event).not_to have_received(:publish)
-      expect(handover_change_event).not_to have_received(:publish)
+      expect(handover_change_event).not_to have_received(:publish).with(hash_including(tags: include('recalculate_handover_date')))
     end
   end
 

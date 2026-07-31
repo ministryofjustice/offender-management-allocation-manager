@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class Responsibility < ApplicationRecord
+  include Auditable
+
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
-  after_commit :publish_audit_event, on: %i[create destroy]
+  after_commit :save_audit_event
 
   belongs_to :offender,
              primary_key: :nomis_offender_id,
@@ -62,13 +64,11 @@ class Responsibility < ApplicationRecord
 
 private
 
-  def publish_audit_event
-    AuditEvent.publish(
-      nomis_offender_id:,
-      tags: %w[record responsibility override] << (destroyed? ? 'removed' : 'created'),
-      system_event: PaperTrail.request.whodunnit.blank?,
-      username: PaperTrail.request.whodunnit,
-      data: attributes.slice('value', 'reason')
-    )
+  def audit_event_tags
+    %w[record responsibility override].freeze
+  end
+
+  def audit_excluded_keys
+    %w[reason_text created_at updated_at].freeze
   end
 end
