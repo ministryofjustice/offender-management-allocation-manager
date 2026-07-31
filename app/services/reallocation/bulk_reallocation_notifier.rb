@@ -28,6 +28,7 @@ module Reallocation
         pom_email: target_pom.email_address,
         old_pom_name: source_pom.full_name_ordered,
         message: result.message,
+        has_message: notify_boolean(result.message.present?),
         allocations: result.allocations_for_email,
         url: caseload_url_for(target_pom),
       ).bulk_allocations_created.deliver_later
@@ -41,6 +42,7 @@ module Reallocation
         pom_email: source_pom.email_address,
         new_pom_name: target_pom.full_name_ordered,
         message: result.message,
+        has_message: notify_boolean(result.message.present?),
         allocations: result.allocations_for_email,
         url: caseload_url_for(source_pom),
       ).bulk_allocations_removed.deliver_later
@@ -48,6 +50,11 @@ module Reallocation
 
     def caseload_url_for(pom)
       Rails.application.routes.url_helpers.prison_staff_caseload_url(prison.code, pom.staff_id)
+    end
+
+    # Notify expects yes/no for conditional template placeholders
+    def notify_boolean(value)
+      value ? 'yes' : 'no'
     end
   end
 end

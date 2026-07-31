@@ -148,6 +148,7 @@ RSpec.describe PomMailer, type: :mailer do
         pom_email: 'new.pom@example.com',
         old_pom_name: 'Old Pom',
         message: 'Bulk move',
+        has_message: 'yes',
         allocations: [
           'Alice Zephyr (G1234AA) – responsible',
           'Bob Amber (G5678BB) – supporting'
@@ -173,6 +174,7 @@ RSpec.describe PomMailer, type: :mailer do
           pom_name: params[:pom_name],
           old_pom_name: params[:old_pom_name],
           message: 'Bulk move',
+          has_message: 'yes',
           allocations: params[:allocations],
           url: params[:url]
         )
@@ -181,12 +183,14 @@ RSpec.describe PomMailer, type: :mailer do
     context 'when no optional message has been added to the email' do
       it 'personalises the email with an empty message' do
         params[:message] = ''
+        params[:has_message] = 'no'
 
         expect(mail.govuk_notify_personalisation)
           .to eq(
             pom_name: params[:pom_name],
             old_pom_name: params[:old_pom_name],
             message: '',
+            has_message: 'no',
             allocations: params[:allocations],
             url: params[:url]
           )
@@ -201,6 +205,7 @@ RSpec.describe PomMailer, type: :mailer do
         pom_email: 'old.pom@example.com',
         new_pom_name: 'New Pom',
         message: 'Bulk move',
+        has_message: 'yes',
         allocations: [
           'Alice Zephyr (G1234AA) – responsible',
           'Bob Amber (G5678BB) – supporting'
@@ -226,6 +231,7 @@ RSpec.describe PomMailer, type: :mailer do
           pom_name: params[:pom_name],
           new_pom_name: params[:new_pom_name],
           message: 'Bulk move',
+          has_message: 'yes',
           allocations: params[:allocations],
           url: params[:url]
         )
@@ -234,12 +240,14 @@ RSpec.describe PomMailer, type: :mailer do
     context 'when no optional message has been added to the email' do
       it 'personalises the email with an empty message' do
         params[:message] = ''
+        params[:has_message] = 'no'
 
         expect(mail.govuk_notify_personalisation)
           .to eq(
             pom_name: params[:pom_name],
             new_pom_name: params[:new_pom_name],
             message: '',
+            has_message: 'no',
             allocations: params[:allocations],
             url: params[:url]
           )
