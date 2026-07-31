@@ -201,4 +201,43 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
       end
     end
   end
+
+  describe '#handle_unexpected_error' do
+    let(:error) { StandardError.new('something went wrong') }
+
+    before do
+      allow(Rails.logger).to receive(:error)
+      allow(Rails.error).to receive(:report)
+      allow(controller).to receive(:render)
+
+      controller.instance_variable_set(:@prison, prison)
+      controller.instance_variable_set(:@pom, double(staff_id: old_pom.staffId))
+      controller.instance_variable_set(:@new_pom, double(staff_id: new_pom.staffId))
+
+      controller.send(:handle_unexpected_error, error)
+    end
+
+    it 'logs a structured error event' do
+      expect(Rails.logger).to have_received(:error).with(
+        /event=bulk_reallocation_error.*prison_id=#{prison.code}.*source_pom_id=#{old_pom.staffId}/
+      )
+    end
+
+    it 'reports to Rails error reporter with context' do
+      expect(Rails.error).to have_received(:report).with(
+        error,
+        severity: :error,
+        source: 'bulk_reallocation',
+        context: hash_including(
+          prison_id: prison.code,
+          source_pom_id: old_pom.staffId,
+          target_pom_id: new_pom.staffId,
+        ),
+      )
+    end
+
+    it 'renders the error page with 500 status' do
+      expect(controller).to have_received(:render).with('reallocations/error', status: :internal_server_error)
+    end
+  end
 end
