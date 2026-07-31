@@ -54,6 +54,7 @@ RSpec.describe Reallocation::BulkReallocationNotifier do
       pom_email: 'new.pom@example.com',
       old_pom_name: 'Old Pom',
       message: 'Bulk move',
+      has_message: 'yes',
       allocations: ['Alice Zephyr (G1234AA) – responsible'],
       url: 'http://localhost:3000/prisons/LEI/staff/10002/caseload'
     ).and_return(instance_double(PomMailer, bulk_allocations_created: created_email))
@@ -62,6 +63,7 @@ RSpec.describe Reallocation::BulkReallocationNotifier do
       pom_email: 'old.pom@example.com',
       new_pom_name: 'New Pom',
       message: 'Bulk move',
+      has_message: 'yes',
       allocations: ['Alice Zephyr (G1234AA) – responsible'],
       url: 'http://localhost:3000/prisons/LEI/staff/10001/caseload'
     ).and_return(instance_double(PomMailer, bulk_allocations_removed: removed_email))
@@ -79,6 +81,7 @@ RSpec.describe Reallocation::BulkReallocationNotifier do
       pom_email: 'old.pom@example.com',
       new_pom_name: 'New Pom',
       message: 'Bulk move',
+      has_message: 'yes',
       allocations: ['Alice Zephyr (G1234AA) – responsible'],
       url: 'http://localhost:3000/prisons/LEI/staff/10001/caseload'
     ).and_return(instance_double(PomMailer, bulk_allocations_removed: removed_email))
@@ -96,6 +99,7 @@ RSpec.describe Reallocation::BulkReallocationNotifier do
       pom_email: 'new.pom@example.com',
       old_pom_name: 'Old Pom',
       message: 'Bulk move',
+      has_message: 'yes',
       allocations: ['Alice Zephyr (G1234AA) – responsible'],
       url: 'http://localhost:3000/prisons/LEI/staff/10002/caseload'
     ).and_return(instance_double(PomMailer, bulk_allocations_created: created_email))
@@ -104,5 +108,31 @@ RSpec.describe Reallocation::BulkReallocationNotifier do
 
     expect(created_email).to have_received(:deliver_later).with(no_args)
     expect(mailer).not_to have_received(:with).with(hash_including(pom_email: nil))
+  end
+
+  context 'when no optional message is provided' do
+    let(:result) do
+      Reallocation::BulkReallocationResult.new(
+        source_pom_id: source_pom.staff_id,
+        target_pom_id: target_pom.staff_id,
+        message: '',
+        reallocated_cases: [reallocated_case],
+        failed_cases: [],
+        remaining_cases_count: 3,
+      )
+    end
+
+    it 'passes has_message as no' do
+      allow(mailer).to receive(:with)
+        .with(hash_including(message: '', has_message: 'no'))
+        .and_return(
+          instance_double(PomMailer, bulk_allocations_created: created_email),
+          instance_double(PomMailer, bulk_allocations_removed: removed_email),
+        )
+
+      notifier.call(result)
+
+      expect(mailer).to have_received(:with).with(hash_including(message: '', has_message: 'no')).twice
+    end
   end
 end
