@@ -48,6 +48,10 @@ module HmppsApi
     end
 
     # See: https://nomis-user-roles-api-dev.prison.service.justice.gov.uk/swagger-ui/index.html#/staff-member-resource/setJobClassification
+    #
+    # Note: NOMIS will return 500 if `toDate` is before `fromDate`, which happens
+    # when trying to expire a role on the same day it was created (this should not
+    # be a problem in production, but it happens sometimes during QA/testing)
     def self.expire_staff_role(pom)
       client.put(
         "/agency/#{pom.agency_id}/staff-members/#{pom.staff_id}/staff-role/POM",

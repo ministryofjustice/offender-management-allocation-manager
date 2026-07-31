@@ -170,7 +170,6 @@ RSpec.describe Reallocation::BulkReallocationService do
     context 'when the allocation history does not exist (new allocation)' do
       before do
         AllocationHistory.where(nomis_offender_id: offender_no).delete_all
-        allow(NomisUserRolesService).to receive(:remove_pom)
       end
 
       it 'uses allocate_primary_pom as the event' do

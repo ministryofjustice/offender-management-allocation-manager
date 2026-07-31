@@ -50,6 +50,12 @@ class NomisUserRolesService
 
     prison.pom_details.find_by(nomis_staff_id:)&.deleted!
 
+    expire_nomis_role!(prison, nomis_staff_id)
+
+    true
+  end
+
+  def self.expire_nomis_role!(prison, nomis_staff_id)
     pom = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(
       prison.code, staff_id: nomis_staff_id
     ).first
@@ -61,7 +67,15 @@ class NomisUserRolesService
       # list endpoint until any previous cached request expires (which could take 1h)
       HmppsApi::PrisonApi::PrisonOffenderManagerApi.expire_list_cache(prison.code)
     end
-
-    true
+  rescue StandardError => e
+    Rails.logger.error(
+      "event=nomis_role_removal_failed,prison_id=#{prison.code},staff_id=#{nomis_staff_id},from_date=#{pom&.from_date}|#{e.message}"
+    )
+    Rails.error.report(e, severity: :warning, source: 'nomis_role_removal', context: {
+      prison_id: prison.code,
+      staff_id: nomis_staff_id,
+      from_date: pom&.from_date,
+    })
   end
+  private_class_method :expire_nomis_role!
 end

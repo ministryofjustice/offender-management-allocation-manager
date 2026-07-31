@@ -169,5 +169,55 @@ RSpec.describe NomisUserRolesService do
         expect(HmppsApi::PrisonApi::PrisonOffenderManagerApi).not_to have_received(:expire_list_cache)
       end
     end
+
+    context 'when the NOMIS role expiry fails' do
+      before do
+        allow(HmppsApi::NomisUserRolesApi).to receive(:expire_staff_role)
+          .and_raise(Faraday::ServerError, 'the server responded with status 500')
+        allow(Rails.logger).to receive(:error)
+        allow(Rails.error).to receive(:report)
+      end
+
+      it 'still deallocates the POM' do
+        described_class.remove_pom(prison, nomis_staff_id)
+
+        expect(AllocationHistory).to have_received(:deallocate_pom).with(
+          nomis_staff_id, prison.code, event_trigger:
+        )
+      end
+
+      it 'still soft-deletes the POM details' do
+        described_class.remove_pom(prison, nomis_staff_id)
+
+        expect(pom_detail.reload).to be_deleted
+      end
+
+      it 'logs a structured error event' do
+        described_class.remove_pom(prison, nomis_staff_id)
+
+        expect(Rails.logger).to have_received(:error).with(
+          /event=nomis_role_removal_failed.*staff_id=#{nomis_staff_id}.*from_date=/
+        )
+      end
+
+      it 'reports to Rails error reporter with context' do
+        described_class.remove_pom(prison, nomis_staff_id)
+
+        expect(Rails.error).to have_received(:report).with(
+          an_instance_of(Faraday::ServerError),
+          severity: :warning,
+          source: 'nomis_role_removal',
+          context: hash_including(
+            prison_id: prison.code,
+            staff_id: nomis_staff_id,
+            from_date: pom.from_date,
+          ),
+        )
+      end
+
+      it 'does not raise' do
+        expect { described_class.remove_pom(prison, nomis_staff_id) }.not_to raise_error
+      end
+    end
   end
 end
