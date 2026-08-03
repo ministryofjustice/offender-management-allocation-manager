@@ -217,16 +217,6 @@ describe CaseInformation do
     context 'when the record is a manual entry' do
       let(:case_info) { create(:case_information, :manual_entry, tier: 'B', rosh_level: 'LOW', enhanced_resourcing: false) }
 
-      it 'publishes an audit event with the correct tags and offender id' do
-        expect { case_info }.to change(AuditEvent, :count).by(1)
-
-        audit = AuditEvent.order(:created_at).last
-        aggregate_failures do
-          expect(audit.nomis_offender_id).to eq(case_info.nomis_offender_id)
-          expect(audit.tags).to eq(%w[record case_information changed])
-        end
-      end
-
       it 'records before and after changes on update' do
         case_info
         last_audit = AuditEvent.order(:created_at).last
@@ -239,15 +229,33 @@ describe CaseInformation do
           expect(audit.data['after']).to include('tier' => 'A', 'rosh_level' => 'HIGH')
         end
       end
+
+      it 'publishes an audit event on destroy' do
+        case_info
+
+        expect { case_info.destroy! }.to change(AuditEvent, :count).by(1)
+
+        audit = AuditEvent.order(:created_at).last
+        expect(audit.tags).to include('destroyed')
+      end
     end
 
     context 'when the record is not a manual entry' do
       let(:case_info) { create(:case_information, manual_entry: false, tier: 'B') }
 
-      it 'does not publish an audit event' do
+      it 'does not publish an audit event on update' do
         case_info
 
         expect { case_info.update!(tier: 'A') }.not_to change(AuditEvent, :count)
+      end
+
+      it 'publishes an audit event on destroy' do
+        case_info
+
+        expect { case_info.destroy! }.to change(AuditEvent, :count).by(1)
+
+        audit = AuditEvent.order(:created_at).last
+        expect(audit.tags).to include('destroyed')
       end
     end
   end

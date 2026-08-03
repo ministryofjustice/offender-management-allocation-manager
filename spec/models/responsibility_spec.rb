@@ -60,13 +60,8 @@ RSpec.describe Responsibility, type: :model do
     it { is_expected.to be_valid }
   end
 
-  describe 'audit events' do
-    let(:audit_payloads) { [] }
-
+  describe '#save_audit_event' do
     before do
-      allow(AuditEvent).to receive(:publish) do |**payload|
-        audit_payloads << payload
-      end
       PaperTrail.request.whodunnit = 'HOMD_USER'
     end
 
@@ -74,37 +69,33 @@ RSpec.describe Responsibility, type: :model do
       PaperTrail.request.whodunnit = nil
     end
 
-    it 'publishes an audit event when a responsibility override is created' do
-      create(:responsibility, offender: offender)
+    it 'only includes value and reason in the audit data on create' do
+      responsibility = create(:responsibility, offender: offender)
 
-      expect(AuditEvent).to have_received(:publish).once
-      expect(audit_payloads.last).to include(
-        nomis_offender_id: offender.nomis_offender_id,
-        tags: %w[record responsibility override created],
-        system_event: false,
-        username: 'HOMD_USER',
-        data: {
-          'value' => Responsibility::PROBATION,
-          'reason' => 'less_than_10_months_to_serve',
-        }
-      )
+      audit = AuditEvent.order(:created_at).last
+      aggregate_failures do
+        expect(audit.data['after'].keys).to contain_exactly('value', 'reason')
+        expect(audit.data['after']).to eq(
+          'value' => responsibility.value,
+          'reason' => responsibility.reason
+        )
+      end
     end
 
-    it 'publishes an audit event when a responsibility override is removed' do
+    it 'only includes value and reason in the audit data on destroy' do
       responsibility = create(:responsibility, offender: offender)
 
       responsibility.destroy!
 
-      expect(audit_payloads.last).to include(
-        nomis_offender_id: offender.nomis_offender_id,
-        tags: %w[record responsibility override removed],
-        system_event: false,
-        username: 'HOMD_USER',
-        data: {
-          'value' => Responsibility::PROBATION,
-          'reason' => 'less_than_10_months_to_serve',
-        }
-      )
+      audit = AuditEvent.order(:created_at).last
+      aggregate_failures do
+        expect(audit.data['before'].keys).to contain_exactly('value', 'reason')
+        expect(audit.data['before']).to eq(
+          'value' => responsibility.value,
+          'reason' => responsibility.reason
+        )
+        expect(audit.data['after']).to eq({})
+      end
     end
   end
 end

@@ -85,4 +85,52 @@ RSpec.describe Auditable do
       expect { pom_detail.save! }.not_to change(AuditEvent, :count)
     end
   end
+
+  describe 'on destroy' do
+    let!(:case_info) { create(:case_information, :manual_entry, tier: 'B', rosh_level: 'LOW', enhanced_resourcing: false) }
+
+    it 'publishes an audit event' do
+      expect { case_info.destroy! }.to change(AuditEvent, :count).by(1)
+    end
+
+    it 'records the destroyed attributes as before and an empty after' do
+      case_info.destroy!
+      audit = AuditEvent.order(:created_at).last
+
+      aggregate_failures do
+        expect(audit.data['before']).not_to have_key('id')
+        expect(audit.data['before']).not_to have_key('nomis_offender_id')
+        expect(audit.data['before']['tier']).to eq('B')
+        expect(audit.data['after']).to eq({})
+      end
+    end
+
+    it 'sets nomis_offender_id from the destroyed record' do
+      offender_id = case_info.nomis_offender_id
+      case_info.destroy!
+      audit = AuditEvent.order(:created_at).last
+      expect(audit.nomis_offender_id).to eq(offender_id)
+    end
+
+    it "replaces the 'changed' tag with 'destroyed'" do
+      case_info.destroy!
+      audit = AuditEvent.order(:created_at).last
+
+      aggregate_failures do
+        expect(audit.tags).to include('destroyed')
+        expect(audit.tags).not_to include('changed')
+        expect(audit.tags).to include('record', 'case_information')
+      end
+    end
+  end
+
+  describe 'tags on create and update' do
+    let!(:case_info) { create(:case_information, :manual_entry, tier: 'B', rosh_level: 'LOW', enhanced_resourcing: false) }
+
+    it "uses 'changed' tag on create" do
+      audit = AuditEvent.order(:created_at).last
+      expect(audit.tags).to include('changed')
+      expect(audit.tags).not_to include('destroyed')
+    end
+  end
 end

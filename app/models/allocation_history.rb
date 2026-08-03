@@ -234,7 +234,7 @@ private
   end
 
   def audit_event_tags
-    ['record', 'allocation', 'changed', event].freeze
+    ['record', 'allocation', event].freeze
   end
 
   def audit_excluded_keys

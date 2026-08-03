@@ -55,6 +55,6 @@ private
   end
 
   def audit_event_tags
-    %w[record handover_progress_checklist changed].freeze
+    %w[record handover_progress_checklist].freeze
   end
 end
