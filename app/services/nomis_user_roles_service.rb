@@ -28,6 +28,17 @@ class NomisUserRolesService
       prison.code, nomis_staff_id, config
     )
 
+    publish_audit_event(
+      tags: %w[nomis_role created],
+      prison_code: prison.code,
+      staff_id: nomis_staff_id,
+      data: {
+        position: config[:position],
+        schedule_type: config[:schedule_type],
+        hours_per_week: config[:hours_per_week],
+      }
+    )
+
     # Expire cache, otherwise the POM just added might not come back in the
     # list endpoint until any previous cached request expires (which could take 1h)
     HmppsApi::PrisonApi::PrisonOffenderManagerApi.expire_list_cache(prison.code)
@@ -63,6 +74,19 @@ class NomisUserRolesService
     if pom
       HmppsApi::NomisUserRolesApi.expire_staff_role(pom)
 
+      publish_audit_event(
+        tags: %w[nomis_role expired],
+        prison_code: prison.code,
+        staff_id: nomis_staff_id,
+        data: {
+          from_date: pom.from_date,
+          to_date: pom.to_date,
+          position: pom.position,
+          schedule_type: pom.schedule_type,
+          hours_per_week: pom.hours_per_week,
+        }
+      )
+
       # Expire cache, otherwise the POM just removed might still come back in the
       # list endpoint until any previous cached request expires (which could take 1h)
       HmppsApi::PrisonApi::PrisonOffenderManagerApi.expire_list_cache(prison.code)
@@ -78,4 +102,14 @@ class NomisUserRolesService
     })
   end
   private_class_method :expire_nomis_role!
+
+  def self.publish_audit_event(tags:, prison_code:, staff_id:, data: {})
+    AuditEvent.publish(
+      tags:,
+      system_event: PaperTrail.request.whodunnit.blank?,
+      username: PaperTrail.request.whodunnit,
+      data: { prison_code:, staff_id: }.merge(data)
+    )
+  end
+  private_class_method :publish_audit_event
 end
