@@ -93,7 +93,7 @@ RSpec.describe NomisUserRolesService do
   end
 
   describe '.add_pom' do
-    let(:config) { { hours_per_week: 37.5 } }
+    let(:config) { { hours_per_week: 37.5, position: 'PRO', schedule_type: 'FT' } }
     let(:pom_detail) { instance_double(PomDetail) }
 
     before do
@@ -120,6 +120,34 @@ RSpec.describe NomisUserRolesService do
         status: 'active',
         hours_per_week: config[:hours_per_week]
       )
+    end
+
+    describe 'audit event on POM onboarding' do
+      before do
+        PaperTrail.request.whodunnit = spo_username
+      end
+
+      after do
+        PaperTrail.request.whodunnit = nil
+      end
+
+      it 'publishes an audit event with onboarding details' do
+        described_class.add_pom(prison, nomis_staff_id, spo_username, config)
+
+        audit_event = AuditEvent.tags('nomis_role', 'created').last
+        expect(audit_event).to have_attributes(
+          system_event: false,
+          username: spo_username,
+          tags: %w[nomis_role created],
+        )
+        expect(audit_event.data).to include(
+          'prison_code' => prison.code,
+          'staff_id' => nomis_staff_id,
+          'position' => 'PRO',
+          'schedule_type' => 'FT',
+          'hours_per_week' => 37.5,
+        )
+      end
     end
   end
 
@@ -157,6 +185,79 @@ RSpec.describe NomisUserRolesService do
       expect(
         HmppsApi::PrisonApi::PrisonOffenderManagerApi
       ).to have_received(:expire_list_cache).with(prison.code)
+    end
+
+    describe 'audit event on role expiry' do
+      context 'when triggered by a user' do
+        before do
+          PaperTrail.request.whodunnit = spo_username
+        end
+
+        after do
+          PaperTrail.request.whodunnit = nil
+        end
+
+        it 'publishes a user-initiated audit event with POM details' do
+          described_class.remove_pom(prison, nomis_staff_id)
+
+          audit_event = AuditEvent.tags('nomis_role', 'expired').last
+          expect(audit_event).to have_attributes(
+            system_event: false,
+            username: spo_username,
+            tags: %w[nomis_role expired],
+          )
+          expect(audit_event.data).to include(
+            'prison_code' => prison.code,
+            'staff_id' => nomis_staff_id,
+            'from_date' => pom.from_date,
+            'to_date' => pom.to_date,
+            'position' => pom.position,
+            'schedule_type' => pom.schedule_type,
+            'hours_per_week' => pom.hours_per_week,
+          )
+        end
+      end
+
+      context 'when triggered by the system (no whodunnit)' do
+        before do
+          PaperTrail.request.whodunnit = nil
+        end
+
+        it 'publishes a system audit event' do
+          described_class.remove_pom(prison, nomis_staff_id)
+
+          audit_event = AuditEvent.tags('nomis_role', 'expired').last
+          expect(audit_event).to have_attributes(
+            system_event: true,
+            username: nil,
+          )
+        end
+      end
+
+      context 'when POM is not found in NOMIS' do
+        let(:pom_list) { [] }
+
+        it 'does not publish an audit event' do
+          described_class.remove_pom(prison, nomis_staff_id)
+
+          expect(AuditEvent.tags('nomis_role', 'expired')).to be_empty
+        end
+      end
+
+      context 'when the NOMIS role expiry fails' do
+        before do
+          allow(HmppsApi::NomisUserRolesApi).to receive(:expire_staff_role)
+            .and_raise(Faraday::ServerError, 'the server responded with status 500')
+          allow(Rails.logger).to receive(:error)
+          allow(Rails.error).to receive(:report)
+        end
+
+        it 'does not publish an audit event' do
+          described_class.remove_pom(prison, nomis_staff_id)
+
+          expect(AuditEvent.tags('nomis_role', 'expired')).to be_empty
+        end
+      end
     end
 
     context 'when POM is not found' do
