@@ -24,6 +24,9 @@ generic-service:
 
   scheduledDowntime:
     enabled: true
+    additionalScaleTargets:
+      - name: offender-management-events-consumer
+        startupReplicas: 1
 
   env:
     ENV_NAME: staging
