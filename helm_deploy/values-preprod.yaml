@@ -20,6 +20,11 @@ generic-service:
 
   scheduledDowntime:
     enabled: true
+    additionalScaleTargets:
+      - name: offender-management-events-consumer
+        startupReplicas: 1
+      - name: offender-management-jobs-processor
+        startupReplicas: 1
 
   env:
     ENV_NAME: preprod
