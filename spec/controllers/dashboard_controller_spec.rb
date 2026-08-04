@@ -96,6 +96,34 @@ RSpec.describe DashboardController, type: :controller do
         expect(response.body).to have_text('View all handover cases')
       end
 
+      describe 'bulk reallocation announcement' do
+        context 'when enabled' do
+          before do
+            stub_feature_flag(:bulk_reallocation, enabled: true)
+          end
+
+          it 'shows the homepage announcement and NEW badge on View all POMs' do
+            get :index, params: { prison_id: prison }
+
+            expect(response.body).to include('moj-alert--information')
+            expect(response.body).to include('moj-badge moj-badge--red')
+          end
+        end
+
+        context 'when disabled' do
+          before do
+            stub_feature_flag(:bulk_reallocation, enabled: false)
+          end
+
+          it 'shows the homepage announcement but hides the NEW badge' do
+            get :index, params: { prison_id: prison }
+
+            expect(response.body).to include('moj-alert--information')
+            expect(response.body).not_to include('moj-badge moj-badge--red')
+          end
+        end
+      end
+
       describe 'Make allocations tab' do
         context 'when the count is more than 0' do
           # create offenders with case_information so that they display as un-allocated
