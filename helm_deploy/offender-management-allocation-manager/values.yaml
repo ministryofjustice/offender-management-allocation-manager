@@ -27,7 +27,7 @@ custom_templates_config:
 cronjobs:
   process_movements:
     enabled: true
-    schedule: 45 6 * * 1-5
+    schedule: 52 6 * * 1-5
     command: bundle exec rake movements:process
   recalculate_handover_dates:
     enabled: true
