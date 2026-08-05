@@ -105,10 +105,18 @@ generic-service:
     enabled: true
 
   # Scheduled downtime can be used in non-production environments to save costs
+  # By default, the shared GitHub Actions deploy workflow sets deterministic
+  # startup/shutdown cron values (`autogenerate_scheduled_downtime_cron: true`).
+  #
+  # To use explicit schedules from values files instead, set
+  # `autogenerate_scheduled_downtime_cron: false` on deploy jobs in
+  # `.github/workflows/pipeline.yml`, then define:
+  # - `scheduledDowntime.shutdown` for shutdown schedule
+  # - `scheduledDowntime.startupOverride` for startup schedule
+  #
   # Override per environment (do not enable in production!)
   scheduledDowntime:
     enabled: false
-    shutdown: '45 21 * * 1-5'
     additionalScaleTargets:
       - name: offender-management-jobs-processor
         startupReplicas: 1
