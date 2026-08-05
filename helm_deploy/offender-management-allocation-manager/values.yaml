@@ -104,6 +104,19 @@ generic-service:
   ingress:
     enabled: true
 
+  # Scheduled downtime can be used in non-production environments to save costs
+  # Override per environment (do not enable in production!)
+  scheduledDowntime:
+    enabled: false
+    shutdown: '45 21 * * 1-5'
+    additionalScaleTargets:
+      - name: offender-management-jobs-processor
+        startupReplicas: 1
+      - name: offender-management-events-consumer
+        startupReplicas: 1
+      - name: offender-management-prometheus-exporter
+        startupReplicas: 1
+
   # https://github.com/ministryofjustice/hmpps-ip-allowlists/blob/main/ip-allowlist-groups.yaml
   allowlist:
     groups:
