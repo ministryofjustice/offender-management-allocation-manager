@@ -3,42 +3,22 @@ module DomainEvents
     class TierChangeHandler
       def handle(event, logger: Shoryuken::Logging.logger)
         logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type}," \
-                      "version=#{event.version},crn=#{event.crn_number}"
+                      "event_version=#{event.version},crn=#{event.crn_number}"
 
-        case_info = CaseInformation.find_by(crn: event.crn_number)
-        return if case_info.nil?
-
-        api_tier_info = HmppsApi::TieringApi.get_calculation(
-          event.crn_number, event.additional_information['calculationId'], version: event.version
+        result = TierUpdateService.call(
+          crn: event.crn_number, audit_tags: ['handler']
         )
-        return if api_tier_info.try(:[], :tier).nil?
 
-        new_tier = api_tier_info[:tier][0]
-        old_tier = case_info.tier
-
-        return if new_tier == old_tier
-
-        case_info.tier = new_tier
-        case_info.manual_entry = false
-
-        attrs_before = case_info.changed_attributes
-
-        if case_info.save
-          AuditEvent.publish(
-            nomis_offender_id: case_info.nomis_offender_id,
-            tags: %w[handler case_information tier changed],
-            system_event: true,
-            data: {
-              'before' => attrs_before,
-              'after' => case_info.slice(attrs_before.keys)
-            }
-          )
-
+        case result.status
+        when :updated
           logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type}," \
-                        "version=#{event.version},crn=#{event.crn_number},old_tier=#{old_tier},new_tier=#{new_tier}"
-        else
+                        "version=#{result.version},crn=#{event.crn_number},old_tier=#{result.old_tier},new_tier=#{result.new_tier}"
+        when :update_failed
           logger.error "event=domain_event_handle_failure,domain_event_type=#{event.event_type}," \
-            "version=#{event.version},crn=#{event.crn_number},old_tier=#{old_tier},new_tier=#{new_tier}|#{case_info.errors.full_messages.join(',')}"
+                         "version=#{result.version},crn=#{event.crn_number},old_tier=#{result.old_tier},new_tier=#{result.new_tier}|#{result.errors}"
+        when :tier_api_failed
+          logger.warn "event=domain_event_handle_tier_api_failed,domain_event_type=#{event.event_type}," \
+                        "version=#{result.version},crn=#{event.crn_number}"
         end
       end
     end
