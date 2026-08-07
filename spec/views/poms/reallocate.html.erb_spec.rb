@@ -8,7 +8,7 @@ RSpec.describe 'poms/reallocate', type: :view do
   let(:pom) { StaffMember.new(prison, pom_record.staff_id) }
 
   before do
-    stub_poms(prison.code, [pom_record])
+    stub_onboarded_poms(prison, [pom_record])
     stub_offenders_for_prison(prison.code, offenders)
 
     view.request.path_parameters[:prison_id] = prison.code

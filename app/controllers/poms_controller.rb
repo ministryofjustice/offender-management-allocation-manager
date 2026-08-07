@@ -128,13 +128,16 @@ private
 
   def ensure_pom_is_editable
     unless @pom.editable?
-      redirect_to prison_pom_path(active_prison_id, id: nomis_staff_id),
-                  notice: 'This POM has been removed and their profile cannot be edited.'
+      redirect_to prison_pom_path(active_prison_id, nomis_staff_id:),
+                  alert: 'This POM has been removed and their profile cannot be edited.'
     end
   end
 
   def load_pom_staff_member
-    @pom = StaffMember.new @prison, nomis_staff_id
+    @pom = StaffMember.new(@prison, nomis_staff_id)
+    return if @pom.status.present?
+
+    redirect_to prison_poms_path(active_prison_id), alert: 'This POM cannot be found in this service.'
   end
 
   def edit_pom_params

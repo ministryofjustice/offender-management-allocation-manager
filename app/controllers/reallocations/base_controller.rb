@@ -28,13 +28,13 @@ module Reallocations
     def load_pom
       @pom = StaffMember.new(@prison, params[:nomis_staff_id])
 
-      redirect_to error_prison_reallocation_path unless @pom.inactive? || @pom.in_limbo?
+      redirect_to error_prison_reallocation_path unless @pom.status.present? && (@pom.inactive? || @pom.in_limbo?)
     end
 
     def load_new_pom
       @new_pom = StaffMember.new(@prison, params.fetch(:new_pom))
 
-      redirect_to error_prison_reallocation_path unless @new_pom.active? && @new_pom.has_pom_role?
+      redirect_to error_prison_reallocation_path unless @new_pom.status.present? && @new_pom.active? && @new_pom.has_pom_role?
     end
 
     def next_reallocation_step_path(journey = @journey)

@@ -21,7 +21,7 @@ RSpec.describe "allocation_staff/index", type: :view do
   let(:recent_pom_history) { [] }
 
   before do
-    stub_poms(prison.code, poms)
+    stub_onboarded_poms(prison, poms)
     stub_offenders_for_prison(prison.code, [])
 
     assign(:prison, prison)

@@ -11,7 +11,7 @@ RSpec.describe "poms/show", type: :view do
   let(:two_days_ago) { Time.zone.today - 2.days }
 
   before do
-    stub_poms prison.code, [pom]
+    stub_onboarded_poms(prison, [pom])
 
     assign :prison, prison
     assign :pom, StaffMember.new(prison, pom.staff_id)

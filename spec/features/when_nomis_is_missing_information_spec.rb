@@ -15,6 +15,7 @@ context 'when NOMIS is missing information' do
       signin_pom_user([prison_code], staff_id)
       stub_user('MOIC_POM', staff_id)
       stub_keyworker(offender_no)
+      create(:pom_detail, :active, prison_code: prison_code, nomis_staff_id: staff_id)
     end
 
     describe 'the caseload page' do
@@ -109,6 +110,7 @@ context 'when NOMIS is missing information' do
           offender: build(:offender, nomis_offender_id: offender_no),
           enhanced_resourcing: true
         )
+        create(:pom_detail, :active, prison_code: prison_code, nomis_staff_id: staff_id)
       end
 
       describe 'the pom details page' do
