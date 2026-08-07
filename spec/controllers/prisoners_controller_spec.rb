@@ -644,7 +644,7 @@ RSpec.describe PrisonersController, type: :controller do
     before do
       stub_sso_data(prison.code)
       stub_offenders_for_prison(prison.code, [offender])
-      stub_poms(prison.code, [pom_record])
+      stub_onboarded_poms(prison, [pom_record])
       create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
       create(:allocation_history, nomis_offender_id: offender.fetch(:prisonerNumber), prison: prison.code, primary_pom_nomis_id: pom_record.staff_id)
     end

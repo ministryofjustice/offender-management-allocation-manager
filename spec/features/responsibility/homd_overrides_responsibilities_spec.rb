@@ -8,7 +8,7 @@ describe 'HOMD overrides responsibilities' do
   before do
     stub_bank_holidays
     stub_signin_spo(homd_user)
-    stub_poms(prison.code, [pom, homd_user])
+    stub_onboarded_poms(prison, [pom, homd_user])
   end
 
   specify 'HOMD removes community responsibility override returning case to calculated responsibility of POM' do

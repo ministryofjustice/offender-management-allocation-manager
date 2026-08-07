@@ -337,7 +337,7 @@ feature 'Case History' do
       stub_offenders_for_prison(open_prison.code, [nomis_offender])
       stub_movements_for nomis_offender.fetch(:prisonerNumber), offender_movements
       signin_spo_user([open_prison.code])
-      stub_poms(open_prison.code, [pom])
+      stub_onboarded_poms(open_prison, [pom])
       stub_pom pom
     end
 

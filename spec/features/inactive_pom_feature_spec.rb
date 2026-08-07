@@ -11,7 +11,7 @@ feature 'Inactive POM' do
     let(:nomis_offender) { [build(:nomis_offender, prisonId: prison_code, prisonerNumber: nomis_offender_id)] }
 
     before do
-      stub_poms(prison_code, [active_pom])
+      stub_onboarded_poms(prison, [active_pom])
       stub_signin_spo(active_pom, prison_code)
       stub_offenders_for_prison(prison.code, nomis_offender)
 

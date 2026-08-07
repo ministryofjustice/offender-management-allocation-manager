@@ -326,4 +326,52 @@ RSpec.describe StaffMember, type: :model do
       expect(user.total_allocations_count).to eq(2)
     end
   end
+
+  describe 'when pom_detail is nil' do
+    let(:user_without_detail) { described_class.new(prison, staff_id, nil) }
+
+    it 'returns nil for status' do
+      expect(user_without_detail.status).to be_nil
+    end
+
+    it 'returns nil for working_pattern' do
+      expect(user_without_detail.working_pattern).to be_nil
+    end
+
+    it 'returns nil for active?' do
+      expect(user_without_detail.active?).to be_nil
+    end
+
+    it 'returns nil for deleted?' do
+      expect(user_without_detail.deleted?).to be_nil
+    end
+
+    it 'returns nil for unavailable?' do
+      expect(user_without_detail.unavailable?).to be_nil
+    end
+
+    it 'returns nil for inactive?' do
+      expect(user_without_detail.inactive?).to be_nil
+    end
+
+    context 'when POM has a NOMIS role' do
+      before do
+        allow(user_without_detail).to receive(:fetch_pom).and_return(double(:pom))
+      end
+
+      it 'is not in limbo (has role, not deleted)' do
+        expect(user_without_detail).not_to be_in_limbo
+      end
+    end
+
+    context 'when POM has no NOMIS role' do
+      before do
+        allow(user_without_detail).to receive(:fetch_pom).and_return(nil)
+      end
+
+      it 'is in limbo (no role)' do
+        expect(user_without_detail).to be_in_limbo
+      end
+    end
+  end
 end

@@ -5,7 +5,7 @@ feature 'Search for offenders' do
     prison = create(:prison, code: prison_code)
     pom = build(:pom)
 
-    stub_poms(prison.code, [pom])
+    stub_onboarded_poms(prison, [pom])
     stub_pom_user(pom)
     stub_signin_spo(build(:homd))
 

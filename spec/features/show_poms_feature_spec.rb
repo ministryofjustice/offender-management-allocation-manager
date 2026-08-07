@@ -11,8 +11,8 @@ feature "get poms list", flaky: true do
 
   before do
     signin_spo_user
-    create(:pom_detail, :inactive, prison_code: 'LEI', nomis_staff_id: inactive_pom.staff_id)
-    stub_poms('LEI', [active_probation_pom, moic_pom, inactive_pom])
+    stub_onboarded_poms('LEI', [active_probation_pom, moic_pom, inactive_pom])
+    PomDetail.find_by!(prison_code: 'LEI', nomis_staff_id: inactive_pom.staff_id).inactive!
   end
 
   it "shows the page" do

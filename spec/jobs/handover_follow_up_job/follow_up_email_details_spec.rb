@@ -21,7 +21,7 @@ describe HandoverFollowUpJob::FollowUpEmailDetails do
 
   describe "the details used in sending the CommunityMailer email" do
     before do
-      stub_poms(prison.code, [pom])
+      stub_onboarded_poms(prison, [pom])
       stub_filtered_pom(prison.code, pom)
     end
 

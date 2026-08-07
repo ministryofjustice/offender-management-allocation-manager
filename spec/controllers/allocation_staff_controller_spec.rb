@@ -16,7 +16,7 @@ RSpec.describe AllocationStaffController, type: :controller do
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
-    stub_poms(prison_code, poms)
+    stub_onboarded_poms(prison_code, poms)
     stub_offender(offender)
     stub_movements_for offender_no, [attributes_for(:movement)]
   end

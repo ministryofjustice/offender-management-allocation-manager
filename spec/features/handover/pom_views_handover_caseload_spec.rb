@@ -16,7 +16,7 @@ describe "POM views their handover caseload" do
   let(:pom) { build(:pom) }
 
   before do
-    stub_poms(prison.code, [pom])
+    stub_onboarded_poms(prison, [pom])
     stub_pom_user(pom)
     signin_pom_user([prison.code], pom.staff_id)
   end

@@ -13,7 +13,7 @@ describe 'HOMD allocates cases to POMS' do
   before do
     stub_bank_holidays
     stub_signin_spo(build(:homd))
-    stub_poms(prison.code, poms)
+    stub_onboarded_poms(prison, poms)
     stub_offenders_for_prison(prison.code, [offender])
   end
 
@@ -99,7 +99,7 @@ describe 'HOMD allocates cases to POMS' do
 
   specify 'HOMD does not see current primary or co-working POMs when selecting a new POM' do
     extra_pom = build(:pom, :prison_officer, staffId: 2222, firstName: 'Extra', lastName: 'Pom')
-    stub_poms(prison.code, poms + [extra_pom])
+    stub_onboarded_poms(prison, poms + [extra_pom])
 
     create(
       :allocation_history,

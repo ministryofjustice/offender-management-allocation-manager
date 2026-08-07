@@ -18,7 +18,7 @@ describe "HOMD views handover summary for a Prison" do
       'emily' => build(:pom),
       'frank' => build(:pom)
     }.tap do |poms|
-      stub_poms(prison.code, poms.values)
+      stub_onboarded_poms(prison, poms.values)
     end
   end
 

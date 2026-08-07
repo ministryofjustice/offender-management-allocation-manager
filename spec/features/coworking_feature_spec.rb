@@ -32,8 +32,7 @@ feature 'Co-working' do
   let(:prisoner_name_forwards) { "#{offender.fetch(:firstName)} #{offender.fetch(:lastName)}" }
 
   before(:each) do
-    stub_poms(prison.code, poms)
-    poms.each { |pom| stub_filtered_pom(prison.code, pom) }
+    stub_onboarded_poms(prison, poms)
 
     stub_offenders_for_prison prison.code, [offender]
     stub_signin_spo poms.last, [prison.code]

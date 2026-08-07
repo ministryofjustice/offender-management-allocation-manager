@@ -18,8 +18,8 @@ RSpec.feature 'Active caseload enforcement' do
     create(:prison, code: 'RSI')
 
     signin_spo_user(%w[LEI RSI])
-    stub_poms('LEI', [pom])
-    stub_poms('RSI', [pom])
+    stub_onboarded_poms('LEI', [pom])
+    stub_onboarded_poms('RSI', [pom])
     stub_offenders_for_prison('LEI', [])
 
     stub_dps_header_footer

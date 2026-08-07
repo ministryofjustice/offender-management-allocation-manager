@@ -32,13 +32,12 @@ RSpec.shared_context 'with reallocation controller defaults' do
   let(:override_offender_no) { override_offender.fetch(:prisonerNumber) }
 
   before do
-    stub_poms(prison.code, poms)
+    stub_onboarded_poms(prison, poms)
     stub_signed_in_spo_pom(prison.code, 99_999, 'spo-user')
     stub_offenders_for_prison(prison.code, offenders_in_prison)
     offenders_in_prison.each { |prisoner| stub_oasys_assessments(prisoner.fetch(:prisonerNumber)) }
 
-    create(:pom_detail, :inactive, prison_code: prison.code, nomis_staff_id: old_pom.staffId)
-    create(:pom_detail, :active, prison_code: prison.code, nomis_staff_id: new_pom.staffId)
+    prison.pom_details.find_by!(nomis_staff_id: old_pom.staffId).inactive!
     create_reallocation_case(offender_no, tier: 'A')
   end
 
