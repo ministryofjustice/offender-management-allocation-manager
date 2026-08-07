@@ -9,7 +9,7 @@ RSpec.describe 'Parole set hearing outcome date', type: :feature do
   before do
     stub_keyworker(offender_no)
     stub_signin_spo(pom, [prison_code])
-    stub_poms(prison_code, [pom])
+    stub_onboarded_poms(prison_code, [pom])
     stub_offender(nomis_offender)
 
     visit prison_prisoner_path(prison_code, offender_no)

@@ -46,7 +46,7 @@ describe 'View a prisoner profile page' do
     let(:pom) { build(:pom, staffId: 1234, firstName: 'A', lastName: 'Pom') }
 
     before do
-      stub_poms(prison.code, [pom])
+      stub_onboarded_poms(prison, [pom])
       create(:allocation_history, nomis_offender_id: 'G1234AB', primary_pom_nomis_id: 1234, primary_pom_name: 'A Pom', prison: prison.code)
       local_delivery_unit = create(:local_delivery_unit, name: 'An LDU', email_address: 'test@example.com')
       CaseInformation.find_by(nomis_offender_id: 'G1234AB').update(local_delivery_unit:, team_name: 'Team X', com_name: 'Bob Smith')

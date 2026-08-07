@@ -14,7 +14,7 @@ feature 'complexity level feature' do
 
     stub_offenders_for_prison(womens_prison.code, offenders)
     stub_signin_spo(spo, [womens_prison.code])
-    stub_poms(womens_prison.code, [pom, spo])
+    stub_onboarded_poms(womens_prison, [pom, spo])
     stub_keyworker(offender_no)
     stub_community_offender(offender_no, build(:community_data))
     allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return(RoshSummary.missing)

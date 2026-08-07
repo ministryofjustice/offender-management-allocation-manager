@@ -17,7 +17,14 @@ class Prison < ApplicationRecord
 
     details = pom_details.where(nomis_staff_id: poms.map(&:staff_id))
 
-    result = poms.map { |pom| PomWrapper.new(pom, get_pom_detail(details, pom)) }
+    result = poms.filter_map do |pom|
+      pom_detail = details.detect { it.nomis_staff_id == pom.staff_id }
+      if pom_detail.nil?
+        Rails.logger.warn("event=pom_not_onboarded,staff_id=#{pom.staff_id},prison=#{code}")
+        next
+      end
+      PomWrapper.new(pom, pom_detail)
+    end
     include_deleted ? result : result.reject(&:deleted?)
   end
 
@@ -135,10 +142,5 @@ private
     Rails.logger.info("event=ghost_pom_created,staff_id=#{staff_id},prison=#{code}") if pom_detail.previously_new_record?
 
     StaffMember.new(self, staff_id, pom_detail)
-  end
-
-  def get_pom_detail(details, pom)
-    details.detect { it.nomis_staff_id == pom.staff_id } ||
-      PomDetail.find_or_create_as_system!(prison_code: code, nomis_staff_id: pom.staff_id)
   end
 end

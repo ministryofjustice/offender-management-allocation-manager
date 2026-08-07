@@ -86,7 +86,7 @@ feature "view POM's caseload" do
         other_pom
       ]
 
-    stub_poms(prison.code, poms)
+    stub_onboarded_poms(prison, poms)
     signin_pom_user [prison.code]
 
     # Add attributes to moved_offenders to make them ROTLs - needed in conjunction with the ROTL movements

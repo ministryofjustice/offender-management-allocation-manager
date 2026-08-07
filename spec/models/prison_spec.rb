@@ -179,11 +179,15 @@ RSpec.describe Prison do
     let(:duplicate_pom1) { build(:pom, staffId: pom1.staff_id) }
     let(:non_pom) { build(:pom, position: 'STAFF') }
 
+    # Both POMs have been onboarded through our service
+    let!(:pom1_detail) { create(:pom_detail, :active, prison: prison, nomis_staff_id: pom1.staff_id) }
+    let!(:pom2_detail) { create(:pom_detail, :active, prison: prison, nomis_staff_id: pom2.staff_id) }
+
     before do
       stub_poms(prison.code, [pom1, pom2, duplicate_pom1, non_pom])
     end
 
-    it 'returns a list of wrapped POMs' do
+    it 'returns a list of wrapped POMs for onboarded staff' do
       result = prison.get_list_of_poms
 
       expect(result.size).to eq(2)
@@ -191,18 +195,50 @@ RSpec.describe Prison do
       expect(result.map(&:staff_id)).to match_array([pom1.staff_id, pom2.staff_id])
     end
 
-    it 'creates POM details for new POMs' do
+    it 'does not create PomDetail records for POMs seen in NOMIS' do
+      prison2 = create(:prison)
+      new_pom = build(:pom)
+      stub_poms(prison2.code, [new_pom])
+
       expect {
-        prison.get_list_of_poms
-      }.to change(PomDetail, :count).by(2)
+        prison2.get_list_of_poms
+      }.not_to change(PomDetail, :count)
     end
 
-    it 'uses working pattern details pulled from the POM' do
+    it 'uses local PomDetail data for status and working pattern' do
       result = prison.get_list_of_poms
 
       expect(result.map(&:status)).to all(eq('active'))
-      expect(result[0].working_pattern).to eq(0.0)
-      expect(result[1].working_pattern).to eq(0.0)
+      expect(result.map(&:working_pattern)).to all(eq(pom1_detail.working_pattern))
+    end
+
+    context 'when a POM has a NOMIS role but has not been onboarded through our service' do
+      let(:unonboarded_pom) { build(:pom) }
+
+      before do
+        stub_poms(prison.code, [pom1, pom2, unonboarded_pom])
+      end
+
+      it 'excludes the un-onboarded POM from results' do
+        result = prison.get_list_of_poms
+
+        expect(result.map(&:staff_id)).to match_array([pom1.staff_id, pom2.staff_id])
+        expect(result.map(&:staff_id)).not_to include(unonboarded_pom.staff_id)
+      end
+
+      it 'does not create a PomDetail for the un-onboarded POM' do
+        expect {
+          prison.get_list_of_poms
+        }.not_to change(PomDetail, :count)
+      end
+
+      it 'logs a warning for the un-onboarded POM' do
+        allow(Rails.logger).to receive(:warn)
+        prison.get_list_of_poms
+        expect(Rails.logger).to have_received(:warn).with(
+          "event=pom_not_onboarded,staff_id=#{unonboarded_pom.staff_id},prison=#{prison.code}"
+        )
+      end
     end
 
     context 'when fetching a specific POM' do
@@ -220,7 +256,7 @@ RSpec.describe Prison do
 
     context 'when a POM has been soft-deleted' do
       before do
-        create(:pom_detail, :deleted, prison: prison, nomis_staff_id: pom1.staff_id)
+        pom1_detail.deleted!
       end
 
       it 'excludes the soft-deleted POM by default' do

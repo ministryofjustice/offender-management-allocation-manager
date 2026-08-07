@@ -7,7 +7,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
 
   before do
     stub_feature_flag(:rosh_recommendations, enabled: true)
-    stub_poms(prison.code, poms)
+    stub_onboarded_poms(prison, poms)
     stub_signed_in_pom(prison.code, pom.staffId, 'Alice')
     stub_sso_data(prison.code)
     stub_offender(offender)

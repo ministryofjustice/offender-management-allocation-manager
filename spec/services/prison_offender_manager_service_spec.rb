@@ -16,9 +16,8 @@ describe PrisonOffenderManagerService do
   end
 
   before(:each) do
-    PomDetail.create(prison_code: 'LEI', nomis_staff_id: other_staff_id, working_pattern: 1.0, status: 'inactive')
-
-    stub_poms(prison.code, poms)
+    stub_onboarded_poms(prison, poms)
+    prison.pom_details.find_by!(nomis_staff_id: other_staff_id).inactive!
   end
 
   describe '#get_list_of_poms' do

@@ -16,7 +16,7 @@ feature 'POM onboarding' do
     let(:search_response) { { totalElements: 0, content: [] } }
 
     before do
-      stub_poms(prison.code, existing_poms)
+      stub_onboarded_poms(prison, existing_poms)
 
       stub_request(:get, search_endpoint)
         .to_return(status: 200, body: search_response.to_json)
@@ -282,7 +282,7 @@ feature 'POM onboarding' do
         )
 
         # for the confirmation page
-        stub_filtered_pom(prison.code, pom)
+        stub_onboarded_poms(prison, [pom])
       end
 
       it 'creates the staff job classification and shows a confirmation page' do

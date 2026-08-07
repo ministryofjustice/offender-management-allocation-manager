@@ -74,7 +74,7 @@ RSpec.describe EmailService do
     PomDetail.create(nomis_staff_id: 485_637, working_pattern: 1.0, status: 'inactive')
     create(:case_information, offender: build(:offender, nomis_offender_id: 'G2911GD'))
     stub_offender(offender)
-    stub_poms(prison_code, [andrien, leigh])
+    stub_onboarded_poms(prison_code, [andrien, leigh])
     stub_filtered_pom(prison_code, andrien)
   end
 

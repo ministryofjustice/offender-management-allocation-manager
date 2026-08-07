@@ -82,6 +82,20 @@ module ApiHelper
     end
   end
 
+  # Use this helper when the spec expects the returned NOMIS POMs to be
+  # onboarded and therefore visible in service lists.
+  def stub_onboarded_poms(prison, poms, status: 'active', working_pattern: 1.0)
+    prison_code = prison.is_a?(Prison) ? prison.code : prison
+    prison_record = prison.is_a?(Prison) ? prison : Prison.find_by!(code: prison_code)
+
+    stub_poms(prison_code, poms)
+
+    poms.each do |pom|
+      pom_detail = PomDetail.find_or_initialize_by(prison_code: prison_record.code, nomis_staff_id: pom.staff_id)
+      pom_detail.update!(status:, working_pattern:)
+    end
+  end
+
   def stub_filtered_pom(prison, pom)
     pom.agencyId = prison
 

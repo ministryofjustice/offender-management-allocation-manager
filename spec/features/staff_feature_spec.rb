@@ -226,7 +226,7 @@ feature "staff pages" do
     before do
       stub_signin_spo spo, [female_prison]
       stub_offenders_for_prison(female_prison, offenders_in_prison << nomis_offender)
-      stub_poms(female_prison, poms)
+      stub_onboarded_poms(female_prison, poms)
 
       offenders_in_prison.map { |o| o.fetch(:prisonerNumber) }.each do |nomis_id|
         stub_keyworker(nomis_id)

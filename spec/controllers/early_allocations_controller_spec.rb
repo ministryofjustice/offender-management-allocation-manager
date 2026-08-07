@@ -34,7 +34,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     allow(OffenderService).to receive(:get_offender).and_raise(NotImplementedError)
     allow(OffenderService).to receive(:get_offender).with(nomis_offender_id).and_return(mpc_offender)
 
-    stub_poms(prison, poms)
+    stub_onboarded_poms(prison, poms)
     stub_filtered_pom(prison, first_pom)
     stub_offenders_for_prison(prison, [offender])
     allow(EarlyAllocationService).to receive(:process_eligibility_change)

@@ -8,6 +8,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
   let(:new_secondary_pom) { build(:pom) }
 
   before do
+    stub_onboarded_poms(prison, [primary_pom, new_secondary_pom])
     stub_sso_data(prison)
     stub_offender(offender)
     create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
