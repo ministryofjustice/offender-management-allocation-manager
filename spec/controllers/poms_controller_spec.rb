@@ -167,22 +167,45 @@ RSpec.describe PomsController, type: :controller do
         .to_return(body: { staffId: deleted_staff_id, lastName: 'Removed', firstName: 'Person' }.to_json)
     end
 
-    it 'redirects from edit with a notice' do
+    it 'redirects from edit with an alert' do
       get :edit, params: { prison_id: prison.code, nomis_staff_id: deleted_staff_id }
 
-      expect(response).to redirect_to(prison_pom_path(prison.code, id: deleted_staff_id))
-      expect(flash[:notice]).to eq('This POM has been removed and their profile cannot be edited.')
+      expect(response).to redirect_to(prison_pom_path(prison.code, nomis_staff_id: deleted_staff_id))
+      expect(flash[:alert]).to eq('This POM has been removed and their profile cannot be edited.')
     end
 
-    it 'redirects from update with a notice' do
+    it 'redirects from update with an alert' do
       put :update, params: {
         prison_id: prison.code,
         nomis_staff_id: deleted_staff_id,
         edit_pom: { status: 'active', description: 'FT', working_pattern: '1.0' },
       }
 
-      expect(response).to redirect_to(prison_pom_path(prison.code, id: deleted_staff_id))
-      expect(flash[:notice]).to eq('This POM has been removed and their profile cannot be edited.')
+      expect(response).to redirect_to(prison_pom_path(prison.code, nomis_staff_id: deleted_staff_id))
+      expect(flash[:alert]).to eq('This POM has been removed and their profile cannot be edited.')
+    end
+  end
+
+  describe 'load_pom_staff_member guard for non-onboarded POMs' do
+    let(:unknown_staff_id) { 999_999 }
+
+    before do
+      # POM exists in NOMIS but has no local PomDetail onboarding record
+      stub_poms(prison.code, [build(:pom, staffId: unknown_staff_id, firstName: 'Unknown', lastName: 'Person')])
+    end
+
+    it 'redirects show to staff list with an alert' do
+      get :show, params: { prison_id: prison.code, nomis_staff_id: unknown_staff_id }
+
+      expect(response).to redirect_to(prison_poms_path(prison.code))
+      expect(flash[:alert]).to eq('This POM cannot be found in this service.')
+    end
+
+    it 'redirects confirm_delete to staff list with an alert' do
+      get :confirm_delete, params: { prison_id: prison.code, nomis_staff_id: unknown_staff_id }
+
+      expect(response).to redirect_to(prison_poms_path(prison.code))
+      expect(flash[:alert]).to eq('This POM cannot be found in this service.')
     end
   end
 
@@ -197,10 +220,18 @@ RSpec.describe PomsController, type: :controller do
     end
 
     context 'with legacy flow (no confirmation form)' do
+      before do
+        allow(NomisUserRolesService).to receive(:remove_pom) do |given_prison, staff_id|
+          given_prison.pom_details.find_by!(nomis_staff_id: staff_id).deleted!
+          true
+        end
+      end
+
       it 'removes the pom and redirects back to the attention needed tab' do
         delete :destroy, params: { prison_id: prison.code, nomis_staff_id: removed_staff_id }
 
         expect(NomisUserRolesService).to have_received(:remove_pom).with(prison, removed_staff_id)
+        expect(PomDetail.find_by!(nomis_staff_id: removed_staff_id).status).to eq('deleted')
         expect(response).to redirect_to(prison_poms_path(anchor: 'attention_needed!top'))
         expect(flash[:notice]).to eq('Mateo Example removed. If necessary, their cases have been moved to @unallocated_link@.')
       end
@@ -208,6 +239,13 @@ RSpec.describe PomsController, type: :controller do
 
     context 'with confirm delete flow' do
       context 'when confirmed yes and POM has no primary allocations' do
+        before do
+          allow(NomisUserRolesService).to receive(:remove_pom) do |given_prison, staff_id|
+            given_prison.pom_details.find_by!(nomis_staff_id: staff_id).deleted!
+            true
+          end
+        end
+
         it 'removes POM and redirects to staff page' do
           delete :destroy, params: {
             prison_id: prison.code,
@@ -216,6 +254,7 @@ RSpec.describe PomsController, type: :controller do
           }
 
           expect(NomisUserRolesService).to have_received(:remove_pom).with(prison, removed_staff_id)
+          expect(PomDetail.find_by!(nomis_staff_id: removed_staff_id).status).to eq('deleted')
           expect(response).to redirect_to(prison_poms_path(prison.code))
         end
       end

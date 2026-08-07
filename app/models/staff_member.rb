@@ -8,10 +8,10 @@ class StaffMember
   delegate :position_description, :probation_officer?, :prison_officer?, to: :pom, allow_nil: true
   delegate :working_pattern, :status, :active?, :unavailable?, :inactive?, :deleted?, to: :@pom_detail, allow_nil: true
 
-  def initialize(prison, staff_id, pom_detail = default_pom_detail(prison, staff_id))
+  def initialize(prison, staff_id, pom_detail = nil)
     @prison = prison
     @staff_id = staff_id.to_i
-    @pom_detail = pom_detail
+    @pom_detail = pom_detail || prison.pom_details.find_by(nomis_staff_id: @staff_id)
   end
 
   def full_name_ordered
@@ -120,12 +120,6 @@ private
   def fetch_pom
     poms = HmppsApi::PrisonApi::PrisonOffenderManagerApi.list(prison.code)
     poms.detect { it.staff_id == staff_id }
-  end
-
-  # Attempt to forward-populate the PomDetail table for new records
-  # TODO: this auto-creation is now temporary and due to be removed
-  def default_pom_detail(prison, staff_id)
-    PomDetail.find_or_create_as_system!(prison_code: prison.code, nomis_staff_id: staff_id)
   end
 
   # This may raise a 404 for no longer existing NOMIS accounts (should be rare).

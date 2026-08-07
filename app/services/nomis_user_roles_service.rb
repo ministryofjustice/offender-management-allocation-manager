@@ -80,7 +80,6 @@ class NomisUserRolesService
         staff_id: nomis_staff_id,
         data: {
           from_date: pom.from_date,
-          to_date: pom.to_date,
           position: pom.position,
           schedule_type: pom.schedule_type,
           hours_per_week: pom.hours_per_week,

@@ -24,7 +24,7 @@ RSpec.describe 'reallocations/index', type: :view do
   let(:from_tab) { false }
 
   before do
-    stub_poms(prison.code, all_pom_records)
+    stub_onboarded_poms(prison, all_pom_records)
     stub_offenders_for_prison(prison.code, [])
 
     view.request.path_parameters[:prison_id] = prison.code
