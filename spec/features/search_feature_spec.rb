@@ -23,6 +23,8 @@ feature 'Search for offenders' do
   end
 
   it 'Can search from the dashboard' do
+    create(:case_information, offender: build(:offender, nomis_offender_id: 'T0000AA'))
+
     visit root_path
     fill_in 'Find a case', with: 'Cal'
     click_on 'Search'
@@ -30,8 +32,11 @@ feature 'Search for offenders' do
     expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
     expect(all('[aria-label="Prisoner name"]').map(&:text)).to eq(['Mccoy, California T0000AA', 'Agnes, Cally T0000AB', 'Callins, Bridget T0000AE'])
 
-    click_on 'Mccoy, California'
-    expect(page).to have_title "View case information"
+    # Offender with case information is linked
+    expect(page).to have_link('Mccoy, California', href: prison_prisoner_review_case_details_path(prison_code, 'T0000AA'))
+    # Offenders without case information are shown as plain text
+    expect(page).not_to have_link('Agnes, Cally')
+    expect(page).to have_content('Agnes, Cally')
   end
 
   it 'Can search from the Allocations summary page' do
