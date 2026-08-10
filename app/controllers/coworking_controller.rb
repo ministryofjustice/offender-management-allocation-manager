@@ -72,7 +72,7 @@ class CoworkingController < PrisonsApplicationController
       notice = nil
     end
 
-    redirect_to helpers.prisoner_path_for_role(current_user_is_spo?, @prison, prisoner), notice:
+    redirect_to helpers.prisoner_path_for_role(@prison, prisoner), notice:
   end
 
 private

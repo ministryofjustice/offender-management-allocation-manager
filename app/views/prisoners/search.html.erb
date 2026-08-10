@@ -36,7 +36,7 @@
       <% @offenders.each_with_index do |offender, i| %>
         <tr class="govuk-table__row allocated_offender_row_<%= i %>">
           <td aria-label="Prisoner name" class="govuk-table__cell">
-            <%= link_to(highlight(offender.full_name, @q), prisoner_path_for_role(@is_spo, @prison, offender)) %>
+            <%= link_to(highlight(offender.full_name, @q), prisoner_path_for_role(@prison, offender)) %>
             <br/><%= highlight(offender.offender_no, @q) %>
           </td>
           <td aria-label="POM" class="govuk-table__cell"><%= offender.formatted_pom_name || 'None allocated' %></td>

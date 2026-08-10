@@ -25,7 +25,7 @@
     <% @parole_cases.each_with_index do |offender, i| %>
       <tr class="govuk-table__row offender_row_<%= i %>">
         <td aria-label="Prisoner name" class="govuk-table__cell ">
-          <a href="<%= prison_prisoner_path(@prison.code, offender.offender_no) %>"><%= offender.full_name %></a>
+          <%= link_to offender.full_name, prisoner_path_for_role(@prison, offender) %>
           <br/>
           <span class='govuk-hint govuk-!-margin-bottom-0'>
             <%= offender.offender_no %>

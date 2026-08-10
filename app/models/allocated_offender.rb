@@ -34,6 +34,10 @@ class AllocatedOffender
     @offender = offender
   end
 
+  def active_allocation
+    @allocation
+  end
+
   # check for changes in the last week where the target value
   # (item[1] in the array) is our staff_id
   def new_case?
