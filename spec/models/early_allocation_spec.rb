@@ -194,7 +194,7 @@ RSpec.describe EarlyAllocation, type: :model do
 
       audit = AuditEvent.order(:created_at).last
       aggregate_failures do
-        expect(audit.tags).to eq(%w[record early_allocation eligible changed])
+        expect(audit.tags).to eq(%w[record early_allocation eligible created])
         expect(audit.data['after']).to include('outcome' => 'eligible')
       end
     end

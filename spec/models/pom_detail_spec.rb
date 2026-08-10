@@ -68,8 +68,8 @@ RSpec.describe PomDetail, type: :model do
   describe '.find_or_create_as_system!' do
     let(:nomis_staff_id) { 555_555 }
 
-    it 'creates a PomDetail with default attributes' do
-      pom_detail = described_class.find_or_create_as_system!(prison_code: prison.code, nomis_staff_id:)
+    it 'creates a PomDetail with the given attributes' do
+      pom_detail = described_class.find_or_create_as_system!(prison_code: prison.code, nomis_staff_id:, status: 'active', working_pattern: 0.0)
 
       expect(pom_detail).to be_persisted
       expect(pom_detail.status).to eq('active')
@@ -86,7 +86,7 @@ RSpec.describe PomDetail, type: :model do
     it 'returns the existing record if one already exists' do
       existing = create(:pom_detail, prison:, nomis_staff_id:, status: 'active')
 
-      result = described_class.find_or_create_as_system!(prison_code: prison.code, nomis_staff_id:, status: 'deleted')
+      result = described_class.find_or_create_as_system!(prison_code: prison.code, nomis_staff_id:, status: 'deleted', working_pattern: 0.0)
 
       expect(result.id).to eq(existing.id)
       expect(result.status).to eq('active')
@@ -95,7 +95,7 @@ RSpec.describe PomDetail, type: :model do
     it 'records as system-initiated even during a user session' do
       PaperTrail.request.whodunnit = 'SPO_USER'
 
-      described_class.find_or_create_as_system!(prison_code: prison.code, nomis_staff_id:)
+      described_class.find_or_create_as_system!(prison_code: prison.code, nomis_staff_id:, status: 'active', working_pattern: 0.0)
 
       version = PaperTrail::Version.where(item_type: 'PomDetail').last
       expect(version.whodunnit).to be_nil
@@ -117,7 +117,7 @@ RSpec.describe PomDetail, type: :model do
       create(:pom_detail, prison: prison, status: 'active')
 
       audit = AuditEvent.order(:created_at).last
-      expect(audit.tags).to include('active')
+      expect(audit.tags).to include('status_active')
     end
 
     it 'records before and after changes on update' do

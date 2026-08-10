@@ -137,7 +137,7 @@ private
   # NomisUserRolesService.remove_pom) work seamlessly
   def find_or_create_ghost_pom(staff_id)
     pom_detail = PomDetail.find_or_create_as_system!(
-      prison_code: code, nomis_staff_id: staff_id, status: 'deleted'
+      prison_code: code, nomis_staff_id: staff_id, status: 'deleted', working_pattern: 0.0
     )
     Rails.logger.info("event=ghost_pom_created,staff_id=#{staff_id},prison=#{code}") if pom_detail.previously_new_record?
 

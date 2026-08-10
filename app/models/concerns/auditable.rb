@@ -24,11 +24,9 @@ private
       end
     end
 
-    action_tag = destroyed? ? 'destroyed' : 'changed'
-
     AuditEvent.publish(
       nomis_offender_id: (nomis_offender_id if has_attribute?(:nomis_offender_id)),
-      tags: [*audit_event_tags, action_tag],
+      tags: [*audit_event_tags, audit_action_tag],
       system_event: PaperTrail.request.whodunnit.blank?,
       username: PaperTrail.request.whodunnit,
       data: audit_additional_data.merge(
@@ -46,5 +44,12 @@ private
   # Override in including models to merge additional identifying data
   def audit_additional_data
     {}
+  end
+
+  def audit_action_tag
+    return 'destroyed' if destroyed?
+    return 'created'   if previous_changes.key?('id')
+
+    'changed'
   end
 end

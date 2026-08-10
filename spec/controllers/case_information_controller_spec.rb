@@ -58,7 +58,7 @@ RSpec.describe CaseInformationController, type: :controller do
       expect(AuditEvent).to have_received(:publish).once.with(
         hash_including(
           nomis_offender_id: offender_no,
-          tags: %w[record case_information changed],
+          tags: %w[record case_information created],
           system_event: false
         )
       )
