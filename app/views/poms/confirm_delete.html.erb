@@ -1,12 +1,12 @@
 <% content_for :title, 'Confirm POM removal – Digital Prison Services' %>
 
-<%= link_to 'Back', edit_prison_pom_path(@prison.code, @pom.staff_id),
+<%= link_to 'Back', edit_prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id),
             class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <%= form_for(@confirm_delete_form, as: :confirm_delete_pom,
-                 url: prison_pom_path(@prison.code, @pom.staff_id),
+                 url: prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id),
                  method: :delete,
                  builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
 

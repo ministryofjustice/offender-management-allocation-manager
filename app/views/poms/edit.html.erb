@@ -1,6 +1,6 @@
 <% content_for :title, "Edit profile – Digital Prison Services" %>
 
-<%= link_to 'Back', prison_pom_path(@prison.code, @pom.staff_id),
+<%= link_to 'Back', prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id),
             class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
 
 <div class="govuk-grid-row">
@@ -49,7 +49,7 @@
 
       <div class="govuk-form-group">
         <%= f.govuk_submit 'Save' %>
-        <%= link_to 'Cancel', prison_pom_path(@prison.code, @pom.staff_id), class: 'govuk-link app-cancel-link' %>
+        <%= link_to 'Cancel', prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: 'govuk-link app-cancel-link' %>
       </div>
     <% end %>
   </div>

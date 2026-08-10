@@ -47,13 +47,13 @@ feature "remove a POM no longer present in NOMIS" do
       end
 
       # Goes to the Manage your staff page
-      visit prison_poms_path(prison_id: prison.code)
+      visit prison_poms_path(prison.code)
     end
   end
 
   shared_examples 'without an attention needed tab' do
     it 'does not show the attention needed tab' do
-      visit prison_poms_path(prison_id: prison.code)
+      visit prison_poms_path(prison.code)
 
       expect(page).not_to have_css('a.govuk-tabs__tab', text: 'Attention needed')
     end
@@ -118,7 +118,7 @@ feature "remove a POM no longer present in NOMIS" do
           create(:case_information, offender: offender_record)
         end
 
-        visit prison_poms_path(prison_id: prison.code)
+        visit prison_poms_path(prison.code)
       end
 
       it 'links directly to the POM selection page, skipping the summary' do
