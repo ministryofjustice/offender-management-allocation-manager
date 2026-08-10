@@ -23,7 +23,7 @@ class PomDetail < ApplicationRecord
 
   belongs_to :prison, foreign_key: :prison_code, inverse_of: :pom_details
 
-  def self.find_or_create_as_system!(prison_code:, nomis_staff_id:, status: 'active', working_pattern: 0.0)
+  def self.find_or_create_as_system!(prison_code:, nomis_staff_id:, status:, working_pattern:)
     find_by(prison_code:, nomis_staff_id:) ||
       PaperTrail.request(whodunnit: nil) do
         find_or_create_by!(prison_code:, nomis_staff_id:) do |pd|
@@ -62,7 +62,7 @@ class PomDetail < ApplicationRecord
 private
 
   def audit_event_tags
-    ['record', 'pom_detail', status].freeze
+    ['record', 'pom_detail', "status_#{status}"].freeze
   end
 
   def audit_additional_data

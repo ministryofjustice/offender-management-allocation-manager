@@ -127,9 +127,18 @@ RSpec.describe Auditable do
   describe 'tags on create and update' do
     let!(:case_info) { create(:case_information, :manual_entry, tier: 'B', rosh_level: 'LOW', enhanced_resourcing: false) }
 
-    it "uses 'changed' tag on create" do
+    it "uses 'created' tag on create" do
+      audit = AuditEvent.order(:created_at).last
+      expect(audit.tags).to include('created')
+      expect(audit.tags).not_to include('changed')
+      expect(audit.tags).not_to include('destroyed')
+    end
+
+    it "uses 'changed' tag on update" do
+      case_info.update!(tier: 'C')
       audit = AuditEvent.order(:created_at).last
       expect(audit.tags).to include('changed')
+      expect(audit.tags).not_to include('created')
       expect(audit.tags).not_to include('destroyed')
     end
   end

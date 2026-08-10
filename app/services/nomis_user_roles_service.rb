@@ -43,10 +43,6 @@ class NomisUserRolesService
     # list endpoint until any previous cached request expires (which could take 1h)
     HmppsApi::PrisonApi::PrisonOffenderManagerApi.expire_list_cache(prison.code)
 
-    # This should not be neccessary if we decide to use NOMIS working hours
-    # upon reading the list of POMS.
-    # For now, we are not doing that so we need to create the PomDetail here
-    # as part of the onboarding to save the correct hours.
     prison.pom_details.find_or_initialize_by(nomis_staff_id:).tap do |pd|
       pd.update!(created_by:, status: 'active', hours_per_week: config[:hours_per_week])
     end
