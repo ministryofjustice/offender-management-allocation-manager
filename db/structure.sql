@@ -1191,6 +1191,13 @@ CREATE INDEX index_audit_events_on_tags ON public.audit_events USING gin (tags);
 
 
 --
+-- Name: index_audit_events_on_username; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_audit_events_on_username ON public.audit_events USING btree (username);
+
+
+--
 -- Name: index_calculated_handover_dates_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1346,6 +1353,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260811114112'),
 ('20260714160140'),
 ('20260713120000'),
 ('20260409113634'),
