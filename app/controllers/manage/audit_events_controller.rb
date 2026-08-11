@@ -2,8 +2,10 @@ class Manage::AuditEventsController < ApplicationController
   before_action :authenticate_user, :ensure_admin_user
 
   def index
-    @nomis_offender_id = params[:nomis_offender_id]
+    @nomis_offender_id = params[:nomis_offender_id]&.strip
+    @username = params[:whodunnit]&.strip
     @tags = params.fetch(:tags, '').strip.split(/[^\w.=]+/)
+
     query = AuditEvent.order(created_at: :desc)
 
     if @nomis_offender_id.present?
@@ -14,6 +16,14 @@ class Manage::AuditEventsController < ApplicationController
       query = query.tags(*@tags)
     end
 
-    @audit_events = query.page params[:page]
+    if @username.present?
+      query = if @username.casecmp('system').zero?
+                query.where(system_event: true)
+              else
+                query.where(username: @username)
+              end
+    end
+
+    @audit_events = query.page(params[:page]).without_count
   end
 end
