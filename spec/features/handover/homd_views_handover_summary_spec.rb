@@ -43,6 +43,14 @@ describe "HOMD views handover summary for a Prison" do
     expect(page).to have_content("Upcoming handovers (1)")
     expect(page).to have_content(offender_with_upcoming_handover.nomis_offender_id)
     expect(page).not_to have_content(another_offender_with_upcoming_handover_but_different_pom.nomis_offender_id)
+
+    # Offender links go to the allocation page, not the prisoner profile
+    within 'tr', text: offender_with_upcoming_handover.nomis_offender_id do
+      expect(page).to have_link(href: prison_prisoner_allocation_path(prison.code, prisoner_id: offender_with_upcoming_handover.nomis_offender_id))
+    end
+
+    # POM column is hidden since we're already viewing this POM's cases
+    expect(page).not_to have_css('th', text: 'POM')
   end
 
   specify 'HOMD can view in progress handovers' do
