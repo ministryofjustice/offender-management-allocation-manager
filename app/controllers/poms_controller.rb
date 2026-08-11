@@ -28,7 +28,7 @@ class PomsController < PrisonStaffApplicationController
       @overdue_com_allocations = @handover_cases.com_allocation_overdue
     end
 
-    @pom_view = true
+    @pom_view = false
   end
 
   # This is for the situation where the user is no longer a POM
