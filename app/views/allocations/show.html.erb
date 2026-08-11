@@ -141,7 +141,7 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell govuk-!-width-one-half">POM</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= link_to @pom.full_name, prison_pom_path(@prison.code, @pom.staff_id), class: "govuk-link" %>
+        <%= link_to @pom.full_name, prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: "govuk-link" %>
         <%= link_to 'Reallocate', prison_prisoner_review_case_details_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right" %>
       </td>
     </tr>
@@ -153,7 +153,7 @@
           <%= link_to 'Allocate', prison_prisoner_review_case_details_path(@prison.code, @prisoner.offender_no, coworking: true), class: "govuk-link pull-right" %>
         <% else %>
           <%= link_to_if @coworker.has_pom_role?, @coworker.full_name.presence || 'Unknown',
-                         prison_pom_path(@prison.code, @coworker.staff_id), class: "govuk-link" %>
+                         prison_pom_path(@prison.code, nomis_staff_id: @coworker.staff_id), class: "govuk-link" %>
           <%= link_to 'Remove', prison_coworking_confirm_removal_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right" %>
         <% end %>
       </td>

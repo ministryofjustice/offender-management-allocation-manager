@@ -17,9 +17,13 @@ module SearchHelper
     end
   end
 
-  def prisoner_path_for_role(is_spo, prison, offender)
-    if is_spo && offender.active_allocation
-      prison_prisoner_allocation_path(prison.code, prisoner_id: offender.offender_no)
+  def prisoner_path_for_role(prison, offender)
+    if current_user_is_spo?
+      if offender.active_allocation
+        prison_prisoner_allocation_path(prison.code, prisoner_id: offender.offender_no)
+      else
+        prison_prisoner_review_case_details_path(prison.code, offender.offender_no)
+      end
     else
       prison_prisoner_path(prison.code, offender.offender_no)
     end

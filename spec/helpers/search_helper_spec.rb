@@ -40,17 +40,17 @@ RSpec.describe SearchHelper do
     end
 
     context 'when user is not an SPO' do
-      let(:is_spo) { false }
+      def current_user_is_spo? = false
 
       it 'returns the prisoner path' do
         expect(
-          prisoner_path_for_role(is_spo, prison, offender)
+          prisoner_path_for_role(prison, offender)
         ).to eq(prison_prisoner_path(prison.code, offender.offender_no))
       end
     end
 
     context 'when user is an SPO' do
-      let(:is_spo) { true }
+      def current_user_is_spo? = true
 
       context 'with an active allocation' do
         before do
@@ -59,7 +59,7 @@ RSpec.describe SearchHelper do
 
         it 'returns the allocation path' do
           expect(
-            prisoner_path_for_role(is_spo, prison, offender)
+            prisoner_path_for_role(prison, offender)
           ).to eq(prison_prisoner_allocation_path(prison.code, prisoner_id: offender.offender_no))
         end
       end
@@ -69,10 +69,10 @@ RSpec.describe SearchHelper do
           allow(offender).to receive(:active_allocation).and_return(nil)
         end
 
-        it 'returns the prisoner path' do
+        it 'returns the review case details path' do
           expect(
-            prisoner_path_for_role(is_spo, prison, offender)
-          ).to eq(prison_prisoner_path(prison.code, offender.offender_no))
+            prisoner_path_for_role(prison, offender)
+          ).to eq(prison_prisoner_review_case_details_path(prison.code, offender.offender_no))
         end
       end
     end

@@ -1,5 +1,5 @@
 <td class="govuk-table__cell staff-member">
   <%= link_to(staff_member.full_name_ordered,
-              prison_pom_path(@prison, staff_member.staff_id),
+              prison_pom_path(@prison.code, nomis_staff_id: staff_member.staff_id),
               class: 'govuk-link govuk-link--no-visited-state') %>
 </td>

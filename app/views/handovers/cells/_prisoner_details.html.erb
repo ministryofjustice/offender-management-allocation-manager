@@ -1,5 +1,6 @@
 <td class="govuk-table__cell prisoner-details">
-  <%= link_to offender.full_name, prison_prisoner_path(prison_id, offender.offender_no),
+  <%= link_to offender.full_name,
+              pom_view ? prison_prisoner_path(prison_id, offender.offender_no) : prison_prisoner_allocation_path(prison_id, prisoner_id: offender.offender_no),
               class: 'govuk-link', data: { 'sort-value' => offender.last_name} %>
   <br>
   <span class="govuk-hint govuk-!-margin-bottom-0 offender-no"><%= offender.offender_no %></span>
