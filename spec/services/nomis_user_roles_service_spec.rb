@@ -24,7 +24,6 @@ RSpec.describe NomisUserRolesService do
 
     before do
       allow(HmppsApi::NomisUserRolesApi).to receive(:get_users).and_return(api_response)
-      allow(prison).to receive(:get_list_of_poms).and_return([double(staff_id: 222)])
     end
 
     it 'calls the NOMIS API with correct parameters' do
@@ -35,48 +34,61 @@ RSpec.describe NomisUserRolesService do
       )
     end
 
-    it 'filters out existing POMs and adjusts total count' do
+    it 'filters out active POMs and adjusts total count' do
+      create(:pom_detail, :active, prison: prison, nomis_staff_id: 222)
+
       results, total = described_class.search_staff(prison, filter)
 
       expect(results).to contain_exactly({ 'staffId' => 111 }, { 'staffId' => 333 })
       expect(total).to eq(2)
     end
 
-    context 'when a POM has been soft-deleted but still has their NOMIS role' do
-      before do
-        # POM 333 is soft-deleted locally but their NOMIS role has not yet been
-        # expired (e.g. cases still pending reallocation). They should still be
-        # excluded from the search results to prevent re-onboarding mid-removal
-        allow(prison).to receive(:get_list_of_poms)
-          .with(include_deleted: true)
-          .and_return([double(staff_id: 222), double(staff_id: 333)])
-      end
+    context 'when a POM has an unavailable status' do
+      it 'excludes them from results' do
+        create(:pom_detail, :unavailable, prison: prison, nomis_staff_id: 222)
 
-      it 'excludes the soft-deleted POM from results' do
         results, total = described_class.search_staff(prison, filter)
 
-        expect(results).to contain_exactly({ 'staffId' => 111 })
-        expect(total).to eq(1)
+        expect(results).to contain_exactly({ 'staffId' => 111 }, { 'staffId' => 333 })
+        expect(total).to eq(2)
       end
     end
 
-    context 'when a POM has been fully removed (role expired in NOMIS)' do
-      before do
-        # POM 222 was previously removed and their NOMIS role has been expired,
-        # so `get_list_of_poms` no longer returns them. They will appear in the
-        # search results so they can be re-onboarded
-        allow(prison).to receive(:get_list_of_poms)
-          .with(include_deleted: true)
-          .and_return([])
-      end
+    context 'when a POM has an inactive status' do
+      it 'excludes them from results' do
+        create(:pom_detail, :inactive, prison: prison, nomis_staff_id: 333)
 
-      it 'includes the fully removed POM in results' do
+        results, total = described_class.search_staff(prison, filter)
+
+        expect(results).to contain_exactly({ 'staffId' => 111 }, { 'staffId' => 222 })
+        expect(total).to eq(2)
+      end
+    end
+
+    context 'when a POM has been deleted' do
+      it 'includes them in results so they can be re-onboarded' do
+        create(:pom_detail, :deleted, prison: prison, nomis_staff_id: 222)
+
         results, total = described_class.search_staff(prison, filter)
 
         expect(results).to contain_exactly(
           { 'staffId' => 111 }, { 'staffId' => 222 }, { 'staffId' => 333 }
         )
         expect(total).to eq(3)
+      end
+    end
+
+    context 'when multiple POMs have mixed statuses' do
+      it 'only excludes non-deleted POMs' do
+        create(:pom_detail, :active, prison: prison, nomis_staff_id: 111)
+        create(:pom_detail, :deleted, prison: prison, nomis_staff_id: 222)
+        create(:pom_detail, :inactive, prison: prison, nomis_staff_id: 333)
+
+        results, total = described_class.search_staff(prison, filter)
+
+        # 111 excluded (active), 222 included (deleted), 333 excluded (inactive)
+        expect(results).to contain_exactly({ 'staffId' => 222 })
+        expect(total).to eq(1)
       end
     end
 
