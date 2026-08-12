@@ -11,9 +11,12 @@ class NomisUserRolesService
     results = response.fetch('content', [])
     total_elements = response.fetch('totalElements', 0)
 
-    # We remove existing POMs from the search results
-    existing_pom_ids = prison.get_list_of_poms(include_deleted: true).map(&:staff_id)
+    # Exclude POMs who already appear in the staff lists (active, unavailable,
+    # or inactive) as SPOs manage those via status changes, not re-onboarding.
+    # Only deleted POMs should be eligible for re-onboarding via search.
+    existing_pom_ids = prison.pom_details.not_deleted.pluck(:nomis_staff_id)
     filtered_results = results.reject { |result| existing_pom_ids.include?(result['staffId']) }
+
     total_elements -= (results.size - filtered_results.size)
 
     [filtered_results, total_elements]
