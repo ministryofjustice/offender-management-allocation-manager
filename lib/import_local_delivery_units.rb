@@ -134,6 +134,6 @@ private
   end
 
   def logger
-    @logger ||= Logger.new($stdout)
+    @logger ||= Rails.env.test? ? Rails.logger : Logger.new($stdout)
   end
 end
