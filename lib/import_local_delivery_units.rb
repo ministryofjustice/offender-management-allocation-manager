@@ -10,6 +10,11 @@ class ImportLocalDeliveryUnits
     OTHERLDU
   ].freeze
 
+  # Safety threshold: if the API returns fewer than this percentage of the
+  # existing LDU count, abort the import to avoid mass deletion caused by
+  # an upstream API issue (empty response, partial data, misconfiguration)
+  MINIMUM_RETENTION_PERCENTAGE = 90
+
   attr_reader :dry_run
 
   def initialize(dry_run: true)
@@ -23,6 +28,12 @@ class ImportLocalDeliveryUnits
     log("Number of LDUs in database: #{existing_ldu_codes.size}")
     log("Retrieved #{mailboxes.size} mailboxes from register. Processing...")
 
+    if Rails.env.production? && existing_ldu_codes.any? && below_safety_threshold?(mailboxes.size, existing_ldu_codes.size)
+      log("ABORTING: API returned #{mailboxes.size} mailboxes but we have #{existing_ldu_codes.size} LDUs locally. " \
+          "This looks like a partial or empty response (threshold: #{MINIMUM_RETENTION_PERCENTAGE}%).")
+      return
+    end
+
     destroys_count = 0
     creates_count = 0
     updates_count = 0
@@ -34,9 +45,13 @@ class ImportLocalDeliveryUnits
       name = mailbox['name']
       uuid = mailbox['id']
 
-      ldu = LocalDeliveryUnit
-              .where(mailbox_register_id: uuid)
-              .first_or_initialize.tap do |record|
+      # Look up by UUID first, then fall back to code. This handles the case
+      # where an LDU was deleted from Mailbox Register and re-added with the
+      # same code but a new UUID, as we want to update the existing record (and
+      # preserve its associations) rather than trying to delete-and-recreate.
+      ldu = (LocalDeliveryUnit.find_by(mailbox_register_id: uuid) ||
+             LocalDeliveryUnit.find_by(code: code) ||
+             LocalDeliveryUnit.new).tap do |record|
         record.code = code
         record.mailbox_register_id = uuid
         record.name = mailbox['name'].presence || mailbox['emailAddress']
@@ -103,6 +118,12 @@ class ImportLocalDeliveryUnits
   end
 
 private
+
+  def below_safety_threshold?(remote_count, local_count)
+    return false if local_count.zero?
+
+    (remote_count.to_f / local_count * 100) < MINIMUM_RETENTION_PERCENTAGE
+  end
 
   def log(msg)
     logger.info("[#{self.class}] #{log_prefix}#{msg}")
