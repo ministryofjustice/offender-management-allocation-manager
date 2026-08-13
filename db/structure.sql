@@ -515,7 +515,8 @@ CREATE TABLE public.omic_eligibilities (
     eligible boolean DEFAULT false,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    prison character varying
+    prison character varying,
+    missing_runs_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -1261,6 +1262,13 @@ CREATE INDEX index_omic_eligibilities_on_eligible ON public.omic_eligibilities U
 
 
 --
+-- Name: index_omic_eligibilities_on_missing_runs_count; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_omic_eligibilities_on_missing_runs_count ON public.omic_eligibilities USING btree (missing_runs_count);
+
+
+--
 -- Name: index_omic_eligibilities_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1353,6 +1361,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260813173000'),
 ('20260811114112'),
 ('20260714160140'),
 ('20260713120000'),
