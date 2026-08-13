@@ -26,6 +26,20 @@ describe 'PersistOmicEligibilityService' do
         allow(PrisonService).to receive(:prison_codes).and_return(%w[LEI])
       end
 
+      it 'calls the bulk offender API with the expected arguments' do
+        expect(HmppsApi::PrisonApi::OffenderApi)
+          .to receive(:get_offenders_in_prison)
+          .with(
+            'LEI',
+            fetch_complexities: false,
+            fetch_categories: false,
+            fetch_movements: false
+          )
+          .and_call_original
+
+        service.call
+      end
+
       it 'persists offenders inside omic policy as eligible' do
         service.call
 
@@ -130,6 +144,18 @@ describe 'PersistOmicEligibilityService' do
       expect(PersistOmicEligibilityService.logger)
         .to receive(:info)
         .with(include('status=orphaned_prison_rows_detected', 'prisons=ZZZ'))
+
+      service.call
+    end
+
+    it 'logs how many rows are pending deletion in future runs' do
+      create(:omic_eligibility, nomis_offender_id: 'X1111AA', eligible: true, prison: 'LEI', missing_runs_count: 0)
+      create(:omic_eligibility, nomis_offender_id: 'X1111AB', eligible: true, prison: 'LEI', missing_runs_count: 1)
+      allow(PersistOmicEligibilityService.logger).to receive(:info)
+
+      expect(PersistOmicEligibilityService.logger)
+        .to receive(:info)
+        .with(include('status=cleanup_pending', 'threshold=2', 'due_now=1', 'due_next_run=1'))
 
       service.call
     end

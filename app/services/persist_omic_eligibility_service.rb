@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PersistOmicEligibilityService
-  API_ARGS = { ignore_legal_status: true, fetch_complexities: false, fetch_categories: false, fetch_movements: false }.freeze
+  API_ARGS = { fetch_complexities: false, fetch_categories: false, fetch_movements: false }.freeze
 
   # This is set to a conservative approach, meaning it will take 2 runs (~48h)
   # for an offender no longer returned to be deleted from the `OmicEligibility`
@@ -81,7 +81,9 @@ private
         .update_all('missing_runs_count = missing_runs_count + 1')
     end
 
-    OmicEligibility.where('missing_runs_count >= ?', DEFAULT_MISSING_RUNS_THRESHOLD).delete_all
+    log_pending_cleanup_counts
+
+    OmicEligibility.where('missing_runs_count >= ?', threshold).delete_all
   end
 
   def log_orphaned_prison_rows(valid_prison_codes)
@@ -91,6 +93,20 @@ private
     log(
       "event=persist_omic_eligibility,status=orphaned_prison_rows_detected,prisons=#{orphaned_prisons.join(',')}"
     )
+  end
+
+  def log_pending_cleanup_counts
+    due_now = OmicEligibility.where('missing_runs_count >= ?', threshold).count
+    due_next_run = threshold > 1 ? OmicEligibility.where(missing_runs_count: threshold - 1).count : 0
+
+    log(
+      'event=persist_omic_eligibility,status=cleanup_pending,' \
+        "threshold=#{threshold},due_now=#{due_now},due_next_run=#{due_next_run}"
+    )
+  end
+
+  def threshold
+    DEFAULT_MISSING_RUNS_THRESHOLD
   end
 
   def log(msg)
