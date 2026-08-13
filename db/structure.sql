@@ -515,7 +515,7 @@ CREATE TABLE public.omic_eligibilities (
     eligible boolean DEFAULT false,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    prison character varying,
+    prison character varying NOT NULL,
     missing_runs_count integer DEFAULT 0 NOT NULL
 );
 

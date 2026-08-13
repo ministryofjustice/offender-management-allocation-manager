@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PersistOmicEligibilityService
   API_ARGS = { ignore_legal_status: true, fetch_complexities: false, fetch_categories: false, fetch_movements: false }.freeze
 
@@ -61,6 +63,8 @@ private
       }
     end
 
+    # Rails still manages `updated_at` here: it refreshes it when any `update_only`
+    # column changes, and preserves it when the values are unchanged
     OmicEligibility.upsert_all(
       records, unique_by: :nomis_offender_id, update_only: %i[eligible prison missing_runs_count]
     )
@@ -68,6 +72,8 @@ private
 
   # First pass marks offenders as missing, second pass deletes them
   def cleanup_missing_offenders(seen_offender_ids_by_prison)
+    log_orphaned_prison_rows(seen_offender_ids_by_prison.keys)
+
     seen_offender_ids_by_prison.each do |prison_code, seen_offender_ids|
       OmicEligibility
         .where(prison: prison_code)
@@ -76,6 +82,15 @@ private
     end
 
     OmicEligibility.where('missing_runs_count >= ?', DEFAULT_MISSING_RUNS_THRESHOLD).delete_all
+  end
+
+  def log_orphaned_prison_rows(valid_prison_codes)
+    orphaned_prisons = (OmicEligibility.distinct.pluck(:prison) - valid_prison_codes)
+    return if orphaned_prisons.empty?
+
+    log(
+      "event=persist_omic_eligibility,status=orphaned_prison_rows_detected,prisons=#{orphaned_prisons.join(',')}"
+    )
   end
 
   def log(msg)

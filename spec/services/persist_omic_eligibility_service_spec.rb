@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
 describe 'PersistOmicEligibilityService' do
   subject(:service) { PersistOmicEligibilityService.new }
 
@@ -117,6 +121,17 @@ describe 'PersistOmicEligibilityService' do
       expect(record.prison).to eq('MDI')
       expect(record.missing_runs_count).to eq(0)
       expect(record.eligible).to be(true)
+    end
+
+    it 'logs when rows exist for prisons outside the authoritative prison list' do
+      create(:omic_eligibility, nomis_offender_id: 'X1111AA', eligible: true, prison: 'ZZZ', missing_runs_count: 0)
+      allow(PersistOmicEligibilityService.logger).to receive(:info)
+
+      expect(PersistOmicEligibilityService.logger)
+        .to receive(:info)
+        .with(include('status=orphaned_prison_rows_detected', 'prisons=ZZZ'))
+
+      service.call
     end
   end
 end
