@@ -2,8 +2,8 @@
 
 class OffenderService
   class << self
-    def get_offender(offender_no, *args)
-      prison_record = HmppsApi::PrisonApi::OffenderApi.get_offender(offender_no, *args)
+    def get_offender(offender_no, **options)
+      prison_record = HmppsApi::PrisonApi::OffenderApi.get_offender(offender_no, **options)
       return unless prison_record
 
       prison = Prison.find_by(code: prison_record.prison_id)
@@ -13,9 +13,9 @@ class OffenderService
       MpcOffender.new(prison:, offender:, prison_record:)
     end
 
-    def get_offenders_in_prison(prison, *args)
+    def get_offenders_in_prison(prison, **options)
       prison_records = HmppsApi::PrisonApi::OffenderApi
-                         .get_offenders_in_prison(prison.code, *args)
+                         .get_offenders_in_prison(prison.code, **options)
                          .index_by(&:offender_no)
 
       offenders = find_or_create_offenders(prison_records.keys)
@@ -28,9 +28,9 @@ class OffenderService
       end
     end
 
-    def get_offenders(offender_numbers, *args)
+    def get_offenders(offender_numbers, **options)
       Array(offender_numbers)
-        .map { |offender_number| get_offender(offender_number, *args) }
+        .map { |offender_number| get_offender(offender_number, **options) }
         .compact
     end
 

@@ -5,14 +5,22 @@ module HmppsApi
     class OffenderApi
       extend PrisonApiClient
 
+      DEFAULT_OPTIONS = {
+        ignore_legal_status: false,
+        fetch_complexities: true,
+        fetch_categories: true,
+        fetch_movements: true,
+        cache: true,
+      }.freeze
+
       # Only allow offenders into the service if their legal status is in this list
       # Used to filter out offenders who are on remand, civil prisoners, unsentenced, etc.
       ALLOWED_LEGAL_STATUSES = %w[SENTENCED INDETERMINATE_SENTENCE RECALL IMMIGRATION_DETAINEE].freeze
 
-      def self.get_offenders_in_prison(prison, *args)
+      def self.get_offenders_in_prison(prison, **options)
         offenders = get_search_api_offenders_in_prison(prison)
 
-        build_offenders(offenders, prison, *args)
+        build_offenders(offenders, prison, **options)
       end
 
       def self.get_offenders_out_of_prison(prison)
@@ -31,22 +39,20 @@ module HmppsApi
       # Warning: when you ignore the offender's legal status, you could potentially receive an offender who wouldn't
       # normally appear within the service. This should only be done under certain circumstances –
       # e.g. when deallocating an offender who has since left the service due to a change in legal status
-      def self.get_offender(offender_no, *args)
-        offender = get_search_api_offenders(offender_no).first
+      def self.get_offender(offender_no, **options)
+        options = options_with_defaults(options)
+
+        offender = get_search_api_offenders(offender_no, cache: options[:cache]).first
         return if offender.nil?
 
         # Restricted Patients use supportingPrisonId, since the offender is currently in hospital
         prison_id = offender.fetch(offender['restrictedPatient'] ? 'supportingPrisonId' : 'prisonId')
 
-        build_offenders([offender], prison_id, *args).first
+        build_offenders([offender], prison_id, **options).first
       end
 
-      def self.build_offenders(unfiltered_offenders, prison_id, *args)
-        default_options = {
-          ignore_legal_status: false, fetch_complexities: true, fetch_categories: true, fetch_movements: true
-        }.freeze
-
-        options = default_options.dup.merge(args.extract_options! || {}).assert_valid_keys(default_options.keys)
+      def self.build_offenders(unfiltered_offenders, prison_id, **options)
+        options = options_with_defaults(options)
 
         offenders = options[:ignore_legal_status] ? unfiltered_offenders : filtered_offenders(unfiltered_offenders)
         return [] if offenders.empty?
@@ -208,13 +214,18 @@ module HmppsApi
         results
       end
 
-      def self.get_search_api_offenders(offender_nos)
+      def self.get_search_api_offenders(offender_nos, cache: true)
         search_route = '/prisoner-search/prisoner-numbers'
-        search_client.post(search_route, { prisonerNumbers: Array(offender_nos) }, queryparams: { 'include-restricted-patients': true }, cache: true)
+        search_client.post(search_route, { prisonerNumbers: Array(offender_nos) }, queryparams: { 'include-restricted-patients': true }, cache:)
       end
 
       def self.default_image
         File.read(Rails.root.join('app/assets/images/default_profile_image.jpg'))
+      end
+
+      def self.options_with_defaults(options)
+        options.assert_valid_keys(DEFAULT_OPTIONS.keys)
+        DEFAULT_OPTIONS.merge(options)
       end
     end
   end

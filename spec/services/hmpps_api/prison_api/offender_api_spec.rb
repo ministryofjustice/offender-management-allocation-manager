@@ -89,6 +89,22 @@ describe HmppsApi::PrisonApi::OffenderApi do
           stub_offender(offender)
         end
 
+        it 'uses cached prisoner search by default' do
+          expect(described_class).to receive(:get_search_api_offenders)
+            .with(offender_no, cache: true)
+            .and_call_original
+
+          described_class.get_offender(offender_no)
+        end
+
+        it 'allows callers to disable prisoner search cache' do
+          expect(described_class).to receive(:get_search_api_offenders)
+            .with(offender_no, cache: false)
+            .and_call_original
+
+          described_class.get_offender(offender_no, cache: false)
+        end
+
         it "can get a single offender's details including recall flag" do
           expect(subject).to be_instance_of(HmppsApi::Offender)
           expect(subject.recalled?).to eq(true)
