@@ -26,8 +26,8 @@ protected
     params.fetch(:prison_id, default_prison_code)
   end
 
-  def get_offender_or_404(offender_no, *args)
-    offender = OffenderService.get_offender(offender_no, *args)
+  def get_offender_or_404(offender_no, **options)
+    offender = OffenderService.get_offender(offender_no, **options)
     return offender if offender.present?
 
     redirect_to '/404'
