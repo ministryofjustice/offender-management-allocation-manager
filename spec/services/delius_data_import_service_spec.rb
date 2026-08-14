@@ -61,6 +61,49 @@ RSpec.describe DeliusDataImportService do
     allow(HmppsApi::TieringApi).to receive(:get_tier).and_return(nil)
   end
 
+  describe 'event-triggered imports' do
+    let(:event_service) { described_class.new(trigger_method: :event) }
+    let(:offender_for_event) { instance_double(HmppsApi::Offender, inside_omic_policy?: true) }
+
+    before do
+      allow(OffenderService).to receive(:get_offender).and_return(offender_for_event)
+    end
+
+    it 'looks up offenders with default legal-status filtering and lightweight fetch flags' do
+      expect(OffenderService)
+        .to receive(:get_offender)
+        .with(
+          nomis_offender_id,
+          fetch_complexities: false,
+          fetch_categories: false,
+          fetch_movements: false
+        )
+        .and_return(offender_for_event)
+
+      event_service.process(nomis_offender_id)
+    end
+
+    it 'skips import when offender cannot be retrieved' do
+      allow(OffenderService).to receive(:get_offender).and_return(nil)
+      allow(event_service.logger).to receive(:error)
+
+      expect {
+        event_service.process(nomis_offender_id)
+      }.not_to change(CaseInformation, :count)
+    end
+
+    it 'skips import when offender is outside omic policy' do
+      allow(OffenderService).to receive(:get_offender).and_return(instance_double(HmppsApi::Offender, inside_omic_policy?: false))
+      allow(event_service.logger).to receive(:info)
+
+      expect {
+        event_service.process(nomis_offender_id)
+      }.not_to change(CaseInformation, :count)
+
+      expect(event_service.logger).to have_received(:info).with(/event=outside_omic_policy/)
+    end
+  end
+
   shared_examples 'audit event' do
     let(:audit_event) { AuditEvent.tags('process_delius_data_job').order(:created_at).last }
 

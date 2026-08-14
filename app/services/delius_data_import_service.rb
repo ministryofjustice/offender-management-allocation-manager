@@ -70,17 +70,9 @@ private
     if trigger_method == :event
       offender = OffenderService.get_offender(
         nomis_offender_id,
-        ignore_legal_status: true, fetch_complexities: false, fetch_categories: false, fetch_movements: false
+        fetch_complexities: false, fetch_categories: false, fetch_movements: false
       )
-
-      if offender.nil?
-        logger.error(
-          "nomis_offender_id=#{nomis_offender_id},job=process_delius_data_job,event=missing_offender_record|" \
-          'Failed to retrieve NOMIS offender record'
-        )
-
-        return
-      end
+      return if offender.nil?
 
       unless offender.inside_omic_policy?
         logger.info(
