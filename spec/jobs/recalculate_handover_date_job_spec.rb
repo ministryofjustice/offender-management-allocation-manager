@@ -8,6 +8,12 @@ describe RecalculateHandoverDateJob do
 
   before { setup_events_and_emails }
 
+  it 'fetches the offender without using Prisoner Search cache' do
+    recalculate_handover_dates
+
+    expect(OffenderService).to have_received(:get_offender).with(offender.nomis_offender_id, cache: false)
+  end
+
   context 'when there is no existing calculation for the offender' do
     before { the_responsibility_will_be_calculated_as(CalculatedHandoverDate.pom_only(reason: :determinate)) }
 
@@ -662,7 +668,7 @@ describe RecalculateHandoverDateJob do
   def setup_events_and_emails
     # Offender
     allow(OffenderService).to receive(:get_offender)
-      .with(offender.nomis_offender_id)
+      .with(offender.nomis_offender_id, cache: false)
       .and_return(offender)
 
     # Handover event
