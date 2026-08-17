@@ -25,25 +25,25 @@ module HmppsApi
 
       # Used by allocation history and debugging (to find the last movement), as well
       # as handling of `prisoner-offender-search.prisoner.released` events
-      def self.movements_for(offender_no, movement_types: ADMISSION_TYPES)
+      def self.movements_for(offender_no, movement_types: ADMISSION_TYPES, cache: true)
         route = '/movements/offenders'
 
         data = client.post(route, [offender_no],
                            queryparams: { latestOnly: false, allBookings: true, movementTypes: movement_types },
-                           cache: true)
+                           cache:)
         movements = data.sort_by { |k| k.fetch('movementDate') + k.fetch('movementTime') }.map do |movement|
           api_deserialiser.deserialise(HmppsApi::Movement, movement)
         end
         PrisonTimeline.new movements
       end
 
-      def self.admissions_for(offender_nos)
+      def self.admissions_for(offender_nos, cache: true)
         # admissions need to include transfers from one place to another
         route = '/movements/offenders'
 
         data = client.post(route, offender_nos,
                            queryparams: { latestOnly: false, movementTypes: ADMISSION_TYPES },
-                           cache: true)
+                           cache:)
                      .group_by { |x| x['offenderNo'] }.values
 
         movements = data.map do |d|
@@ -55,7 +55,7 @@ module HmppsApi
         movements.index_by { |m| m.first.offender_no }
       end
 
-      def self.latest_temp_movement_for(offender_nos)
+      def self.latest_temp_movement_for(offender_nos, cache: true)
         return {} if offender_nos.empty?
 
         route = '/movements/offenders'
@@ -66,7 +66,7 @@ module HmppsApi
         # 'data' is an array of arrays, with one array for each offenderNo
         data = client.post(route, offender_nos,
                            queryparams: { latestOnly: true, movementTypes: types },
-                           cache: true)
+                           cache:)
                      .group_by { |x| x['offenderNo'] }.values
 
         # This reduces the data to the most recent per offender

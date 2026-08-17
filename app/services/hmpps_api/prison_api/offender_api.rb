@@ -62,8 +62,8 @@ module HmppsApi
         # Get additional data from other APIs
         offender_categories = options[:fetch_categories] ? get_offender_categories(offender_nos) : {}
         complexities = options[:fetch_complexities] ? complexities_for(offender_nos, prison_id) : {}
-        temp_movements = options[:fetch_movements] ? latest_temp_movement_for(offenders) : {}
-        movements = options[:fetch_movements] ? HmppsApi::PrisonApi::MovementApi.admissions_for(offender_nos) : {}
+        temp_movements = options[:fetch_movements] ? latest_temp_movement_for(offenders, cache: options[:cache]) : {}
+        movements = options[:fetch_movements] ? HmppsApi::PrisonApi::MovementApi.admissions_for(offender_nos, cache: options[:cache]) : {}
 
         offenders.map do |offender|
           offender_no = offender.fetch('prisonerNumber')
@@ -131,11 +131,11 @@ module HmppsApi
       end
 
       # Get movement details only for those offenders who are temporarily out of prison (TAP/ROTL)
-      def self.latest_temp_movement_for(offenders)
+      def self.latest_temp_movement_for(offenders, cache: true)
         HmppsApi::PrisonApi::MovementApi.latest_temp_movement_for(
           offenders
             .select { |o| temp_out_of_prison?(o) }
-            .map    { |o| o.fetch('prisonerNumber') }
+            .map    { |o| o.fetch('prisonerNumber') }, cache:
         )
       end
 

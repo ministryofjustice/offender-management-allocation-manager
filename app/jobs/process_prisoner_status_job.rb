@@ -36,24 +36,38 @@ private
       return
     end
 
-    if allowed_legal_statuses.exclude?(offender.legal_status)
-      maybe_inactivate_complexity(offender)
+    return handle_out_of_prison(nomis_offender_id) if offender.prison_id == MovementService::RELEASE_MOVEMENT_CODE
 
-      allocation = AllocationHistory.active.find_by(nomis_offender_id:)
-      return if allocation.nil?
+    handle_legal_status_change(offender)
+  end
 
-      logger.info(
-        "nomis_offender_id=#{nomis_offender_id},job=process_prisoner_status_job,event=legal_status_changed|" \
-          "Legal status #{offender.legal_status} is not allowed. Deallocating."
-      )
+  def handle_out_of_prison(nomis_offender_id)
+    logger.info(
+      "nomis_offender_id=#{nomis_offender_id},job=process_prisoner_status_job,event=offender_out_of_prison|" \
+        'Offender prisonId is OUT, delegating release processing to MovementService'
+    )
+    MovementService.process_offender_last_movement(nomis_offender_id)
+  end
 
-      allocation.deallocate_primary_pom(
-        event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED
-      )
-      allocation.deallocate_secondary_pom(
-        event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED
-      )
-    end
+  def handle_legal_status_change(offender)
+    return unless allowed_legal_statuses.exclude?(offender.legal_status)
+
+    maybe_inactivate_complexity(offender)
+
+    allocation = AllocationHistory.active.find_by(nomis_offender_id: offender.offender_no)
+    return if allocation.nil?
+
+    logger.info(
+      "nomis_offender_id=#{offender.offender_no},job=process_prisoner_status_job,event=legal_status_changed|" \
+        "Legal status #{offender.legal_status} is not allowed. Deallocating."
+    )
+
+    allocation.deallocate_primary_pom(
+      event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED
+    )
+    allocation.deallocate_secondary_pom(
+      event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED
+    )
   end
 
   def maybe_inactivate_complexity(offender)

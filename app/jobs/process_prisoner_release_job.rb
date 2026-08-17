@@ -12,17 +12,6 @@ class ProcessPrisonerReleaseJob < ApplicationJob
 private
 
   def process_release(nomis_offender_id)
-    last_movement = HmppsApi::PrisonApi::MovementApi.movements_for(
-      nomis_offender_id, movement_types: []
-    ).last_movement
-
-    if last_movement
-      MovementService.process_movement(last_movement)
-    else
-      logger.error(
-        "nomis_offender_id=#{nomis_offender_id},job=process_prisoner_release_job,event=missing_movement_record|" \
-        'Failed to retrieve offender movements'
-      )
-    end
+    MovementService.process_offender_last_movement(nomis_offender_id)
   end
 end
