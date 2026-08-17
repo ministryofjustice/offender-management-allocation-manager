@@ -19,15 +19,13 @@ private
   end
 
   def process_status_change(nomis_offender_id)
-    allocation = AllocationHistory.active.find_by(nomis_offender_id:)
-    return if allocation.nil?
-
     offender = HmppsApi::PrisonApi::OffenderApi.get_offender(
       nomis_offender_id,
       ignore_legal_status: true,
       fetch_complexities: false,
       fetch_categories: false,
       fetch_movements: false,
+      cache: false,
     )
 
     if offender.nil? || offender.legal_status.blank?
@@ -39,6 +37,11 @@ private
     end
 
     if allowed_legal_statuses.exclude?(offender.legal_status)
+      maybe_inactivate_complexity(offender)
+
+      allocation = AllocationHistory.active.find_by(nomis_offender_id:)
+      return if allocation.nil?
+
       logger.info(
         "nomis_offender_id=#{nomis_offender_id},job=process_prisoner_status_job,event=legal_status_changed|" \
           "Legal status #{offender.legal_status} is not allowed. Deallocating."
@@ -51,5 +54,16 @@ private
         event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED
       )
     end
+  end
+
+  def maybe_inactivate_complexity(offender)
+    return if !offender.in_womens_prison? || offender.sentenced? || offender.immigration_case?
+
+    logger.info(
+      "nomis_offender_id=#{offender.offender_no},job=process_prisoner_status_job,event=legal_status_changed|" \
+        "Legal status #{offender.legal_status} is not allowed. Women prison #{offender.prison_id}. Inactivating CNL."
+    )
+
+    HmppsApi::ComplexityApi.inactivate(offender.offender_no)
   end
 end

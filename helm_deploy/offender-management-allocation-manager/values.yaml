@@ -41,10 +41,6 @@ cronjobs:
     enabled: true
     schedule: 30 7 * * 1-5
     command: bundle exec rake community_api:import
-  deactivate_unsentenced_cnls:
-    enabled: true
-    schedule: 45 7 * * 1-5
-    command: bundle exec rake deactivate_unsentenced_cnls:process
   parole_data_import:
     enabled: true
     schedule: 0 8 * * *

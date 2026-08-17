@@ -93,6 +93,10 @@ module HmppsApi
         criminal_sentence?
     end
 
+    def in_womens_prison?
+      PrisonService.womens_prison?(prison_id)
+    end
+
     def age
       return nil if date_of_birth.blank?
 

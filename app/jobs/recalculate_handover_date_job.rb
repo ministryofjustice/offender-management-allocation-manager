@@ -4,7 +4,7 @@ class RecalculateHandoverDateJob < ApplicationJob
   queue_as :default
 
   def perform(nomis_offender_id, trigger_method: 'manual')
-    @nomis_offender = OffenderService.get_offender(nomis_offender_id)
+    @nomis_offender = OffenderService.get_offender(nomis_offender_id, cache: false)
     @trigger_method = trigger_method
 
     return if nomis_offender.nil?
