@@ -15,6 +15,7 @@ RSpec.describe ProcessPrisonerStatusJob, type: :job do
     allow(AllocationHistory).to receive(:active).and_return(active_allocations)
     allow(active_allocations).to receive(:find_by).with(nomis_offender_id:).and_return(allocation)
     allow(HmppsApi::ComplexityApi).to receive(:inactivate)
+    allow(MovementService).to receive(:process_offender_last_movement)
 
     allow(HmppsApi::PrisonApi::OffenderApi).to receive(:get_offender).with(
       nomis_offender_id,
@@ -61,6 +62,20 @@ RSpec.describe ProcessPrisonerStatusJob, type: :job do
     it 'deallocates POMs' do
       expect(allocation).to receive(:deallocate_primary_pom).with(event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED)
       expect(allocation).to receive(:deallocate_secondary_pom).with(event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED)
+
+      described_class.perform_now(nomis_offender_id)
+    end
+  end
+
+  context 'when offender is OUT of prison' do
+    let(:prison_id) { 'OUT' }
+    let(:legal_status) { 'REMAND' }
+
+    it 'delegates release handling to MovementService and skips legal-status deallocation' do
+      expect(MovementService).to receive(:process_offender_last_movement).with(nomis_offender_id)
+      expect(allocation).not_to receive(:deallocate_primary_pom)
+      expect(allocation).not_to receive(:deallocate_secondary_pom)
+      expect(HmppsApi::ComplexityApi).not_to receive(:inactivate)
 
       described_class.perform_now(nomis_offender_id)
     end

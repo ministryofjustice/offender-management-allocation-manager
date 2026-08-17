@@ -52,6 +52,33 @@ describe MovementService, type: :feature do
     expect(processed).to be false
   end
 
+  describe '.process_offender_last_movement' do
+    let(:nomis_offender_id) { 'A1234BC' }
+    let(:last_movement) { build(:movement, offenderNo: nomis_offender_id, directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: 'LEI') }
+    let(:timeline) { instance_double(HmppsApi::PrisonTimeline, last_movement:) }
+
+    before do
+      allow(HmppsApi::PrisonApi::MovementApi).to receive(:movements_for).and_return(timeline)
+      allow(described_class).to receive(:process_movement)
+    end
+
+    it 'fetches last movement without API cache and processes it' do
+      expect(HmppsApi::PrisonApi::MovementApi).to receive(:movements_for)
+        .with(nomis_offender_id, movement_types: [], cache: false)
+        .and_return(timeline)
+      expect(described_class).to receive(:process_movement).with(last_movement)
+
+      described_class.process_offender_last_movement(nomis_offender_id)
+    end
+
+    it 'returns false when there is no movement to process' do
+      allow(HmppsApi::PrisonApi::MovementApi).to receive(:movements_for)
+        .and_return(instance_double(HmppsApi::PrisonTimeline, last_movement: nil))
+
+      expect(described_class.process_offender_last_movement(nomis_offender_id)).to be(false)
+    end
+  end
+
   describe "processing an offender transfer" do
     let(:transfer_adm_no_to_agency) { build(:movement, offenderNo: 'G7266VD', toAgency: 'COURT')   }
     let(:transfer_in) { build(:movement, offenderNo: 'G7266VD', directionCode: 'IN', movementType: 'ADM', fromAgency: 'VEI', toAgency: 'CFI')   }
@@ -145,6 +172,7 @@ describe MovementService, type: :feature do
     let!(:calculated_handover_date) { create(:calculated_handover_date, offender: case_info.offender) }
     let!(:handover_progress_checklist) { create(:handover_progress_checklist, offender: case_info.offender) }
     let!(:responsibility) { create(:responsibility, offender: case_info.offender) }
+    let!(:omic_eligibility) { create(:omic_eligibility, nomis_offender_id: case_info.nomis_offender_id) }
 
     def pom_tester(valid_release)
       mailer = double(:mailer)
@@ -179,6 +207,7 @@ describe MovementService, type: :feature do
           expect(CalculatedHandoverDate.where(nomis_offender_id: valid_release.offender_no)).to be_empty
           expect(HandoverProgressChecklist.where(nomis_offender_id: valid_release.offender_no)).to be_empty
           expect(Responsibility.where(nomis_offender_id: valid_release.offender_no)).to be_empty
+          expect(OmicEligibility.where(nomis_offender_id: valid_release.offender_no)).to be_empty
           expect(updated_allocation.event_trigger).to eq 'offender_released'
           expect(updated_allocation.prison).to eq 'LEI'
         end

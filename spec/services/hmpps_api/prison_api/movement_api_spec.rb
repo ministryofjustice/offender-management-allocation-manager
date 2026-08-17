@@ -36,4 +36,48 @@ describe HmppsApi::PrisonApi::MovementApi do
       expect(timeline.prison_episode(Date.new 2016, 1, 23).prison_code).to eq(prison.code)
     end
   end
+
+  describe 'Movement lookups with cache control' do
+    let(:offender_nos) { %w[A1234BC] }
+
+    before do
+      allow_any_instance_of(HmppsApi::Client).to receive(:post).and_return([])
+    end
+
+    it 'uses cache for admissions by default' do
+      expect_any_instance_of(HmppsApi::Client).to receive(:post)
+        .with('/movements/offenders', offender_nos, queryparams: { latestOnly: false, movementTypes: HmppsApi::PrisonApi::MovementApi::ADMISSION_TYPES }, cache: true)
+        .and_return([])
+
+      described_class.admissions_for(offender_nos)
+    end
+
+    it 'allows disabling cache for admissions' do
+      expect_any_instance_of(HmppsApi::Client).to receive(:post)
+        .with('/movements/offenders', offender_nos, queryparams: { latestOnly: false, movementTypes: HmppsApi::PrisonApi::MovementApi::ADMISSION_TYPES }, cache: false)
+        .and_return([])
+
+      described_class.admissions_for(offender_nos, cache: false)
+    end
+
+    it 'uses cache for latest temp movements by default' do
+      types = [HmppsApi::MovementType::ADMISSION, HmppsApi::MovementType::TRANSFER, HmppsApi::MovementType::TEMPORARY]
+
+      expect_any_instance_of(HmppsApi::Client).to receive(:post)
+        .with('/movements/offenders', offender_nos, queryparams: { latestOnly: true, movementTypes: types }, cache: true)
+        .and_return([])
+
+      described_class.latest_temp_movement_for(offender_nos)
+    end
+
+    it 'allows disabling cache for latest temp movements' do
+      types = [HmppsApi::MovementType::ADMISSION, HmppsApi::MovementType::TRANSFER, HmppsApi::MovementType::TEMPORARY]
+
+      expect_any_instance_of(HmppsApi::Client).to receive(:post)
+        .with('/movements/offenders', offender_nos, queryparams: { latestOnly: true, movementTypes: types }, cache: false)
+        .and_return([])
+
+      described_class.latest_temp_movement_for(offender_nos, cache: false)
+    end
+  end
 end

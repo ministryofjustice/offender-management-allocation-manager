@@ -105,6 +105,17 @@ describe HmppsApi::PrisonApi::OffenderApi do
           described_class.get_offender(offender_no, cache: false)
         end
 
+        it 'passes cache: false to movement lookups when cache is disabled' do
+          expect(HmppsApi::PrisonApi::MovementApi).to receive(:admissions_for)
+            .with([offender_no], cache: false)
+            .and_call_original
+          expect(HmppsApi::PrisonApi::MovementApi).to receive(:latest_temp_movement_for)
+            .with(anything, cache: false)
+            .and_call_original
+
+          described_class.get_offender(offender_no, cache: false)
+        end
+
         it "can get a single offender's details including recall flag" do
           expect(subject).to be_instance_of(HmppsApi::Offender)
           expect(subject.recalled?).to eq(true)

@@ -8,6 +8,26 @@ class MovementService
     HmppsApi::PrisonApi::MovementApi.movements_on_date(date)
   end
 
+  # Fetches the last recorded movement for an offender and processes it via
+  # `process_movement`. Handles ROTL and transfer edge-cases automatically
+  # because `process_movement` only acts on genuine release (`REL`) and
+  # transfer (`TRN`/`ADM`) movement types.
+  def self.process_offender_last_movement(nomis_offender_id)
+    last_movement = HmppsApi::PrisonApi::MovementApi.movements_for(
+      nomis_offender_id, movement_types: [], cache: false
+    ).last_movement
+
+    unless last_movement
+      Rails.logger.error(
+        "[MOVEMENT] event=missing_movement_record,nomis_offender_id=#{nomis_offender_id}|" \
+          'Failed to retrieve offender movements'
+      )
+      return false
+    end
+
+    process_movement(last_movement)
+  end
+
   def self.process_movement(movement)
     if movement.movement_type == HmppsApi::MovementType::RELEASE
       return process_release(movement)
@@ -95,7 +115,7 @@ private
   end
 
   def self.destroy_offender_stint_data(nomis_offender_id)
-    [CaseInformation, CalculatedHandoverDate, HandoverProgressChecklist, Responsibility].each do |model|
+    [CaseInformation, CalculatedHandoverDate, HandoverProgressChecklist, Responsibility, OmicEligibility].each do |model|
       model.find_by(nomis_offender_id:)&.destroy!
     rescue StandardError => e
       Rails.logger.error("[MOVEMENT] Failed to destroy #{model} for #{nomis_offender_id}: #{e.class} - #{e.message}")
