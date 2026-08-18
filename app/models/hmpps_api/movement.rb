@@ -64,6 +64,22 @@ module HmppsApi
       Time.zone.parse "#{@movement_date} #{@movement_time}"
     end
 
+    def job_payload
+      {
+        offender_no: @offender_no,
+        from_agency: @from_agency,
+        to_agency: @to_agency,
+        movement_type: @movement_type,
+        direction_code: @direction_code,
+        movement_time: @movement_time,
+        movement_date: @movement_date,
+      }
+    end
+
+    def self.from_job_payload(payload)
+      Movement.new(payload.symbolize_keys)
+    end
+
     def self.from_json(payload)
       Movement.new.tap do |obj|
         obj.load_from_json(payload)

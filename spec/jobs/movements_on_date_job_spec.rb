@@ -1,18 +1,39 @@
 RSpec.describe MovementsOnDateJob, type: :job do
-  it 'invokes MovementJob#perform_later for every movement from yesterday' do
-    today_str = '2020-06-12'
-    yesterday = Date.new(2020, 6, 11)
-    movements = [double(:movement1), double(:movement2)]
+  let(:target_date) { Date.parse('2020-06-11') }
+  let(:target_date_str) { target_date.to_s }
+
+  it 'invokes MovementJob once per offender with ordered job payloads and cache disabled' do
+    earlier_movement = build(:movement, offenderNo: 'A1234BC', movementDate: target_date_str, movementTime: '08:00:00')
+    later_movement = build(:movement, offenderNo: 'A1234BC', movementDate: target_date_str, movementTime: '12:00:00')
+    other_offender_movement = build(:movement, offenderNo: 'B1234CD', movementDate: target_date_str, movementTime: '09:00:00')
+    movements = [later_movement, other_offender_movement, earlier_movement]
+
     allow(MovementJob).to receive(:perform_later)
-
     allow(MovementService).to receive(:movements_on)
-    allow(MovementService).to receive(:movements_on).with(yesterday).and_return(movements)
+      .with(target_date, cache: false)
+      .and_return(movements)
 
-    described_class.perform_now(today_str)
+    described_class.perform_now(target_date_str)
 
     aggregate_failures do
-      expect(MovementJob).to have_received(:perform_later).with(movements[0].to_json)
-      expect(MovementJob).to have_received(:perform_later).with(movements[1].to_json)
+      expect(MovementJob).to have_received(:perform_later).with([
+        earlier_movement.job_payload,
+        later_movement.job_payload,
+      ])
+      expect(MovementJob).to have_received(:perform_later).with([
+        other_offender_movement.job_payload,
+      ])
     end
+  end
+
+  it 'does not enqueue movement jobs when no movements are returned' do
+    allow(MovementJob).to receive(:perform_later)
+    allow(MovementService).to receive(:movements_on)
+      .with(target_date, cache: false)
+      .and_return([])
+
+    described_class.perform_now(target_date_str)
+
+    expect(MovementJob).not_to have_received(:perform_later)
   end
 end

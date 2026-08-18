@@ -21,6 +21,34 @@ describe HmppsApi::PrisonApi::MovementApi do
       expect(movements.length).to eq(2)
       expect(movements).to all be_a(HmppsApi::Movement)
     end
+
+    it 'uses cache for date-based movement lookups by default' do
+      expect_any_instance_of(HmppsApi::Client).to receive(:get)
+        .with(
+          '/movements',
+          queryparams: {
+            movementDate: '2019-02-20',
+            fromDateTime: '2018-02-20T00:00'
+          },
+          cache: true
+        ).and_return(JSON.parse(movements.to_json))
+
+      described_class.movements_on_date(Date.iso8601('2019-02-20'))
+    end
+
+    it 'allows disabling cache for date-based movement lookups' do
+      expect_any_instance_of(HmppsApi::Client).to receive(:get)
+        .with(
+          '/movements',
+          queryparams: {
+            movementDate: '2019-02-20',
+            fromDateTime: '2018-02-20T00:00'
+          },
+          cache: false
+        ).and_return(JSON.parse(movements.to_json))
+
+      described_class.movements_on_date(Date.iso8601('2019-02-20'), cache: false)
+    end
   end
 
   describe 'Movements for single offenders' do

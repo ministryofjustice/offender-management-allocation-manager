@@ -4,8 +4,8 @@ class MovementService
   ADMISSION_MOVEMENT_CODE = 'IN'
   RELEASE_MOVEMENT_CODE = 'OUT'
 
-  def self.movements_on(date)
-    HmppsApi::PrisonApi::MovementApi.movements_on_date(date)
+  def self.movements_on(date, cache: true)
+    HmppsApi::PrisonApi::MovementApi.movements_on_date(date, cache:)
   end
 
   # Fetches the last recorded movement for an offender and processes it via
@@ -104,22 +104,7 @@ private
   end
 
   def self.release_offender(nomis_offender_id, from_agency)
-    Rails.logger.info("[MOVEMENT] Processing release for #{nomis_offender_id}")
-
-    alloc = AllocationHistory.active.find_by(nomis_offender_id:)
-    alloc.deallocate_offender_after_release if alloc
-
-    destroy_offender_stint_data(nomis_offender_id)
-
-    HmppsApi::ComplexityApi.inactivate(nomis_offender_id) if PrisonService.womens_prison?(from_agency)
-  end
-
-  def self.destroy_offender_stint_data(nomis_offender_id)
-    [CaseInformation, CalculatedHandoverDate, HandoverProgressChecklist, Responsibility, OmicEligibility].each do |model|
-      model.find_by(nomis_offender_id:)&.destroy!
-    rescue StandardError => e
-      Rails.logger.error("[MOVEMENT] Failed to destroy #{model} for #{nomis_offender_id}: #{e.class} - #{e.message}")
-    end
+    OffenderReleasedService.release_offender(nomis_offender_id, prison_code: from_agency)
   end
 
   def self.hospital_agencies
