@@ -1086,6 +1086,13 @@ ALTER TABLE ONLY public.victim_liaison_officers
 
 
 --
+-- Name: index_allocation_history_on_event_trigger; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_allocation_history_on_event_trigger ON public.allocation_history USING btree (event_trigger);
+
+
+--
 -- Name: index_allocation_history_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1205,6 +1212,13 @@ CREATE UNIQUE INDEX index_calculated_handover_dates_on_nomis_offender_id ON publ
 
 
 --
+-- Name: index_case_information_on_crn; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_case_information_on_crn ON public.case_information USING btree (crn);
+
+
+--
 -- Name: index_case_information_on_local_delivery_unit_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1216,6 +1230,20 @@ CREATE INDEX index_case_information_on_local_delivery_unit_id ON public.case_inf
 --
 
 CREATE UNIQUE INDEX index_case_information_on_nomis_offender_id ON public.case_information USING btree (nomis_offender_id);
+
+
+--
+-- Name: index_case_information_on_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_case_information_on_updated_at ON public.case_information USING btree (updated_at);
+
+
+--
+-- Name: index_early_allocations_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_early_allocations_on_nomis_offender_id ON public.early_allocations USING btree (nomis_offender_id);
 
 
 --
@@ -1289,6 +1317,13 @@ CREATE UNIQUE INDEX index_parole_review_imports_on_snapshot_date_row_number ON p
 
 
 --
+-- Name: index_parole_reviews_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_parole_reviews_on_nomis_offender_id ON public.parole_reviews USING btree (nomis_offender_id);
+
+
+--
 -- Name: index_parole_reviews_on_review_id_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1307,6 +1342,13 @@ CREATE UNIQUE INDEX index_pom_details_on_nomis_staff_id_and_prison_code ON publi
 --
 
 CREATE UNIQUE INDEX index_prisons_on_name ON public.prisons USING btree (name);
+
+
+--
+-- Name: index_responsibilities_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_responsibilities_on_nomis_offender_id ON public.responsibilities USING btree (nomis_offender_id);
 
 
 --
@@ -1353,6 +1395,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260818120000'),
 ('20260813173000'),
 ('20260811114112'),
 ('20260714160140'),
