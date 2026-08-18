@@ -8,7 +8,7 @@ module HmppsApi
       ADMISSION_TYPES = [HmppsApi::MovementType::ADMISSION,
                          HmppsApi::MovementType::TRANSFER].freeze
 
-      def self.movements_on_date(date)
+      def self.movements_on_date(date, cache: true)
         route = '/movements'
 
         # the 'fromDateTime' field in the API is the 'earliest creation date' of a movement
@@ -17,7 +17,7 @@ module HmppsApi
         data = client.get(route, queryparams: {
           movementDate: date.strftime('%F'),
           fromDateTime: (date - 1.year).strftime('%FT%R')
-        })
+        }, cache:)
         data.map do |movement|
           api_deserialiser.deserialise(HmppsApi::Movement, movement)
         end

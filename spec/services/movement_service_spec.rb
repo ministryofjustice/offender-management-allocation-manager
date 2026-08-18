@@ -35,6 +35,16 @@ describe MovementService, type: :feature do
     expect(movements.first).to be_a(HmppsApi::Movement)
   end
 
+  it 'passes cache through when getting recent movements' do
+    date = Date.iso8601('2019-02-20')
+
+    expect(HmppsApi::PrisonApi::MovementApi).to receive(:movements_on_date)
+      .with(date, cache: false)
+      .and_return([])
+
+    described_class.movements_on(date, cache: false)
+  end
+
   it "can ignore movements OUT" do
     processed = described_class.process_movement(transfer_out)
     expect(processed).to be false
@@ -167,92 +177,27 @@ describe MovementService, type: :feature do
   end
 
   describe "processing an offender release" do
-    let!(:case_info) { create(:case_information, offender: build(:offender, nomis_offender_id: 'G7266VD')) }
-    let!(:allocation) { create(:allocation_history, prison: 'LEI', nomis_offender_id: 'G7266VD') }
-    let!(:calculated_handover_date) { create(:calculated_handover_date, offender: case_info.offender) }
-    let!(:handover_progress_checklist) { create(:handover_progress_checklist, offender: case_info.offender) }
-    let!(:responsibility) { create(:responsibility, offender: case_info.offender) }
-    let!(:omic_eligibility) { create(:omic_eligibility, nomis_offender_id: case_info.nomis_offender_id) }
-
-    def pom_tester(valid_release)
-      mailer = double(:mailer)
-      expect(PomMailer).to receive(:with)
-              .with(email: "test@example.com",
-                    pom_name: "Moic",
-                    offender_name: "Doe, John",
-                    nomis_offender_id: valid_release.offender_no,
-                    prison_name: 'Leeds (HMP)',
-                    url: "http://localhost:3000/prisons/LEI/staff/485926/caseload")
-              .and_return(double(:pom_mailer_with, offender_deallocated: mailer))
-      expect(mailer).to receive(:deliver_later)
-    end
-
     context 'with a valid release movement' do
-      let(:updated_allocation) { AllocationHistory.find_by(nomis_offender_id: valid_release.offender_no) }
-      let(:processed) { described_class.process_movement(valid_release) }
-
-      let(:valid_release) do
+      def valid_release(from_agency)
         build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', toAgency: 'OUT', fromAgency: from_agency)
       end
 
-      before { pom_tester(valid_release) }
+      it 'delegates male-prison release cleanup to OffenderReleasedService' do
+        expect(OffenderReleasedService).to receive(:release_offender).with('G7266VD', prison_code: 'BAI')
 
-      context 'and from a male prison' do
-        let(:from_agency) { 'BAI' }
-
-        it "can process movements" do
-          expect(HmppsApi::ComplexityApi).not_to receive(:inactivate).with(valid_release.offender_no)
-          expect(processed).to be true
-          expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
-          expect(CalculatedHandoverDate.where(nomis_offender_id: valid_release.offender_no)).to be_empty
-          expect(HandoverProgressChecklist.where(nomis_offender_id: valid_release.offender_no)).to be_empty
-          expect(Responsibility.where(nomis_offender_id: valid_release.offender_no)).to be_empty
-          expect(OmicEligibility.where(nomis_offender_id: valid_release.offender_no)).to be_empty
-          expect(updated_allocation.event_trigger).to eq 'offender_released'
-          expect(updated_allocation.prison).to eq 'LEI'
-        end
-
-        it 'continues processing even if a destroy fails' do
-          allow_any_instance_of(CaseInformation).to receive(:destroy!).and_raise(ActiveRecord::StatementInvalid, 'boom')
-
-          expect { processed }.not_to raise_error
-          expect(updated_allocation.reload.event_trigger).to eq 'offender_released'
-          expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).not_to be_empty
-          expect(CalculatedHandoverDate.where(nomis_offender_id: valid_release.offender_no)).to be_empty
-        end
+        expect(described_class.process_movement(valid_release('BAI'))).to be true
       end
 
-      context 'and from a female prison' do
-        let(:from_agency) { 'AGI' }
+      it 'delegates female-prison release cleanup to OffenderReleasedService' do
+        expect(OffenderReleasedService).to receive(:release_offender).with('G7266VD', prison_code: 'AGI')
 
-        it "can process movements" do
-          expect(HmppsApi::ComplexityApi).to receive(:inactivate).with(valid_release.offender_no)
-          expect(processed).to be true
-          expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
-          expect(updated_allocation.event_trigger).to eq 'offender_released'
-          expect(updated_allocation.prison).to eq 'LEI'
-        end
+        expect(described_class.process_movement(valid_release('AGI'))).to be true
       end
 
-      context 'and for hospital restricted patient' do
-        let(:from_agency) { 'HOS1' }
+      it 'delegates hospital release cleanup to OffenderReleasedService', flaky: true do
+        expect(OffenderReleasedService).to receive(:release_offender).with('G7266VD', prison_code: 'HOS1')
 
-        it "can process movements", flaky: true do
-          expect(processed).to be true
-          expect(CaseInformation.where(nomis_offender_id: valid_release.offender_no)).to be_empty
-          expect(updated_allocation.event_trigger).to eq 'offender_released'
-          expect(updated_allocation.prison).to eq 'LEI'
-        end
-      end
-
-      context 'and from open prison with inactive allocation' do
-        let(:from_agency) { 'BAI' }
-
-        before { allocation.deallocate_offender_after_release }
-
-        it "can process movements" do
-          expect(processed).to be true
-        end
+        expect(described_class.process_movement(valid_release('HOS1'))).to be true
       end
     end
 
@@ -262,6 +207,8 @@ describe MovementService, type: :feature do
       let(:invalid_release3) { build(:movement, offenderNo: 'G7266VD', directionCode: 'OUT', movementType: 'REL', fromAgency: 'BASDON')   }
 
       it "can ignore invalid release movements" do
+        expect(OffenderReleasedService).not_to receive(:release_offender)
+
         processed = described_class.process_movement(invalid_release1)
         expect(processed).to be false
 
@@ -309,10 +256,11 @@ describe MovementService, type: :feature do
           let(:direction_code) { 'IN' }
 
           it 'can process release movement for offender' do
+            expect(OffenderReleasedService).to receive(:release_offender)
+              .with(immigration_movement.offender_no, prison_code: immigration_movement.from_agency)
+
             processed = described_class.process_movement(immigration_movement)
 
-            expect(CaseInformation.where(nomis_offender_id: immigration_movement.offender_no)).to be_empty
-            expect(allocation.event_trigger).to eq 'offender_released'
             expect(processed).to be true
           end
         end
@@ -324,10 +272,11 @@ describe MovementService, type: :feature do
           let(:direction_code) { 'IN' }
 
           it 'can process release movement for offender' do
+            expect(OffenderReleasedService).not_to receive(:release_offender)
+
             processed = described_class.process_movement(immigration_movement)
 
-            expect(CaseInformation.where(nomis_offender_id: immigration_movement.offender_no)).to be_empty
-            expect(allocation.event_trigger).to eq 'offender_transferred'
+            expect(allocation.reload.event_trigger).to eq 'offender_transferred'
             expect(processed).to be true
           end
         end
@@ -357,10 +306,11 @@ describe MovementService, type: :feature do
           let(:direction_code) { 'OUT' }
 
           it 'can release movement' do
+            expect(OffenderReleasedService).to receive(:release_offender)
+              .with(immigration_movement.offender_no, prison_code: immigration_movement.from_agency)
+
             processed = described_class.process_movement(immigration_movement)
 
-            expect(CaseInformation.where(nomis_offender_id: immigration_movement.offender_no)).to be_empty
-            expect(allocation.event_trigger).to eq 'offender_released'
             expect(processed).to be true
           end
         end
@@ -372,10 +322,11 @@ describe MovementService, type: :feature do
           let(:direction_code) { 'OUT' }
 
           it 'can release movement' do
+            expect(OffenderReleasedService).to receive(:release_offender)
+              .with(immigration_movement.offender_no, prison_code: immigration_movement.from_agency)
+
             processed = described_class.process_movement(immigration_movement)
 
-            expect(CaseInformation.where(nomis_offender_id: immigration_movement.offender_no)).to be_empty
-            expect(allocation.event_trigger).to eq 'offender_released'
             expect(processed).to be true
           end
         end
