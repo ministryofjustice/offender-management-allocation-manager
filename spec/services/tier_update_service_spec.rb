@@ -79,7 +79,7 @@ RSpec.describe TierUpdateService do
       end
     end
 
-    context 'when update is invalid' do
+    context 'when tier API returns an unsupported tier' do
       let(:current_tier) { 'A' }
 
       before do
@@ -87,8 +87,15 @@ RSpec.describe TierUpdateService do
           .and_return({ tier: 'Z1', calculation_date: Date.current })
       end
 
-      it 'returns update_failed' do
-        expect(result.status).to eq(:update_failed)
+      it 'returns invalid_tier and does not persist changes' do
+        expect(result.status).to eq(:invalid_tier)
+        expect(result.errors).to include("Unsupported tier 'Z'")
+        expect(case_information.reload.tier).to eq('A')
+        expect(case_information.reload.manual_entry).to be(true)
+      end
+
+      it 'does not publish an audit event' do
+        expect { result }.not_to change(AuditEvent.tags('test'), :count)
       end
     end
   end

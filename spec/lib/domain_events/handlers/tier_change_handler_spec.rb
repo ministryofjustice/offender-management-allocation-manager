@@ -15,77 +15,64 @@ RSpec.describe DomainEvents::Handlers::TierChangeHandler do
     )
   end
   let(:event_version) { 3 }
-  let(:service_result) do
-    TierUpdateService::Result.new(status: :updated, old_tier: 'A', new_tier: 'D', version: 3)
-  end
 
   before do
     allow(Shoryuken::Logging.logger).to receive(:info).and_return(nil)
-    allow(Shoryuken::Logging.logger).to receive(:error).and_return(nil)
-    allow(Shoryuken::Logging.logger).to receive(:warn).and_return(nil)
-    allow(TierUpdateService).to receive(:call).and_return(service_result)
+    # Prevent the job running inline during handler-focused examples
+    allow(ProcessTierChangeJob).to receive(:perform_later)
   end
 
-  context 'when handling tier change event' do
-    before { handler.handle(event) }
-
-    it 'delegates to the shared tier service' do
-      expect(TierUpdateService).to have_received(:call).with(
-        crn:, audit_tags: %w[handler]
-      )
+  context 'when handling a tracked tier change event' do
+    before do
+      allow(CaseInformation).to receive(:exists?).with(crn: crn).and_return(true)
     end
 
-    it 'emits a start log message with event version' do
-      expect(Shoryuken::Logging.logger).to have_received(:info).with(/event=domain_event_handle_start.*version=3.*crn=#{crn}/)
+    it 'enqueues a ProcessTierChangeJob on the deferred queue', :queueing do
+      allow(ProcessTierChangeJob).to receive(:perform_later).and_call_original
+
+      expect { handler.handle(event) }
+        .to have_enqueued_job(ProcessTierChangeJob)
+        .with(crn, event_type: 'tier.calculation.changed')
+        .on_queue(:deferred)
     end
 
-    context 'when service reports unchanged' do
-      let(:service_result) do
-        TierUpdateService::Result.new(status: :unchanged, old_tier: 'D', new_tier: 'D', version: 3)
-      end
+    it 'checks if the CRN is tracked locally before enqueuing' do
+      handler.handle(event)
 
-      it 'does not emit success or failure logs' do
-        expect(Shoryuken::Logging.logger).not_to have_received(:info).with(/event=domain_event_handle_success/)
-        expect(Shoryuken::Logging.logger).not_to have_received(:error).with(/event=domain_event_handle_failure/)
-      end
+      expect(CaseInformation).to have_received(:exists?).with(crn: crn)
     end
 
-    context 'when service updates the tier' do
-      it 'emits success log with event version' do
-        expect(Shoryuken::Logging.logger).to have_received(:info).with(
-          /event=domain_event_handle_success.*version=3,crn=#{crn},old_tier=A,new_tier=D/
-        )
-      end
+    it 'emits a start log message with event version and CRN' do
+      handler.handle(event)
+
+      expect(Shoryuken::Logging.logger).to have_received(:info)
+        .with(/event=domain_event_handle_start.*event_version=3.*crn=#{crn}/)
     end
 
-    context 'when service reports an update failure' do
-      let(:service_result) do
-        TierUpdateService::Result.new(
-          status: :update_failed,
-          old_tier: 'A',
-          new_tier: 'Z',
-          version: 3,
-          errors: 'Tier is not included in the list'
-        )
-      end
+    it 'emits a success log message after enqueuing' do
+      handler.handle(event)
 
-      it 'emits failure log' do
-        expect(Shoryuken::Logging.logger).to have_received(:error).with(
-          /event=domain_event_handle_failure.*version=3,crn=#{crn},old_tier=A,new_tier=Z/
-        )
-      end
+      expect(Shoryuken::Logging.logger).to have_received(:info)
+        .with(/event=domain_event_handle_success.*event_version=3.*crn=#{crn}/)
+    end
+  end
+
+  context 'when CRN is not tracked locally' do
+    before do
+      allow(CaseInformation).to receive(:exists?).with(crn: crn).and_return(false)
     end
 
-    context 'when tier API fetch fails' do
-      let(:service_result) do
-        TierUpdateService::Result.new(status: :tier_api_failed, version: 3)
-      end
+    it 'does not enqueue a job' do
+      handler.handle(event)
 
-      it 'emits a warning log' do
-        expect(Shoryuken::Logging.logger).to have_received(:warn).with(
-          /event=domain_event_handle_tier_api_failed.*version=3,crn=#{crn}/
-        )
-      end
+      expect(ProcessTierChangeJob).not_to have_received(:perform_later)
+    end
+
+    it 'still emits a success log' do
+      handler.handle(event)
+
+      expect(Shoryuken::Logging.logger).to have_received(:info)
+        .with(/event=domain_event_handle_success.*event_version=3.*crn=#{crn}/)
     end
   end
 end
