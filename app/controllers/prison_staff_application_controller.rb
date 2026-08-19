@@ -7,6 +7,21 @@ private
     @pom = StaffMember.new(@prison, staff_id)
   end
 
+  def load_and_validate_pom
+    load_pom
+    ensure_pom_has_role
+  end
+
+  def ensure_pom_has_role
+    return if @pom&.status.present? && @pom.has_pom_role?
+
+    if current_user_is_spo?
+      redirect_to prison_pom_non_pom_path(active_prison_id, nomis_staff_id: staff_id)
+    else
+      redirect_to '/401'
+    end
+  end
+
   def ensure_signed_in_pom_is_this_pom
     unless staff_id == @staff_id || current_user_is_spo?
       redirect_to '/401'

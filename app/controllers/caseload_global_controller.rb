@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CaseloadGlobalController < PrisonStaffApplicationController
-  before_action :ensure_signed_in_pom_is_this_pom, :load_pom
+  before_action :ensure_signed_in_pom_is_this_pom, :load_and_validate_pom
 
   def index
     @allocated = @prison.allocated.map do |offender|

@@ -6,6 +6,7 @@ RSpec.describe CaseloadGlobalController, type: :controller do
   let(:staff_id) { 456_987 }
   let(:other_staff_id) { 767_584 }
   let(:not_signed_in) { 123_456 }
+  let(:unknown_staff_id) { 999_999 }
   let(:poms) do
     [
       build(:pom,
@@ -25,7 +26,7 @@ RSpec.describe CaseloadGlobalController, type: :controller do
   let(:pom) { poms.first }
 
   before do
-    stub_poms(prison.code, poms)
+    stub_onboarded_poms(prison, poms)
     stub_signed_in_pom(prison.code, pom.staffId, 'alice')
   end
 
@@ -122,6 +123,22 @@ RSpec.describe CaseloadGlobalController, type: :controller do
           it 'is allowed' do
             get :index, params: { prison_id: prison.code, staff_id: staff_id }
             expect(response).to be_successful
+          end
+
+          it 'cannot see the caseload when the requested staff member is not a POM' do
+            get :index, params: { prison_id: prison.code, staff_id: unknown_staff_id }
+            expect(response).to redirect_to(prison_pom_non_pom_path(prison.code, nomis_staff_id: unknown_staff_id))
+          end
+        end
+
+        context 'when user is not an SPO' do
+          before do
+            stub_signed_in_pom(prison.code, unknown_staff_id, 'alice')
+          end
+
+          it 'redirects to 401 when signed in user has no POM role in this prison' do
+            get :index, params: { prison_id: prison.code, staff_id: unknown_staff_id }
+            expect(response).to redirect_to('/401')
           end
         end
 
