@@ -51,6 +51,23 @@ describe HmppsApi::TieringApi do
       it 'returns nil' do
         expect(described_class.get_tier(crn, version:)).to be_nil
       end
+
+      it 'logs the error' do
+        allow(Rails.logger).to receive(:error)
+        described_class.get_tier(crn, version:)
+        expect(Rails.logger).to have_received(:error).with(/event=tiering_get_tier,route=#{route}/)
+      end
+    end
+
+    context 'when the endpoint returns another 4xx error' do
+      before do
+        allow(client).to receive(:get).with(route, cache: false)
+          .and_raise(Faraday::BadRequestError.new(nil))
+      end
+
+      it 'returns nil' do
+        expect(described_class.get_tier(crn, version:)).to be_nil
+      end
     end
 
     context 'when the endpoint returns a server error' do
@@ -59,14 +76,30 @@ describe HmppsApi::TieringApi do
           .and_raise(Faraday::ServerError.new(nil))
       end
 
-      it 'returns nil' do
-        expect(described_class.get_tier(crn, version:)).to be_nil
+      it 'raises so the calling job can be retried by Sidekiq' do
+        expect { described_class.get_tier(crn, version:) }.to raise_error(Faraday::ServerError)
+      end
+    end
+
+    context 'when the request times out' do
+      before do
+        allow(client).to receive(:get).with(route, cache: false)
+          .and_raise(Faraday::TimeoutError.new(nil))
       end
 
-      it 'logs the error' do
-        allow(Rails.logger).to receive(:error)
-        described_class.get_tier(crn, version:)
-        expect(Rails.logger).to have_received(:error).with(/event=tiering_get_tier,route=#{route}/)
+      it 'raises so the calling job can be retried by Sidekiq' do
+        expect { described_class.get_tier(crn, version:) }.to raise_error(Faraday::TimeoutError)
+      end
+    end
+
+    context 'when the connection fails' do
+      before do
+        allow(client).to receive(:get).with(route, cache: false)
+          .and_raise(Faraday::ConnectionFailed.new(nil))
+      end
+
+      it 'raises so the calling job can be retried by Sidekiq' do
+        expect { described_class.get_tier(crn, version:) }.to raise_error(Faraday::ConnectionFailed)
       end
     end
   end

@@ -63,14 +63,14 @@ RSpec.describe FetchTierJob, type: :job do
       end
     end
 
-    context 'when tier update fails validation' do
+    context 'when tier update fails during persistence' do
       let(:service_result) do
         TierUpdateService::Result.new(
           status: :update_failed,
           old_tier: 'A',
-          new_tier: 'Z',
+          new_tier: 'D',
           version: 3,
-          errors: 'Invalid tier'
+          errors: 'Could not save case information'
         )
       end
 
@@ -79,7 +79,27 @@ RSpec.describe FetchTierJob, type: :job do
 
         job.perform(crn)
 
-        expect(job.logger).to have_received(:error).with(/event=tier_update_failed/)
+        expect(job.logger).to have_received(:error).with(/event=tier_update_failed.*old_tier=A,new_tier=D/)
+      end
+    end
+
+    context 'when tier returned by API is unsupported' do
+      let(:service_result) do
+        TierUpdateService::Result.new(
+          status: :invalid_tier,
+          old_tier: 'A',
+          new_tier: 'Z',
+          version: 2,
+          errors: "Unsupported tier 'Z'. Accepted tiers: A,B,C,D"
+        )
+      end
+
+      it 'logs an invalid tier error' do
+        allow(job.logger).to receive(:error)
+
+        job.perform(crn)
+
+        expect(job.logger).to have_received(:error).with(/event=tier_invalid.*old_tier=A,new_tier=Z/)
       end
     end
   end

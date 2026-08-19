@@ -14,7 +14,7 @@ module HmppsApi
         tier: response.fetch('tierScore'),
         calculation_date: response.fetch('calculationDate').to_date
       }
-    rescue Faraday::Error => e
+    rescue Faraday::ClientError => e
       Rails.logger.error("event=tiering_get_tier,route=#{route}|#{e.message}")
       nil
     end

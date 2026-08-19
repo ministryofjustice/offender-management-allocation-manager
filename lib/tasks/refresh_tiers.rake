@@ -9,13 +9,13 @@ task refresh_tiers: :environment do
   total = cases.count
   queued = 0
 
-  puts "Queueing FetchTierJob for #{total} case information records"
+  puts "Queueing BulkFetchTierJob for #{total} case information records"
 
   cases.in_batches(of: 1000) do |batch|
     crns = batch.pluck(:crn)
 
     ActiveJob.perform_all_later(
-      crns.map { FetchTierJob.new(it, trigger_method: :bulk_refresh) }
+      crns.map { BulkFetchTierJob.new(it, trigger_method: :bulk_refresh) }
     )
 
     queued += crns.size

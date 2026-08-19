@@ -14,6 +14,16 @@ class TierUpdateService
     old_tier = case_information.tier
     return Result.new(status: :unchanged, old_tier:, new_tier:, version:) if new_tier == old_tier
 
+    unless CaseInformation.tier_levels.include?(new_tier)
+      return Result.new(
+        status: :invalid_tier,
+        errors: "Unsupported tier '#{new_tier}'. Accepted tiers: #{CaseInformation.tier_levels.join(',')}",
+        old_tier:,
+        new_tier:,
+        version:,
+      )
+    end
+
     case_information.tier = new_tier
     case_information.manual_entry = false
     attrs_before = case_information.changed_attributes
