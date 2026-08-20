@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CaseloadController < PrisonStaffApplicationController
-  before_action :ensure_signed_in_pom_is_this_pom, :load_pom, :pom_allocations_summary
+  before_action :ensure_signed_in_pom_is_this_pom, :load_and_validate_pom, :pom_allocations_summary
 
   def cases; end
 
