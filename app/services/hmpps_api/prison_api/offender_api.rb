@@ -17,19 +17,13 @@ module HmppsApi
       # Used to filter out offenders who are on remand, civil prisoners, unsentenced, etc.
       ALLOWED_LEGAL_STATUSES = %w[SENTENCED INDETERMINATE_SENTENCE RECALL IMMIGRATION_DETAINEE].freeze
 
+      # Used in `offender_summaries_for` for a brief payload of found offenders
+      OFFENDER_SUMMARY_RESPONSE_FIELDS = %w[prisonerNumber prisonId lastPrisonId restrictedPatient legalStatus].freeze
+
       def self.get_offenders_in_prison(prison, **options)
         offenders = get_search_api_offenders_in_prison(prison)
 
         build_offenders(offenders, prison, **options)
-      end
-
-      def self.get_offenders_out_of_prison(prison)
-        offenders = get_search_api_offenders_out_in_last_prison(prison)
-
-        build_offenders(
-          offenders, prison,
-          ignore_legal_status: true, fetch_complexities: false, fetch_categories: false, fetch_movements: false
-        )
       end
 
       # Get a single offender
@@ -121,6 +115,14 @@ module HmppsApi
         client.get(path)
       end
 
+      # Fetch offenders by prisoner numbers, but only return a small subset of
+      # fields from Prisoner Search to reduce payload size
+      def self.offender_summaries_for(offender_nos, cache: true)
+        get_search_api_offenders(
+          offender_nos, response_fields: OFFENDER_SUMMARY_RESPONSE_FIELDS, cache:
+        ).to_h { [it.fetch('prisonerNumber'), it.except('prisonerNumber', 'alerts')] }
+      end
+
       # Despite filtering out civil cases (legal status `CIVIL_PRISONER`) some civil cases
       # will show up as `SENTENCED` legal status, and we need to filter by their sentence type code.
       def self.filtered_offenders(offenders)
@@ -182,41 +184,13 @@ module HmppsApi
         results
       end
 
-      # NOTE: this API endpoint has a total hardcoded limit of 10_000 offenders returned
-      # in total, even if using a lower page size and looping. `BZI` will go over this limit.
-      def self.get_search_api_offenders_out_in_last_prison(prison_code)
-        route = '/attribute-search'
-        page_num = 0
-        last_page = false
-        results = []
-
-        body = {
-          "joinType": 'AND',
-          "queries": [
-            {
-              "joinType": 'AND',
-              "matchers": [
-                { "type": 'String', "attribute": 'prisonId', "condition": 'IS', "searchTerm": 'OUT' },
-                { "type": 'String', "attribute": 'lastPrisonId', "condition": 'IS', "searchTerm": prison_code },
-              ]
-            }
-          ]
-        }.freeze
-
-        until last_page
-          r = search_client.post(route, body, queryparams: { page: page_num, size: 2_000 })
-          # last should always indicate the last page of results, do perform manual check just to be safe
-          last_page = r.fetch('last') || page_num > r.fetch('totalPages')
-          page_num += 1
-          results.concat r.fetch('content')
-        end
-
-        results
-      end
-
-      def self.get_search_api_offenders(offender_nos, cache: true)
+      def self.get_search_api_offenders(offender_nos, response_fields: nil, cache: true)
         search_route = '/prisoner-search/prisoner-numbers'
-        search_client.post(search_route, { prisonerNumbers: Array(offender_nos) }, queryparams: { 'include-restricted-patients': true }, cache:)
+
+        queryparams = { 'include-restricted-patients': true }
+        queryparams['responseFields'] = response_fields if response_fields.present?
+
+        search_client.post(search_route, { prisonerNumbers: Array(offender_nos) }, queryparams:, cache:)
       end
 
       def self.default_image
