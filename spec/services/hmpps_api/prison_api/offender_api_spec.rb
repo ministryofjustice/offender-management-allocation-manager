@@ -77,6 +77,50 @@ describe HmppsApi::PrisonApi::OffenderApi do
     end
   end
 
+  describe '.offender_summaries_for' do
+    it 'requests only the configured response fields from prisoner search' do
+      offender_nos = %w[A1234AA A1234AB]
+      search_api_response = [
+        { 'prisonerNumber' => 'A1234AA', 'prisonId' => 'LEI', 'lastPrisonId' => nil, 'restrictedPatient' => false, 'legalStatus' => 'SENTENCED' },
+        { 'prisonerNumber' => 'A1234AB', 'prisonId' => 'OUT', 'lastPrisonId' => 'MDI', 'restrictedPatient' => true, 'legalStatus' => 'RECALL' }
+      ]
+      expected_result = {
+        'A1234AA' => { 'prisonId' => 'LEI', 'lastPrisonId' => nil, 'restrictedPatient' => false, 'legalStatus' => 'SENTENCED' },
+        'A1234AB' => { 'prisonId' => 'OUT', 'lastPrisonId' => 'MDI', 'restrictedPatient' => true, 'legalStatus' => 'RECALL' }
+      }
+      search_client = instance_double(HmppsApi::Client)
+
+      allow(described_class).to receive(:search_client).and_return(search_client)
+      expect(search_client).to receive(:post)
+        .with(
+          '/prisoner-search/prisoner-numbers',
+          { prisonerNumbers: offender_nos },
+          queryparams: {
+            'include-restricted-patients': true,
+            "responseFields" => described_class::OFFENDER_SUMMARY_RESPONSE_FIELDS
+          },
+          cache: true
+        )
+        .and_return(search_api_response)
+
+      result = described_class.offender_summaries_for(offender_nos)
+
+      expect(result).to eq(expected_result)
+    end
+
+    it 'allows callers to disable or enable cache explicitly' do
+      expect(described_class).to receive(:get_search_api_offenders)
+        .with(
+          ['A1234AA'],
+          cache: false,
+          response_fields: described_class::OFFENDER_SUMMARY_RESPONSE_FIELDS
+        )
+        .and_return([])
+
+      described_class.offender_summaries_for(['A1234AA'], cache: false)
+    end
+  end
+
   describe 'Single offender' do
     describe '#get_offender' do
       subject { described_class.get_offender(offender_no) }
