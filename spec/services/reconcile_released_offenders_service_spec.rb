@@ -20,12 +20,21 @@ RSpec.describe ReconcileReleasedOffendersService do
     OmicEligibility.create!(nomis_offender_id:, eligible: true, prison: prison_code)
   end
 
-  def offender_summary(prison_id:, last_prison_id: nil, legal_status: 'SENTENCED', restricted_patient: false)
+  def offender_summary(
+    prison_id:,
+    last_prison_id: nil,
+    legal_status: 'SENTENCED',
+    restricted_patient: false,
+    in_out_status: 'IN',
+    last_movement_type_code: 'ADM'
+  )
     {
       'prisonId' => prison_id,
       'lastPrisonId' => last_prison_id,
       'restrictedPatient' => restricted_patient,
-      'legalStatus' => legal_status
+      'legalStatus' => legal_status,
+      'inOutStatus' => in_out_status,
+      'lastMovementTypeCode' => last_movement_type_code
     }
   end
 
@@ -37,7 +46,7 @@ RSpec.describe ReconcileReleasedOffendersService do
 
   def stub_released_from(prison_code, *nomis_offender_ids)
     summaries = nomis_offender_ids.index_with do
-      offender_summary(prison_id: 'OUT', last_prison_id: prison_code)
+      offender_summary(prison_id: 'OUT', last_prison_id: prison_code, in_out_status: 'OUT', last_movement_type_code: 'REL')
     end
     stub_summaries_for(nomis_offender_ids, summaries)
   end
@@ -166,6 +175,33 @@ RSpec.describe ReconcileReleasedOffendersService do
               prison_id: 'OUT',
               last_prison_id: prison.code,
               restricted_patient: true
+            )
+          }
+        )
+      end
+
+      it 'does not prune and does not run legal-status processing' do
+        described_class.new(dry_run: false, prison_codes: [prison.code]).call
+
+        expect(ProcessPrisonerStatusJob).not_to have_received(:perform_now)
+        expect(CaseInformation.find_by(nomis_offender_id: offender.nomis_offender_id)).to be_present
+      end
+    end
+
+    context 'when offender is temporarily OUT on ROTL' do
+      let(:offender) { create(:offender) }
+
+      before do
+        create(:case_information, offender:)
+        create_prison_context(offender)
+        stub_summaries_for(
+          [offender.nomis_offender_id],
+          {
+            offender.nomis_offender_id => offender_summary(
+              prison_id: 'OUT',
+              last_prison_id: prison.code,
+              in_out_status: 'OUT',
+              last_movement_type_code: HmppsApi::MovementType::TEMPORARY
             )
           }
         )

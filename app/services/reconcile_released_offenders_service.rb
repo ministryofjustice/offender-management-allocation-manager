@@ -316,9 +316,15 @@ private
     restricted_patient = summary_attributes['restrictedPatient']
 
     return false if prison_id == HmppsApi::MovementDirection::OUT && restricted_patient
+    return false if temp_out_of_prison_from_summary?(summary_attributes)
     return true if prison_id == HmppsApi::MovementDirection::OUT
 
     false
+  end
+
+  def temp_out_of_prison_from_summary?(summary_attributes)
+    summary_attributes['inOutStatus'] == HmppsApi::MovementDirection::OUT &&
+      summary_attributes['lastMovementTypeCode'] == HmppsApi::MovementType::TEMPORARY
   end
 
   def legal_status_requires_status_job?(summary_attributes)

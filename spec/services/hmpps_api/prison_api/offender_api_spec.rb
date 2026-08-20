@@ -81,12 +81,42 @@ describe HmppsApi::PrisonApi::OffenderApi do
     it 'requests only the configured response fields from prisoner search' do
       offender_nos = %w[A1234AA A1234AB]
       search_api_response = [
-        { 'prisonerNumber' => 'A1234AA', 'prisonId' => 'LEI', 'lastPrisonId' => nil, 'restrictedPatient' => false, 'legalStatus' => 'SENTENCED' },
-        { 'prisonerNumber' => 'A1234AB', 'prisonId' => 'OUT', 'lastPrisonId' => 'MDI', 'restrictedPatient' => true, 'legalStatus' => 'RECALL' }
+        {
+          'prisonerNumber' => 'A1234AA',
+          'prisonId' => 'LEI',
+          'lastPrisonId' => nil,
+          'restrictedPatient' => false,
+          'legalStatus' => 'SENTENCED',
+          'inOutStatus' => 'IN',
+          'lastMovementTypeCode' => 'ADM'
+        },
+        {
+          'prisonerNumber' => 'A1234AB',
+          'prisonId' => 'OUT',
+          'lastPrisonId' => 'MDI',
+          'restrictedPatient' => true,
+          'legalStatus' => 'RECALL',
+          'inOutStatus' => 'OUT',
+          'lastMovementTypeCode' => HmppsApi::MovementType::TEMPORARY
+        }
       ]
       expected_result = {
-        'A1234AA' => { 'prisonId' => 'LEI', 'lastPrisonId' => nil, 'restrictedPatient' => false, 'legalStatus' => 'SENTENCED' },
-        'A1234AB' => { 'prisonId' => 'OUT', 'lastPrisonId' => 'MDI', 'restrictedPatient' => true, 'legalStatus' => 'RECALL' }
+        'A1234AA' => {
+          'prisonId' => 'LEI',
+          'lastPrisonId' => nil,
+          'restrictedPatient' => false,
+          'legalStatus' => 'SENTENCED',
+          'inOutStatus' => 'IN',
+          'lastMovementTypeCode' => 'ADM'
+        },
+        'A1234AB' => {
+          'prisonId' => 'OUT',
+          'lastPrisonId' => 'MDI',
+          'restrictedPatient' => true,
+          'legalStatus' => 'RECALL',
+          'inOutStatus' => 'OUT',
+          'lastMovementTypeCode' => HmppsApi::MovementType::TEMPORARY
+        }
       }
       search_client = instance_double(HmppsApi::Client)
 

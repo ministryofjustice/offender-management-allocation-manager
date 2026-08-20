@@ -18,7 +18,15 @@ module HmppsApi
       ALLOWED_LEGAL_STATUSES = %w[SENTENCED INDETERMINATE_SENTENCE RECALL IMMIGRATION_DETAINEE].freeze
 
       # Used in `offender_summaries_for` for a brief payload of found offenders
-      OFFENDER_SUMMARY_RESPONSE_FIELDS = %w[prisonerNumber prisonId lastPrisonId restrictedPatient legalStatus].freeze
+      OFFENDER_SUMMARY_RESPONSE_FIELDS = %w[
+        prisonerNumber
+        prisonId
+        lastPrisonId
+        restrictedPatient
+        legalStatus
+        inOutStatus
+        lastMovementTypeCode
+      ].freeze
 
       def self.get_offenders_in_prison(prison, **options)
         offenders = get_search_api_offenders_in_prison(prison)
