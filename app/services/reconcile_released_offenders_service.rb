@@ -385,7 +385,7 @@ private
 
   def release_offender(nomis_offender_id, prison_code:)
     log("event=reconcile_release,nomis_offender_id=#{nomis_offender_id},prison=#{prison_code}")
-    OffenderReleasedService.release_offender(nomis_offender_id, prison_code:)
+    OffenderReleasedService.release_offender(nomis_offender_id, prison_code:, send_email: false)
   rescue StandardError => e
     log("event=reconcile_release_error,nomis_offender_id=#{nomis_offender_id},error=#{e.class},message=#{e.message}")
   end

@@ -15,7 +15,7 @@ class OffenderReleasedService
     OmicEligibility,
   ].freeze
 
-  def self.release_offender(nomis_offender_id, prison_code: nil)
+  def self.release_offender(nomis_offender_id, prison_code: nil, send_email: true)
     unless local_release_state_present?(nomis_offender_id)
       Rails.logger.info("[RELEASE] Skipping #{nomis_offender_id}; no local release state remains")
       return
@@ -23,14 +23,10 @@ class OffenderReleasedService
 
     Rails.logger.info("[RELEASE] Processing release for #{nomis_offender_id}")
 
-    deallocate(nomis_offender_id)
+    AllocationHistory.active.find_by(nomis_offender_id:)&.deallocate_offender_after_release(send_email:)
+
     destroy_stint_data(nomis_offender_id)
     inactivate_complexity(nomis_offender_id, prison_code) if prison_code.present?
-  end
-
-  def self.deallocate(nomis_offender_id)
-    alloc = AllocationHistory.active.find_by(nomis_offender_id:)
-    alloc.deallocate_offender_after_release if alloc
   end
 
   def self.destroy_stint_data(nomis_offender_id)
@@ -50,5 +46,5 @@ class OffenderReleasedService
       STINT_DATA_MODELS.any? { it.exists?(nomis_offender_id:) }
   end
 
-  private_class_method :deallocate, :inactivate_complexity, :local_release_state_present?
+  private_class_method :inactivate_complexity, :local_release_state_present?
 end
