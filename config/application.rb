@@ -64,6 +64,10 @@ module OffenderManagementAllocationClient
     config.collect_prometheus_metrics = ENV['PROMETHEUS_METRICS']&.strip == 'on'
     config.redis_url = ENV['REDIS_URL']&.strip
 
+    # Shared outbound HTTP timeout defaults for HMPPS API integrations
+    config.hmpps_api_open_timeout_seconds = ENV.fetch('HMPPS_API_OPEN_TIMEOUT_SECONDS', 5).to_i
+    config.hmpps_api_timeout_seconds = ENV.fetch('HMPPS_API_TIMEOUT_SECONDS', 30).to_i
+
     config.cache_expiry = (ENV['CACHE_TIMEOUT']&.strip || 60.minutes).to_i
 
     config.x.simplified_handover_cutoff_date = Date.parse(

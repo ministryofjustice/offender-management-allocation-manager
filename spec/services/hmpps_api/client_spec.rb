@@ -116,6 +116,45 @@ describe HmppsApi::Client do
       expect { client.get(route) }
         .to raise_error(Faraday::TimeoutError, 'request timed out')
     end
+
+    it 'logs the failed request details after retries are exhausted' do
+      allow(Rails.logger).to receive(:warn)
+
+      expect { client.get(route) }.to raise_error(Faraday::TimeoutError, 'request timed out')
+
+      expect(Rails.logger).to have_received(:warn)
+        .with(include('event=hmpps_api_request_failed,reason=Faraday::TimeoutError,method=GET,route=/api/endpoint'))
+        .once
+    end
+  end
+
+  describe 'when a timeout is transient' do
+    let(:route) { '/api/endpoint' }
+
+    before do
+      WebMock.stub_request(:get, api_host + route)
+        .to_raise(Faraday::TimeoutError.new('request timed out')).then
+        .to_return(status: 200, body: '{}')
+    end
+
+    it 'retries and logs the retry event' do
+      allow(Rails.logger).to receive(:warn)
+
+      expect(client.get(route)).to eq({})
+      expect(WebMock).to have_requested(:get, api_host + route).twice
+      expect(Rails.logger).to have_received(:warn)
+        .with(include('event=hmpps_api_retry,reason=Faraday::TimeoutError,method=GET,route=/api/endpoint'))
+        .once
+    end
+  end
+
+  describe 'timeout configuration' do
+    it 'uses the shared HMPPS API timeout settings' do
+      connection = client.instance_variable_get(:@connection)
+
+      expect(connection.options.open_timeout).to eq(Rails.configuration.hmpps_api_open_timeout_seconds)
+      expect(connection.options.timeout).to eq(Rails.configuration.hmpps_api_timeout_seconds)
+    end
   end
 
   describe 'instance method' do
