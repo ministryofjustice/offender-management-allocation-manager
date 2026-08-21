@@ -159,17 +159,19 @@ class AllocationHistory < ApplicationRecord
     deallocate_secondary_pom(nomis_staff_id, prison, event_trigger:)
   end
 
-  def deallocate_offender_after_release
+  def deallocate_offender_after_release(send_email: true)
     deallocate_offender(
       event: AllocationHistory::DEALLOCATE_RELEASED_OFFENDER,
-      event_trigger: AllocationHistory::OFFENDER_RELEASED
+      event_trigger: AllocationHistory::OFFENDER_RELEASED,
+      send_email:
     )
   end
 
-  def deallocate_offender_after_transfer
+  def deallocate_offender_after_transfer(send_email: true)
     deallocate_offender(
       event: AllocationHistory::DEALLOCATE_PRIMARY_POM,
-      event_trigger: AllocationHistory::OFFENDER_TRANSFERRED
+      event_trigger: AllocationHistory::OFFENDER_TRANSFERRED,
+      send_email:
     )
   end
 
@@ -191,23 +193,11 @@ class AllocationHistory < ApplicationRecord
 
 private
 
-  def deallocate_offender(event:, event_trigger:)
+  def deallocate_offender(event:, event_trigger:, send_email:)
     return unless active?
 
-    primary_pom = HmppsApi::NomisUserRolesApi.staff_details(primary_pom_nomis_id)
-
-    # We intentionally bypass legal-status filtering because this can run after
-    # release/legalStatus changes, and we just need the offender's name
-    offender = HmppsApi::PrisonApi::OffenderApi.get_offender(nomis_offender_id, ignore_legal_status: true)
-
-    mail_params = {
-      email: primary_pom.email_address,
-      pom_name: primary_pom.first_name.titleize,
-      offender_name: offender.full_name,
-      nomis_offender_id: nomis_offender_id,
-      prison_name: Prison.find(prison).name,
-      url: Rails.application.routes.url_helpers.prison_staff_caseload_url(prison, primary_pom.staff_id)
-    }
+    # Needed before we do the update to nil
+    primary_pom_id = primary_pom_nomis_id
 
     update!(
       event: event,
@@ -220,15 +210,37 @@ private
       recommended_pom_type: nil,
     )
 
-    if mail_params[:email].present?
-      PomMailer.with(**mail_params).offender_deallocated.deliver_later
-    else
-      Rails.logger.error 'event=deallocate_offender_blank_email,' \
-                         "nomis_offender_id=#{nomis_offender_id}," \
-                         "primary_pom_nomis_id=#{primary_pom.staff_id}," \
-                         "event_trigger=#{event_trigger}|" \
-                         'Attempted to schedule an email send but the primary POM email address is blank'
+    send_deallocation_email(primary_pom_id) if send_email
+  end
+
+  def send_deallocation_email(primary_pom_nomis_id)
+    primary_pom = HmppsApi::NomisUserRolesApi.staff_details(primary_pom_nomis_id)
+
+    if primary_pom&.email_address.blank?
+      Rails.logger.info(
+        'event=deallocate_offender_blank_email,' \
+        "nomis_offender_id=#{nomis_offender_id}," \
+        "primary_pom_nomis_id=#{primary_pom_nomis_id}," \
+        "event_trigger=#{event_trigger}|" \
+        'Attempted to schedule an email send but the primary POM email address is blank'
+      )
+      return
     end
+
+    # We intentionally bypass legal-status filtering because this can run after
+    # release/legalStatus changes, and we just need the offender's name
+    offender = HmppsApi::PrisonApi::OffenderApi.get_offender(nomis_offender_id, ignore_legal_status: true)
+
+    mail_params = {
+      email: primary_pom&.email_address,
+      pom_name: primary_pom&.first_name&.titleize,
+      offender_name: offender&.full_name || 'N/A',
+      nomis_offender_id: nomis_offender_id,
+      prison_name: Prison.find(prison).name,
+      url: Rails.application.routes.url_helpers.prison_staff_caseload_url(prison, primary_pom_nomis_id)
+    }
+
+    PomMailer.with(**mail_params).offender_deallocated.deliver_later
   end
 
   def audit_event_tags

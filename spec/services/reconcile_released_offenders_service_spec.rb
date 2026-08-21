@@ -112,6 +112,8 @@ RSpec.describe ReconcileReleasedOffendersService do
       end
 
       it 'destroys stint data when not in dry-run mode' do
+        expect(PomMailer).not_to receive(:with)
+
         described_class.new(dry_run: false, prison_codes: [prison.code]).call
 
         expect(CaseInformation.find_by(nomis_offender_id: offender.nomis_offender_id)).to be_nil
@@ -380,9 +382,9 @@ RSpec.describe ReconcileReleasedOffendersService do
         stub_released_from(prison.code, offender1.nomis_offender_id, offender2.nomis_offender_id)
 
         allow(OffenderReleasedService).to receive(:release_offender)
-          .with(offender1.nomis_offender_id, prison_code: prison.code).and_raise(StandardError, 'boom')
+          .with(offender1.nomis_offender_id, prison_code: prison.code, send_email: false).and_raise(StandardError, 'boom')
         allow(OffenderReleasedService).to receive(:release_offender)
-          .with(offender2.nomis_offender_id, prison_code: prison.code).and_call_original
+          .with(offender2.nomis_offender_id, prison_code: prison.code, send_email: false).and_call_original
       end
 
       it 'continues processing remaining offenders' do
