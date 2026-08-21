@@ -8,6 +8,9 @@ module HmppsApi
     def initialize(root, extra_retry_methods: [])
       @root = root
       @connection = Faraday.new do |faraday|
+        faraday.options.open_timeout = Rails.configuration.hmpps_api_open_timeout_seconds
+        faraday.options.timeout = Rails.configuration.hmpps_api_timeout_seconds
+
         faraday.request(
           :retry,
           max: 3, interval: 0.05, interval_randomness: 0.5, backoff_factor: 2,
@@ -18,7 +21,7 @@ module HmppsApi
           # update the retried request's Authorization header there
           exceptions: Faraday::Request::Retry::DEFAULT_EXCEPTIONS + [Faraday::ConnectionFailed, Faraday::UnauthorizedError],
           retry_block: lambda { |env, _options, retries_remaining, exception|
-            refresh_token_on_retry(env, retries_remaining, exception)
+            handle_retry_event(env, retries_remaining, exception)
           },
         )
 
@@ -126,6 +129,13 @@ module HmppsApi
         req.params.update(queryparams)
         req.body = body.to_json unless body.nil?
       end
+    rescue Faraday::TimeoutError, Faraday::ConnectionFailed => e
+      Rails.logger.warn(
+        "event=hmpps_api_request_failed,reason=#{e.class},method=#{method.to_s.upcase},route=#{route}," \
+        "open_timeout_seconds=#{Rails.configuration.hmpps_api_open_timeout_seconds}," \
+        "timeout_seconds=#{Rails.configuration.hmpps_api_timeout_seconds},message=#{e.message}"
+      )
+      raise
     rescue Faraday::UnauthorizedError => e
       Rails.logger.error("[#{self.class}] #{url} -- #{e.message}")
 
@@ -154,16 +164,25 @@ module HmppsApi
       HmppsApi::Oauth::TokenService.valid_token
     end
 
-    def refresh_token_on_retry(env, retries_remaining, exception)
-      return unless exception.is_a?(Faraday::UnauthorizedError)
+    def handle_retry_event(env, retries_remaining, exception)
+      if exception.is_a?(Faraday::UnauthorizedError)
+        Rails.logger.warn(
+          "event=hmpps_api_retry_refresh_token,method=#{env.method.to_s.upcase},route=#{env.url.path}," \
+          "retries_remaining=#{retries_remaining}"
+        )
+
+        refreshed_token = HmppsApi::Oauth::TokenService.refresh_token!
+        env.request_headers['Authorization'] = "Bearer #{refreshed_token.access_token}"
+        return
+      end
+
+      return unless exception.is_a?(Faraday::TimeoutError) || exception.is_a?(Faraday::ConnectionFailed)
 
       Rails.logger.warn(
-        "event=hmpps_api_retry_refresh_token,method=#{env.method.to_s.upcase},route=#{env.url.path}," \
-        "retries_remaining=#{retries_remaining}"
+        "event=hmpps_api_retry,reason=#{exception.class},method=#{env.method.to_s.upcase},route=#{env.url.path}," \
+        "retries_remaining=#{retries_remaining},open_timeout_seconds=#{Rails.configuration.hmpps_api_open_timeout_seconds}," \
+        "timeout_seconds=#{Rails.configuration.hmpps_api_timeout_seconds}"
       )
-
-      refreshed_token = HmppsApi::Oauth::TokenService.refresh_token!
-      env.request_headers['Authorization'] = "Bearer #{refreshed_token.access_token}"
     end
 
     def response_cache

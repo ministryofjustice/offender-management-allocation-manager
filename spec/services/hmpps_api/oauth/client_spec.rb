@@ -6,6 +6,15 @@ describe HmppsApi::Oauth::Client do
   let(:client) { described_class.new(api_host) }
   let(:route) { '/auth/oauth/token?grant_type=client_credentials' }
 
+  describe 'timeout configuration' do
+    it 'uses the shared HMPPS API timeout settings' do
+      connection = client.instance_variable_get(:@connection)
+
+      expect(connection.options.open_timeout).to eq(Rails.configuration.hmpps_api_open_timeout_seconds)
+      expect(connection.options.timeout).to eq(Rails.configuration.hmpps_api_timeout_seconds)
+    end
+  end
+
   context 'with a valid request' do
     it 'sets the Authorization header' do
       client.post(route)

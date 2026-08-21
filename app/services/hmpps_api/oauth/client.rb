@@ -8,6 +8,9 @@ module HmppsApi
       def initialize(host)
         @host = host
         @connection = Faraday.new do |faraday|
+          faraday.options.open_timeout = Rails.configuration.hmpps_api_open_timeout_seconds
+          faraday.options.timeout = Rails.configuration.hmpps_api_timeout_seconds
+
           faraday.request :retry, max: 3, interval: 0.05,
                                   interval_randomness: 0.5, backoff_factor: 2,
                                   # We appear to get occasional transient 5xx errors, so retry them
