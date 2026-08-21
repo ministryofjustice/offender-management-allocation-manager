@@ -69,6 +69,16 @@ RSpec.describe OffenderReleasedService do
         expect(allocation.reload.active?).to be false
         expect(CaseInformation.find_by(nomis_offender_id: offender.nomis_offender_id)).to be_nil
       end
+
+      it 'can skip deallocation email and still complete cleanup when offender lookup is missing' do
+        allow(HmppsApi::PrisonApi::OffenderApi).to receive(:get_offender).and_return(nil)
+        expect(PomMailer).not_to receive(:with)
+
+        described_class.release_offender(offender.nomis_offender_id, send_email: false)
+
+        expect(allocation.reload.active?).to be false
+        expect(CaseInformation.find_by(nomis_offender_id: offender.nomis_offender_id)).to be_nil
+      end
     end
 
     context 'when all local release state has already been removed' do

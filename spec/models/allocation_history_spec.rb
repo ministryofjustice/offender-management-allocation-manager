@@ -348,6 +348,22 @@ RSpec.describe AllocationHistory, :enable_domain_event_publish, type: :model do
           expect(fake_mailer).to have_received(:offender_deallocated)
         end
 
+        it 'passes the expected payload to PomMailer' do
+          expect(PomMailer).to have_received(:with) do |payload|
+            expect(payload).to include(
+              :email,
+              :pom_name,
+              :offender_name,
+              :nomis_offender_id,
+              :prison_name,
+              :url
+            )
+            expect(payload[:email]).to eq(pom_email)
+            expect(payload[:nomis_offender_id]).to eq(nomis_offender_id)
+            expect(payload[:url]).to include("/prisons/#{prison_code}/staff/")
+          end
+        end
+
         it 'logs no error' do
           expect(fake_logger).not_to have_received(:error)
         end
@@ -359,8 +375,8 @@ RSpec.describe AllocationHistory, :enable_domain_event_publish, type: :model do
             expect(fake_mailer).not_to have_received(:offender_deallocated)
           end
 
-          it 'logs an error' do
-            expect(fake_logger).to have_received(:error)
+          it 'logs that email was skipped' do
+            expect(fake_logger).to have_received(:info).with(include('event=deallocate_offender_blank_email'))
           end
         end
       end
