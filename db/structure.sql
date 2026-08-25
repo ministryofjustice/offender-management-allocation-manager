@@ -31,8 +31,8 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.allocation_history (
     id bigint NOT NULL,
-    nomis_offender_id character varying,
-    prison character varying,
+    nomis_offender_id character varying NOT NULL,
+    prison character varying NOT NULL,
     allocated_at_tier character varying,
     override_reasons character varying,
     override_detail character varying,
@@ -43,8 +43,8 @@ CREATE TABLE public.allocation_history (
     created_by_name character varying,
     primary_pom_nomis_id integer,
     secondary_pom_nomis_id integer,
-    event integer,
-    event_trigger integer,
+    event integer NOT NULL,
+    event_trigger integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     primary_pom_allocated_at timestamp without time zone,
@@ -201,7 +201,7 @@ ALTER SEQUENCE public.calculated_handover_dates_id_seq OWNED BY public.calculate
 CREATE TABLE public.case_information (
     id bigint NOT NULL,
     tier character varying,
-    nomis_offender_id character varying,
+    nomis_offender_id character varying NOT NULL,
     crn character varying,
     mappa_level integer,
     manual_entry boolean NOT NULL,
@@ -295,7 +295,7 @@ CREATE TABLE public.early_allocations (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     community_decision boolean,
-    prison character varying,
+    prison character varying NOT NULL,
     created_by_firstname character varying,
     created_by_lastname character varying,
     updated_by_firstname character varying,
@@ -1348,7 +1348,7 @@ CREATE UNIQUE INDEX index_prisons_on_name ON public.prisons USING btree (name);
 -- Name: index_responsibilities_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_responsibilities_on_nomis_offender_id ON public.responsibilities USING btree (nomis_offender_id);
+CREATE UNIQUE INDEX index_responsibilities_on_nomis_offender_id ON public.responsibilities USING btree (nomis_offender_id);
 
 
 --
@@ -1395,6 +1395,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260821152126'),
 ('20260818120000'),
 ('20260813173000'),
 ('20260811114112'),
