@@ -9,9 +9,7 @@
       <th class="govuk-table__header" scope="col">POM</th>
       <th class="govuk-table__header" scope="col">POM type</th>
       <th class="govuk-table__header" scope="col">Total cases</th>
-      <% if FeatureFlags.bulk_reallocation.enabled? %>
       <th class="govuk-table__header" scope="col">Action</th>
-      <% end %>
     </tr>
     </thead>
     <tbody class="govuk-table__body">
@@ -22,13 +20,11 @@
         </td>
         <td aria-label="POM type" class="govuk-table__cell"><%= grade(pom) %></td>
         <td aria-label="Total cases" class="govuk-table__cell govuk-!-font-weight-bold"><%= pom.allocations.count %></td>
-        <% if FeatureFlags.bulk_reallocation.enabled? %>
         <td aria-label="Action" class="govuk-table__cell">
           <% if pom.has_primary_allocations? %>
             <%= link_to 'Reallocate cases', prison_reallocation_path(@prison.code, pom.staff_id, from: 'tab'), class: 'govuk-link' %>
           <% end %>
         </td>
-        <% end %>
       </tr>
     <% end %>
     </tbody>

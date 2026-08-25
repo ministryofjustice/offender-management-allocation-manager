@@ -137,8 +137,6 @@ private
   end
 
   def load_reallocation_alert
-    return unless FeatureFlags.bulk_reallocation.enabled?
-
     poms = @prison.get_list_of_poms
     @removed_poms = @prison.get_removed_poms(existing_poms: poms)
   rescue StandardError => e

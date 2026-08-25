@@ -4,10 +4,6 @@
 feature_flags:
   example_feature:
     staging: true
-  bulk_reallocation:
-    staging: true
-    preprod: true
-    production: true
   rosh_level:
     staging: true
     preprod: true

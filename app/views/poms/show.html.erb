@@ -1,6 +1,6 @@
 <% content_for :title, "View a POM's caseload – Digital Prison Services" %>
 
-<%= back_link %>
+<%= pom_profile_back_link(prison: @prison, pom: @pom) %>
 
 <%= render 'layouts/alert', alert: flash[:alert] %>
 <%= render 'layouts/notice', notice: flash[:notice] %>

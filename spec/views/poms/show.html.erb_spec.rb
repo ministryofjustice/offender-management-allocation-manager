@@ -9,6 +9,7 @@ RSpec.describe "poms/show", type: :view do
   let(:offender_nos) { offenders.map(&:offender_no) }
   let(:summary_rows) { page.css('.govuk-summary-list__row') }
   let(:two_days_ago) { Time.zone.today - 2.days }
+  let(:referer) { nil }
 
   before do
     stub_onboarded_poms(prison, [pom])
@@ -38,6 +39,8 @@ RSpec.describe "poms/show", type: :view do
       parole_cases_count: 0,
       last_allocated_date: allocations.max_by(&:primary_pom_allocated_at)&.primary_pom_allocated_at&.to_date
     })
+
+    request.env['HTTP_REFERER'] = referer if referer.present?
 
     render
   end
@@ -86,6 +89,30 @@ RSpec.describe "poms/show", type: :view do
 
     it 'shows releases due in next 4 weeks' do
       expect(summary_rows[2]).to have_content(1)
+    end
+
+    context 'when the profile page was reached from the allocated prisoners list' do
+      let(:referer) { allocated_prison_prisoners_path(prison.code) }
+
+      it 'keeps the back link pointing to that list' do
+        expect(page.at('.govuk-back-link')['href']).to eq(allocated_prison_prisoners_path(prison.code))
+      end
+    end
+
+    context 'when the profile page was reached from the edit page' do
+      let(:referer) { edit_prison_pom_path(prison.code, nomis_staff_id: pom.staff_id) }
+
+      it 'falls back to the POMs list to avoid a back-link loop' do
+        expect(page.at('.govuk-back-link')['href']).to eq(prison_poms_path(prison.code))
+      end
+    end
+
+    context 'when the referer is a crafted external-looking path on this host' do
+      let(:referer) { 'https://www.example.com//foo.bar/path' }
+
+      it 'falls back to the POMs list' do
+        expect(page.at('.govuk-back-link')['href']).to eq(prison_poms_path(prison.code))
+      end
     end
   end
 end

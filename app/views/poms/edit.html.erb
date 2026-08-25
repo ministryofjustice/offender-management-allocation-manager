@@ -28,9 +28,7 @@
 
       <div class='govuk-!-margin-top-6' id="status">
         <%= f.govuk_radio_buttons_fieldset(:status, legend: { text: 'Select status', size: 'm', tag: 'h3' }) do %>
-          <% if FeatureFlags.bulk_reallocation.enabled? %>
-            <p>To reallocate this POM's cases in bulk, first change their status to either away from work or no longer at <%= @prison.name %>.</p>
-          <% end %>
+          <p>To reallocate this POM's cases in bulk, first change their status to either away from work or no longer at <%= @prison.name %>.</p>
           <%= f.govuk_radio_button :status, :active,
                 label: { text: 'Available for new cases' }, link_errors: true %>
           <%= f.govuk_radio_button :status, :unavailable,
@@ -39,11 +37,9 @@
           <%= f.govuk_radio_button :status, :inactive,
                 label: { text: 'Away from work' },
                 hint: { text: 'Use for longer periods of absence. This will remove the POM from the list of people you can allocate to. You will be able to reallocate their cases.' } %>
-          <% if FeatureFlags.bulk_reallocation.enabled? %>
-            <%= f.govuk_radio_button :status, :deleted,
-                  label: { text: "No longer at #{@prison.name}" },
-                  hint: { text: 'Once you have reallocated any cases this POM has, they will be removed from this service.' } %>
-          <% end %>
+          <%= f.govuk_radio_button :status, :deleted,
+                label: { text: "No longer at #{@prison.name}" },
+                hint: { text: 'Once you have reallocated any cases this POM has, they will be removed from this service.' } %>
         <% end %>
       </div>
 
