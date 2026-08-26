@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 feature "remove a POM no longer present in NOMIS" do
-  let(:bulk_reallocation_enabled) { true }
   let!(:prison) { Prison.find_by(code: "LEI") || create(:prison, code: "LEI") }
   let(:spo) { build(:pom) }
   let(:probation_poms) do
@@ -14,8 +13,6 @@ feature "remove a POM no longer present in NOMIS" do
   end
 
   before do
-    stub_feature_flag(:bulk_reallocation, enabled: bulk_reallocation_enabled)
-
     stub_pom(spo)
     stub_signin_spo(spo, [prison.code])
     stub_poms(prison.code, probation_poms)
@@ -66,108 +63,62 @@ feature "remove a POM no longer present in NOMIS" do
     end
   end
 
-  context 'when limbo bulk reallocation is enabled' do
-    let(:bulk_reallocation_enabled) { true }
+  context 'when there are no POMs with cases in limbo' do
+    include_examples 'without an attention needed tab'
+  end
 
-    context 'when there are no POMs with cases in limbo' do
-      include_examples 'without an attention needed tab'
-    end
+  context 'when there are POMs with primary cases in limbo' do
+    include_context 'with a removed pom with cases in limbo'
+    include_examples 'with an attention needed tab'
 
-    context 'when there are POMs with primary cases in limbo' do
-      include_context 'with a removed pom with cases in limbo'
-      include_examples 'with an attention needed tab'
+    it 'shows the updated attention needed copy and reallocation action' do
+      click_link 'Attention needed'
 
-      it 'shows the updated attention needed copy and reallocation action' do
-        click_link 'Attention needed'
-
-        within('section#attention_needed') do
-          expect(page).to have_text("These staff members' cases need reallocating so they can be removed from this service.")
-          expect(page).to have_css('td.govuk-table__cell[aria-label="POM"]', text: 'John Doe')
-          expect(page).to have_css('td.govuk-table__cell[aria-label="Last case allocated"]', text: '22 June 2025')
-          expect(page).to have_css('td.govuk-table__cell[aria-label="Total cases"]', text: '1')
-          expect(page).to have_link('Reallocate cases', href: confirm_removal_prison_pom_path(prison.code, removed_pom_staff_id))
-          expect(page).not_to have_button('Remove POM')
-        end
-      end
-
-      it 'takes the user to the confirmation page' do
-        within('section#attention_needed') do
-          click_link 'Reallocate cases'
-        end
-
-        expect(page).to have_css('h1.govuk-heading-l', text: 'Confirm John Doe can be removed from this service')
-        expect(page).to have_link('Continue', href: prison_reallocation_path(prison.code, removed_pom_staff_id, from: 'tab'))
+      within('section#attention_needed') do
+        expect(page).to have_text("These staff members' cases need reallocating so they can be removed from this service.")
+        expect(page).to have_css('td.govuk-table__cell[aria-label="POM"]', text: 'John Doe')
+        expect(page).to have_css('td.govuk-table__cell[aria-label="Last case allocated"]', text: '22 June 2025')
+        expect(page).to have_css('td.govuk-table__cell[aria-label="Total cases"]', text: '1')
+        expect(page).to have_link('Reallocate cases', href: confirm_removal_prison_pom_path(prison.code, removed_pom_staff_id))
       end
     end
 
-    context 'when a POM with a role is marked as deleted and has cases' do
-      let(:deleted_pom_staff_id) { 789_012 }
-      let(:deleted_pom) { build(:pom, :prison_officer, staffId: deleted_pom_staff_id, firstName: 'JANE', lastName: 'SMITH') }
-      let(:offenders_in_prison) { build_list(:nomis_offender, 1, prisonId: prison.code) }
-
-      before do
-        create(:pom_detail, :deleted, prison_code: prison.code, nomis_staff_id: deleted_pom_staff_id, working_pattern: 1.0)
-
-        stub_poms(prison.code, probation_poms + [deleted_pom])
-        stub_offenders_for_prison(prison.code, offenders_in_prison)
-
-        offenders_in_prison.each do |offender|
-          nomis_offender_id = offender[:prisonerNumber]
-          offender_record = create(:offender, nomis_offender_id:)
-          create(:allocation_history, :primary, prison: prison.code, nomis_offender_id:, primary_pom_nomis_id: deleted_pom_staff_id)
-          create(:case_information, offender: offender_record)
-        end
-
-        visit prison_poms_path(prison.code)
+    it 'takes the user to the confirmation page' do
+      within('section#attention_needed') do
+        click_link 'Reallocate cases'
       end
 
-      it 'links directly to the POM selection page, skipping the summary' do
-        click_link 'Attention needed'
-
-        within('section#attention_needed') do
-          expect(page).to have_link('Reallocate cases', href: prison_reallocation_path(prison.code, deleted_pom_staff_id, from: 'tab'))
-        end
-      end
+      expect(page).to have_css('h1.govuk-heading-l', text: 'Confirm John Doe can be removed from this service')
+      expect(page).to have_link('Continue', href: prison_reallocation_path(prison.code, removed_pom_staff_id, from: 'tab'))
     end
   end
 
-  context 'when limbo bulk reallocation is disabled' do
-    let(:bulk_reallocation_enabled) { false }
+  context 'when a POM with a role is marked as deleted and has cases' do
+    let(:deleted_pom_staff_id) { 789_012 }
+    let(:deleted_pom) { build(:pom, :prison_officer, staffId: deleted_pom_staff_id, firstName: 'JANE', lastName: 'SMITH') }
+    let(:offenders_in_prison) { build_list(:nomis_offender, 1, prisonId: prison.code) }
 
-    context 'when there are no POMs with cases in limbo' do
-      include_examples 'without an attention needed tab'
-    end
+    before do
+      create(:pom_detail, :deleted, prison_code: prison.code, nomis_staff_id: deleted_pom_staff_id, working_pattern: 1.0)
 
-    context 'when there are POMs with primary cases in limbo' do
-      include_context 'with a removed pom with cases in limbo'
-      include_examples 'with an attention needed tab'
+      stub_poms(prison.code, probation_poms + [deleted_pom])
+      stub_offenders_for_prison(prison.code, offenders_in_prison)
 
-      it 'shows the legacy attention needed copy and remove action' do
-        click_link 'Attention needed'
-
-        within('section#attention_needed') do
-          expect(page).to have_text('These people are no longer recorded as POMs on NOMIS or Digital Prison Services. You must remove them from this service and then reallocate their cases.')
-          expect(page).to have_css('td.govuk-table__cell[aria-label="POM"]', text: 'John Doe')
-          expect(page).to have_css('td.govuk-table__cell[aria-label="Last case allocated"]', text: '22 June 2025')
-          expect(page).to have_css('td.govuk-table__cell[aria-label="Total cases"]', text: '1')
-          expect(page).to have_css('td.govuk-table__cell[aria-label="Action"]', text: 'Remove POM')
-          expect(page).not_to have_link('Reallocate cases')
-        end
+      offenders_in_prison.each do |offender|
+        nomis_offender_id = offender[:prisonerNumber]
+        offender_record = create(:offender, nomis_offender_id:)
+        create(:allocation_history, :primary, prison: prison.code, nomis_offender_id:, primary_pom_nomis_id: deleted_pom_staff_id)
+        create(:case_information, offender: offender_record)
       end
 
-      it 'removes the POM' do
-        within('section#attention_needed') do
-          click_button 'Remove POM'
-        end
+      visit prison_poms_path(prison.code)
+    end
 
-        expect(page).to have_css('.moj-banner--success',
-                                 text: 'John Doe removed. If necessary, their cases have been moved to the allocations list.')
+    it 'links directly to the POM selection page, skipping the summary' do
+      click_link 'Attention needed'
 
-        expect(page).to have_link('the allocations list',
-                                  href: unallocated_prison_prisoners_path(prison))
-
-        pom_details = PomDetail.find_by(prison_code: prison.code, nomis_staff_id: removed_pom_staff_id)
-        expect(pom_details).to be_deleted
+      within('section#attention_needed') do
+        expect(page).to have_link('Reallocate cases', href: prison_reallocation_path(prison.code, deleted_pom_staff_id, from: 'tab'))
       end
     end
   end

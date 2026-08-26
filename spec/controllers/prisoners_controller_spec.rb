@@ -651,11 +651,10 @@ RSpec.describe PrisonersController, type: :controller do
 
     render_views
 
-    context 'when bulk_reallocation is enabled and there are removed POMs with cases' do
+    context 'when there are removed POMs with cases' do
       let(:removed_offender) { build(:nomis_offender) }
 
       before do
-        stub_feature_flag(:bulk_reallocation, enabled: true)
         stub_offenders_for_prison(prison.code, [offender, removed_offender])
         create(:pom_detail, prison_code: prison.code, nomis_staff_id: removed_staff_id)
         create(:case_information, offender: build(:offender, nomis_offender_id: removed_offender.fetch(:prisonerNumber)))
@@ -673,23 +672,7 @@ RSpec.describe PrisonersController, type: :controller do
       end
     end
 
-    context 'when bulk_reallocation is disabled' do
-      before do
-        stub_feature_flag(:bulk_reallocation, enabled: false)
-      end
-
-      it 'does not show the reallocation alert' do
-        get :unallocated, params: { prison_id: prison.code }
-
-        expect(response.body).not_to include('Cases to reallocate')
-      end
-    end
-
     context 'when there are no removed POMs with cases' do
-      before do
-        stub_feature_flag(:bulk_reallocation, enabled: true)
-      end
-
       it 'does not show the reallocation alert' do
         get :unallocated, params: { prison_id: prison.code }
 

@@ -59,7 +59,7 @@ class PomsController < PrisonStaffApplicationController
       pom_detail.save!
 
       if pom_detail.inactive?
-        if FeatureFlags.bulk_reallocation.enabled? && pom_detail.has_primary_allocations?
+        if pom_detail.has_primary_allocations?
           redirect_to reallocate_prison_pom_path(active_prison_id, nomis_staff_id:) and return
         else
           AllocationHistory.deallocate_pom(
@@ -68,7 +68,7 @@ class PomsController < PrisonStaffApplicationController
         end
       end
 
-      redirect_to prison_pom_path(active_prison_id, id: nomis_staff_id),
+      redirect_to prison_pom_path(active_prison_id, nomis_staff_id:),
                   notice: "Profile updated for #{helpers.full_name_ordered(@pom)}"
     else
       render :edit
@@ -92,16 +92,6 @@ class PomsController < PrisonStaffApplicationController
   end
 
   def destroy
-    # Legacy flow (limbo poms removal without confirmation form)
-    # TODO: to be removed once we release the new bulk-reallocation feature
-    unless params.key?(:confirm_delete_pom)
-      NomisUserRolesService.remove_pom(@prison, nomis_staff_id)
-      redirect_to prison_poms_path(anchor: 'attention_needed!top'),
-                  notice: "#{@pom.full_name_or_staff_id} removed. If necessary, their cases have been moved to @unallocated_link@."
-      return
-    end
-
-    # New flow (confirm_delete form submission)
     @confirm_delete_form = ConfirmDeletePomForm.new(confirm_delete_params)
 
     if @confirm_delete_form.valid?

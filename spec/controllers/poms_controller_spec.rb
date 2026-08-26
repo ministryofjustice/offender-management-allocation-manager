@@ -127,6 +127,19 @@ RSpec.describe PomsController, type: :controller do
       stub_poms(prison.code, [build(:pom, staffId: updated_staff_id, firstName: 'Mateo', lastName: 'Example')])
     end
 
+    context 'when the update is valid' do
+      it 'redirects to the canonical show URL' do
+        put :update, params: {
+          prison_id: prison.code,
+          nomis_staff_id: updated_staff_id,
+          edit_pom: { status: 'active', description: 'PT', working_pattern: '0.8' },
+        }
+
+        expect(response).to redirect_to(prison_pom_path(prison.code, nomis_staff_id: updated_staff_id))
+        expect(flash[:notice]).to eq('Profile updated for Mateo Example')
+      end
+    end
+
     context 'when status is deleted' do
       it 'does not save and redirects to confirm delete page' do
         put :update, params: {
@@ -217,24 +230,6 @@ RSpec.describe PomsController, type: :controller do
       stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{removed_staff_id}")
         .to_return(body: { staffId: removed_staff_id, lastName: 'Example', firstName: 'Mateo' }.to_json)
       allow(NomisUserRolesService).to receive(:remove_pom).with(prison, removed_staff_id).and_return(true)
-    end
-
-    context 'with legacy flow (no confirmation form)' do
-      before do
-        allow(NomisUserRolesService).to receive(:remove_pom) do |given_prison, staff_id|
-          given_prison.pom_details.find_by!(nomis_staff_id: staff_id).deleted!
-          true
-        end
-      end
-
-      it 'removes the pom and redirects back to the attention needed tab' do
-        delete :destroy, params: { prison_id: prison.code, nomis_staff_id: removed_staff_id }
-
-        expect(NomisUserRolesService).to have_received(:remove_pom).with(prison, removed_staff_id)
-        expect(PomDetail.find_by!(nomis_staff_id: removed_staff_id).status).to eq('deleted')
-        expect(response).to redirect_to(prison_poms_path(anchor: 'attention_needed!top'))
-        expect(flash[:notice]).to eq('Mateo Example removed. If necessary, their cases have been moved to @unallocated_link@.')
-      end
     end
 
     context 'with confirm delete flow' do
