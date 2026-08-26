@@ -212,6 +212,46 @@ describe HmppsApi::PrisonApi::OffenderApi do
         end
       end
 
+      context 'when offender prison location data is missing' do
+        context 'when offender is not a restricted patient and prisonId is missing' do
+          let(:offender) do
+            build(
+              :nomis_offender,
+              sentence: attributes_for(:sentence_detail, recall: true),
+              prisonId: nil
+            )
+          end
+
+          before do
+            stub_offender(offender)
+          end
+
+          it 'returns nil (non-workable) instead of raising' do
+            expect(subject).to be_nil
+          end
+        end
+
+        context 'when offender is a restricted patient and supportingPrisonId is missing' do
+          let(:offender) do
+            build(
+              :nomis_offender,
+              sentence: attributes_for(:sentence_detail, recall: true),
+              restrictedPatient: true,
+              prisonId: 'LEI',
+              supportingPrisonId: nil
+            )
+          end
+
+          before do
+            stub_offender(offender)
+          end
+
+          it 'returns nil (non-workable) instead of raising' do
+            expect(subject).to be_nil
+          end
+        end
+      end
+
       context 'when some offenders are temporarily out on ROTL' do
         let(:offender) { build(:nomis_offender, :rotl) }
         let(:rotl_movement) { attributes_for(:movement, :rotl, offenderNo: offender[:prisonerNumber]) }
@@ -253,6 +293,44 @@ describe HmppsApi::PrisonApi::OffenderApi do
           expect(get_accepted_offenders).to all be_a(HmppsApi::Offender)
         end
       end
+    end
+  end
+
+  describe '.build_offenders' do
+    let(:options) do
+      {
+        fetch_complexities: false,
+        fetch_categories: false,
+        fetch_movements: false,
+        ignore_legal_status: true
+      }
+    end
+
+    it 'ignores restricted patients without supportingPrisonId' do
+      valid_offender = build(:nomis_offender, prisonerNumber: 'A1234AA').deep_stringify_keys
+      invalid_restricted = build(
+        :nomis_offender,
+        prisonerNumber: 'A1234AB',
+        restrictedPatient: true,
+        prisonId: 'LEI',
+        supportingPrisonId: nil
+      ).deep_stringify_keys
+
+      result = described_class.build_offenders([valid_offender, invalid_restricted], 'LEI', **options)
+
+      expect(result.map(&:offender_no)).to eq(['A1234AA'])
+    end
+
+    it 'ignores non-restricted offenders without prisonId' do
+      invalid_offender = build(
+        :nomis_offender,
+        restrictedPatient: false,
+        prisonId: nil
+      ).deep_stringify_keys
+
+      result = described_class.build_offenders([invalid_offender], 'LEI', **options)
+
+      expect(result).to eq([])
     end
   end
 

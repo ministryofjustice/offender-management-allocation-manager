@@ -47,8 +47,8 @@ module HmppsApi
         offender = get_search_api_offenders(offender_no, cache: options[:cache]).first
         return if offender.nil?
 
-        # Restricted Patients use supportingPrisonId, since the offender is currently in hospital
-        prison_id = offender.fetch(offender['restrictedPatient'] ? 'supportingPrisonId' : 'prisonId')
+        prison_id = prison_id_for(offender)
+        return if prison_id.blank?
 
         build_offenders([offender], prison_id, **options).first
       end
@@ -57,6 +57,7 @@ module HmppsApi
         options = options_with_defaults(options)
 
         offenders = options[:ignore_legal_status] ? unfiltered_offenders : filtered_offenders(unfiltered_offenders)
+        offenders = offenders.select { prison_id_for(it).present? }
         return [] if offenders.empty?
 
         offender_nos = offenders.pluck('prisonerNumber')
@@ -170,6 +171,11 @@ module HmppsApi
       end
 
     private
+
+      # Restricted patients use `supportingPrisonId`, since the offender is currently in hospital
+      def self.prison_id_for(offender)
+        offender['restrictedPatient'] ? offender['supportingPrisonId'] : offender['prisonId']
+      end
 
       def self.get_search_api_offenders_in_prison(prison_code)
         route = "/prisoner-search/prison/#{prison_code}"
