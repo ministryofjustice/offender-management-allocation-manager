@@ -1,18 +1,52 @@
-<% content_for :title, "Check this POM is still active – Digital Prison Services" %>
+<% content_for :title, "There is a problem with this person's account – Digital Prison Services" %>
 
-<h1 class="govuk-heading-l">Check this POM is still active</h1>
-<p class="govuk-body">This person is no longer recorded as a POM in NOMIS or Digital Prison Services.</p>
-<h2 class="govuk-heading-m">If they are still managing cases</h2>
-<p class="govuk-body">Check that:</p>
-<ul>
-  <li>
-    <p>they have the right role in Digital Prison Services</p>
-  </li>
-  <li>
-    <p>their NOMIS account is active and the correct roles are assigned to them</p>
-  </li>
-</ul>
-<h2 class="govuk-heading-m">If they have left or will be absent for a while</h2>
-<p>
-  You must remove them from their cases by changing their status to inactive. Then, allocate their cases to another POM.
-</p>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">
+      There is a problem with this person's account
+    </h1>
+
+    <p class="govuk-body">
+      This person's account may not be set up correctly or they may no longer have access to this service.
+    </p>
+
+    <h2 class="govuk-heading-m">
+      What you need to do
+    </h2>
+
+    <h3 class="govuk-heading-s">
+      Check their access roles
+    </h3>
+    <p class="govuk-body">
+      Ask a local systems administrator to confirm the user has been given the Allocations - POM role on Digital Prison
+      Services.
+    </p>
+
+    <h3 class="govuk-heading-s">
+      Ensure they have been added to this
+    </h3>
+    <p class="govuk-body">
+      Go to the <%= link_to 'Manage staff section', prison_poms_path(@prison.code), class: 'govuk-link' %> to see if
+      this person is listed as either a prison POM or probation POM. If not,
+      <%= link_to 'add them as a POM', search_prison_onboarding_index_path(@prison.code), class: 'govuk-link' %>.
+    </p>
+
+    <h3 class="govuk-heading-s">
+      Check the Attention needed tab
+    </h3>
+    <p class="govuk-body">
+      If they are listed on the Attention needed tab of
+      the <%= link_to 'Manage staff section', prison_poms_path(@prison.code), class: 'govuk-link' %>, you must
+      reallocate their cases so they can be removed from this service.
+    </p>
+
+    <h3 class="govuk-heading-s">
+      Change their status
+    </h3>
+    <p class="govuk-body">
+      If this person has left the prison either permanently or temporarily, select their name in
+      the <%= link_to 'Manage staff section', prison_poms_path(@prison.code), class: 'govuk-link' %> and then select
+      edit profile to change their status.
+    </p>
+  </div>
+</div>

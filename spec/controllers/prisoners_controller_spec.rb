@@ -609,10 +609,68 @@ RSpec.describe PrisonersController, type: :controller do
           expect(page.css('#oasys-date')).to have_text 'No OASys information'
         end
       end
+
+      context 'when the primary POM is no longer a POM and there is no co-worker' do
+        let(:inactive_pom_staff_id) { 543_453 }
+
+        before do
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
+          create(:allocation_history,
+                 prison: prison,
+                 nomis_offender_id: offender_no,
+                 primary_pom_nomis_id: inactive_pom_staff_id)
+          allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
+          allow(HmppsApi::NomisUserRolesApi).to receive(:staff_details).with(inactive_pom_staff_id).and_return(nil)
+        end
+
+        render_views
+
+        it 'shows an unlinked Unknown primary POM and leaves co-working POM blank' do
+          get :show, params: { prison_id: prison, id: offender_no }
+
+          expect(response).to have_http_status(:ok)
+          expect(response.body).to include('Unknown')
+          expect(response.body).to include('Reallocate')
+          expect(response.body).to include('Allocate')
+          expect(response.body).not_to include(prison_pom_path(prison, nomis_staff_id: inactive_pom_staff_id))
+
+          coworker_row = page.at_css('#co-working-pom td.table_cell__left_align')
+          expect(coworker_row.text.gsub(/\s+/, ' ').strip).to eq('Allocate')
+        end
+      end
+
+      context 'when the co-working POM is no longer a POM' do
+        let(:inactive_coworker_staff_id) { 543_454 }
+
+        before do
+          create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
+          create(:allocation_history,
+                 prison: prison,
+                 nomis_offender_id: offender_no,
+                 primary_pom_nomis_id: 1,
+                 secondary_pom_nomis_id: inactive_coworker_staff_id)
+          allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
+          allow(HmppsApi::NomisUserRolesApi).to receive(:staff_details).with(1).and_return(double(first_name: 'Primary', last_name: 'Pom'))
+          allow(HmppsApi::NomisUserRolesApi).to receive(:staff_details).with(inactive_coworker_staff_id).and_return(nil)
+        end
+
+        render_views
+
+        it 'shows an unlinked Unknown co-working POM' do
+          get :show, params: { prison_id: prison, id: offender_no }
+
+          expect(response).to have_http_status(:ok)
+          expect(response.body).to include('Unknown')
+          expect(response.body).to include('Remove')
+          expect(response.body).not_to include(prison_pom_path(prison, nomis_staff_id: inactive_coworker_staff_id))
+        end
+      end
     end
   end
 
   describe 'when an allocation exists but is not active (no primary pom allocated)' do
+    render_views
+
     it 'can still render the page' do
       prison = create(:prison)
       offender = build(:nomis_offender, prisonId: prison.code)
@@ -621,17 +679,18 @@ RSpec.describe PrisonersController, type: :controller do
       stub_offender(offender)
       stub_keyworker(offender_id)
       stub_sso_data(prison.code)
-
-      allow(PrisonOffenderManagerService).to receive(:fetch_pom_name).with(nil).and_raise(Faraday::ResourceNotFound, "the server responded with status 404")
-      allow(PrisonOffenderManagerService).to receive(:fetch_pom_name).with(222_888).and_return('Secondary Pom')
+      stub_poms(prison.code, [])
+      allow(HmppsApi::NomisUserRolesApi).to receive(:staff_details).with(222_888).and_return(nil)
 
       create(:allocation_history, nomis_offender_id: offender_id, secondary_pom_name: 'Secondary Pom', secondary_pom_nomis_id: 222_888, prison: prison.code, primary_pom_nomis_id: nil, primary_pom_name: nil)
 
       get :show, params: { prison_id: prison.code, id: offender_id }
+      page = Nokogiri::HTML(response.body)
 
       expect(response.status).to be(200)
-      expect(assigns(:primary_pom_name)).to be_nil
-      expect(assigns(:secondary_pom_name)).to eq('Secondary Pom')
+      expect(assigns(:pom)).to be_nil
+      expect(assigns(:coworker)&.staff_id).to eq(222_888)
+      expect(page.at_css('#primary_pom_name').text.gsub(/\s+/, ' ').strip).to eq('Allocate')
     end
   end
 

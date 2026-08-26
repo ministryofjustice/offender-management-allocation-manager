@@ -37,6 +37,21 @@ RSpec.describe "prisoners/review_case_details", type: :view do
   end
 
   describe 'At a glance section' do
+    context 'when a POM is present but has no role' do
+      before do
+        assign(:pom, instance_double(StaffMember, full_name_ordered: 'Sam Pom', email_address: 'sam@example.com', position_description: nil))
+        stub_feature_flag(:rosh_level, enabled: true)
+        render
+      end
+
+      it 'shows N/A for the POM type value' do
+        row = at_a_glance_summary.find('#pom-type-row')
+
+        expect(row).to have_text('POM type')
+        expect(row).to have_text('N/A')
+      end
+    end
+
     context 'when the rosh feature flag is enabled' do
       before do
         stub_feature_flag(:rosh_level, enabled: true)

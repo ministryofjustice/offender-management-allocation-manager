@@ -67,25 +67,53 @@ RSpec.describe AllocationsController, type: :controller do
         end
       end
 
+      context 'when there is no active allocation (unallocated offender)' do
+        it 'redirects to 404' do
+          get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
+
+          expect(response).to redirect_to('/404')
+        end
+      end
+
       context 'when POM has left' do
+        let(:page) { Nokogiri::HTML(response.body) }
+
         before do
           create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: inactive_pom_staff_id)
+          allow(HmppsApi::NomisUserRolesApi).to receive(:staff_details).with(inactive_pom_staff_id).and_return(nil)
         end
 
-        it 'redirects to the inactive POM page' do
+        render_views
+
+        it 'shows the page with an unlinked Unknown POM and allows reallocation' do
           get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
-          expect(response).to redirect_to(prison_pom_non_pom_path(prison_code, inactive_pom_staff_id))
+
+          expect(response).to have_http_status(:ok)
+          expect(response.body).to include('Allocation information')
+          expect(response.body).to include('Unknown')
+          expect(response.body).to include('Reallocate')
+          expect(response.body).not_to include(prison_pom_path(prison_code, nomis_staff_id: inactive_pom_staff_id))
         end
       end
 
       context 'with an inactive co-worker' do
+        let(:page) { Nokogiri::HTML(response.body) }
+
         before do
           create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.first.staffId, secondary_pom_nomis_id: inactive_pom_staff_id)
+          allow(HmppsApi::NomisUserRolesApi).to receive(:staff_details).and_call_original
+          allow(HmppsApi::NomisUserRolesApi).to receive(:staff_details).with(inactive_pom_staff_id).and_return(nil)
         end
 
-        it 'shows the page' do
+        render_views
+
+        it 'shows the page with an unlinked Unknown co-worker' do
           get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
+
           expect(response).to have_http_status(:ok)
+          expect(response.body).to include('Unknown')
+          expect(response.body).to include('Remove')
+          expect(response.body).not_to include(prison_pom_path(prison_code, nomis_staff_id: inactive_pom_staff_id))
         end
       end
 
@@ -152,6 +180,7 @@ RSpec.describe AllocationsController, type: :controller do
       context 'when rendering the allocation summary' do
         let(:active_pom) { poms.last }
         let(:allocation_event_date) { Time.zone.local(2026, 3, 4, 12, 0, 0) }
+        let(:page) { Nokogiri::HTML(response.body) }
 
         render_views
 
@@ -172,6 +201,13 @@ RSpec.describe AllocationsController, type: :controller do
           expect(response).to have_http_status(:ok)
           expect(response.body).to include('Allocation history')
           expect(response.body).to include("POM allocated - #{allocation_event_date.strftime('%d/%m/%Y')}")
+        end
+
+        it 'leaves the co-working POM value blank when there is no co-worker' do
+          get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
+
+          coworker_row = page.at_css('#co-working-pom td.table_cell__left_align')
+          expect(coworker_row.text.gsub(/\s+/, ' ').strip).to eq('Allocate')
         end
       end
     end
@@ -270,6 +306,7 @@ RSpec.describe AllocationsController, type: :controller do
             Timecop.travel 2.days.ago do
               ProcessDeliusDataJob.perform_now offender_no
             end
+            stub_keyworker(offender_no)
           end
 
           it 'shows the correct date on the show page' do

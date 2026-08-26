@@ -125,9 +125,9 @@
               <dt class="govuk-summary-list__key">POM email</dt>
               <dd class="govuk-summary-list__value"><%= @pom.email_address %></dd>
             </div>
-            <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
-              <dt class="govuk-summary-list__key">POM role</dt>
-              <dd class="govuk-summary-list__value"><%= @pom.position_description %></dd>
+            <div class="govuk-summary-list__row govuk-summary-list__row--no-actions" id="pom-type-row">
+              <dt class="govuk-summary-list__key">POM type</dt>
+              <dd class="govuk-summary-list__value"><%= @pom.position_description.presence || 'N/A' %></dd>
             </div>
           <% end %>
         </dl>
@@ -342,13 +342,15 @@
 
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell govuk-!-width-one-third">Co-working POM</td>
-                <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= @secondary_pom_name || 'None allocated' %></td>
+                <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2">
+                  <%= @coworker.present? ? (@coworker.full_name_ordered.presence || 'Unknown') : 'None allocated' %>
+                </td>
               </tr>
 
-              <% if @secondary_pom_name.present? %>
+              <% if @coworker.present? %>
                 <tr class="govuk-table__row">
                   <td class="govuk-table__cell govuk-!-width-one-third">Co-working POM email</td>
-                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= @secondary_pom_email %></td>
+                  <td class="govuk-table__cell govuk-!-width-two-thirds" colspan="2"><%= @coworker.email_address.presence || 'N/A' %></td>
                 </tr>
               <% end %>
 

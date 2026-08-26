@@ -138,10 +138,13 @@
         <span class="handover-reason">(<%= @prisoner.handover_reason %>)</span>
       </td>
     </tr>
-    <tr class="govuk-table__row">
+    <tr class="govuk-table__row" id="primary-pom">
       <td class="govuk-table__cell govuk-!-width-one-half">POM</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
-        <%= link_to @pom.full_name, prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: "govuk-link" %>
+        <span>
+          <%= link_to_if @pom.has_pom_role?, @pom.full_name.presence || 'Unknown',
+                         prison_pom_path(@prison.code, nomis_staff_id: @pom.staff_id), class: "govuk-link" %>
+        </span>
         <%= link_to 'Reallocate', prison_prisoner_review_case_details_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right" %>
       </td>
     </tr>
@@ -149,11 +152,12 @@
       <td class="govuk-table__cell govuk-!-width-one-half">Co-working POM</td>
       <td class="govuk-table__cell table_cell__left_align govuk-!-width-one-half">
         <% if @coworker.nil? %>
-          N/A
           <%= link_to 'Allocate', prison_prisoner_review_case_details_path(@prison.code, @prisoner.offender_no, coworking: true), class: "govuk-link pull-right" %>
         <% else %>
-          <%= link_to_if @coworker.has_pom_role?, @coworker.full_name.presence || 'Unknown',
-                         prison_pom_path(@prison.code, nomis_staff_id: @coworker.staff_id), class: "govuk-link" %>
+          <span>
+            <%= link_to_if @coworker.has_pom_role?, @coworker.full_name.presence || 'Unknown',
+                           prison_pom_path(@prison.code, nomis_staff_id: @coworker.staff_id), class: "govuk-link" %>
+          </span>
           <%= link_to 'Remove', prison_coworking_confirm_removal_path(@prison.code, @prisoner.offender_no), class: "govuk-link pull-right" %>
         <% end %>
       </td>

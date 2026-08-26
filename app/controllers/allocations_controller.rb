@@ -4,20 +4,18 @@ class AllocationsController < PrisonsApplicationController
   before_action :ensure_spo_user, except: :history
   before_action :load_prisoner
 
+  rescue_from ActiveRecord::RecordNotFound, with: :render_404
+
   def show
-    allocation = AllocationHistory.find_by!(nomis_offender_id: @prisoner.offender_no)
+    allocation = AllocationHistory.active.find_by!(nomis_offender_id: @prisoner.offender_no)
     @allocation = CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
     @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@prisoner.offender_no)
 
-    @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id, nil)
-    unless @pom.has_pom_role?
-      redirect_to prison_pom_non_pom_path(@prison.code, @pom.staff_id)
-      return
-    end
+    @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
 
     secondary_pom_nomis_id = @allocation.secondary_pom_nomis_id
     if secondary_pom_nomis_id.present?
-      @coworker = StaffMember.new(@prison, secondary_pom_nomis_id, nil)
+      @coworker = StaffMember.new(@prison, secondary_pom_nomis_id)
     end
 
     @keyworker = KeyworkerService.get_keyworker(@prisoner.offender_no)
@@ -76,5 +74,9 @@ private
 
   def load_prisoner
     @prisoner = get_offender_or_404(nomis_offender_id_from_url)
+  end
+
+  def render_404
+    redirect_to '/404'
   end
 end
