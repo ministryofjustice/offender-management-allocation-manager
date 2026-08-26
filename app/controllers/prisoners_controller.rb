@@ -52,7 +52,7 @@ class PrisonersController < PrisonsApplicationController
 
     @keyworker = KeyworkerService.get_keyworker(@prisoner.offender_no)
 
-    @coworking = params[:coworking].present?
+    @coworking = params[:coworking].present? && @allocation&.active?
   end
 
   def show
