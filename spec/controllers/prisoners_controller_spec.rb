@@ -671,26 +671,52 @@ RSpec.describe PrisonersController, type: :controller do
   describe 'when an allocation exists but is not active (no primary pom allocated)' do
     render_views
 
-    it 'can still render the page' do
-      prison = create(:prison)
-      offender = build(:nomis_offender, prisonId: prison.code)
-      offender_id = offender[:prisonerNumber]
+    let(:prison) { create(:prison) }
+    let(:offender) { build(:nomis_offender, prisonId: prison.code) }
+    let(:offender_id) { offender[:prisonerNumber] }
+    let(:coworker_staff_id) { 222_888 }
 
+    before do
       stub_offender(offender)
       stub_keyworker(offender_id)
       stub_sso_data(prison.code)
-      stub_poms(prison.code, [])
-      allow(HmppsApi::NomisUserRolesApi).to receive(:staff_details).with(222_888).and_return(nil)
+      allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_id).and_return(nil)
 
-      create(:allocation_history, nomis_offender_id: offender_id, secondary_pom_name: 'Secondary Pom', secondary_pom_nomis_id: 222_888, prison: prison.code, primary_pom_nomis_id: nil, primary_pom_name: nil)
+      create(:case_information, offender: build(:offender, nomis_offender_id: offender_id))
+    end
+
+    it 'renders show when only a co-working POM is present' do
+      stub_poms(prison.code, [])
+      allow(HmppsApi::NomisUserRolesApi).to receive(:staff_details).with(coworker_staff_id).and_return(nil)
+
+      create(:allocation_history, nomis_offender_id: offender_id, secondary_pom_name: 'Secondary Pom', secondary_pom_nomis_id: coworker_staff_id, prison: prison.code, primary_pom_nomis_id: nil, primary_pom_name: nil)
 
       get :show, params: { prison_id: prison.code, id: offender_id }
       page = Nokogiri::HTML(response.body)
 
-      expect(response.status).to be(200)
+      expect(response).to have_http_status(:ok)
       expect(assigns(:pom)).to be_nil
-      expect(assigns(:coworker)&.staff_id).to eq(222_888)
+      expect(assigns(:coworker)&.staff_id).to eq(coworker_staff_id)
       expect(page.at_css('#primary_pom_name').text.gsub(/\s+/, ' ').strip).to eq('Allocate')
+    end
+
+    it 'ignores coworking=true and renders standard review case details when there is no primary POM' do
+      allow(AllocationService).to receive(:pom_terms).and_return([])
+      allow(OffenderService).to receive(:get_mappa_details).and_return({ status: :not_found })
+      allow(RoshSummary).to receive(:for).and_return(RoshSummary.unable)
+      allow(HmppsApi::PrisonAlertsApi).to receive(:alerts_for).and_return([])
+
+      create(:allocation_history,
+             nomis_offender_id: offender_id,
+             prison: prison.code,
+             primary_pom_nomis_id: nil,
+             primary_pom_name: nil)
+
+      get :review_case_details, params: { prison_id: prison.code, prisoner_id: offender_id, coworking: true }
+
+      expect(response).to have_http_status(:ok)
+      expect(assigns(:coworking)).to be(false)
+      expect(response.body).not_to include('Primary POM:')
     end
   end
 

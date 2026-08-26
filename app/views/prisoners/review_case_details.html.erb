@@ -12,7 +12,7 @@
           Review <%= @prisoner.first_name.capitalize %> <%= @prisoner.last_name.capitalize %>'s case
         </h1>
         <% if @allocation.present? %>
-          <% if @coworking %>
+          <% if @coworking && @pom.present? %>
             <span class="govuk-caption-l govuk-!-margin-bottom-2">Primary POM: <%= @pom.full_name_ordered %></span>
           <% elsif @pom.present? %>
             <span class="govuk-caption-l govuk-!-margin-bottom-2">Currently allocated
