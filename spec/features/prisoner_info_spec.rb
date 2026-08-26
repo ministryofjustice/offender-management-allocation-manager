@@ -130,6 +130,29 @@ describe 'View a prisoner profile page' do
       within('tr', text: 'Allocation history') { click_link 'View' }
       within('.moj-timeline__item', text: 'Contact removed') { expect(page).to have_content('by MOIC POM') }
     end
+
+    context 'when signed in as a POM' do
+      before do
+        signin_pom_user([prison.code], pom.staff_id)
+        stub_pom_user(pom)
+      end
+
+      it 'hides SPO-only links in the allocation section' do
+        visit prison_prisoner_path(prison.code, 'G1234AB')
+
+        within '#primary-pom' do
+          expect(page).to have_text('A Pom')
+          expect(page).not_to have_link('A Pom', href: prison_pom_path(prison.code, nomis_staff_id: pom.staff_id))
+          expect(page).not_to have_link('Reallocate')
+          expect(page).not_to have_link('Allocate')
+        end
+
+        within '#co-working-pom' do
+          expect(page).not_to have_link('Allocate')
+          expect(page).not_to have_link('Remove')
+        end
+      end
+    end
   end
 
   context 'when case is outside omic policy' do

@@ -31,7 +31,7 @@ RSpec.describe "allocations/show", type: :view do
 
   before do
     assign(:prison, prison)
-    assign(:pom, build(:pom))
+    assign(:pom, instance_double(StaffMember, has_pom_role?: true, full_name: 'Pom Name', staff_id: 485_926))
     assign(:prisoner, offender)
     assign(:allocation, create(:allocation_history, prison: build(:prison).code))
     assign(:keyworker, build(:keyworker))

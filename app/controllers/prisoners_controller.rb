@@ -45,9 +45,8 @@ class PrisonersController < PrisonsApplicationController
         @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
       end
 
-      if @allocation.secondary_pom_name.present?
-        @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id)
-        @secondary_pom_email = PrisonOffenderManagerService.fetch_pom_email(@allocation.secondary_pom_nomis_id)
+      if @allocation.secondary_pom_nomis_id.present?
+        @coworker = StaffMember.new(@prison, @allocation.secondary_pom_nomis_id)
       end
     end
 
@@ -66,11 +65,11 @@ class PrisonersController < PrisonsApplicationController
     @oasys_assessment = HmppsApi::AssessRisksAndNeedsApi.get_latest_oasys_date(@prisoner.offender_no)
 
     if @allocation.present? && @allocation.primary_pom_nomis_id.present?
-      @primary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.primary_pom_nomis_id)
+      @pom = StaffMember.new(@prison, @allocation.primary_pom_nomis_id)
     end
 
     if @allocation.present? && @allocation.secondary_pom_nomis_id.present?
-      @secondary_pom_name = PrisonOffenderManagerService.fetch_pom_name(@allocation.secondary_pom_nomis_id)
+      @coworker = StaffMember.new(@prison, @allocation.secondary_pom_nomis_id)
     end
 
     @keyworker = KeyworkerService.get_keyworker(@prisoner.offender_no)
