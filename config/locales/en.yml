@@ -154,7 +154,6 @@ en:
               blank: Enter an email address in the correct format, like name@example.com
               invalid: Enter an email address in the correct format, like name@example.com
         early_allocation:
-          # This is a Rails 6 feature (to customise messages per-model)
           format: "%{message}"
           attributes:
 #           These attributes are all 'inclusion' because booleans are validated in: [true false] otherwise No isn't accepted
@@ -165,6 +164,14 @@ en:
               inclusion: You must say if this referral has been approved
             community_decision:
               inclusion: You must say whether the community has accepted this case or not
+        parole_review:
+          format: "%{message}"
+          attributes:
+            hearing_outcome_received_on:
+              blank: The date the hearing outcome was confirmed must be entered and a valid date
+              invalid: The date the hearing outcome was confirmed must be a valid date
+              too_old: The date the hearing outcome was confirmed must be a valid date
+              in_future: The date the hearing outcome was confirmed must be in the past
 
   shared:
     unavailable_poms:

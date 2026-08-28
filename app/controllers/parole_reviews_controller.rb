@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 class ParoleReviewsController < PrisonsApplicationController
-  before_action :load_offender, :load_parole_review_record
+  before_action :load_offender, :load_parole_review_record, :ensure_editable_parole_review
 
   def edit; end
 
   def update
-    @parole_review.update(parole_review_params)
+    @parole_review.assign_attributes(parole_review_params)
 
-    if @parole_review.valid?(:manual_update)
+    if @parole_review.save(context: :manual_update)
       RecalculateHandoverDateJob.perform_now(@offender.offender_no, trigger_method: 'parole_review')
-      redirect_to prison_prisoner_path(prison: @prison, id: @offender.offender_no)
+      redirect_to helpers.prisoner_path_for_role(@prison, @offender)
     else
       render :edit
     end
@@ -23,7 +23,13 @@ private
   end
 
   def load_parole_review_record
-    @parole_review = ParoleReview.find_by!(review_id: params[:id])
+    @parole_review = ParoleReview.find_by!(review_id: params[:id], nomis_offender_id: @offender.offender_no)
+  end
+
+  def ensure_editable_parole_review
+    return if @parole_review.hearing_outcome_received_on.blank? && !@parole_review.no_hearing_outcome?
+
+    redirect_to '/404'
   end
 
   def parole_review_params

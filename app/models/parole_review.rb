@@ -1,4 +1,8 @@
 class ParoleReview < ApplicationRecord
+  include Auditable
+
+  after_commit :save_audit_event, on: :update, if: :auditable_user_update?
+
   belongs_to :offender, foreign_key: :nomis_offender_id, inverse_of: :parole_reviews, optional: true
   has_one :previous_review
 
@@ -34,11 +38,13 @@ class ParoleReview < ApplicationRecord
   # Used when POM manually enters this date
   def hearing_outcome_received_on_must_be_in_past
     if hearing_outcome_received_on.blank?
-      errors.add('hearing_outcome_received_on',
-                 'The date the hearing outcome was confirmed must be entered and a valid date')
+      errors.add(:hearing_outcome_received_on, :blank)
+    elsif invalid_hearing_outcome_date_parts?
+      errors.add(:hearing_outcome_received_on, :invalid)
+    elsif hearing_outcome_received_on < 10.years.ago.to_date
+      errors.add(:hearing_outcome_received_on, :too_old)
     elsif hearing_outcome_received_on.future?
-      errors.add('hearing_outcome_received_on',
-                 'The date the hearing outcome was confirmed must be in the past')
+      errors.add(:hearing_outcome_received_on, :in_future)
     end
   end
 
@@ -85,5 +91,38 @@ class ParoleReview < ApplicationRecord
 
   def active?
     ACTIVE_REVIEW_STATUS.include? review_status
+  end
+
+private
+
+  def auditable_user_update?
+    PaperTrail.request.whodunnit.present?
+  end
+
+  def audit_event_tags
+    %w[record parole_review].freeze
+  end
+
+  def audit_additional_data
+    {
+      'review_id' => review_id,
+      'review_type' => review_type,
+      'review_status' => review_status,
+      'hearing_outcome' => hearing_outcome,
+    }
+  end
+
+  def invalid_hearing_outcome_date_parts?
+    date_parts = read_attribute_before_type_cast('hearing_outcome_received_on')
+    return false unless date_parts.is_a?(Hash)
+
+    year = date_parts[1] || date_parts['1']
+    month = date_parts[2] || date_parts['2']
+    day = date_parts[3] || date_parts['3']
+    return false if [year, month, day].any?(&:blank?)
+
+    Date.new(year.to_i, month.to_i, day.to_i) != hearing_outcome_received_on
+  rescue Date::Error
+    true
   end
 end
