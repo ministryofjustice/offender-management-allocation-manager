@@ -73,6 +73,7 @@ module OffenderManagementAllocationClient
     config.x.simplified_handover_cutoff_date = Date.parse(
       ENV.fetch('SIMPLIFIED_HANDOVER_CUTOFF_DATE', '2026-09-01')
     )
+    config.x.simplified_handover_enable_date = config.x.simplified_handover_cutoff_date
 
     config.time_zone = 'London'
 

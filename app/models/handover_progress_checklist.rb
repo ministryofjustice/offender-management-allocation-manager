@@ -14,11 +14,12 @@ class HandoverProgressChecklist < ApplicationRecord
   delegate :handover_type, :handover_date, to: :offender
 
   def self.permitted_task_fields(handover_type:, handover_date:)
-    cutoff = Rails.configuration.x.simplified_handover_cutoff_date
+    cutoff_date = Rails.configuration.x.simplified_handover_cutoff_date
+    enable_date = Rails.configuration.x.simplified_handover_enable_date
 
     if handover_type != 'enhanced'
       STANDARD_HANDOVER_TASK_FIELDS
-    elsif FeatureFlags.simplified_enhanced_handover.enabled? && handover_date.present? && handover_date >= cutoff
+    elsif Date.current >= enable_date && handover_date.present? && handover_date >= cutoff_date
       SIMPLIFIED_ENHANCED_HANDOVER_TASK_FIELDS
     else
       ENHANCED_HANDOVER_TASK_FIELDS

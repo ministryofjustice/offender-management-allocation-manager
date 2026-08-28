@@ -13,6 +13,3 @@ feature_flags:
   rosh_recommendations:
     staging: true
     preprod: true
-  simplified_enhanced_handover:
-    staging: true
-    preprod: true

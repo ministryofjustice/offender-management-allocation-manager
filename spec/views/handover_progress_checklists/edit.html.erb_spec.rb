@@ -27,6 +27,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
   let(:page) { Capybara::Node::Simple.new(rendered) }
 
   before do
+    allow(Date).to receive(:current).and_return(cutoff_date - 1.day)
     offender # instantiate and stub
 
     assign(:prison, prison)
@@ -123,6 +124,7 @@ RSpec.describe 'handover_progress_checklists/edit' do
 
   describe 'when handover date is on or after the cutoff (2-task version)' do
     before do
+      allow(Date).to receive(:current).and_return(cutoff_date)
       allow(handover_progress_checklist.offender).to receive_messages(handover_date: cutoff_date) if handover_progress_checklist.offender
     end
 
