@@ -9,7 +9,6 @@ class ParoleReviewsController < PrisonsApplicationController
     @parole_review.assign_attributes(parole_review_params)
 
     if @parole_review.save(context: :manual_update)
-      RecalculateHandoverDateJob.perform_now(@offender.offender_no, trigger_method: 'parole_review')
       redirect_to helpers.prisoner_path_for_role(@prison, @offender)
     else
       render :edit

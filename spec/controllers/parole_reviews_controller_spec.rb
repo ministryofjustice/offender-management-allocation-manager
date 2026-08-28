@@ -52,8 +52,7 @@ RSpec.describe ParoleReviewsController, type: :controller do
         }
       end
 
-      it 'enqueues the job and redirects to the offender' do
-        expect(RecalculateHandoverDateJob).to receive(:perform_now).with(offender.offender_no, trigger_method: 'parole_review')
+      it 'redirects to the offender path for the current role' do
         expect(controller.helpers).to receive(:prisoner_path_for_role).with(instance_of(Prison), offender).and_return('/dynamic-prisoner-path')
 
         patch :update, params: {
@@ -71,8 +70,7 @@ RSpec.describe ParoleReviewsController, type: :controller do
         allow(parole_review).to receive(:save).with(context: :manual_update).and_return(false)
       end
 
-      it 'does not enqueue the job and renders the edit template' do
-        expect(RecalculateHandoverDateJob).not_to receive(:perform_now)
+      it 'renders the edit template' do
         patch :update, params: {
           prison_id: prison, prisoner_id: offender.offender_no, id: parole_review.review_id, parole_review: invalid_params.to_h
         }
