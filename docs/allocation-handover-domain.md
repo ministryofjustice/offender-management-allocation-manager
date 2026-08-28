@@ -184,10 +184,9 @@ The handover calculation does not use all the release dates NOMIS holds — it u
 
 Responsibility is not a static label — it changes automatically over time as a prisoner gets closer to release. However, the system does not recalculate it on every page load. Instead, the dates are persisted and refreshed in the background.
 
-Handover dates are persisted in `calculated_handover_dates` and recomputed by [`RecalculateHandoverDateJob`](../app/jobs/recalculate_handover_date_job.rb), which is triggered in three ways:
+Handover dates are persisted in `calculated_handover_dates` and recomputed by [`RecalculateHandoverDateJob`](../app/jobs/recalculate_handover_date_job.rb), which is triggered via:
 
 - **Nightly cron** — a scheduled Kubernetes job runs `rake recalculate_handover_dates` every weekday at 07:00, queuing the job for every active offender. This is the primary mechanism by which responsibility transitions (e.g. from `CustodyOnly` to `CustodyWithCom`) are picked up as time passes.
-- **Parole review saved** — when a parole review is recorded via [`ParoleReviewsController`](../app/controllers/parole_reviews_controller.rb), the job runs immediately for that offender.
 - **Early allocation saved** — when an early allocation decision is made via [`EarlyAllocationService`](../app/services/early_allocation_service.rb), the job runs immediately for that offender.
 
 > **Note:** inbound domain events (probation changes, tier changes, prisoner status changes) do **not** directly trigger handover recalculation. `TierChangeHandler` only updates `CaseInformation#tier`; `ProbationChangeHandler` only updates `CaseInformation` fields (COM name, MAPPA level, etc.). The nightly cron picks up the downstream effect of those changes the following morning.
