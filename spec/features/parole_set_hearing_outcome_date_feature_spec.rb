@@ -8,6 +8,8 @@ RSpec.describe 'Parole set hearing outcome date', type: :feature do
 
   before do
     stub_keyworker(offender_no)
+    allow_any_instance_of(MpcOffender).to receive(:mappa_details).and_return(status: :not_found)
+    allow_any_instance_of(MpcOffender).to receive(:rosh_summary).and_return(RoshSummary.missing)
     stub_signin_spo(pom, [prison_code])
     stub_onboarded_poms(prison_code, [pom])
     stub_offender(nomis_offender)
@@ -28,27 +30,18 @@ RSpec.describe 'Parole set hearing outcome date', type: :feature do
       text: "This is the date that PPCS sent the ‘outcome of Parole Board decision’ letter")
   end
 
-  it 'displays an error if date is in the future' do
+  it 'displays an error if date is invalid' do
     click_link 'Enter the date'
 
-    fill_in 'Day', with: '1'
-    fill_in 'Month', with: '1'
-    fill_in 'Year', with: (Time.zone.today.year + 1).to_s
+    fill_in 'Day', with: '31'
+    fill_in 'Month', with: '2'
+    fill_in 'Year', with: '2020'
 
     click_button('Save')
 
-    expect(page).to have_content('must be in the past')
-  end
-
-  it 'displays an error if date is incomplete' do
-    click_link 'Enter the date'
-
-    fill_in 'Day', with: '1'
-    fill_in 'Month', with: '1'
-
-    click_button('Save')
-
-    expect(page).to have_content('and a valid date')
+    expect(page).to have_content('must be a valid date')
+    expect(page).to have_button('Save')
+    expect(page).not_to have_css('.govuk-table__cell', text: 'Mar 2020')
   end
 
   it 'displays on prisoner once filled' do
@@ -56,11 +49,12 @@ RSpec.describe 'Parole set hearing outcome date', type: :feature do
 
     fill_in 'Day', with: '1'
     fill_in 'Month', with: '1'
-    fill_in 'Year', with: '2001'
+    year = Time.zone.today.year - 1
+    fill_in 'Year', with: year.to_s
 
     click_button('Save')
 
-    expect(page).to have_css('.govuk-table__cell', text: /#{parole_review.hearing_outcome}/i)
-    expect(page).to have_css('.govuk-table__cell', text: 'Jan 2001')
+    expect(page).to have_current_path(prison_prisoner_review_case_details_path(prison_code, offender_no))
+    expect(parole_review.reload.hearing_outcome_received_on).to eq(Date.new(year, 1, 1))
   end
 end

@@ -106,17 +106,103 @@ RSpec.describe ParoleReview, type: :model do
     it 'validates that the hearing_outcome_received_on is in the past' do
       subject.hearing_outcome_received_on = 1.week.from_now
       subject.valid?(:manual_update)
-      expect(subject.errors[:hearing_outcome_received_on]).to include(
-        'The date the hearing outcome was confirmed must be in the past'
-      )
+      expect(subject.errors.details[:hearing_outcome_received_on]).to include(error: :in_future)
     end
 
     it 'validates that the hearing_outcome_received_on is present' do
       subject.hearing_outcome_received_on = nil
       subject.valid?(:manual_update)
-      expect(subject.errors[:hearing_outcome_received_on]).to include(
-        'The date the hearing outcome was confirmed must be entered and a valid date'
+      expect(subject.errors.details[:hearing_outcome_received_on]).to include(error: :blank)
+    end
+
+    it 'validates that the hearing_outcome_received_on is not older than 10 years' do
+      subject.hearing_outcome_received_on = 10.years.ago.to_date - 1.day
+      subject.valid?(:manual_update)
+      expect(subject.errors.details[:hearing_outcome_received_on]).to include(error: :too_old)
+    end
+
+    it 'allows a hearing_outcome_received_on within the last 10 years' do
+      subject.hearing_outcome_received_on = 10.years.ago.to_date
+      subject.valid?(:manual_update)
+
+      expect(subject.errors[:hearing_outcome_received_on]).to be_empty
+    end
+
+    it 'rejects invalid multipart dates that would otherwise roll over' do
+      subject.assign_attributes(
+        'hearing_outcome_received_on(1i)' => '2020',
+        'hearing_outcome_received_on(2i)' => '2',
+        'hearing_outcome_received_on(3i)' => '31',
       )
+
+      subject.valid?(:manual_update)
+
+      expect(subject.errors.details[:hearing_outcome_received_on]).to include(error: :invalid)
+    end
+  end
+
+  describe 'auditing' do
+    let!(:parole_review) { create(:parole_review, :pom_task) }
+
+    it 'does not publish an audit event when whodunnit is blank (date update)' do
+      PaperTrail.request(whodunnit: nil) do
+        expect {
+          parole_review.update!(hearing_outcome_received_on: Time.zone.today - 1.day)
+        }.not_to change(AuditEvent, :count)
+      end
+    end
+
+    it 'does not publish an audit event when whodunnit is blank (non-date update)' do
+      PaperTrail.request(whodunnit: nil) do
+        expect {
+          parole_review.update!(review_status: 'Inactive')
+        }.not_to change(AuditEvent, :count)
+      end
+    end
+
+    it 'publishes an audit event for manual date updates' do
+      PaperTrail.request(whodunnit: 'MOIC_POM') do
+        expect {
+          parole_review.assign_attributes(hearing_outcome_received_on: Time.zone.today - 1.day)
+          parole_review.save!(context: :manual_update)
+        }.to change(AuditEvent, :count).by(1)
+      end
+
+      audit = AuditEvent.order(:created_at).last
+
+      aggregate_failures do
+        expect(audit.tags).to include('record', 'parole_review', 'changed')
+        expect(audit.data['review_id']).to eq(parole_review.review_id)
+        expect(audit.data['review_type']).to eq(parole_review.review_type)
+        expect(audit.data['review_status']).to eq(parole_review.review_status)
+        expect(audit.data['hearing_outcome']).to eq(parole_review.hearing_outcome)
+        expect(audit.data['before']).to include('hearing_outcome_received_on' => nil)
+        expect(audit.data['after']).to include('hearing_outcome_received_on' => (Time.zone.today - 1.day).to_s)
+      end
+    end
+
+    it 'publishes an audit event when another user-triggered field changes' do
+      PaperTrail.request(whodunnit: 'MOIC_POM') do
+        expect {
+          parole_review.update!(review_status: 'Inactive')
+        }.to change(AuditEvent, :count).by(1)
+      end
+
+      audit = AuditEvent.order(:created_at).last
+
+      aggregate_failures do
+        expect(audit.tags).to include('record', 'parole_review', 'changed')
+        expect(audit.data['before']).to include('review_status' => 'Active')
+        expect(audit.data['after']).to include('review_status' => 'Inactive')
+      end
+    end
+
+    it 'does not publish an audit event on destroy' do
+      PaperTrail.request(whodunnit: 'MOIC_POM') do
+        expect {
+          parole_review.destroy!
+        }.not_to change(AuditEvent, :count)
+      end
     end
   end
 end

@@ -35,7 +35,7 @@ class ParoleDataProcessService
       log('No MPC offender matches NOMIS ID', import_row_id: import_row.id, nomis_offender_id: import_row.sanitized_nomis_id)
     else
       begin
-        record = ParoleReview.find_or_initialize_by(review_id: import_row.review_id, nomis_offender_id: import_row.sanitized_nomis_id)
+        record = find_or_initialize_parole_review(import_row)
 
         hearing_outcome_received_on = if record.hearing_outcome_received_on.present?
                                         record.hearing_outcome_received_on
@@ -56,6 +56,8 @@ class ParoleDataProcessService
           record.id.present? ? @results[:parole_reviews_updated_count] += 1 : @results[:parole_reviews_created_count] += 1
           record.save
         end
+
+        deduplicate_parole_reviews(record)
       rescue StandardError => e
         @results[:other_error_count] += 1
         log("Error importing parole review: #{e}", import_row_id: import_row.id, nomis_offender_id: import_row.sanitized_nomis_id, level: :error)
@@ -70,6 +72,33 @@ private
 
   def self.format_results
     @results.map { |k, v| "#{k}: #{v}" }.join(', ')
+  end
+
+  # Prefer an existing row already under the current NOMIS ID for this review.
+  # If none exists, reuse the newest row for the same review_id to avoid
+  # creating split records when NOMIS IDs change upstream (i.e. merges)
+  def self.find_or_initialize_parole_review(import_row)
+    review_id = import_row.review_id
+    nomis_offender_id = import_row.sanitized_nomis_id
+
+    record = ParoleReview.find_by(review_id:, nomis_offender_id:) ||
+             ParoleReview.where(review_id:).order(updated_at: :desc).first ||
+             ParoleReview.new(review_id:)
+
+    record.nomis_offender_id = nomis_offender_id
+    record
+  end
+
+  def self.deduplicate_parole_reviews(record)
+    return if record.new_record?
+
+    deleted_count = ParoleReview.where(review_id: record.review_id).where.not(id: record.id).delete_all
+    return if deleted_count.zero?
+
+    log(
+      "Deduplicated parole reviews for review_id=#{record.review_id},deleted=#{deleted_count}",
+      nomis_offender_id: record.nomis_offender_id
+    )
   end
 
   def self.log(msg, import_row_id: nil, nomis_offender_id: nil, level: :info)

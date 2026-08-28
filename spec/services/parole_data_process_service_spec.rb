@@ -252,7 +252,7 @@ RSpec.describe ParoleDataProcessService do
                                     final_result: 'Not Applicable',
                                     snapshot_date: snapshot_date)
 
-      allow(ParoleReview).to receive(:find_or_initialize_by).and_raise(StandardError)
+      allow(ParoleReview).to receive(:find_by).and_raise(StandardError)
       allow(Rails.logger).to receive(:error)
     end
 
@@ -295,6 +295,93 @@ RSpec.describe ParoleDataProcessService do
 
       parole_review = ParoleReview.find_by(nomis_offender_id: 'A1111AA')
       expect(parole_review.target_hearing_date).to eq(Date.parse('10/10/2021'))
+    end
+  end
+
+  describe 'deduplication when NOMIS IDs change (potential merge)' do
+    let(:old_nomis_id) { 'Z1111ZZ' }
+    let(:new_nomis_id) { 'Z2222ZZ' }
+
+    before do
+      create(:offender, nomis_offender_id: old_nomis_id)
+      create(:offender, nomis_offender_id: new_nomis_id)
+
+      create(:parole_review_import,
+             nomis_id: old_nomis_id,
+             review_date: '29-10-2025',
+             review_id: '1182067',
+             review_milestone_date_id: '12345678',
+             review_status: 'Active - Referred',
+             curr_target_date: '29-10-2025',
+             ms13_target_date: '23-05-2025',
+             final_result: 'Not Applicable',
+             snapshot_date: snapshot_date)
+
+      described_class.process
+
+      create(:parole_review_import,
+             nomis_id: new_nomis_id,
+             review_date: '29-10-2025',
+             review_id: '1182067',
+             review_milestone_date_id: '12345678',
+             review_status: 'Active - Referred',
+             curr_target_date: '29-10-2025',
+             ms13_target_date: '28-05-2025',
+             final_result: 'Not Applicable',
+             snapshot_date: snapshot_date + 1.day)
+    end
+
+    it 'keeps a single parole review row and updates it to the new NOMIS ID' do
+      results
+
+      reviews = ParoleReview.where(review_id: 1_182_067)
+      expect(reviews.count).to eq(1)
+      expect(reviews.first.nomis_offender_id).to eq(new_nomis_id)
+    end
+  end
+
+  describe 'deduplication of historical split rows' do
+    let(:old_nomis_id) { 'Z1111ZZ' }
+    let(:new_nomis_id) { 'Z2222ZZ' }
+
+    before do
+      old_offender = create(:offender, nomis_offender_id: old_nomis_id)
+      new_offender = create(:offender, nomis_offender_id: new_nomis_id)
+
+      create(:parole_review,
+             offender: old_offender,
+             review_id: 1_182_067,
+             target_hearing_date: Date.new(2025, 10, 29),
+             custody_report_due: Date.new(2025, 5, 23),
+             review_status: 'Active - Referred',
+             hearing_outcome: 'Not Applicable')
+
+      create(:parole_review,
+             offender: new_offender,
+             review_id: 1_182_067,
+             target_hearing_date: Date.new(2025, 10, 29),
+             custody_report_due: Date.new(2025, 5, 28),
+             review_status: 'Active - Referred',
+             hearing_outcome: 'Not Applicable')
+
+      create(:parole_review_import,
+             nomis_id: new_nomis_id,
+             review_date: '29-10-2025',
+             review_id: '1182067',
+             review_milestone_date_id: '12345678',
+             review_status: 'Active - Referred',
+             curr_target_date: '29-10-2025',
+             ms13_target_date: '28-05-2025',
+             final_result: 'Not Applicable',
+             snapshot_date: snapshot_date)
+    end
+
+    it 'collapses duplicates to a single row for the review_id' do
+      results
+
+      reviews = ParoleReview.where(review_id: 1_182_067)
+      expect(reviews.count).to eq(1)
+      expect(reviews.first.nomis_offender_id).to eq(new_nomis_id)
     end
   end
 end
