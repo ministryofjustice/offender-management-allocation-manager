@@ -1,6 +1,7 @@
 class HandoverProgressChecklist < ApplicationRecord
   include Auditable
 
+  SIMPLIFIED_ENHANCED_HANDOVER_CUTOFF_DATE = Date.parse('2026-09-01')
   SIMPLIFIED_ENHANCED_HANDOVER_TASK_FIELDS = %w[reviewed_oasys contacted_com].freeze
   ENHANCED_HANDOVER_TASK_FIELDS = %w[reviewed_oasys contacted_com attended_handover_meeting].freeze
   STANDARD_HANDOVER_TASK_FIELDS = %w[contacted_com sent_handover_report].freeze
@@ -14,12 +15,9 @@ class HandoverProgressChecklist < ApplicationRecord
   delegate :handover_type, :handover_date, to: :offender
 
   def self.permitted_task_fields(handover_type:, handover_date:)
-    cutoff_date = Rails.configuration.x.simplified_handover_cutoff_date
-    enable_date = Rails.configuration.x.simplified_handover_enable_date
-
     if handover_type != 'enhanced'
       STANDARD_HANDOVER_TASK_FIELDS
-    elsif Date.current >= enable_date && handover_date.present? && handover_date >= cutoff_date
+    elsif handover_date.present? && handover_date >= SIMPLIFIED_ENHANCED_HANDOVER_CUTOFF_DATE
       SIMPLIFIED_ENHANCED_HANDOVER_TASK_FIELDS
     else
       ENHANCED_HANDOVER_TASK_FIELDS

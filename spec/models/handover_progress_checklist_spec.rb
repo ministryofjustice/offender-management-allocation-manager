@@ -1,10 +1,9 @@
 RSpec.describe HandoverProgressChecklist do
   subject(:checklist) { described_class.new offender: FactoryBot.build(:offender) }
 
-  let(:cutoff_date) { Rails.configuration.x.simplified_handover_cutoff_date }
+  let(:cutoff_date) { described_class::SIMPLIFIED_ENHANCED_HANDOVER_CUTOFF_DATE }
 
   before do
-    allow(Date).to receive(:current).and_return(cutoff_date - 1.day)
     allow(checklist.offender).to receive_messages(handover_type: 'enhanced')
   end
 
@@ -17,37 +16,21 @@ RSpec.describe HandoverProgressChecklist do
                )).to eq(%i[reviewed_oasys contacted_com attended_handover_meeting])
       end
 
-      it 'returns 2-task fields when current date and handover_date are on or after the cutoff' do
-        allow(Date).to receive(:current).and_return(cutoff_date)
-
+      it 'returns 2-task fields when handover_date is on or after the cutoff' do
         expect(described_class.permitted_task_fields(
                  handover_type: 'enhanced',
                  handover_date: cutoff_date,
                )).to eq(%i[reviewed_oasys contacted_com])
       end
 
-      it 'returns 3-task fields when handover_date is on or after cutoff but current date is before cutoff' do
-        allow(Date).to receive(:current).and_return(cutoff_date - 1.day)
-
+      it 'returns 2-task fields when handover_date is after the cutoff' do
         expect(described_class.permitted_task_fields(
                  handover_type: 'enhanced',
                  handover_date: cutoff_date + 1.day,
-               )).to eq(%i[reviewed_oasys contacted_com attended_handover_meeting])
-      end
-
-      it 'returns 2-task fields when current date is on or after enable_date and handover_date is on or after cutoff' do
-        allow(Rails.configuration.x).to receive(:simplified_handover_enable_date).and_return(cutoff_date - 7.days)
-        allow(Date).to receive(:current).and_return(cutoff_date - 1.day)
-
-        expect(described_class.permitted_task_fields(
-                 handover_type: 'enhanced',
-                 handover_date: cutoff_date,
                )).to eq(%i[reviewed_oasys contacted_com])
       end
 
-      it 'returns 3-task fields when handover_date is nil (default)' do
-        allow(Date).to receive(:current).and_return(cutoff_date)
-
+      it 'returns 3-task fields when handover_date is nil' do
         expect(described_class.permitted_task_fields(
                  handover_type: 'enhanced',
                  handover_date: nil,
@@ -140,7 +123,6 @@ RSpec.describe HandoverProgressChecklist do
 
   context 'when enhanced handover date is on or after the cutoff (2-task version)' do
     before do
-      allow(Date).to receive(:current).and_return(cutoff_date)
       allow(checklist.offender).to receive_messages(handover_date: cutoff_date)
     end
 
