@@ -84,11 +84,7 @@ RSpec.describe HandoverProgressChecklistsController do
   end
 
   describe '#update' do
-    let(:cutoff_date) { Rails.configuration.x.simplified_handover_cutoff_date }
-
-    before do
-      allow(Date).to receive(:current).and_return(cutoff_date - 1.day)
-    end
+    let(:cutoff_date) { HandoverProgressChecklist::SIMPLIFIED_ENHANCED_HANDOVER_CUTOFF_DATE }
 
     describe 'when offender exists' do
       describe 'when current POM is not the allocated POM' do
@@ -188,10 +184,6 @@ RSpec.describe HandoverProgressChecklistsController do
         let!(:offender) do
           stub_mpc_offender(offender_no: nomis_offender_id, handover_type: 'enhanced',
                             model: double(handover_date: cutoff_date))
-        end
-
-        before do
-          allow(Date).to receive(:current).and_return(cutoff_date)
         end
 
         it 'persists only the simplified task fields' do
