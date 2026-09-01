@@ -321,10 +321,6 @@ RSpec.configure do |config|
           description: 'Retrieve handover dates and current responsibility between prison and probation',
         },
         {
-          name: 'Offenders',
-          description: 'Retrieve prisoner-level data exposed by Manage POM Cases APIs',
-        },
-        {
           name: 'Subject Access Request',
           description: 'SAR endpoints for retrieving service data and the Mustache template used by the SAR HTML renderer',
         },

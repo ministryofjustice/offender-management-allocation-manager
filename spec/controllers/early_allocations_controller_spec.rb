@@ -37,7 +37,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     stub_onboarded_poms(prison, poms)
     stub_filtered_pom(prison, first_pom)
     stub_offenders_for_prison(prison, [offender])
-    allow(EarlyAllocationService).to receive(:process_eligibility_change)
+    allow(RecalculateHandoverDateJob).to receive(:perform_now)
     create(:allocation_history, prison: prison, nomis_offender_id: nomis_offender_id, primary_pom_nomis_id: nomis_staff_id)
   end
 
@@ -111,14 +111,13 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
     describe '#update' do
       let(:early_allocation) { assigns(:early_allocation) }
-      let(:early_allocation_datum) { CalculatedEarlyAllocationStatus.find(nomis_offender_id) }
 
-      it 'updates the updated_by_ fields and processes the eligibility change' do
+      it 'updates the updated_by_ fields and recalculates handover dates' do
         put :update, params: { prison_id: prison, prisoner_id: nomis_offender_id, early_allocation: { community_decision: true } }
         aggregate_failures do
           expect(early_allocation.updated_by_firstname).to eq(first_pom.firstName)
           expect(early_allocation.updated_by_lastname).to eq(first_pom.lastName)
-          expect(EarlyAllocationService).to have_received(:process_eligibility_change).with(mpc_offender)
+          expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id, trigger_method: 'early_allocation')
         end
       end
     end
@@ -141,7 +140,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
     end
   end
 
-  describe '#create', :disable_early_allocation_event do
+  describe '#create' do
     context 'when on eligible screen' do
       let(:eligible_params) do
         { "oasys_risk_assessment_date" => valid_date,

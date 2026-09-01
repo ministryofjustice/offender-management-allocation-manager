@@ -50,10 +50,6 @@ RSpec.configure do |config|
     page.driver.browser.manage.window.resize_to(1280, 3072)
   end
 
-  config.before(:each, :disable_early_allocation_event) do
-    allow(EarlyAllocationService).to receive(:send_early_allocation)
-  end
-
   config.before(:each) do
     DatabaseCleaner.strategy = :transaction
   end
