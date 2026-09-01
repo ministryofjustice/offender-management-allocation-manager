@@ -195,7 +195,6 @@ Rails.application.routes.draw do
 
   namespace :api do
     get('/' => 'api#index')
-    resources :offenders, only: [:show], param: :nomis_offender_id
     resources :handovers, only: [:show], controller: :handovers_api
   end
 

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-feature "early allocation", :disable_early_allocation_event, type: :feature do
+feature "early allocation", type: :feature do
   let(:nomis_staff_id) { 485_926 }
   # any date less than 3 months
   let(:valid_date) { Time.zone.today - 2.months }
@@ -28,7 +28,6 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
     visit prison_staff_caseload_cases_path(prison, nomis_staff_id)
 
     allow_any_instance_of(MpcOffender).to receive_messages(handover_type: 'enhanced')
-    allow(EarlyAllocationService).to receive(:send_early_allocation)
     allow(RecalculateHandoverDateJob).to receive(:perform_now)
     allow(RecalculateHandoverDateJob).to receive(:perform_later)
 
@@ -125,8 +124,6 @@ feature "early allocation", :disable_early_allocation_event, type: :feature do
             click_link 'View assessment'
             expect(page).to have_text 'View previous early allocation assessment'
 
-            expect(EarlyAllocationService).to have_received(:send_early_allocation).with(
-              CalculatedEarlyAllocationStatus.find_by_nomis_offender_id(nomis_offender_id))
             expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id, trigger_method: 'early_allocation')
           end
 

@@ -389,8 +389,6 @@ tags:
 - name: Handovers
   description: Retrieve handover dates and current responsibility between prison and
     probation
-- name: Offenders
-  description: Retrieve prisoner-level data exposed by Manage POM Cases APIs
 - name: Subject Access Request
   description: SAR endpoints for retrieving service data and the Mustache template
     used by the SAR HTML renderer
@@ -573,58 +571,6 @@ paths:
                     nullable: true
         '404':
           description: Handover information for offender not found
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/Status"
-  "/api/offenders/{nomsNumber}":
-    get:
-      summary: Retrieves information for a prisoner including early allocation status
-      security:
-      - Bearer: []
-      tags:
-      - Offenders
-      description: |-
-        Returns prisoner information exposed by Manage POM Cases for the supplied prisoner number, including whether the prisoner currently has early allocation eligibility.
-
-        Authentication requirements:
-        * A valid Bearer token must be supplied in the Authorization header.
-        * The role ROLE_VIEW_POM_ALLOCATIONS is required.
-      parameters:
-      - name: nomsNumber
-        in: path
-        schema:
-          "$ref": "#/components/schemas/NomsNumber"
-        description: NOMIS Prison Number for the prisoner
-        required: true
-      responses:
-        '401':
-          description: Request is not authorised
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/Status"
-        '200':
-          description: Offender has an early allocation
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  offender_no:
-                    "$ref": "#/components/schemas/NomsNumber"
-                  nomsNumber:
-                    "$ref": "#/components/schemas/NomsNumber"
-                  early_allocation_eligibility_status:
-                    type: boolean
-                    description: true if prisoner is subject to early allocation,
-                      and so has an early handover date
-                required:
-                - offender_no
-                - nomsNumber
-                - early_allocation_eligibility_status
-        '404':
-          description: Offender not found
           content:
             application/json:
               schema:

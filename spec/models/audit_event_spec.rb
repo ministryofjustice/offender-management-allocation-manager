@@ -32,6 +32,19 @@ RSpec.describe AuditEvent do
       expect(line).to match(/tag1.+tag2/)
     end
 
+    it 'does not log the audit event when the surrounding transaction rolls back' do
+      allow(Rails.logger).to receive(:info)
+
+      expect {
+        described_class.transaction do
+          described_class.publish(**attributes)
+          raise ActiveRecord::Rollback
+        end
+      }.not_to change(described_class, :count)
+
+      expect(Rails.logger).not_to have_received(:info).with(a_string_matching(/event=audit_event_published/))
+    end
+
     it 'saves a created_at date' do
       record = described_class.publish(**attributes)
       expect(record.created_at).to be_within(1.second).of(Time.zone.now.utc)
