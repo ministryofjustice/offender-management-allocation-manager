@@ -159,5 +159,33 @@ RSpec.describe DebuggingController, type: :controller do
       expect(log_items[1].then { [it.class, it.tags] }).to eq([AuditEvent, %w[event tag two]])
       expect(log_items[2].then { [it.class, it.tags] }).to eq([AuditEvent, %w[event tag one]])
     end
+
+    it 'includes predecessor NOMIS ID audit events for merged offenders' do
+      old_id = 'A1111AA'
+      older_id = 'A0000AA'
+      create(:nomis_id_merge, old_nomis_id: old_id, new_nomis_id: offender_no)
+      create(:nomis_id_merge, old_nomis_id: older_id, new_nomis_id: old_id)
+
+      create(:audit_event, nomis_offender_id: old_id, created_at: 5.seconds.ago, tags: %w[event merged old])
+      create(:audit_event, nomis_offender_id: older_id, created_at: 3.seconds.ago, tags: %w[event merged older])
+
+      get :timeline, params: { prison_id:, offender_no: }
+
+      log_nomis_ids = assigns(:log).map(&:nomis_offender_id)
+      expect(log_nomis_ids).to include(offender_no, old_id, older_id)
+    end
+
+    context 'when rendering timeline view' do
+      render_views
+
+      it 'styles nomis_id_merge entries as merge events with a yellow tag' do
+        create(:audit_event, nomis_offender_id: offender_no, created_at: 2.seconds.ago, tags: %w[record nomis_id_merge created])
+
+        get :timeline, params: { prison_id:, offender_no: }
+
+        expect(response.body).to include('govuk-tag govuk-tag--yellow')
+        expect(response.body).to include('audit event')
+      end
+    end
   end
 end

@@ -1,0 +1,5 @@
+<%= render partial: 'case_history/case_history', locals: {
+  title: 'Prison numbers merged',
+  object: merge,
+  description: "This case was merged from prison number #{merge.old_nomis_id} to #{merge.new_nomis_id}. Earlier history may be under #{merge.old_nomis_id}."
+} %>

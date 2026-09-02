@@ -3,6 +3,8 @@
 class ProcessPrisonerMergeJob < ApplicationJob
   queue_as :default
 
+  discard_on ActiveRecord::RecordInvalid
+
   def perform(old_offender_id, new_offender_id, event_type:)
     logger.info(
       "old_offender_id=#{old_offender_id},new_offender_id=#{new_offender_id}," \

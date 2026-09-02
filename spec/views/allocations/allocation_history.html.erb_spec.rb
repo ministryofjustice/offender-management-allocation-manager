@@ -222,5 +222,16 @@ RSpec.describe "allocations/history", type: :view do
         expect(page.css('.moj-timeline__date')).to have_text('19th November 2060 (11:28)')
       end
     end
+
+    context 'when a merge history item is present' do
+      let(:history) { [MergeHistory.new(build(:nomis_id_merge, old_nomis_id: 'A1111AA', new_nomis_id: offender.offender_no, created_at: now))] }
+
+      it 'shows a merge information row with the old prison number' do
+        render
+
+        expect_timeline_titles('Prison numbers merged')
+        expect(page.css('.moj-timeline__description')).to have_text("This case was merged from prison number A1111AA to #{offender.offender_no}.")
+      end
+    end
   end
 end

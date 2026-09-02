@@ -35,7 +35,7 @@ class DebuggingController < PrisonsApplicationController
     return unless @nomis_id
     return unless @known_offender
 
-    @log = AuditEvent.where(nomis_offender_id: @nomis_id).order(created_at: :desc)
+    @log = AuditEvent.where(nomis_offender_id: timeline_nomis_ids).order(created_at: :desc)
   end
 
 private
@@ -46,5 +46,9 @@ private
 
   def ensure_known_offender
     @known_offender = Offender.exists?(nomis_offender_id: @nomis_id)
+  end
+
+  def timeline_nomis_ids
+    [@nomis_id, *NomisIdMerge.predecessor_ids_for(@nomis_id)].uniq
   end
 end

@@ -345,6 +345,21 @@ RSpec.describe AllocationsController, type: :controller do
 
             expect(allocation_history.map(&:event)).to eq(['allocate_primary_pom', 'allocate_primary_pom'])
           end
+
+          context 'when the case has a NOMIS merge into the current prisoner number' do
+            before do
+              create(:nomis_id_merge, old_nomis_id: 'A1111AA', new_nomis_id: offender_no)
+            end
+
+            it 'includes a merge history entry so users can identify merged prison numbers' do
+              get :history, params: { prison_id: prison_code, prisoner_id: offender_no }
+              merge_entries = assigns(:history).select { |entry| entry.is_a?(MergeHistory) }
+
+              expect(merge_entries.size).to eq(1)
+              expect(merge_entries.first.old_nomis_id).to eq('A1111AA')
+              expect(merge_entries.first.new_nomis_id).to eq(offender_no)
+            end
+          end
         end
       end
     end
