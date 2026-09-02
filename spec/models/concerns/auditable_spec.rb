@@ -142,4 +142,24 @@ RSpec.describe Auditable do
       expect(audit.tags).not_to include('destroyed')
     end
   end
+
+  describe '.without_audit_events' do
+    let!(:prison) { create(:prison) }
+
+    it 'suppresses audit events inside the block' do
+      expect {
+        described_class.without_audit_events do
+          create(:pom_detail, prison:)
+        end
+      }.not_to change(AuditEvent, :count)
+    end
+
+    it 'restores audit event publishing after the block' do
+      described_class.without_audit_events do
+        create(:pom_detail, prison:)
+      end
+
+      expect { create(:pom_detail, prison:) }.to change(AuditEvent, :count).by(1)
+    end
+  end
 end

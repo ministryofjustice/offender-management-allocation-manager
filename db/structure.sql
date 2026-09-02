@@ -431,6 +431,38 @@ ALTER SEQUENCE public.local_delivery_units_id_seq OWNED BY public.local_delivery
 
 
 --
+-- Name: nomis_id_merges; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.nomis_id_merges (
+    id bigint NOT NULL,
+    old_nomis_id character varying NOT NULL,
+    new_nomis_id character varying NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: nomis_id_merges_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.nomis_id_merges_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: nomis_id_merges_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.nomis_id_merges_id_seq OWNED BY public.nomis_id_merges.id;
+
+
+--
 -- Name: offender_email_opt_outs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -838,6 +870,13 @@ ALTER TABLE ONLY public.local_delivery_units ALTER COLUMN id SET DEFAULT nextval
 
 
 --
+-- Name: nomis_id_merges id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.nomis_id_merges ALTER COLUMN id SET DEFAULT nextval('public.nomis_id_merges_id_seq'::regclass);
+
+
+--
 -- Name: offender_email_opt_outs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -987,6 +1026,14 @@ ALTER TABLE ONLY public.handover_progress_checklists
 
 ALTER TABLE ONLY public.local_delivery_units
     ADD CONSTRAINT local_delivery_units_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: nomis_id_merges nomis_id_merges_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.nomis_id_merges
+    ADD CONSTRAINT nomis_id_merges_pkey PRIMARY KEY (id);
 
 
 --
@@ -1261,6 +1308,20 @@ CREATE UNIQUE INDEX index_local_delivery_units_on_code ON public.local_delivery_
 
 
 --
+-- Name: index_nomis_id_merges_on_new_nomis_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_nomis_id_merges_on_new_nomis_id ON public.nomis_id_merges USING btree (new_nomis_id);
+
+
+--
+-- Name: index_nomis_id_merges_on_old_nomis_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_nomis_id_merges_on_old_nomis_id ON public.nomis_id_merges USING btree (old_nomis_id);
+
+
+--
 -- Name: index_offender_email_opt_out_unique_composite_key; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1395,6 +1456,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260821153518'),
 ('20260821152126'),
 ('20260818120000'),
 ('20260813173000'),
