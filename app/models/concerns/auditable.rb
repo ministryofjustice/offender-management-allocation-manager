@@ -5,9 +5,25 @@ module Auditable
 
   AUDIT_EXCLUDED_KEYS = %w[id nomis_offender_id].freeze
 
+  class << self
+    def without_audit_events
+      previous = ActiveSupport::IsolatedExecutionState[:auditable_events_suppressed]
+      ActiveSupport::IsolatedExecutionState[:auditable_events_suppressed] = true
+      yield
+    ensure
+      ActiveSupport::IsolatedExecutionState[:auditable_events_suppressed] = previous
+    end
+
+    def audit_events_suppressed?
+      ActiveSupport::IsolatedExecutionState[:auditable_events_suppressed] == true
+    end
+  end
+
 private
 
   def save_audit_event
+    return if Auditable.audit_events_suppressed?
+
     excluded = AUDIT_EXCLUDED_KEYS + audit_excluded_keys
 
     if destroyed?
@@ -25,7 +41,7 @@ private
     end
 
     AuditEvent.publish(
-      nomis_offender_id: (nomis_offender_id if has_attribute?(:nomis_offender_id)),
+      nomis_offender_id: (nomis_offender_id if respond_to?(:nomis_offender_id)),
       tags: [*audit_event_tags, audit_action_tag],
       system_event: PaperTrail.request.whodunnit.blank?,
       username: PaperTrail.request.whodunnit,
