@@ -68,9 +68,7 @@ feature 'POM onboarding' do
           it 'returns error message' do
             expect(page).to have_title('No results – Digital Prison Services')
             expect(page).to have_css('label.govuk-label--l', text: 'No results for foobar')
-            expect(page).to have_text(
-              'Search again or check with a local systems administrator that an account has been created for the person you are looking for.'
-            )
+            expect(page).to have_text('Search again or ask a local systems administrator')
           end
         end
 

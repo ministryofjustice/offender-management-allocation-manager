@@ -39,8 +39,8 @@ RSpec.describe PrisonerMergeService do
     expect(Rails.logger).to have_received(:info).with(a_string_matching(pattern))
   end
 
-  def expect_conflict_logged(record_type)
-    expect_logged_info(/event=migrate_record_conflict.*record=#{record_type}.*old_nomis_id=#{old_id}.*canonical_id=#{new_id}/)
+  def expect_already_present_logged(record_type)
+    expect_logged_info(/event=migrate_record_already_present.*record=#{record_type}.*old_nomis_id=#{old_id}.*canonical_id=#{new_id}/)
   end
 
   def create_orphaned_record(factory)
@@ -401,10 +401,10 @@ RSpec.describe PrisonerMergeService do
         expect_existing_record_unchanged(Responsibility, :value, 'Probation')
       end
 
-      it 'logs a conflict for observability' do
+      it 'logs that the canonical record was already present' do
         service.process
 
-        expect_conflict_logged('responsibility')
+        expect_already_present_logged('responsibility')
       end
     end
   end
