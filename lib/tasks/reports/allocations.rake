@@ -39,6 +39,8 @@ namespace :reports do
         'Current POM Responsible Type', # If this allocation was for a Responsible POM, what type - could be probation/prison/blank
         'Current POM Supporting Type',  # If this allocation was for a Supporting POM, what type - could be probation/prison/blank
         'Current POM Co-working Type',  # If this allocation was for a Co-working POM, what type - could be probation/prison/blank
+        'Primary POM Staff ID',
+        'Secondary POM Staff ID',
       ].freeze
     end
 
@@ -164,6 +166,8 @@ namespace :reports do
           format_date(mpc.licence_expiry_date),
           sentence_remaining_for(offender),
           *pom_type_columns(pom_types, allocation, responsibility),
+          allocation.primary_pom_nomis_id,
+          allocation.secondary_pom_nomis_id,
         ]
       end
     end

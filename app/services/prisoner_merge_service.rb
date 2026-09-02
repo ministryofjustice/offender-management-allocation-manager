@@ -88,7 +88,7 @@ private
     extra_log = "record=#{record_type},old_nomis_id=#{old_offender_id},canonical_id=#{canonical_id}"
 
     if model_class.exists?(nomis_offender_id: canonical_id)
-      log_event(event_name: 'migrate_record_conflict', extra: extra_log)
+      log_event(event_name: 'migrate_record_already_present', extra: extra_log)
       return
     end
 
