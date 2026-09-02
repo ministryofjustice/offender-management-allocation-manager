@@ -38,4 +38,10 @@ RSpec.describe ProcessPrisonerMergeJob, type: :job do
     expect(Rails.logger).to have_received(:info)
       .with(/old_offender_id=#{old_id},new_offender_id=#{new_id}.*job=process_prisoner_merge_job,event=finished/)
   end
+
+  it 'discards ActiveRecord::RecordInvalid without retrying' do
+    allow(PrisonerMergeService).to receive(:new).and_raise(ActiveRecord::RecordInvalid.new(NomisIdMerge.new))
+
+    expect { described_class.perform_now(old_id, new_id, event_type:) }.not_to raise_error
+  end
 end

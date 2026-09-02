@@ -55,6 +55,9 @@ class AllocationsController < PrisonsApplicationController
       end
     }.flatten
 
+    merge_history = NomisIdMerge.where(new_nomis_id: nomis_offender_id_from_url)
+                                .order(:created_at).map { MergeHistory.new(it) }
+
     @history = [
       AllocationService.history(allocation),
       vlo_history,
@@ -63,6 +66,7 @@ class AllocationsController < PrisonsApplicationController
       complexity_history,
       email_history,
       ea_history,
+      merge_history,
     ].flatten.sort_by(&:created_at)
   end
 

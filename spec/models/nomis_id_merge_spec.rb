@@ -38,17 +38,18 @@ RSpec.describe NomisIdMerge do
         expect(described_class.canonical_id_for('Q1111ZZ')).to eq('Q1111ZZ')
       end
     end
+  end
 
-    context 'when there is a cycle in the merge chain (data integrity guard)' do
-      before do
-        create(:nomis_id_merge, old_nomis_id: 'A1234BC', new_nomis_id: 'Z9876XY')
-        create(:nomis_id_merge, old_nomis_id: 'Z9876XY', new_nomis_id: 'A1234BC')
-      end
+  describe '.predecessor_ids_for' do
+    it 'returns an empty list when there are no predecessor merges' do
+      expect(described_class.predecessor_ids_for('A1234BC')).to eq([])
+    end
 
-      it 'does not loop infinitely and returns a result' do
-        result = described_class.canonical_id_for('A1234BC')
-        expect(result).to be_in(['A1234BC', 'Z9876XY'])
-      end
+    it 'returns all predecessor IDs in a merge chain' do
+      create(:nomis_id_merge, old_nomis_id: 'A1234BC', new_nomis_id: 'Z9876XY')
+      create(:nomis_id_merge, old_nomis_id: 'Z9876XY', new_nomis_id: 'Q1111ZZ')
+
+      expect(described_class.predecessor_ids_for('Q1111ZZ')).to contain_exactly('Z9876XY', 'A1234BC')
     end
   end
 
@@ -66,6 +67,14 @@ RSpec.describe NomisIdMerge do
       duplicate = build(:nomis_id_merge, old_nomis_id: 'A1234BC', new_nomis_id: 'Q1111ZZ')
 
       expect(duplicate).not_to be_valid
+    end
+
+    it 'is invalid when it would create a cycle' do
+      create(:nomis_id_merge, old_nomis_id: 'A1234BC', new_nomis_id: 'Z9876XY')
+      cyclic = build(:nomis_id_merge, old_nomis_id: 'Z9876XY', new_nomis_id: 'A1234BC')
+
+      expect(cyclic).not_to be_valid
+      expect(cyclic.errors[:new_nomis_id]).to include('would create a merge cycle')
     end
   end
 
