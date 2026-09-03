@@ -16,30 +16,50 @@ module DomainEvents
         source_crn = event.additional_information.fetch('sourceCRN')
         target_crn = event.additional_information.fetch('targetCRN')
 
-        logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type}," \
-                      "source_crn=#{source_crn},target_crn=#{target_crn}"
+        context = merge_log_context(event:, old_crn: source_crn, new_crn: target_crn)
+        log_event(logger, event_name: 'domain_event_handle_start', context:)
 
-        # TODO: to be implemented
-        logger.info "[MERGE] source case exists? #{CaseInformation.exists?(crn: source_crn)} - " \
-                      "target case exists? #{CaseInformation.exists?(crn: target_crn)}" \
+        if ProbationMergeService.locally_tracked?(source_crn)
+          ProcessProbationMergeJob.perform_later(
+            source_crn, target_crn, event_type: event.event_type
+          )
+        else
+          log_event(
+            logger, event_name: 'domain_event_handle_noop', context:, message: 'Old CRN untracked locally'
+          )
+        end
 
-        logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type}," \
-                      "source_crn=#{source_crn},target_crn=#{target_crn}"
+        log_event(logger, event_name: 'domain_event_handle_success', context:)
       end
 
       def handle_probation_case_unmerge(event, logger)
         reactivated_crn = event.additional_information.fetch('reactivatedCRN')
         unmerged_crn = event.additional_information.fetch('unmergedCRN')
 
-        logger.info "event=domain_event_handle_start,domain_event_type=#{event.event_type}," \
-                      "reactivated_crn=#{reactivated_crn},unmerged_crn=#{unmerged_crn}"
+        context = merge_log_context(event:, old_crn: reactivated_crn, new_crn: unmerged_crn)
+        log_event(logger, event_name: 'domain_event_handle_start', context:)
 
-        # TODO: to be implemented
-        logger.info "[UNMERGE] reactivated case exists? #{CaseInformation.exists?(crn: reactivated_crn)} - " \
-                      "unmerged case exists? #{CaseInformation.exists?(crn: unmerged_crn)}"
+        if ProbationUnmergeService.locally_tracked?(old_crn: reactivated_crn, new_crn: unmerged_crn)
+          ProcessProbationUnmergeJob.perform_later(
+            reactivated_crn, unmerged_crn, event_type: event.event_type
+          )
+        else
+          log_event(
+            logger, event_name: 'domain_event_handle_noop', context:, message: 'Merge mapping not tracked locally'
+          )
+        end
 
-        logger.info "event=domain_event_handle_success,domain_event_type=#{event.event_type}," \
-                      "reactivated_crn=#{reactivated_crn},unmerged_crn=#{unmerged_crn}"
+        log_event(logger, event_name: 'domain_event_handle_success', context:)
+      end
+
+      def merge_log_context(event:, old_crn:, new_crn:)
+        "domain_event_type=#{event.event_type},old_crn=#{old_crn},new_crn=#{new_crn}"
+      end
+
+      def log_event(logger, event_name:, context:, message: nil)
+        payload = "event=#{event_name},#{context}"
+        payload += "|#{message}" if message
+        logger.info(payload)
       end
     end
   end

@@ -689,6 +689,40 @@ CREATE TABLE public.prisons (
 
 
 --
+-- Name: probation_case_merges; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.probation_case_merges (
+    id bigint NOT NULL,
+    old_crn character varying NOT NULL,
+    new_crn character varying NOT NULL,
+    active boolean DEFAULT true NOT NULL,
+    superseded_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: probation_case_merges_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.probation_case_merges_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: probation_case_merges_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.probation_case_merges_id_seq OWNED BY public.probation_case_merges.id;
+
+
+--
 -- Name: responsibilities; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -912,6 +946,13 @@ ALTER TABLE ONLY public.pom_details ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: probation_case_merges id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.probation_case_merges ALTER COLUMN id SET DEFAULT nextval('public.probation_case_merges_id_seq'::regclass);
+
+
+--
 -- Name: responsibilities id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1101,6 +1142,14 @@ ALTER TABLE ONLY public.prisons
 
 
 --
+-- Name: probation_case_merges probation_case_merges_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.probation_case_merges
+    ADD CONSTRAINT probation_case_merges_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: responsibilities responsibilities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1130,6 +1179,13 @@ ALTER TABLE ONLY public.versions
 
 ALTER TABLE ONLY public.victim_liaison_officers
     ADD CONSTRAINT victim_liaison_officers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: idx_probation_case_merges_old_crn_active; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_probation_case_merges_old_crn_active ON public.probation_case_merges USING btree (old_crn) WHERE (active = true);
 
 
 --
@@ -1406,6 +1462,13 @@ CREATE UNIQUE INDEX index_prisons_on_name ON public.prisons USING btree (name);
 
 
 --
+-- Name: index_probation_case_merges_on_new_crn_and_active; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_probation_case_merges_on_new_crn_and_active ON public.probation_case_merges USING btree (new_crn, active);
+
+
+--
 -- Name: index_responsibilities_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1456,6 +1519,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260903090000'),
 ('20260821153518'),
 ('20260821152126'),
 ('20260818120000'),

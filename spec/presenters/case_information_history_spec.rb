@@ -59,7 +59,9 @@ RSpec.describe CaseInformationHistory do
 
     it 'returns the tracked details in the timeline order' do
       version = PaperTrail::Version.new(
+        event: 'update',
         object_changes: YAML.dump(
+          'crn' => ['X12345', 'X54321'],
           'tier' => ['A', 'C'],
           'rosh_level' => ['HIGH', 'VERY_HIGH'],
           'enhanced_resourcing' => [false, true]
@@ -69,9 +71,9 @@ RSpec.describe CaseInformationHistory do
       details = described_class.new(version).change_details
 
       aggregate_failures do
-        expect(details.map(&:label)).to eq(['Tier', 'ROSH', 'Resourcing'])
-        expect(details.map(&:from_value)).to eq(['A', 'High', 'standard'])
-        expect(details.map(&:to_value)).to eq(['C', 'Very high', 'enhanced'])
+        expect(details.map(&:label)).to eq(['CRN merge', 'Tier', 'ROSH', 'Resourcing'])
+        expect(details.map(&:from_value)).to eq(['X12345', 'A', 'High', 'standard'])
+        expect(details.map(&:to_value)).to eq(['X54321', 'C', 'Very high', 'enhanced'])
       end
     end
 
@@ -144,6 +146,57 @@ RSpec.describe CaseInformationHistory do
       details = described_class.new(version).change_details
 
       expect(details).to eq([])
+    end
+
+    it 'does not include CRN when previous value is nil' do
+      version = PaperTrail::Version.new(
+        event: 'update',
+        object_changes: YAML.dump(
+          'crn' => [nil, 'X54321'],
+          'tier' => ['A', 'B']
+        )
+      )
+
+      details = described_class.new(version).change_details
+
+      aggregate_failures do
+        expect(details.map(&:label)).to eq(['Tier'])
+        expect(details.map(&:to_value)).to eq(['B'])
+      end
+    end
+
+    it 'does not include CRN when new value is nil' do
+      version = PaperTrail::Version.new(
+        event: 'update',
+        object_changes: YAML.dump(
+          'crn' => ['X12345', nil],
+          'tier' => ['A', 'B']
+        )
+      )
+
+      details = described_class.new(version).change_details
+
+      aggregate_failures do
+        expect(details.map(&:label)).to eq(['Tier'])
+        expect(details.map(&:to_value)).to eq(['B'])
+      end
+    end
+
+    it 'does not include CRN on create events' do
+      version = PaperTrail::Version.new(
+        event: 'create',
+        object_changes: YAML.dump(
+          'crn' => [nil, 'X54321'],
+          'tier' => [nil, 'A']
+        )
+      )
+
+      details = described_class.new(version).change_details
+
+      aggregate_failures do
+        expect(details.map(&:label)).to eq(['Tier'])
+        expect(details.map(&:to_value)).to eq(['A'])
+      end
     end
   end
 end

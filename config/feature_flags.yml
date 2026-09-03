@@ -17,3 +17,7 @@ feature_flags:
     staging: true
     preprod: true
     production: true
+  probation_merges:
+    staging: true
+    preprod: true
+    production: true
