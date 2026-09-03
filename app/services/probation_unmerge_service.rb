@@ -31,13 +31,12 @@ private
 
   def record_unmerge
     unmerged = ProbationCaseMerge.record_unmerge!(old_crn:, new_crn:)
-    event_name = unmerged ? 'record_unmerge' : 'record_unmerge_noop'
-    log_event(event_name:, extra: "old_crn=#{old_crn},new_crn=#{new_crn}")
+    log_event(event_name: unmerged ? 'record_unmerge' : 'record_unmerge_noop')
     unmerged
   end
 
   def restore_case_information
-    extra_log = "record=case_information,old_crn=#{old_crn},new_crn=#{new_crn}"
+    extra_log = 'record=case_information'
 
     old_record = CaseInformation.find_by(crn: old_crn)
     if old_record

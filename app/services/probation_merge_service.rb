@@ -32,10 +32,7 @@ private
     merge_record = ProbationCaseMerge.record_merge!(old_crn:, new_crn:)
     canonical_crn = ProbationCaseMerge.canonical_crn_for(merge_record.new_crn)
 
-    log_event(
-      event_name: 'record_merge',
-      extra: "old_crn=#{old_crn},canonical_crn=#{canonical_crn}"
-    )
+    log_event(event_name: 'record_merge', extra: "canonical_crn=#{canonical_crn}")
 
     canonical_crn
   end
@@ -46,7 +43,7 @@ private
     old_record = CaseInformation.find_by(crn: old_crn)
     return unless old_record
 
-    extra_log = "record=case_information,old_crn=#{old_crn},canonical_crn=#{canonical_crn}"
+    extra_log = "record=case_information,canonical_crn=#{canonical_crn}"
 
     if CaseInformation.exists?(crn: canonical_crn)
       log_event(event_name: 'migrate_record_already_present', extra: extra_log)
