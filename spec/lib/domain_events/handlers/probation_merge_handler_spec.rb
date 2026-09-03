@@ -1,12 +1,26 @@
 RSpec.describe DomainEvents::Handlers::ProbationMergeHandler do
   subject(:handler) { described_class.new }
 
-  let(:log_messages) { [] }
+  let(:old_crn) { 'X12345' }
+  let(:new_crn) { 'X54321' }
+  let(:event_type) { 'probation-case.merge.completed' }
+  let(:event) do
+    DomainEvents::Event.new(
+      event_type:,
+      version: 1,
+      description: 'A probation case merge has completed',
+      additional_information: {
+        'sourceCRN' => old_crn,
+        'targetCRN' => new_crn,
+      },
+      external_event: true,
+    )
+  end
 
   before do
-    allow(Shoryuken::Logging.logger).to receive(:info) do |message|
-      log_messages << message
-    end
+    allow(Shoryuken::Logging.logger).to receive(:info)
+    allow(ProcessProbationMergeJob).to receive(:perform_later)
+    allow(ProcessProbationUnmergeJob).to receive(:perform_later)
   end
 
   describe 'domain event registration' do
@@ -18,55 +32,57 @@ RSpec.describe DomainEvents::Handlers::ProbationMergeHandler do
     end
   end
 
-  context 'when handling a probation case merge event' do
-    let(:event_type) { 'probation-case.merge.completed' }
-    let(:event) do
-      DomainEvents::Event.new(
-        event_type:,
-        version: 1,
-        description: 'A probation case merge has completed',
-        additional_information: {
-          'sourceCRN' => 'X12345',
-          'targetCRN' => 'X54321',
-        },
-        external_event: true,
-      )
-    end
-
+  context 'when handling a probation merge event and old CRN is tracked locally' do
     before do
-      allow(CaseInformation).to receive(:exists?).with(crn: 'X12345').and_return(true)
-      allow(CaseInformation).to receive(:exists?).with(crn: 'X54321').and_return(false)
+      allow(ProbationMergeService).to receive(:locally_tracked?).with(old_crn).and_return(true)
     end
 
-    it 'logs start, merge debug and success messages' do
+    it 'enqueues ProcessProbationMergeJob with CRNs and event type', :queueing do
+      allow(ProcessProbationMergeJob).to receive(:perform_later).and_call_original
+
+      expect { handler.handle(event) }
+        .to have_enqueued_job(ProcessProbationMergeJob)
+        .with(old_crn, new_crn, event_type:)
+    end
+
+    it 'logs start and success' do
       handler.handle(event)
 
-      aggregate_failures do
-        expect(log_messages).to include(
-          a_string_matching(
-            /event=domain_event_handle_start.*domain_event_type=probation-case\.merge\.completed.*source_crn=X12345.*target_crn=X54321/
-          )
-        )
+      expect(Shoryuken::Logging.logger).to have_received(:info)
+        .with(/event=domain_event_handle_start.*old_crn=#{old_crn}.*new_crn=#{new_crn}/)
+      expect(Shoryuken::Logging.logger).to have_received(:info)
+        .with(/event=domain_event_handle_success.*old_crn=#{old_crn}.*new_crn=#{new_crn}/)
+    end
 
-        expect(log_messages).to include(
-          a_string_matching(
-            /\[MERGE\] source case exists\? true - target case exists\? false/
-          )
-        )
+    it 'does not emit noop log' do
+      handler.handle(event)
 
-        expect(log_messages).to include(
-          a_string_matching(
-            /event=domain_event_handle_success.*domain_event_type=probation-case\.merge\.completed.*source_crn=X12345.*target_crn=X54321/
-          )
-        )
-
-        expect(CaseInformation).to have_received(:exists?).with(crn: 'X12345')
-        expect(CaseInformation).to have_received(:exists?).with(crn: 'X54321')
-      end
+      expect(Shoryuken::Logging.logger).not_to have_received(:info).with(/event=domain_event_handle_noop/)
     end
   end
 
-  context 'when handling a probation case unmerge event' do
+  context 'when handling a probation merge event and old CRN is not tracked locally' do
+    before do
+      allow(ProbationMergeService).to receive(:locally_tracked?).with(old_crn).and_return(false)
+    end
+
+    it 'does not enqueue ProcessProbationMergeJob' do
+      handler.handle(event)
+
+      expect(ProcessProbationMergeJob).not_to have_received(:perform_later)
+    end
+
+    it 'emits noop and success logs' do
+      handler.handle(event)
+
+      expect(Shoryuken::Logging.logger).to have_received(:info)
+        .with(/event=domain_event_handle_noop.*old_crn=#{old_crn}.*new_crn=#{new_crn}/)
+      expect(Shoryuken::Logging.logger).to have_received(:info)
+        .with(/event=domain_event_handle_success.*old_crn=#{old_crn}.*new_crn=#{new_crn}/)
+    end
+  end
+
+  context 'when handling a probation unmerge event' do
     let(:event_type) { 'probation-case.unmerge.completed' }
     let(:event) do
       DomainEvents::Event.new(
@@ -74,42 +90,42 @@ RSpec.describe DomainEvents::Handlers::ProbationMergeHandler do
         version: 1,
         description: 'A probation case unmerge has completed',
         additional_information: {
-          'reactivatedCRN' => 'X12345',
-          'unmergedCRN' => 'X54321',
+          'reactivatedCRN' => old_crn,
+          'unmergedCRN' => new_crn,
         },
         external_event: true,
       )
     end
 
-    before do
-      allow(CaseInformation).to receive(:exists?).with(crn: 'X12345').and_return(false)
-      allow(CaseInformation).to receive(:exists?).with(crn: 'X54321').and_return(true)
+    context 'when merge mapping is tracked locally' do
+      before do
+        allow(ProbationUnmergeService).to receive(:locally_tracked?).with(old_crn:, new_crn:).and_return(true)
+      end
+
+      it 'enqueues ProcessProbationUnmergeJob with CRNs and event type', :queueing do
+        allow(ProcessProbationUnmergeJob).to receive(:perform_later).and_call_original
+
+        expect { handler.handle(event) }
+          .to have_enqueued_job(ProcessProbationUnmergeJob)
+          .with(old_crn, new_crn, event_type:)
+      end
     end
 
-    it 'logs start, unmerge debug and success messages' do
-      handler.handle(event)
+    context 'when merge mapping is not tracked locally' do
+      before do
+        allow(ProbationUnmergeService).to receive(:locally_tracked?).with(old_crn:, new_crn:).and_return(false)
+      end
 
-      aggregate_failures do
-        expect(log_messages).to include(
-          a_string_matching(
-            /event=domain_event_handle_start.*domain_event_type=probation-case\.unmerge\.completed.*reactivated_crn=X12345.*unmerged_crn=X54321/
-          )
-        )
+      it 'does not enqueue ProcessProbationUnmergeJob and emits noop' do
+        handler.handle(event)
 
-        expect(log_messages).to include(
-          a_string_matching(
-            /\[UNMERGE\] reactivated case exists\? false - unmerged case exists\? true/
-          )
-        )
-
-        expect(log_messages).to include(
-          a_string_matching(
-            /event=domain_event_handle_success.*domain_event_type=probation-case\.unmerge\.completed.*reactivated_crn=X12345.*unmerged_crn=X54321/
-          )
-        )
-
-        expect(CaseInformation).to have_received(:exists?).with(crn: 'X12345')
-        expect(CaseInformation).to have_received(:exists?).with(crn: 'X54321')
+        aggregate_failures do
+          expect(ProcessProbationUnmergeJob).not_to have_received(:perform_later)
+          expect(Shoryuken::Logging.logger).to have_received(:info)
+            .with(/event=domain_event_handle_noop.*Merge mapping not tracked locally/)
+          expect(Shoryuken::Logging.logger).to have_received(:info)
+            .with(/event=domain_event_handle_success.*old_crn=#{old_crn}.*new_crn=#{new_crn}/)
+        end
       end
     end
   end

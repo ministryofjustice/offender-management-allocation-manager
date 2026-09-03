@@ -2,6 +2,7 @@
 
 class CaseInformationHistory < BaseHistoryPresenter
   TIMELINE_DETAILS = {
+    'crn' => 'CRN merge',
     'tier' => 'Tier',
     'rosh_level' => 'ROSH',
     'enhanced_resourcing' => 'Resourcing',
@@ -43,6 +44,7 @@ class CaseInformationHistory < BaseHistoryPresenter
       next unless changeset.key?(attribute)
 
       previous_value, new_value = changeset.fetch(attribute, [nil, nil])
+      next if attribute == 'crn' && (event != 'update' || previous_value.nil? || new_value.nil?)
 
       Detail.new(
         label,
