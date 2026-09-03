@@ -178,13 +178,22 @@ RSpec.describe DebuggingController, type: :controller do
     context 'when rendering timeline view' do
       render_views
 
-      it 'styles nomis_id_merge entries as merge events with a yellow tag' do
+      it 'styles prisoner merge entries as merge events with a yellow tag' do
         create(:audit_event, nomis_offender_id: offender_no, created_at: 2.seconds.ago, tags: %w[record nomis_id_merge created])
 
         get :timeline, params: { prison_id:, offender_no: }
 
         expect(response.body).to include('govuk-tag govuk-tag--yellow')
         expect(response.body).to include('audit event')
+      end
+
+      it 'styles probation merge entries as merge events with a yellow tag' do
+        create(:audit_event, nomis_offender_id: offender_no, created_at: 2.seconds.ago, tags: %w[record probation_case_merge created])
+
+        get :timeline, params: { prison_id:, offender_no: }
+
+        expect(response.body).to include('govuk-tag govuk-tag--yellow')
+        expect(response.body).to include('probation_case_merge')
       end
     end
   end

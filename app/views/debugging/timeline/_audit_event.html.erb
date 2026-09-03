@@ -1,5 +1,5 @@
 <% audit_event = log_item %>
-<% merge_event = audit_event.tags.include?('nomis_id_merge') %>
+<% merge_event = audit_event.tags.include?('nomis_id_merge') || audit_event.tags.include?('probation_case_merge') %>
 <tr class="govuk-table__row timeline-row">
   <td class="govuk-table__cell" ><%= audit_event.created_at.strftime('%d/%m/%Y %H:%M:%S') %></td>
   <td class="govuk-table__cell" style="display: flex; flex-direction: column; margin-bottom: -1px;">

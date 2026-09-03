@@ -57,7 +57,7 @@ RSpec.describe ProbationMergeService do
     it 'logs migrate_record for case information reassignment' do
       service.process
 
-      expect_logged_info(/event=migrate_record.*record=case_information.*old_crn=#{old_crn}.*canonical_crn=#{new_crn}/)
+      expect_logged_info(/event=migrate_record.*old_crn=#{old_crn}.*record=case_information.*canonical_crn=#{new_crn}/)
     end
 
     it 'creates a paper trail version that captures crn reassignment' do
@@ -95,7 +95,7 @@ RSpec.describe ProbationMergeService do
 
       it 'logs migrate_record_already_present' do
         service.process
-        expect_logged_info(/event=migrate_record_already_present.*record=case_information.*old_crn=#{old_crn}.*canonical_crn=#{new_crn}/)
+        expect_logged_info(/event=migrate_record_already_present.*old_crn=#{old_crn}.*record=case_information.*canonical_crn=#{new_crn}/)
       end
     end
 

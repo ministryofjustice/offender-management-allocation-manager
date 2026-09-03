@@ -53,10 +53,7 @@ private
                                .find_or_create_by!(old_nomis_id: old_offender_id)
     canonical_id = NomisIdMerge.canonical_id_for(merge_record.new_nomis_id)
 
-    log_event(
-      event_name: 'record_merge',
-      extra: "old_nomis_id=#{old_offender_id},canonical_id=#{canonical_id}"
-    )
+    log_event(event_name: 'record_merge', extra: "canonical_id=#{canonical_id}")
 
     canonical_id
   end
@@ -85,7 +82,7 @@ private
     return unless old_record
 
     record_type = model_class.model_name.singular
-    extra_log = "record=#{record_type},old_nomis_id=#{old_offender_id},canonical_id=#{canonical_id}"
+    extra_log = "record=#{record_type},canonical_id=#{canonical_id}"
 
     if model_class.exists?(nomis_offender_id: canonical_id)
       log_event(event_name: 'migrate_record_already_present', extra: extra_log)
@@ -117,7 +114,7 @@ private
 
     log_event(
       event_name: 'migrate_bulk_records',
-      extra: "record=#{record_type},count=#{count},old_nomis_id=#{old_offender_id},canonical_id=#{canonical_id}"
+      extra: "record=#{record_type},count=#{count},canonical_id=#{canonical_id}"
     )
   end
 
@@ -137,7 +134,7 @@ private
 
     log_event(
       event_name: 'migrate_parole_reviews',
-      extra: "record=parole_review,migrated=#{migrated},deleted=#{deleted},old_nomis_id=#{old_offender_id},canonical_id=#{canonical_id}"
+      extra: "record=parole_review,migrated=#{migrated},deleted=#{deleted},canonical_id=#{canonical_id}"
     )
   end
 

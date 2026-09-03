@@ -40,7 +40,7 @@ RSpec.describe PrisonerMergeService do
   end
 
   def expect_already_present_logged(record_type)
-    expect_logged_info(/event=migrate_record_already_present.*record=#{record_type}.*old_nomis_id=#{old_id}.*canonical_id=#{new_id}/)
+    expect_logged_info(/event=migrate_record_already_present.*old_offender_id=#{old_id}.*record=#{record_type}.*canonical_id=#{new_id}/)
   end
 
   def create_orphaned_record(factory)
