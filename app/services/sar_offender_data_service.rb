@@ -20,7 +20,6 @@ private
     {
       nomsNumber: nomis_offender_id,
       allocationHistory: allocation_with_history,
-      calculatedEarlyAllocationStatus: by_offender_id(CalculatedEarlyAllocationStatus, :state).first,
       calculatedHandoverDate: by_offender_id(CalculatedHandoverDate, :state).first,
       caseInformation: by_offender_id(CaseInformation, :state).first,
       earlyAllocations: by_offender_id(EarlyAllocation, :event),

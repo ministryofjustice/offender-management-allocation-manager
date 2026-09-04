@@ -4,7 +4,7 @@ info:
   title: Manage POM Cases API
   version: v2
   description: |-
-    API endpoints for Manage POM Cases, covering offender allocations, handovers, early allocation status, and subject access request (SAR) data.
+    API endpoints for Manage POM Cases, covering offender allocations, handovers, and subject access request (SAR) data.
 
     ### Authentication
 
@@ -122,21 +122,6 @@ components:
         suitabilityDetail:
           type: string
           nullable: true
-        updatedAt:
-          type: string
-    SarCalculatedEarlyAllocationStatus:
-      type: object
-      nullable: true
-      additionalProperties: false
-      required:
-      - eligible
-      - createdAt
-      - updatedAt
-      properties:
-        eligible:
-          type: boolean
-        createdAt:
-          type: string
         updatedAt:
           type: string
     SarCalculatedHandoverDate:
@@ -356,7 +341,6 @@ components:
           required:
           - nomsNumber
           - allocationHistory
-          - calculatedEarlyAllocationStatus
           - calculatedHandoverDate
           - caseInformation
           - earlyAllocations
@@ -369,8 +353,6 @@ components:
               type: array
               items:
                 "$ref": "#/components/schemas/SarAllocationHistoryItem"
-            calculatedEarlyAllocationStatus:
-              "$ref": "#/components/schemas/SarCalculatedEarlyAllocationStatus"
             calculatedHandoverDate:
               "$ref": "#/components/schemas/SarCalculatedHandoverDate"
             caseInformation:

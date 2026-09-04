@@ -20,7 +20,6 @@ RSpec.describe SarOffenderDataService do
     context 'with matching offender record' do
       before do
         create_historic(:offender, nomis_offender_id, offset: 7.days)
-        create_historic(:calculated_early_allocation_status, nomis_offender_id)
         create_historic(:calculated_handover_date, nomis_offender_id, reason: 'immigration_case', responsibility: 'CustodyWithCom')
         create_historic(:case_information, nomis_offender_id, local_delivery_unit: build(:local_delivery_unit, name: 'Leeds'))
         create_historic_list(:early_allocation, nomis_offender_id)
@@ -63,7 +62,6 @@ RSpec.describe SarOffenderDataService do
         end
 
         it 'returns all has_one data' do
-          expect(result[:calculatedEarlyAllocationStatus].keys).to include('eligible')
           expect(result[:calculatedHandoverDate].keys).to include('handoverDate')
           expect(result[:caseInformation].keys).to include('tier')
           expect(result[:handoverProgressChecklist].keys).to include('reviewedOasys')
@@ -124,7 +122,6 @@ RSpec.describe SarOffenderDataService do
 
           describe 'with has_one relationship' do
             %i[
-              calculatedEarlyAllocationStatus
               calculatedHandoverDate
               caseInformation
               handoverProgressChecklist

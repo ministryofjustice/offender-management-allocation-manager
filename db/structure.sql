@@ -147,18 +147,6 @@ CREATE TABLE public.audit_events (
 
 
 --
--- Name: calculated_early_allocation_statuses; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.calculated_early_allocation_statuses (
-    nomis_offender_id character varying NOT NULL,
-    eligible boolean NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
 -- Name: calculated_handover_dates; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1006,14 +994,6 @@ ALTER TABLE ONLY public.audit_events
 
 
 --
--- Name: calculated_early_allocation_statuses calculated_early_allocation_statuses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.calculated_early_allocation_statuses
-    ADD CONSTRAINT calculated_early_allocation_statuses_pkey PRIMARY KEY (nomis_offender_id);
-
-
---
 -- Name: calculated_handover_dates calculated_handover_dates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1519,6 +1499,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260904103721'),
 ('20260903090000'),
 ('20260821153518'),
 ('20260821152126'),
