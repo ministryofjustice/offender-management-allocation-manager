@@ -9,7 +9,7 @@ RSpec.configure do |config|
         title: 'Manage POM Cases API',
         version: 'v2',
         description: [
-          'API endpoints for Manage POM Cases, covering offender allocations, handovers, early allocation status, and subject access request (SAR) data.',
+          'API endpoints for Manage POM Cases, covering offender allocations, handovers, and subject access request (SAR) data.',
           '',
           '### Authentication',
           '',
@@ -108,21 +108,6 @@ RSpec.configure do |config|
               prison: { type: :string, nullable: true },
               recommendedPomType: { type: :string, nullable: true },
               suitabilityDetail: { type: :string, nullable: true },
-              updatedAt: { type: :string },
-            }
-          },
-          SarCalculatedEarlyAllocationStatus: {
-            type: :object,
-            nullable: true,
-            additionalProperties: false,
-            required: %w[
-              eligible
-              createdAt
-              updatedAt
-            ],
-            properties: {
-              eligible: { type: :boolean },
-              createdAt: { type: :string },
               updatedAt: { type: :string },
             }
           },
@@ -283,7 +268,6 @@ RSpec.configure do |config|
                 required: %w[
                   nomsNumber
                   allocationHistory
-                  calculatedEarlyAllocationStatus
                   calculatedHandoverDate
                   caseInformation
                   earlyAllocations
@@ -296,7 +280,6 @@ RSpec.configure do |config|
                     type: :array,
                     items: { '$ref' => '#/components/schemas/SarAllocationHistoryItem' }
                   },
-                  calculatedEarlyAllocationStatus: { '$ref' => '#/components/schemas/SarCalculatedEarlyAllocationStatus' },
                   calculatedHandoverDate: { '$ref' => '#/components/schemas/SarCalculatedHandoverDate' },
                   caseInformation: { '$ref' => '#/components/schemas/SarCaseInformation' },
                   earlyAllocations: {

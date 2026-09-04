@@ -84,27 +84,6 @@
     {{/allocationHistory}}
 
     <br>
-    <h3>Calculated early allocation status</h3>
-    <br>
-    {{#calculatedEarlyAllocationStatus}}
-        <table class="data-table">
-            <tr>
-                <td class="data-column-35">Eligible</td>
-                <td class="data-column-30">Created at</td>
-                <td class="data-column-35">Updated at</td>
-            </tr>
-            <tr>
-                <td>{{ convertBoolean eligible }}</td>
-                <td>{{ optionalValue (formatDate createdAt) }}</td>
-                <td>{{ optionalValue (formatDate updatedAt) }}</td>
-            </tr>
-        </table>
-    {{/calculatedEarlyAllocationStatus}}
-    {{^calculatedEarlyAllocationStatus}}
-        <p>No Data Held</p>
-    {{/calculatedEarlyAllocationStatus}}
-
-    <br>
     <h3>Calculated handover date</h3>
     <br>
     {{#calculatedHandoverDate}}

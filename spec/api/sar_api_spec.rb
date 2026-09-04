@@ -160,7 +160,6 @@ describe 'SAR API' do
             create(:offender, nomis_offender_id: prn)
             create(:allocation_history, prison: 'LEI', nomis_offender_id: prn, primary_pom_name: 'OLD_NAME, MOIC')
             create(:audit_event, nomis_offender_id: prn)
-            create(:calculated_early_allocation_status, nomis_offender_id: prn)
             create(:calculated_handover_date, nomis_offender_id: prn)
             create(:case_information, nomis_offender_id: prn)
             create(:early_allocation, nomis_offender_id: prn)

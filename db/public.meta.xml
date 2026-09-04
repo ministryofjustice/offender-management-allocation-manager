@@ -19,11 +19,6 @@
         <foreignKey table="offenders" column="nomis_offender_id"/>
       </column>
     </table>
-    <table name="calculated_early_allocation_statuses">
-      <column name="nomis_offender_id">
-        <foreignKey table="offenders" column="nomis_offender_id"/>
-      </column>
-    </table>
     <table name="calculated_handover_dates">
       <column name="nomis_offender_id">
         <foreignKey table="offenders" column="nomis_offender_id"/>
