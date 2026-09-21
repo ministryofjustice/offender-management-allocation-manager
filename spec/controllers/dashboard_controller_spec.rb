@@ -96,14 +96,6 @@ RSpec.describe DashboardController, type: :controller do
         expect(response.body).to have_text('View all handover cases')
       end
 
-      describe 'bulk reallocation announcement' do
-        it 'shows the NEW badge on View all POMs' do
-          get :index, params: { prison_id: prison }
-
-          expect(response.body).to include('moj-badge moj-badge--red')
-        end
-      end
-
       describe 'Make allocations tab' do
         context 'when the count is more than 0' do
           # create offenders with case_information so that they display as un-allocated
