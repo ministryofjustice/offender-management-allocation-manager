@@ -89,8 +89,10 @@ private
       return
     end
 
-    old_record.nomis_offender_id = canonical_id
-    old_record.save!(validate: false)
+    # This is a technical repoint, not a business update. Bypass callbacks,
+    # PaperTrail and timestamp touching so merge processing does not create
+    # misleading history or mutate business-facing dates derived from `updated_at`
+    old_record.update_columns(nomis_offender_id: canonical_id)
 
     publish_merge_audit_event(record_type:, canonical_id:)
 
@@ -101,14 +103,8 @@ private
   # UPDATE. Used for tables that hold multiple rows per prisoner
   def migrate_bulk_records(model_class:, canonical_id:)
     record_type = model_class.model_name.singular
-    records = model_class.where(nomis_offender_id: old_offender_id).to_a
-    count = records.count
+    count = model_class.where(nomis_offender_id: old_offender_id).update_all(nomis_offender_id: canonical_id)
     return if count.zero?
-
-    records.each do |record|
-      record.nomis_offender_id = canonical_id
-      record.save!(validate: false)
-    end
 
     publish_merge_audit_event(record_type:, canonical_id:)
 

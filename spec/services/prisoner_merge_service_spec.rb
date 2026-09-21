@@ -53,6 +53,16 @@ RSpec.describe PrisonerMergeService do
     AuditEvent.where("ARRAY[?]::text[] <@ tags", %w[service prisoner_merge migrated] + [record_type])
   end
 
+  def expect_repoint_without_touch(record, expected_nomis_id: new_id)
+    reloaded = record.class.find(record.id)
+
+    aggregate_failures do
+      expect(reloaded.nomis_offender_id).to eq(expected_nomis_id)
+      # Allow for microsecond precision differences when comparing timestamps
+      expect(reloaded.updated_at).to be_within(0.001).of(record.updated_at)
+    end
+  end
+
   describe '.locally_tracked?' do
     subject(:tracked?) { described_class.locally_tracked?(old_id) }
 
@@ -107,6 +117,20 @@ RSpec.describe PrisonerMergeService do
         expect { service.process }.not_to raise_error
         expect_migrated_records(EarlyAllocation, count: 2)
       end
+
+      it 'preserves timestamps and does not create paper trail versions when bulk repointing' do
+        version_counts_by_item_before = PaperTrail::Version.group(:item_type, :item_id).count
+
+        service.process
+
+        [early_alloc1, early_alloc2].each do |early_alloc|
+          before_count = version_counts_by_item_before.fetch(['EarlyAllocation', early_alloc.id], 0)
+          after_count = PaperTrail::Version.where(item_type: 'EarlyAllocation', item_id: early_alloc.id).count
+
+          expect_repoint_without_touch(early_alloc)
+          expect(after_count).to eq(before_count)
+        end
+      end
     end
 
     context 'when old ID has victim liaison officers' do
@@ -119,7 +143,7 @@ RSpec.describe PrisonerMergeService do
         expect_migrated_records(VictimLiaisonOfficer, count: 2)
       end
 
-      it 'creates paper trail versions for each reassigned VLO record' do
+      it 'does not create paper trail versions or touch timestamps for reassigned VLO records' do
         version_counts_by_item_before = PaperTrail::Version.group(:item_type, :item_id).count
 
         service.process
@@ -127,7 +151,9 @@ RSpec.describe PrisonerMergeService do
         [vlo1, vlo2].each do |vlo|
           before_count = version_counts_by_item_before.fetch(['VictimLiaisonOfficer', vlo.id], 0)
           after_count = PaperTrail::Version.where(item_type: 'VictimLiaisonOfficer', item_id: vlo.id).count
-          expect(after_count).to eq(before_count + 1)
+
+          expect_repoint_without_touch(vlo)
+          expect(after_count).to eq(before_count)
         end
       end
     end
@@ -263,7 +289,7 @@ RSpec.describe PrisonerMergeService do
       old_offender = create(:offender, nomis_offender_id: old_id)
       create(:case_information, :manual_entry, offender: old_offender)
 
-      allow_any_instance_of(CaseInformation).to receive(:save!).and_raise(StandardError, 'boom')
+      allow_any_instance_of(CaseInformation).to receive(:update_columns).and_raise(StandardError, 'boom')
 
       expect { service.process }.to raise_error(StandardError, 'boom')
 
@@ -280,7 +306,7 @@ RSpec.describe PrisonerMergeService do
       old_offender = create(:offender, nomis_offender_id: old_id)
       create(:case_information, :manual_entry, offender: old_offender)
 
-      allow_any_instance_of(CaseInformation).to receive(:save!)
+      allow_any_instance_of(CaseInformation).to receive(:update_columns)
         .and_raise(ActiveRecord::RecordNotUnique, 'duplicate key value violates unique constraint')
 
       expect { service.process }.to raise_error(ActiveRecord::RecordNotUnique)
@@ -421,15 +447,16 @@ RSpec.describe PrisonerMergeService do
         expect_migrated_records(CaseInformation, count: 1)
       end
 
-      it 'creates a paper trail version that captures nomis_offender_id reassignment' do
+      it 'does not create a paper trail version or touch timestamps when repointing' do
         before_count = manual_case_info.versions.count
+        previous_updated_at = manual_case_info.updated_at
 
         service.process
 
-        expect(manual_case_info.reload.versions.count).to eq(before_count + 1)
-
-        changeset = YAML.unsafe_load(manual_case_info.reload.versions.last.object_changes)
-        expect(changeset['nomis_offender_id']).to eq([old_id, new_id])
+        aggregate_failures do
+          expect(manual_case_info.reload.versions.count).to eq(before_count)
+          expect(manual_case_info.updated_at).to be_within(0.001).of(previous_updated_at)
+        end
       end
     end
 
@@ -474,6 +501,21 @@ RSpec.describe PrisonerMergeService do
       it 'does not publish allocation.changed as primary POM assignment is unchanged' do
         expect_any_instance_of(DomainEvents::Event).not_to receive(:publish)
         service.process
+      end
+
+      it 'does not touch timestamps, paper trail or flattened allocation history versions' do
+        before_version_count = allocation_history.versions.count
+        before_flattened_count = allocation_history.allocation_history_versions.count
+        previous_updated_at = allocation_history.updated_at
+
+        service.process
+
+        aggregate_failures do
+          expect_repoint_without_touch(allocation_history)
+          expect(allocation_history.reload.versions.count).to eq(before_version_count)
+          expect(allocation_history.allocation_history_versions.count).to eq(before_flattened_count)
+          expect(allocation_history.updated_at).to be_within(0.001).of(previous_updated_at)
+        end
       end
     end
 
