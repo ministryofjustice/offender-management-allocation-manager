@@ -57,17 +57,22 @@ private
     allocation = AllocationHistory.active.find_by(nomis_offender_id: offender.offender_no)
     return if allocation.nil?
 
-    logger.info(
-      "nomis_offender_id=#{offender.offender_no},job=process_prisoner_status_job,event=legal_status_changed|" \
-        "Legal status #{offender.legal_status} is not allowed. Deallocating."
-    )
+    allocation.with_lock do
+      allocation.reload
+      return unless allocation.active?
 
-    allocation.deallocate_primary_pom(
-      event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED
-    )
-    allocation.deallocate_secondary_pom(
-      event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED
-    )
+      logger.info(
+        "nomis_offender_id=#{offender.offender_no},job=process_prisoner_status_job,event=legal_status_changed|" \
+          "Legal status #{offender.legal_status} is not allowed. Deallocating."
+      )
+
+      allocation.deallocate_primary_pom(
+        event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED
+      )
+      allocation.deallocate_secondary_pom(
+        event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED
+      )
+    end
   end
 
   def maybe_inactivate_complexity(offender)

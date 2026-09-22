@@ -188,8 +188,9 @@ Handover dates are persisted in `calculated_handover_dates` and recomputed by [`
 
 - **Nightly cron** — a scheduled Kubernetes job runs `rake recalculate_handover_dates` every weekday at 07:00, queuing the job for every active offender. This is the primary mechanism by which responsibility transitions (e.g. from `CustodyOnly` to `CustodyWithCom`) are picked up as time passes.
 - **Early allocation saved** — when an early allocation decision is made via [`EarlyAllocationService`](../app/services/early_allocation_service.rb), the job runs immediately for that offender.
+- **Relevant prisoner sentence changes** — prisoner update events can also trigger a background recalculation for offenders already tracked by this service. This is used for sentence-driven changes that could affect handover dates before the next daily sweep.
 
-> **Note:** inbound domain events (probation changes, tier changes, prisoner status changes) do **not** directly trigger handover recalculation. `TierChangeHandler` only updates `CaseInformation#tier`; `ProbationChangeHandler` only updates `CaseInformation` fields (COM name, MAPPA level, etc.). The nightly cron picks up the downstream effect of those changes the following morning.
+> **Note:** not all inbound domain events recalculate handover dates. Probation changes mainly refresh `CaseInformation` fields (COM name, MAPPA level, resourcing, etc.) and tier-change events mainly refresh `CaseInformation#tier`. Prisoner **status** changes are handled separately in near real time because they can affect allocation eligibility, but they do not usually recalculate handover dates by themselves.
 
 When the dates change, a `handover.changed` domain event is published to notify downstream systems (e.g. nDelius).
 

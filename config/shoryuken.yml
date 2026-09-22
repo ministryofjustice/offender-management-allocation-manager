@@ -1,4 +1,4 @@
-concurrency: 1
+concurrency: <%= ENV.fetch('SHORYUKEN_CONCURRENCY') { 5 } %>
 pidfile: ./tmp/shoryuken.pid
 queues:
   - '<%= ENV.fetch("DOMAIN_EVENTS_SQS_QUEUE_NAME") %>'

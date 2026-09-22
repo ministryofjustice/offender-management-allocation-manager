@@ -2,7 +2,7 @@
 
 RSpec.describe ProcessPrisonerStatusJob, type: :job do
   let(:nomis_offender_id) { 'A1234BC' }
-  let(:allocation) { instance_double(AllocationHistory, deallocate_primary_pom: true, deallocate_secondary_pom: true) }
+  let(:allocation) { instance_double(AllocationHistory, active?: true, deallocate_primary_pom: true, deallocate_secondary_pom: true) }
   let(:active_allocations) { double('active_allocations') }
   let(:offender) { double('Offender', offender_no: nomis_offender_id, legal_status:, prison_id:, 'in_womens_prison?': in_womens_prison, sentenced?: sentenced, immigration_case?: immigration_case) }
   let(:legal_status) { 'SENTENCED' }
@@ -14,6 +14,10 @@ RSpec.describe ProcessPrisonerStatusJob, type: :job do
   before do
     allow(AllocationHistory).to receive(:active).and_return(active_allocations)
     allow(active_allocations).to receive(:find_by).with(nomis_offender_id:).and_return(allocation)
+    if allocation
+      allow(allocation).to receive(:with_lock).and_yield
+      allow(allocation).to receive(:reload).and_return(allocation)
+    end
     allow(HmppsApi::ComplexityApi).to receive(:inactivate)
     allow(MovementService).to receive(:process_offender_last_movement)
 
@@ -60,6 +64,8 @@ RSpec.describe ProcessPrisonerStatusJob, type: :job do
     let(:legal_status) { 'REMAND' }
 
     it 'deallocates POMs' do
+      expect(allocation).to receive(:with_lock).and_yield
+      expect(allocation).to receive(:reload).and_return(allocation)
       expect(allocation).to receive(:deallocate_primary_pom).with(event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED)
       expect(allocation).to receive(:deallocate_secondary_pom).with(event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED)
 
