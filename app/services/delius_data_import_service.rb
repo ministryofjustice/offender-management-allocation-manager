@@ -88,9 +88,9 @@ private
   end
 
   def process_record(probation_record, nomis_offender_id)
-    DeliusImportError.where(nomis_offender_id: nomis_offender_id).destroy_all
+    DeliusImportError.where(nomis_offender_id:).destroy_all
 
-    prisoner = Offender.find_or_create_by!(nomis_offender_id: nomis_offender_id)
+    prisoner = Offender.create_or_find_by!(nomis_offender_id:)
     case_info = prisoner.case_information || prisoner.build_case_information
 
     map_delius_to_case_info!(probation_record, case_info)

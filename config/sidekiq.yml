@@ -1,8 +1,10 @@
 ---
-:concurrency: <%= ENV.fetch('RAILS_MAX_THREADS') { 3 } %>
+:concurrency: <%= ENV.fetch('SIDEKIQ_CONCURRENCY') { 10 } %>
 
+# Queue weighting: debounce gets priority (checked 3x per mailers),
+# critical work gets handled before lower priority deferred tasks
 :queues:
-  - debounce
-  - default
-  - mailers
-  - deferred
+  - [debounce, 3]
+  - [default, 2]
+  - [mailers, 1]
+  - [deferred, 1]
