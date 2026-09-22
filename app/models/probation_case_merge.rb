@@ -61,6 +61,10 @@ class ProbationCaseMerge < ApplicationRecord
     true
   end
 
+  def nomis_offender_id
+    CaseInformation.find_by(crn: old_crn)&.nomis_offender_id
+  end
+
 private
 
   def does_not_create_cycle
