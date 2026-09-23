@@ -28,6 +28,31 @@ $purple: govuk-colour("purple");
     float: left;
     font-weight: bold;
   }
+
+  table.responsive .poms-table__narrow-column,
+  table.responsive .poms-table__status-column,
+  table.responsive .poms-table__high-complexity-column,
+  table.responsive [class*="govuk-!-width"] {
+    width: auto !important;
+  }
+
+  table.responsive td.poms-table__high-complexity-column,
+  table.responsive td.poms-table__total-cases-column {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: right;
+  }
+
+  table.responsive td.poms-table__total-cases-column {
+    padding-right: 20px;
+  }
+
+  table.responsive td.poms-table__high-complexity-column:before,
+  table.responsive td.poms-table__total-cases-column:before {
+    float: none;
+    margin-right: 15px;
+  }
 }
 
 .table_cell__right_align {
@@ -72,6 +97,43 @@ $purple: govuk-colour("purple");
     border-left: 5px solid $purple;
     padding-left: 5px;
   }
+}
+
+.poms-table__case-mix-cell {
+  vertical-align: top;
+}
+
+.poms-table .govuk-table__header {
+  vertical-align: bottom;
+}
+
+.poms-table__case-mix-cell .case-mix-bar {
+  width: 100%;
+  min-height: 40px;
+}
+
+.poms-table__narrow-column {
+  width: 5.5rem;
+  white-space: nowrap;
+}
+
+.poms-table__status-column {
+  width: 5rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.poms-table__high-complexity-column {
+  width: 4rem;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+  text-align: center;
+}
+
+.poms-table__total-cases-column {
+  text-align: center;
 }
 
 // POM selection table

@@ -17,6 +17,10 @@ RSpec.describe PomHelper do
     it "formats a POM's PT 0.8 working pattern" do
       expect(format_working_pattern(0.8)).to eq('Part time – 4 days per week')
     end
+
+    it "formats a POM's PT working pattern in short form" do
+      expect(format_working_pattern(0.5, format: :short)).to eq('Part time – 2.5 days')
+    end
   end
 
   describe '#working_pattern_to_days' do
