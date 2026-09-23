@@ -7,7 +7,6 @@ if sentry_dsn
   Sentry.init do |config|
     config.dsn = sentry_dsn
     config.release = ENV['BUILD_NUMBER']
-    config.enable_metrics = false
 
     # Opt in to new Rails error reporting API
     # https://edgeguides.rubyonrails.org/error_reporting.html

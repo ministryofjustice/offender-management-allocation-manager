@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'Sentry initializer' do
   let(:initializer_path) { Rails.root.join('config/initializers/sentry.rb') }
   let(:fake_sentry_config_class) do
-    Struct.new(:dsn, :release, :enable_metrics, :before_send, :excluded_exceptions, :rails, keyword_init: true)
+    Struct.new(:dsn, :release, :before_send, :excluded_exceptions, :rails, keyword_init: true)
   end
   let(:fake_event_class) { Struct.new(:extra, :user, :contexts) }
   let(:rails_config) { double('rails_config', register_error_subscriber: nil, report_rescued_exceptions: nil) }

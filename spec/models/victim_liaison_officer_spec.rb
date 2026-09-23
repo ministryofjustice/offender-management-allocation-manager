@@ -9,6 +9,14 @@ RSpec.describe VictimLiaisonOfficer, type: :model do
     expect(subject).to validate_presence_of :email
   end
 
+  it 'strips whitespace from email, first_name and last_name before validation' do
+    vlo = build(:victim_liaison_officer, email: '  test@example.com ', first_name: '  John  ', last_name: '  Doe  ')
+    expect(vlo).to be_valid
+    expect(vlo.email).to eq('test@example.com')
+    expect(vlo.first_name).to eq('John')
+    expect(vlo.last_name).to eq('Doe')
+  end
+
   context 'with an offender record' do
     before do
       create(:offender, victim_liaison_officers: [vlo])
