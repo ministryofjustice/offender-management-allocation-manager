@@ -1,0 +1,10 @@
+name: Setup Ruby
+description: Set up Ruby with bundler cache using a single pinned ruby/setup-ruby reference
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Ruby and install gems
+      uses: ruby/setup-ruby@984c0c890880bbf811283d6f09c4607c62d210a4 # v1.323.0
+      with:
+        bundler-cache: true
