@@ -17,7 +17,7 @@ gem 'csv'
 gem 'date_validator'
 gem 'faraday', '~> 1.10.3'
 gem 'govuk_notify_rails', '~> 3.0.0'
-gem 'govuk_design_system_formbuilder', '~> 6.0.0'
+gem 'govuk_design_system_formbuilder', '~> 6.5.0'
 gem 'json-schema', '~> 6.2'
 gem 'jwt'
 gem 'kaminari' # pagination
@@ -32,7 +32,7 @@ gem 'paper_trail', '~> 17.0'
 gem 'pg'
 gem 'prawn-rails'
 gem 'prometheus_exporter'
-gem 'puma', '~> 7.2'
+gem 'puma', '~> 8.0'
 gem 'redis'
 gem 'rswag-api' # api-documentation
 gem 'rswag-ui'  # api-documentation interface
