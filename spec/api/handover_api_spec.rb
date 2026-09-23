@@ -53,11 +53,12 @@ describe 'Handover API' do
           end
 
           response '200', 'Handover information successfully found' do
-            schema required: %w[nomsNumber handoverDate responsibility responsibleComName responsibleComEmail responsiblePomName responsiblePomNomisId],
+            schema required: %w[nomsNumber handoverDate handoverStartDate responsibility responsibleComName responsibleComEmail responsiblePomName responsiblePomNomisId],
                    type: :object,
                    properties: {
                      nomsNumber: { '$ref' => '#/components/schemas/NomsNumber' },
-                     handoverDate: { type: :string, format: :date },
+                     handoverDate: { type: :string, format: :date, nullable: true },
+                     handoverStartDate: { type: :string, format: :date, nullable: true },
                      responsibility: { type: :string, pattern: '^POM|COM$' },
                      responsibleComName: { type: :string, nullable: true },
                      responsibleComEmail: { type: :string, nullable: true },
