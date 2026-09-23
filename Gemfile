@@ -12,7 +12,6 @@ gem 'aws-sdk-sns'
 # Need Shoryuken for consuming domain events (includes aws-sdk-sqs)
 gem 'shoryuken', '~> 7.0'
 
-gem 'auto_strip_attributes'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'csv'
 gem 'date_validator'

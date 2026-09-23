@@ -3,20 +3,98 @@ updates:
   - package-ecosystem: bundler
     directory: "/"
     schedule:
-      interval: daily
-    # Disable version updates, but leave security updates
-    open-pull-requests-limit: 0
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/London
+    cooldown:
+      default-days: 7
+    groups:
+      bundler-runtime-dependencies:
+        dependency-type: production
+        patterns:
+          - "*"
+      bundler-development-dependencies:
+        dependency-type: development
+        patterns:
+          - "*"
+      bundler-other:
+        patterns:
+          - "*"
 
   - package-ecosystem: docker
     directory: "/"
     schedule:
-      interval: daily
-    # Disable version updates, but leave security updates
-    open-pull-requests-limit: 0
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/London
+    cooldown:
+      default-days: 7
+    groups:
+      docker-dependencies:
+        patterns:
+          - "*"
 
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: daily
-    # Disable version updates, but leave security updates
-    open-pull-requests-limit: 0
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/London
+    cooldown:
+      default-days: 7
+      exclude:
+        - "ministryofjustice/*"
+    groups:
+      github-actions-official:
+        patterns:
+          - "actions/*"
+          - "browser-actions/*"
+          - "ruby/setup-ruby"
+      github-actions-ministry-of-justice:
+        patterns:
+          - "ministryofjustice/*"
+      github-actions-other:
+        patterns:
+          - "*"
+
+  - package-ecosystem: helm
+    directory: "/helm_deploy/offender-management-allocation-manager"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/London
+    cooldown:
+      default-days: 7
+    groups:
+      helm-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/London
+    cooldown:
+      default-days: 7
+    groups:
+      npm-frontend-runtime:
+        patterns:
+          - "@ministryofjustice/*"
+          - "govuk-frontend"
+      npm-build-tooling:
+        patterns:
+          - "sass"
+      npm-other:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@ministryofjustice/*"
+          - "govuk-frontend"
+          - "sass"
