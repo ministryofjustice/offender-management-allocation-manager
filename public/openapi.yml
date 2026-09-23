@@ -478,6 +478,8 @@ paths:
                         type: string
                       surname:
                         type: string
+                      email:
+                        type: string
                   prison:
                     type: object
                     properties:
@@ -524,6 +526,7 @@ paths:
                 required:
                 - nomsNumber
                 - handoverDate
+                - handoverStartDate
                 - responsibility
                 - responsibleComName
                 - responsibleComEmail
@@ -536,6 +539,11 @@ paths:
                   handoverDate:
                     type: string
                     format: date
+                    nullable: true
+                  handoverStartDate:
+                    type: string
+                    format: date
+                    nullable: true
                   responsibility:
                     type: string
                     pattern: "^POM|COM$"

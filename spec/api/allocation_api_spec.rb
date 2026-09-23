@@ -135,7 +135,8 @@ describe 'Allocation API' do
                      properties: {
                        code: { type: :integer },
                        forename: { type: :string },
-                       surname: { type: :string }
+                       surname: { type: :string },
+                       email: { type: :string }
                      }
                    },
                    prison: {
