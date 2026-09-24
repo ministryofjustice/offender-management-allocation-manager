@@ -10,20 +10,22 @@ RSpec.describe CaseInformationHistory do
 
   describe '.timeline_entries_for' do
     let(:nomis_offender_id) { 'A1234BC' }
-    let(:create_version) { PaperTrail::Version.new(event: 'create', object_changes: YAML.dump('tier' => [nil, 'A'])) }
     let(:tracked_version) { PaperTrail::Version.new(event: 'update', object_changes: YAML.dump('tier' => ['A', 'B'])) }
     let(:tracked_nil_version) { PaperTrail::Version.new(event: 'update', object_changes: YAML.dump('enhanced_resourcing' => [false, nil])) }
-    let(:destroy_version) { PaperTrail::Version.new(event: 'destroy') }
     let(:hidden_version) { PaperTrail::Version.new }
+    let(:relation) { instance_double(ActiveRecord::Relation) }
 
-    it 'builds presenters for tracked create and update versions, including changes to nil, and filters out hidden entries' do
+    it 'builds presenters for tracked update versions, including changes to nil, and filters out hidden entries' do
       allow(PaperTrail::Version).to receive(:where)
-        .with(item_type: 'CaseInformation', nomis_offender_id: nomis_offender_id)
-        .and_return([create_version, tracked_version, tracked_nil_version, destroy_version, hidden_version])
+        .with(item_type: 'CaseInformation', event: 'update', nomis_offender_id: nomis_offender_id)
+        .and_return(relation)
+
+      allow(relation).to receive(:filter_map) do |&block|
+        [tracked_version, tracked_nil_version, hidden_version].filter_map(&block)
+      end
 
       entries = described_class.timeline_entries_for(nomis_offender_id)
-
-      expect(entries.map(&:event)).to eq(%w[create update update])
+      expect(entries.map(&:event)).to eq(%w[update update])
     end
   end
 
@@ -131,21 +133,6 @@ RSpec.describe CaseInformationHistory do
         expect(details.first.from_value).to eq('standard')
         expect(details.first.to_value).to eq('(unset)')
       end
-    end
-
-    it 'returns no tracked details for destroy versions because the timeline uses generic copy' do
-      version = PaperTrail::Version.new(
-        event: 'destroy',
-        object_changes: YAML.dump(
-          'tier' => ['B', nil],
-          'rosh_level' => ['LOW', nil],
-          'enhanced_resourcing' => [false, nil]
-        )
-      )
-
-      details = described_class.new(version).change_details
-
-      expect(details).to eq([])
     end
 
     it 'does not include CRN when previous value is nil' do
