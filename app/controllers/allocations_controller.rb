@@ -44,7 +44,7 @@ class AllocationsController < PrisonsApplicationController
                            end
                          end
     complexity_history = [] if complexity_history.nil?
-    email_history = EmailHistory.where(nomis_offender_id: nomis_offender_id_from_url)
+    email_history = EmailHistory.where(nomis_offender_id: nomis_offender_id_from_url).where.not(event: hidden_email_history_events)
     early_allocations = Offender.includes(:early_allocations).find_by!(nomis_offender_id: nomis_offender_id_from_url).early_allocations
 
     ea_history = early_allocations.map { |ea|
@@ -78,6 +78,14 @@ private
 
   def load_prisoner
     @prisoner = get_offender_or_404(nomis_offender_id_from_url)
+  end
+
+  def hidden_email_history_events
+    [
+      EmailHistory::RESPONSIBILITY_OVERRIDE,
+      EmailHistory::RESPONSIBILITY_TO_CUSTODY,
+      EmailHistory::RESPONSIBILITY_TO_CUSTODY_WITH_POM,
+    ]
   end
 
   def render_404

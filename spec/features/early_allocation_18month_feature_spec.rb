@@ -38,7 +38,6 @@ feature 'early allocation when crossing 18 month threshold' do
       within_timeline_section(prison.name) do
         expect_timeline_titles(
           'Prisoner allocated',
-          'Case information created',
           'Early allocation assessment form completed',
           'Reminder sent to POM for early allocation re-assessment'
         )

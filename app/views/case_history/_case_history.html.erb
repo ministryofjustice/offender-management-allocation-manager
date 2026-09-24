@@ -4,7 +4,7 @@
   </div>
 
   <p class="moj-timeline__date">
-    <%= format_date_long(object.created_at) %> by <%= object.created_by_name.present? ? object.created_by_name : "System Admin" %>
+    <%= format_date_long(object.created_at) %> by <%= object.created_by_name.present? ? object.created_by_name : 'System' %>
   </p>
 
   <div class="moj-timeline__description app-case-history__description">

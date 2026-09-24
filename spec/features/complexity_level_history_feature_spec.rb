@@ -54,7 +54,7 @@ feature 'Case history with complexity level' do
       within_timeline_section(prison.name) do
         expect(page).to have_css('.govuk-heading-m', text: prison.name)
 
-        expect_timeline_titles('Prisoner allocated', 'Case information created', 'Complexity of need level added')
+        expect_timeline_titles('Prisoner allocated', 'Complexity of need level added')
       end
     end
 
@@ -105,7 +105,7 @@ feature 'Case history with complexity level' do
       within_timeline_section(prison.name) do
         expect(page).to have_css('.govuk-heading-m', text: prison.name)
 
-        expect_timeline_titles('Prisoner allocated', 'Case information created', 'Complexity of need level added', 'Complexity of need level updated')
+        expect_timeline_titles('Prisoner allocated', 'Complexity of need level added', 'Complexity of need level updated')
       end
     end
 
@@ -134,7 +134,7 @@ feature 'Case history with complexity level' do
       within_timeline_section(prison.name) do
         expect(page).to have_css('.govuk-heading-m', text: prison.name)
 
-        expect_timeline_titles('Prisoner allocated', 'Case information created')
+        expect_timeline_titles('Prisoner allocated')
       end
     end
   end

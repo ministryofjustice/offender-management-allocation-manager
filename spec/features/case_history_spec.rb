@@ -267,12 +267,12 @@ feature 'Case History' do
         within_timeline_section(first_prison.name) do
           expect(page).to have_css('.govuk-heading-m', text: first_prison.name)
 
-          within find_timeline_item("#{formatted_deallocate_date} by System Admin") { |item|
+          within find_timeline_item("#{formatted_deallocate_date} by System") { |item|
                    item.has_css?('.moj-timeline__title', text: 'Prisoner unallocated')
                  } do
             [
               ['.moj-timeline__title', "Prisoner unallocated"],
-              ['.moj-timeline__date', "#{formatted_deallocate_date} by System Admin"],
+              ['.moj-timeline__date', "#{formatted_deallocate_date} by System"],
             ].each do |key, val|
               expect(page).to have_css(key, text: val)
             end
@@ -365,7 +365,6 @@ feature 'Case History' do
         aggregate_failures do
           expect_timeline_titles(
             'Prisoner allocated',
-            'Case information created',
             'Early allocation assessment form completed',
             'Early allocation decision recorded'
           )
@@ -437,16 +436,11 @@ feature 'Case History' do
         visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
 
         aggregate_failures do
-          expect_timeline_titles('Case information created', 'Case information updated')
+          expect_timeline_titles('Case information updated')
 
-          within(find_timeline_item('Case information created') { |item| item.text.include?('by Legacy User') }) do
-            expect(page).to have_css('.moj-timeline__description', text: 'Tier: B')
-            expect(page).to have_css('.moj-timeline__date', text: 'by Legacy User')
-          end
-
-          within(find_timeline_item('Case information updated') { |item| item.text.include?('by System Admin') }) do
+          within(find_timeline_item('Case information updated') { |item| item.text.include?('by System') }) do
             expect(page).to have_css('.moj-timeline__description', text: 'Tier: B → C')
-            expect(page).to have_css('.moj-timeline__date', text: 'by System Admin')
+            expect(page).to have_css('.moj-timeline__date', text: 'by System')
           end
 
           within(find_timeline_item('Case information updated') { |item| item.text.include?('by MOIC POM') }) do
@@ -474,7 +468,7 @@ feature 'Case History' do
         within_timeline_item('Case information updated') do
           aggregate_failures do
             expect(page).to have_css('.moj-timeline__description', text: 'ROSH: High → Low')
-            expect(page).to have_css('.moj-timeline__date', text: 'by System Admin')
+            expect(page).to have_css('.moj-timeline__date', text: 'by System')
           end
         end
       end
@@ -523,7 +517,7 @@ feature 'Case History' do
           aggregate_failures do
             expect(page).to have_css('.moj-timeline__title', text: 'Case information updated')
             expect(page).to have_css('.moj-timeline__description', text: 'Resourcing: standard → (unset)')
-            expect(page).to have_css('.moj-timeline__date', text: 'by System Admin')
+            expect(page).to have_css('.moj-timeline__date', text: 'by System')
           end
         end
       end
@@ -536,6 +530,23 @@ feature 'Case History' do
 
       before do
         Timecop.travel tomorrow do
+          create(
+            :email_history,
+            nomis_offender_id: nomis_offender_id,
+            name: 'Responsible COM',
+            email: 'responsible.com@example.com',
+            event: EmailHistory::RESPONSIBILITY_OVERRIDE,
+            prison: open_prison.code
+          )
+          create(
+            :email_history,
+            nomis_offender_id: nomis_offender_id,
+            name: 'Custody Team',
+            email: 'custody.team@example.com',
+            event: EmailHistory::RESPONSIBILITY_TO_CUSTODY,
+            prison: open_prison.code
+          )
+
           PaperTrail.request(whodunnit: 'legacy.user') do
             create(
               :responsibility,
@@ -565,6 +576,13 @@ feature 'Case History' do
         expect(page).to have_css('.moj-timeline__description', text: "Reason: Other – #{responsibility_reason_text}")
         expect(page).to have_css('.moj-timeline__title', text: 'Responsibility override removed')
         expect(page).to have_css('.moj-timeline__description', text: 'Community probation team no longer responsible for this case')
+      end
+
+      it 'hides responsibility email history entries' do
+        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
+
+        expect(page).not_to have_css('.moj-timeline__description', text: 'Request for responsible COM to be allocated sent to responsible.com@example.com')
+        expect(page).not_to have_css('.moj-timeline__description', text: 'Responsibility returned to custody notification sent to custody.team@example.com')
       end
 
       it 'renders historical and newly populated PaperTrail actor names together' do

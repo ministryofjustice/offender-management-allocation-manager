@@ -19,7 +19,7 @@ class CaseInformationHistory < BaseHistoryPresenter
 
   def self.timeline_entries_for(nomis_offender_id)
     PaperTrail::Version
-      .where(item_type: 'CaseInformation', nomis_offender_id:)
+      .where(item_type: 'CaseInformation', event: 'update', nomis_offender_id:)
       .filter_map do |version|
         history = new(version)
         history if history.change_details.any?
@@ -35,8 +35,6 @@ class CaseInformationHistory < BaseHistoryPresenter
   end
 
   def change_details
-    return [] if event == 'destroy'
-
     changeset = @version.changeset || {}
 
     TIMELINE_DETAILS.filter_map do |attribute, label|
