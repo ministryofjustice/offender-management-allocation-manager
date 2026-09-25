@@ -113,5 +113,18 @@ RSpec.describe ProbationCaseMerge do
         expect(audit.data['after']).to include('old_crn' => merge.old_crn, 'new_crn' => merge.new_crn)
       end
     end
+
+    it 'publishes an AuditEvent on create with a NOMIS ID resolved from the new CRN case information' do
+      offender = create(:offender, nomis_offender_id: 'A1234BC')
+      create(:case_information, offender:, crn: 'X54321')
+      create(:probation_case_merge, old_crn: 'X12345', new_crn: 'X54321')
+
+      audit = AuditEvent
+                .where('ARRAY[?]::text[] <@ tags', %w[record probation_case_merge created])
+                .order(:created_at)
+                .last
+
+      expect(audit.nomis_offender_id).to eq('A1234BC')
+    end
   end
 end
