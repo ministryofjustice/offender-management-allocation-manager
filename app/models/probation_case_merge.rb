@@ -46,9 +46,7 @@ class ProbationCaseMerge < ApplicationRecord
     current_active_merge = active.find_by(old_crn:)
     return current_active_merge if current_active_merge&.new_crn == new_crn
 
-    if current_active_merge
-      current_active_merge.update!(active: false, superseded_at: Time.current)
-    end
+    current_active_merge&.update!(active: false, superseded_at: Time.current)
 
     create!(old_crn:, new_crn:, active: true)
   end
@@ -62,7 +60,7 @@ class ProbationCaseMerge < ApplicationRecord
   end
 
   def nomis_offender_id
-    CaseInformation.find_by(crn: old_crn)&.nomis_offender_id
+    CaseInformation.find_by(crn: [old_crn, new_crn])&.nomis_offender_id
   end
 
 private
