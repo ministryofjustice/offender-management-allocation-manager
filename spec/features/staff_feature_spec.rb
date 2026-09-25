@@ -227,6 +227,7 @@ feature "staff pages" do
       stub_signin_spo spo, [female_prison]
       stub_offenders_for_prison(female_prison, offenders_in_prison << nomis_offender)
       stub_onboarded_poms(female_prison, poms)
+      PomDetail.find_by!(nomis_staff_id: probation_poms.first.staff_id).update!(working_pattern: 0.5)
 
       offenders_in_prison.map { |o| o.fetch(:prisonerNumber) }.each do |nomis_id|
         stub_keyworker(nomis_id)
@@ -259,6 +260,11 @@ feature "staff pages" do
       pom_row = find('td', text: poms.first.full_name_ordered).ancestor('tr')
 
       within pom_row do
+        cell = find('td[aria-label="POM and working pattern"]')
+
+        expect(cell).to have_content(poms.first.full_name_ordered)
+        expect(cell).to have_content('Part time – 2.5 days')
+
         within ".case-mix-bar" do
           expect(page).to have_css(".case-mix__tier_a", text: '2')
           expect(page).to have_css(".case-mix__tier_b", text: '1')
@@ -275,6 +281,11 @@ feature "staff pages" do
       pom_row = find('td', text: poms.last.full_name_ordered).ancestor('tr')
 
       within pom_row do
+        cell = find('td[aria-label="POM and working pattern"]')
+
+        expect(cell).to have_content(poms.last.full_name_ordered)
+        expect(cell).to have_content('Full time')
+
         within ".case-mix-bar" do
           expect(page).to have_css(".case-mix__tier_c", text: '1')
           expect(page).to have_css(".case-mix__tier_d", text: '1')

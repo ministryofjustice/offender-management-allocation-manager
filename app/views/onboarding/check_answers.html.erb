@@ -35,9 +35,9 @@
         </dt>
         <dd class="govuk-summary-list__value">
           <% if @onboarding_form.part_time? %>
-            <%= "Part time – #{working_pattern_to_days(@onboarding_form.working_pattern)} per week" %>
+            <%= t('pom.working_pattern.part_time.default', days: working_pattern_to_days(@onboarding_form.working_pattern)) %>
           <% else %>
-            Full time
+            <%= t('pom.working_pattern.full_time') %>
           <% end %>
         </dd>
         <dd class="govuk-summary-list__actions">

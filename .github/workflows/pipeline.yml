@@ -143,7 +143,7 @@ jobs:
           dropdb -U schemaspy -h localhost --if-exists mpc_schemaspy && \
           createdb -U schemaspy -h localhost mpc_schemaspy && \
           psql -U schemaspy -h localhost -d mpc_schemaspy < db/structure.sql
-      - uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/database_schema_report@accf37e936517ed39e7a888cf74f0277dab3310e # v1.1.4
+      - uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/database_schema_report@90bdfa991e9944e4997eba4c1f2709d21ec807ea # v1.1.5
         with:
           database_name: mpc_schemaspy
           user: schemaspy

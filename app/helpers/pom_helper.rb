@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module PomHelper
-  def format_working_pattern(pattern)
+  def format_working_pattern(pattern, format: :default)
     if pattern.to_d == 1.0.to_d
-      'Full time'
+      I18n.t('pom.working_pattern.full_time')
     else
-      "Part time – #{working_pattern_to_days(pattern * 10)} per week"
+      I18n.t("pom.working_pattern.part_time.#{format}", days: working_pattern_to_days(pattern * 10))
     end
   end
 

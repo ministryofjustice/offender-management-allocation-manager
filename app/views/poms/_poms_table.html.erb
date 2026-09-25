@@ -1,30 +1,33 @@
-<table class="govuk-table responsive">
+<table class="govuk-table responsive poms-table">
   <%= case_mix_key %>
   <thead class="govuk-table__head">
   <tr class="govuk-table__row">
     <th class="govuk-table__header govuk-!-width-one-quarter" scope="col">POM</th>
-    <th class="govuk-table__header" scope="col">Working pattern</th>
-    <th class="govuk-table__header" scope="col">Status</th>
-    <th class="govuk-table__header govuk-!-width-one-quarter" scope="col">Case mix by tier</th>
+    <th class="govuk-table__header poms-table__status-column" scope="col">Status</th>
+    <th class="govuk-table__header govuk-!-width-one-third" scope="col">Case mix by tier</th>
     <% if @prison.womens? %>
-      <th class="govuk-table__header govuk-table__header--numeric" scope="col">High complexity cases</th>
+      <th class="govuk-table__header poms-table__high-complexity-column" scope="col">High<br>complexity<br>cases</th>
     <% end %>
-    <th class="govuk-table__header govuk-table__header--numeric" scope="col">Total cases</th>
+    <th class="govuk-table__header poms-table__narrow-column poms-table__total-cases-column" scope="col">Total cases</th>
   </tr>
   </thead>
   <tbody class="govuk-table__body">
-  <% poms.each_with_index do |pom, i| %>
-    <tr class="govuk-table__row <%= pom_type %>_pom_row_<%= i %>">
-      <td aria-label="POM" class="govuk-table__cell"><%= link_to full_name_ordered(pom), prison_pom_path(@prison.code, nomis_staff_id: pom.staff_id) %></td>
-      <td aria-label="Working pattern" class="govuk-table__cell"><%= format_working_pattern(pom.working_pattern) %></td>
-      <td aria-label="Status" class="govuk-table__cell"><%= status(pom).capitalize %></td>
-      <td aria-label="Case mix by tier" class="govuk-table__cell"><%= case_mix_bar_by_tiers(pom.allocations) %></td>
+  <% poms.each do |pom| %>
+    <tr class="govuk-table__row">
+      <td aria-label="POM and working pattern" class="govuk-table__cell poms-table__name-cell">
+        <%= link_to full_name_ordered(pom), prison_pom_path(@prison.code, nomis_staff_id: pom.staff_id) %><br>
+        <span class="govuk-!-margin-bottom-0"><%= format_working_pattern(pom.working_pattern, format: :short) %></span>
+      </td>
+      <td aria-label="Status" class="govuk-table__cell poms-table__status-column"><%= status(pom).capitalize %></td>
+      <td aria-label="Case mix by tier" class="govuk-table__cell poms-table__case-mix-cell">
+        <%= case_mix_bar_by_tiers(pom.allocations, preserve_space_if_none: true) %>
+      </td>
       <% if @prison.womens? %>
-        <td aria-label="High complexity cases" class="govuk-table__cell govuk-table__cell--numeric">
-          <%= pom.allocations.count { |o| o.complexity_level == 'high' } %>
+        <td aria-label="High complexity cases" class="govuk-table__cell poms-table__high-complexity-column">
+          <%= pom.allocations.count { it.complexity_level == 'high' } %>
         </td>
       <% end %>
-      <td aria-label="Total cases" class="govuk-table__cell govuk-table__cell--numeric govuk-!-font-weight-bold"><%= pom.allocations.count %></td>
+      <td aria-label="Total cases" class="govuk-table__cell govuk-!-font-weight-bold poms-table__narrow-column poms-table__total-cases-column"><%= pom.allocations.count %></td>
     </tr>
   <% end %>
   </tbody>

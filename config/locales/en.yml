@@ -56,6 +56,13 @@ en:
 
   service_name: 'POM cases'
 
+  pom:
+    working_pattern:
+      full_time: Full time
+      part_time:
+        default: "Part time – %{days} per week"
+        short: "Part time – %{days}"
+
   activemodel:
     errors:
       models:
