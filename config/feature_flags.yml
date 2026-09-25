@@ -7,12 +7,15 @@ feature_flags:
   rosh_level:
     staging: true
     preprod: true
+    production: true
   new_tiers:
     staging: true
     preprod: true
+    production: true
   rosh_recommendations:
     staging: true
     preprod: true
+    production: true
   prisoner_merges:
     staging: true
     preprod: true
