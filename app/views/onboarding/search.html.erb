@@ -20,24 +20,25 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-one-half">
-    <div class="moj-search govuk-!-margin-bottom-8">
+    <search class="moj-search govuk-!-margin-bottom-8">
       <%= form_for(@onboarding_form, url: search_prison_onboarding_index_path, method: :post,
-                   builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+                   builder: GOVUKDesignSystemFormBuilder::FormBuilder,
+                   html: { class: 'app-onboarding-search__form' }) do |f| %>
 
         <%= hidden_field_tag :from, params[:from] %>
 
         <%= f.govuk_text_field :search_query, type: :search, class: 'moj-search__input',
-                               autocomplete: 'off', autocorrect: 'off',
-                               label: { text: heading_text, tag: 'h1', size: 'l' },
-                               hint: { text: 'Search people who have not been added to the service yet.', size: 's' } do %>
+                               autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', spellcheck: false,
+                               label: { text: heading_text, tag: 'h1', size: 'l', class: 'moj-search__label' },
+                               hint: { text: 'Search people who have not been added to the service yet.', size: 's' },
+                               form_group: { class: 'app-onboarding-search__form-group' },
+                               after_input: -> { f.govuk_submit('Search', class: 'moj-search__button') } do %>
           <p class="govuk-!-margin-top-5 govuk-!-margin-bottom-0 govuk-!-font-weight-bold">
             Use name, email address or username
           </p>
         <% end %>
-
-        <%= f.govuk_submit 'Search', class: 'moj-search__button' %>
       <% end %>
-    </div>
+    </search>
   </div>
 
   <div class="govuk-grid-column-two-thirds">

@@ -1,9 +1,8 @@
-@forward "govuk-frontend/dist/govuk/index" with (
-  $govuk-global-styles: true,
-  $govuk-image-url-function: "image-url",
-  $govuk-font-url-function: "asset-url",
-  $govuk-assets-path: 'govuk-frontend/dist/govuk/assets/'
+@use "@ministryofjustice/frontend/moj/all" with (
+  $govuk-global-styles: true
 );
 
-@use "govuk-frontend/dist/govuk/index";
-@use "@ministryofjustice/frontend/moj/all";
+@use "govuk-frontend/dist/govuk";
+
+@forward "govuk-frontend/dist/govuk/core";
+@forward "govuk-frontend/dist/govuk/helpers";

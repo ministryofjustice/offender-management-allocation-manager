@@ -5,7 +5,7 @@
 <p class="govuk-body"><%= t('parole.upcoming.pom') %></p>
 
 <% if @pom.blank? || @parole_cases.empty? %>
-  <h2 class="govuk-heading-l">No cases approaching parole </h2>
+  <p class="govuk-body">No cases approaching parole.</p>
 <% else %>
   <table class="govuk-table responsive">
     <thead class="govuk-table__head">

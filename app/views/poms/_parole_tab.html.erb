@@ -5,7 +5,7 @@
       <p class="govuk-body"><%= t('parole.upcoming.pom') %></p>
 
       <% if @parole_cases.empty? %>
-        <h2 class="govuk-heading-l">No cases approaching parole </h2>
+        <p class="govuk-body">No cases approaching parole.</p>
       <% else %>
         <%= render partial: 'shared/pagination', locals: { data: @parole_cases } %>
         <%= render 'shared/parole_table' %>
