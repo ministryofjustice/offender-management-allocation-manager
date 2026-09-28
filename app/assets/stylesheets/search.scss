@@ -12,6 +12,57 @@
     }
 }
 
+// Recent versions of the MOJ Frontend really messed up with the search
+// In the interim, these overrides attempt to keep the appearance as before
+.moj-search .moj-search__button.govuk-button {
+    display: inline-block;
+    width: auto;
+    margin-bottom: 0;
+    margin-left: govuk-spacing(2);
+    align-self: flex-start;
+}
+
+.moj-search.moj-search--stacked .moj-search__button.govuk-button {
+    margin-left: 0;
+}
+
+.app-onboarding-search__form-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+
+    > .govuk-label-wrapper,
+    > .govuk-hint,
+    > .govuk-error-message,
+    > p {
+        flex: 0 0 100%;
+    }
+
+    > .govuk-input.moj-search__input {
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+    }
+
+    > .moj-search__button.govuk-button {
+        flex: 0 0 auto;
+    }
+}
+
+@media (max-width: 19.99em) {
+    .app-onboarding-search__form-group {
+        > .govuk-input.moj-search__input {
+            flex-basis: 100%;
+            width: 100%;
+        }
+
+        > .moj-search__button.govuk-button {
+            margin-top: govuk-spacing(2);
+            margin-left: 0;
+        }
+    }
+}
+
 mark {
     border-bottom: 3px solid govuk-functional-colour("focus");
     margin-right: 1px;

@@ -21,9 +21,7 @@
 
 <%= render 'reallocation_alert' %>
 
-<div class="govuk-!-margin-bottom-4">
-  <%= render "search/search_box" %>
-</div>
+<%= render "search/search_box" %>
 
 <%= render(:partial => 'shared/summary_subnav', :locals => {:active => :unallocated,
                                                             :unallocated_count => @unallocated.count,
