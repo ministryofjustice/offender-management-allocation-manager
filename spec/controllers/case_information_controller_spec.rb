@@ -7,14 +7,12 @@ RSpec.describe CaseInformationController, type: :controller do
   let(:offender) { build(:nomis_offender, prisonId: prison.code) }
   let(:offender_no) { offender.fetch(:prisonerNumber) }
   let(:pom) { build(:pom) }
-  let(:rosh_level_feature_enabled) { true }
   let!(:offender_record) { create(:offender, nomis_offender_id: offender_no) }
 
   before do
     stub_offender(offender)
     stub_sso_data(prison.code)
     stub_poms(prison.code, [pom])
-    stub_feature_flag(:rosh_level, enabled: rosh_level_feature_enabled)
   end
 
   describe '#create' do
@@ -274,16 +272,6 @@ RSpec.describe CaseInformationController, type: :controller do
 
           expect(response).to have_http_status(:ok)
         end
-
-        context 'when the rosh feature flag is disabled' do
-          let(:rosh_level_feature_enabled) { false }
-
-          it 'refuses access because the case is complete for allocation' do
-            get :new, params: { prison_id: prison.code, prisoner_id: offender_no }
-
-            expect(response).to redirect_to('/404')
-          end
-        end
       end
 
       context 'when enhanced resourcing is the only missing field' do
@@ -380,28 +368,6 @@ RSpec.describe CaseInformationController, type: :controller do
         }
 
         expect(response).to redirect_to(prison_prisoner_allocation_path(prison.code, prisoner_id: offender_no))
-      end
-
-      context 'when the rosh feature flag is disabled' do
-        let(:rosh_level_feature_enabled) { false }
-
-        it 'does not update the rosh level' do
-          put :update, params: {
-            prison_id: prison.code,
-            prisoner_id: offender_no,
-            from: 'review_case',
-            case_information: {
-              tier: 'A',
-              rosh_level: 'HIGH',
-              enhanced_resourcing: 'true'
-            }
-          }
-
-          aggregate_failures do
-            expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
-            expect(case_information.reload.rosh_level).to eq('LOW')
-          end
-        end
       end
     end
 

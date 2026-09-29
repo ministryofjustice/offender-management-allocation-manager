@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe Auditable do
   before do
     PaperTrail.request.whodunnit = 'TEST_USER'
-    stub_feature_flag(:rosh_level, enabled: true)
   end
 
   after do

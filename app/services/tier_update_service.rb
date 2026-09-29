@@ -2,7 +2,7 @@ class TierUpdateService
   Result = Struct.new(:status, :errors, :old_tier, :new_tier, :version, keyword_init: true)
 
   def self.call(crn:, audit_tags:)
-    version = FeatureFlags.new_tiers.enabled? ? 3 : 2
+    version = 3
 
     case_information = CaseInformation.find_by(crn:)
     return Result.new(status: :unchanged, version:) if case_information.nil?

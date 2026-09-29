@@ -17,7 +17,6 @@ RSpec.describe PrisonerMergeService do
 
   before do
     allow(Rails.logger).to receive(:info)
-    stub_feature_flag(:prisoner_merges, enabled: true)
   end
 
   def expect_migrated_records(model_class, count: nil)
@@ -247,21 +246,6 @@ RSpec.describe PrisonerMergeService do
     it 'records the merge in the database' do
       expect { service.process }
         .to change(NomisIdMerge, :count).by(1)
-    end
-
-    describe 'feature flag: prisoner_merges' do
-      before do
-        stub_feature_flag(:prisoner_merges, enabled: false)
-      end
-
-      it 'records merge mapping but skips record reassignment' do
-        old_offender = create(:offender, nomis_offender_id: old_id)
-        create(:case_information, :manual_entry, offender: old_offender)
-
-        expect { service.process }.to change(NomisIdMerge, :count).by(1)
-        expect(CaseInformation.find_by(nomis_offender_id: old_id)).to be_present
-        expect(CaseInformation.find_by(nomis_offender_id: new_id)).to be_nil
-      end
     end
 
     it 'stores the correct old and new NOMIS IDs' do

@@ -13,7 +13,7 @@
   <% show_all_fields = action_name.in?(%w[edit update]) %>
   <% editable_fields = @editable_case_information_fields || [] %>
   <% show_tier = show_all_fields || editable_fields.include?(:tier) %>
-  <% show_rosh_level = (show_all_fields && FeatureFlags.rosh_level.enabled?) || editable_fields.include?(:rosh_level) %>
+  <% show_rosh_level = show_all_fields || editable_fields.include?(:rosh_level) %>
   <% show_enhanced_resourcing = show_all_fields || editable_fields.include?(:enhanced_resourcing) %>
 
   <% if show_tier %>

@@ -12,22 +12,8 @@ RSpec.describe TierUpdateService do
   end
   let(:audit_tags) { %w[test] }
 
-  describe 'version selection' do
-    context 'when new_tiers is enabled' do
-      it 'uses version 3' do
-        expect(result.version).to eq(3)
-      end
-    end
-
-    context 'when new_tiers is disabled' do
-      before do
-        stub_feature_flag(:new_tiers, enabled: false)
-      end
-
-      it 'uses version 2' do
-        expect(result.version).to eq(2)
-      end
-    end
+  it 'uses version 3' do
+    expect(result.version).to eq(3)
   end
 
   context 'when case info does not exist' do

@@ -38,7 +38,6 @@ class CaseInformationHistory < BaseHistoryPresenter
     changeset = @version.changeset || {}
 
     TIMELINE_DETAILS.filter_map do |attribute, label|
-      next if attribute == 'rosh_level' && FeatureFlags.rosh_level.disabled?
       next unless changeset.key?(attribute)
 
       previous_value, new_value = changeset.fetch(attribute, [nil, nil])

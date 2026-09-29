@@ -14,9 +14,6 @@ class ProbationUnmergeService
       unmerged = record_unmerge
       return unless unmerged
 
-      # TODO: keep it feature-flagged for a while to make it easier to disable it if needed
-      return unless FeatureFlags.probation_merges.enabled?
-
       Auditable.without_audit_events do
         restore_case_information
       end

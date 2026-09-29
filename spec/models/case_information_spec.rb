@@ -1,10 +1,5 @@
 describe CaseInformation do
   let(:case_info) { create(:case_information) }
-  let(:rosh_level_feature_enabled) { true }
-
-  before do
-    stub_feature_flag(:rosh_level, enabled: rosh_level_feature_enabled)
-  end
 
   context 'with mappa level' do
     subject { build(:case_information) }
@@ -45,16 +40,6 @@ describe CaseInformation do
       expect(subject.errors.messages).to include(rosh_level: ['Select ROSH'])
     end
 
-    context 'when the rosh feature flag is disabled' do
-      let(:rosh_level_feature_enabled) { false }
-
-      it 'does not require a rosh level for manual entry' do
-        subject.rosh_level = nil
-
-        expect(subject.valid?(:manual_entry)).to be(true)
-      end
-    end
-
     it 'treats a blank rosh level as missing for manual entry' do
       subject.rosh_level = ''
 
@@ -83,38 +68,20 @@ describe CaseInformation do
   end
 
   describe '.tier_levels' do
-    context 'when new_tiers feature flag is enabled' do
-      before { stub_feature_flag(:new_tiers, enabled: true) }
-
-      it 'returns extended tiers A-G' do
-        expect(described_class.tier_levels).to eq %w[A B C D E F G]
-      end
-
-      it 'accepts tier E' do
-        expect(build(:case_information, tier: 'E')).to be_valid
-      end
-
-      it 'accepts tier F' do
-        expect(build(:case_information, tier: 'F')).to be_valid
-      end
-
-      it 'accepts tier G' do
-        expect(build(:case_information, tier: 'G')).to be_valid
-      end
+    it 'returns tiers A-G' do
+      expect(described_class.tier_levels).to eq %w[A B C D E F G]
     end
 
-    context 'when new_tiers feature flag is disabled' do
-      before { stub_feature_flag(:new_tiers, enabled: false) }
+    it 'accepts tier E' do
+      expect(build(:case_information, tier: 'E')).to be_valid
+    end
 
-      it 'returns base tiers A-D' do
-        expect(described_class.tier_levels).to eq %w[A B C D]
-      end
+    it 'accepts tier F' do
+      expect(build(:case_information, tier: 'F')).to be_valid
+    end
 
-      it 'rejects tier E' do
-        ci = build(:case_information, tier: 'E')
-        expect(ci).not_to be_valid
-        expect(ci.errors.messages).to eq(tier: ['Select tier'])
-      end
+    it 'accepts tier G' do
+      expect(build(:case_information, tier: 'G')).to be_valid
     end
   end
 
@@ -190,14 +157,6 @@ describe CaseInformation do
 
     it 'is false when rosh level is missing' do
       expect(build(:case_information, rosh_level: nil).complete_for_allocation?).to be(false)
-    end
-
-    context 'when the rosh feature flag is disabled' do
-      let(:rosh_level_feature_enabled) { false }
-
-      it 'is true when rosh level is missing' do
-        expect(build(:case_information, tier: 'A', rosh_level: nil).complete_for_allocation?).to be(true)
-      end
     end
 
     it 'is false when tier is missing' do

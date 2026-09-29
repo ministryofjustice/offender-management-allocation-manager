@@ -16,7 +16,6 @@ RSpec.describe ProbationMergeService do
 
   before do
     allow(Rails.logger).to receive(:info)
-    stub_feature_flag(:probation_merges, enabled: true)
   end
 
   def expect_logged_info(pattern)
@@ -124,18 +123,6 @@ RSpec.describe ProbationMergeService do
         expect(old_merge.active).to be(false)
         expect(old_merge.superseded_at).to be_present
         expect(new_merge.active).to be(true)
-      end
-    end
-
-    context 'when probation_merges feature flag is disabled' do
-      before do
-        stub_feature_flag(:probation_merges, enabled: false)
-      end
-
-      it 'records merge mapping but skips case information reassignment' do
-        expect { service.process }.to change(ProbationCaseMerge, :count).by(1)
-        expect(old_case_info.reload.crn).to eq(old_crn)
-        expect(CaseInformation.find_by(crn: new_crn)).to be_nil
       end
     end
   end

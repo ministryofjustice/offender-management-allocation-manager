@@ -127,35 +127,18 @@ RSpec.describe "allocations/show", type: :view do
       end
     end
 
-    context 'when the rosh feature flag is enabled' do
-      before do
-        stub_feature_flag(:rosh_level, enabled: true)
-      end
+    it 'shows the rosh row' do
+      render
 
-      it 'shows the rosh row' do
-        render
-
-        expect(page.at_css('tr#rosh-row')).to have_text('ROSH')
-        expect(page.at_css('tr#rosh-row')).to have_text('High')
-      end
-
-      it 'shows the rosh change link when the case information is editable' do
-        allow(offender).to receive(:manual_entry?).and_return(true)
-        render
-
-        expect(page.at_css('tr#rosh-row')).to have_css("a[href='#{edit_prison_prisoner_case_information_path(prison.code, offender.offender_no, from: :allocation)}']", text: 'Change')
-      end
+      expect(page.at_css('tr#rosh-row')).to have_text('ROSH')
+      expect(page.at_css('tr#rosh-row')).to have_text('High')
     end
 
-    context 'when the rosh feature flag is disabled' do
-      before do
-        stub_feature_flag(:rosh_level, enabled: false)
-        render
-      end
+    it 'shows the rosh change link when the case information is editable' do
+      allow(offender).to receive(:manual_entry?).and_return(true)
+      render
 
-      it 'does not show the rosh row' do
-        expect(page).not_to have_css('tr#rosh-row')
-      end
+      expect(page.at_css('tr#rosh-row')).to have_css("a[href='#{edit_prison_prisoner_case_information_path(prison.code, offender.offender_no, from: :allocation)}']", text: 'Change')
     end
   end
 

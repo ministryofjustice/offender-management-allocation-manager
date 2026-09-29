@@ -33,7 +33,7 @@ class RecommendationService
   private
 
     def strategy
-      FeatureFlags.rosh_recommendations.enabled? ? RoshStrategy : TierStrategy
+      RoshStrategy
     end
   end
 end

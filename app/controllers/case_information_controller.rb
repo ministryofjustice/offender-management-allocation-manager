@@ -111,7 +111,7 @@ private
     @editable_case_information_fields ||= if @case_info.persisted?
                                             [].tap do |fields|
                                               fields << :tier if @case_info.tier.blank?
-                                              fields << :rosh_level if rosh_level_feature_enabled? && @case_info.rosh_level.blank?
+                                              fields << :rosh_level if @case_info.rosh_level.blank?
                                               fields << :enhanced_resourcing if @case_info.enhanced_resourcing.nil?
                                             end
                                           else
@@ -120,12 +120,6 @@ private
   end
 
   def manual_entry_case_information_fields
-    @manual_entry_case_information_fields ||= %i[tier enhanced_resourcing].tap do |fields|
-      fields.insert(1, :rosh_level) if rosh_level_feature_enabled?
-    end
-  end
-
-  def rosh_level_feature_enabled?
-    FeatureFlags.rosh_level.enabled?
+    @manual_entry_case_information_fields ||= %i[tier rosh_level enhanced_resourcing]
   end
 end
