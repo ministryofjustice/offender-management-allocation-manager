@@ -8,8 +8,7 @@ class CaseInformation < ApplicationRecord
   has_paper_trail meta: { nomis_offender_id: :nomis_offender_id }
 
   MAPPA_LEVELS = [0, 1, 2, 3].freeze
-  TIER_LEVELS = %w[A B C D].freeze
-  EXTENDED_TIER_LEVELS = %w[E F G].freeze
+  TIER_LEVELS = %w[A B C D E F G].freeze
   ROSH_LEVELS = %w[VERY_HIGH HIGH MEDIUM LOW].freeze
 
   # Create/update audit events for non-manual records are published ad-hoc
@@ -27,7 +26,7 @@ class CaseInformation < ApplicationRecord
   validates :tier, inclusion: { in: ->(_) { CaseInformation.tier_levels }, message: 'Select tier' }
 
   validates :rosh_level, inclusion: { in: ROSH_LEVELS, allow_blank: true }
-  validates :rosh_level, presence: { message: 'Select ROSH' }, on: :manual_entry, if: :rosh_level_feature_enabled?
+  validates :rosh_level, presence: { message: 'Select ROSH' }, on: :manual_entry
 
   validates :enhanced_resourcing,
             inclusion: { in: [true, false], message: 'Select case allocation decision' },
@@ -40,11 +39,11 @@ class CaseInformation < ApplicationRecord
   scope :without_com, -> { where(com_name: nil) }
 
   def self.tier_levels
-    FeatureFlags.new_tiers.enabled? ? TIER_LEVELS + EXTENDED_TIER_LEVELS : TIER_LEVELS
+    TIER_LEVELS
   end
 
   def complete_for_allocation?
-    tier.present? && (!rosh_level_feature_enabled? || rosh_level.present?)
+    tier.present? && rosh_level.present?
   end
 
   def welsh_offender
@@ -52,10 +51,6 @@ class CaseInformation < ApplicationRecord
   end
 
 private
-
-  def rosh_level_feature_enabled?
-    FeatureFlags.rosh_level.enabled?
-  end
 
   def audit_event_tags
     %w[record case_information].freeze

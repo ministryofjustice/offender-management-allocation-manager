@@ -49,7 +49,6 @@
       </td>
     </tr>
 
-    <% if FeatureFlags.rosh_level.enabled? %>
     <tr class="govuk-table__row" id="rosh-row">
       <td class="govuk-table__cell">ROSH</td>
       <td class="govuk-table__cell table_cell__left_align">
@@ -59,7 +58,6 @@
                     class: 'govuk-link pull-right' if @prisoner.manual_entry? %>
       </td>
     </tr>
-    <% end %>
 
     <% if @prison.womens? %>
       <tr class="govuk-table__row" id="complexity-level-row">

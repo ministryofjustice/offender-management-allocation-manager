@@ -40,7 +40,6 @@ RSpec.describe "prisoners/review_case_details", type: :view do
     context 'when a POM is present but has no role' do
       before do
         assign(:pom, instance_double(StaffMember, full_name_ordered: 'Sam Pom', email_address: 'sam@example.com', position_description: nil))
-        stub_feature_flag(:rosh_level, enabled: true)
         render
       end
 
@@ -52,59 +51,50 @@ RSpec.describe "prisoners/review_case_details", type: :view do
       end
     end
 
-    context 'when the rosh feature flag is enabled' do
-      before do
-        stub_feature_flag(:rosh_level, enabled: true)
-        render
-      end
+    it 'shows the shared case type badge' do
+      render
 
-      it 'shows the shared case type badge' do
-        expect(page).to have_css('#prisoner-case-type', text: 'Determinate')
-      end
-
-      it 'shows the rosh row' do
-        row = at_a_glance_summary.find('#rosh-row')
-
-        expect(row).to have_text('ROSH')
-        expect(row).to have_text('High')
-      end
-
-      it 'shows the rosh change link when the case information is editable' do
-        row = at_a_glance_summary.find('#rosh-row')
-
-        expect(row).to have_link('Change', href: edit_prison_prisoner_case_information_path(prison, offender.offender_no, from: :review_case))
-      end
-
-      it 'shows the pom role needed row' do
-        row = at_a_glance_summary.find('#pom-role-needed-row')
-
-        expect(row).to have_text('POM role needed')
-        expect(row).to have_text('Responsible')
-      end
-
-      it 'shows the override change link in the pom role needed row when custody is currently responsible' do
-        row = at_a_glance_summary.find('#pom-role-needed-row')
-
-        expect(row).to have_link('Change', href: new_prison_responsibility_path(prison, offender.offender_no, from: :review_case))
-      end
+      expect(page).to have_css('#prisoner-case-type', text: 'Determinate')
     end
 
-    context 'when the rosh feature flag is disabled' do
-      before do
-        stub_feature_flag(:rosh_level, enabled: false)
-        render
-      end
+    it 'shows the rosh row' do
+      render
 
-      it 'does not show the rosh row' do
-        expect(at_a_glance_summary).not_to have_css('#rosh-row')
-      end
+      row = at_a_glance_summary.find('#rosh-row')
+
+      expect(row).to have_text('ROSH')
+      expect(row).to have_text('High')
+    end
+
+    it 'shows the rosh change link when the case information is editable' do
+      render
+
+      row = at_a_glance_summary.find('#rosh-row')
+
+      expect(row).to have_link('Change', href: edit_prison_prisoner_case_information_path(prison, offender.offender_no, from: :review_case))
+    end
+
+    it 'shows the pom role needed row' do
+      render
+
+      row = at_a_glance_summary.find('#pom-role-needed-row')
+
+      expect(row).to have_text('POM role needed')
+      expect(row).to have_text('Responsible')
+    end
+
+    it 'shows the override change link in the pom role needed row when custody is currently responsible' do
+      render
+
+      row = at_a_glance_summary.find('#pom-role-needed-row')
+
+      expect(row).to have_link('Change', href: new_prison_responsibility_path(prison, offender.offender_no, from: :review_case))
     end
 
     context 'when there is active VLO contact information' do
       let(:case_info) { build(:case_information, :with_active_vlo, rosh_level: 'HIGH') }
 
       before do
-        stub_feature_flag(:rosh_level, enabled: true)
         render
       end
 
@@ -121,7 +111,6 @@ RSpec.describe "prisoners/review_case_details", type: :view do
           responsibility_override?: true,
         )
         allow(view).to receive(:pom_responsibility_label).with(offender).and_return('Supporting')
-        stub_feature_flag(:rosh_level, enabled: true)
         render
       end
 
@@ -141,7 +130,6 @@ RSpec.describe "prisoners/review_case_details", type: :view do
           responsibility_override?: false,
         )
         allow(view).to receive(:pom_responsibility_label).with(offender).and_return('Supporting')
-        stub_feature_flag(:rosh_level, enabled: true)
         render
       end
 

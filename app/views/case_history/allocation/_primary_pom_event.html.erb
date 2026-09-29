@@ -1,9 +1,7 @@
 <% description = capture do %>
   Prisoner <%= variant %> to <%= allocation.primary_pom_name.titleize %> - <%= format_email(allocation.primary_pom_email) %>
   <br/>Tier: <%= allocation.allocated_at_tier %>
-  <% if FeatureFlags.rosh_recommendations.enabled? %>
   <br/>ROSH: <%= allocation.allocated_at_rosh.present? ? allocation.allocated_at_rosh.humanize : 'N/A' %>
-  <% end %>
   <% if allocation.override_reasons.present? %>
     <p class="govuk-body govuk-!-margin-bottom-1 govuk-!-margin-top-3"><%= display_override_pom(allocation) %></p>
     <p class="govuk-body govuk-!-margin-bottom-1">Reason(s):</p>

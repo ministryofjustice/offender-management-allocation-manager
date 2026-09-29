@@ -13,9 +13,6 @@ class ProbationMergeService
     ApplicationRecord.transaction do
       canonical_crn = record_merge
 
-      # TODO: keep it feature-flagged for a while to make it easier to disable it if needed
-      return unless FeatureFlags.probation_merges.enabled?
-
       Auditable.without_audit_events do
         migrate_case_information(canonical_crn)
       end

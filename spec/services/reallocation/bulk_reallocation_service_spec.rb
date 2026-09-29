@@ -92,7 +92,6 @@ RSpec.describe Reallocation::BulkReallocationService do
   end
 
   before do
-    stub_feature_flag(:rosh_recommendations, enabled: true)
     allocation # ensure it's created
 
     allow(prison).to receive(:all_policy_offenders).and_return([double(offender_no: offender_no)])
@@ -178,20 +177,6 @@ RSpec.describe Reallocation::BulkReallocationService do
         expect(AllocationService).to have_received(:create_or_update) do |attributes, _further_info, **options|
           expect(attributes).to include(event: :allocate_primary_pom)
           expect(options).to include(notify: false)
-        end
-      end
-    end
-
-    context 'when rosh_recommendations is disabled' do
-      before do
-        stub_feature_flag(:rosh_recommendations, enabled: false)
-      end
-
-      it 'stores nil allocated_at_rosh' do
-        service.call([selected_case], message: 'Moving cases')
-
-        expect(AllocationService).to have_received(:create_or_update) do |attributes, _further_info, **_options|
-          expect(attributes[:allocated_at_rosh]).to be_nil
         end
       end
     end

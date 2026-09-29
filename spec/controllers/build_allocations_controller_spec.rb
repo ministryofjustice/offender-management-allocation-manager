@@ -6,7 +6,6 @@ RSpec.describe BuildAllocationsController, type: :controller do
   let(:offender_no) { offender.fetch(:prisonerNumber) }
 
   before do
-    stub_feature_flag(:rosh_recommendations, enabled: true)
     stub_onboarded_poms(prison, poms)
     stub_signed_in_pom(prison.code, pom.staffId, 'Alice')
     stub_sso_data(prison.code)
@@ -215,31 +214,10 @@ RSpec.describe BuildAllocationsController, type: :controller do
         expect(response).to redirect_to(unallocated_prison_prisoners_path)
       end
 
-      it 'stores the offender ROSH when rosh_recommendations is enabled' do
+      it 'stores the offender ROSH' do
         allocation = AllocationHistory.find_by!(nomis_offender_id: offender_no)
 
         expect(allocation.allocated_at_rosh).to eq('HIGH')
-      end
-
-      context 'when rosh_recommendations is disabled' do
-        before do
-          stub_feature_flag(:rosh_recommendations, enabled: false)
-          AllocationHistory.where(nomis_offender_id: offender_no).delete_all
-
-          put :update, params: {
-            allocation_form: { message: notes },
-            prison_id: prison.code,
-            prisoner_id: offender_no,
-            staff_id: pom.staffId,
-            id: 'allocate'
-          }
-        end
-
-        it 'stores nil allocated_at_rosh' do
-          allocation = AllocationHistory.find_by!(nomis_offender_id: offender_no)
-
-          expect(allocation.allocated_at_rosh).to be_nil
-        end
       end
 
       context 'when RoSH is missing and tier is not A' do
@@ -363,7 +341,7 @@ RSpec.describe BuildAllocationsController, type: :controller do
           end
         end
 
-        it 'stores the offender ROSH when rosh_recommendations is enabled' do
+        it 'stores the offender ROSH' do
           allocation = AllocationHistory.find_by!(nomis_offender_id: offender_no)
 
           expect(allocation.allocated_at_rosh).to eq('HIGH')

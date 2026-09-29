@@ -16,7 +16,6 @@ RSpec.describe ProbationUnmergeService do
 
   before do
     allow(Rails.logger).to receive(:info)
-    stub_feature_flag(:probation_merges, enabled: true)
   end
 
   def expect_logged_info(pattern)
@@ -120,24 +119,6 @@ RSpec.describe ProbationUnmergeService do
           expect(CaseInformation.find_by(crn: old_crn)).to be_nil
           expect(CaseInformation.find_by(crn: new_crn)).to be_nil
           expect_logged_info(/event=unmerge_case_information_source_missing.*old_crn=#{old_crn}.*new_crn=#{new_crn}/)
-        end
-      end
-    end
-
-    context 'when probation_merges feature flag is disabled' do
-      before do
-        stub_feature_flag(:probation_merges, enabled: false)
-        old_case_info.update!(crn: new_crn)
-      end
-
-      it 'deactivates merge mapping but skips case information restoration' do
-        service.process
-
-        merge = ProbationCaseMerge.find_by!(old_crn:, new_crn:)
-        aggregate_failures do
-          expect(merge.active).to be(false)
-          expect(old_case_info.reload.crn).to eq(new_crn)
-          expect(CaseInformation.find_by(crn: old_crn)).to be_nil
         end
       end
     end

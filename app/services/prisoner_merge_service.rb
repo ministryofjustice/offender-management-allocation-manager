@@ -31,9 +31,6 @@ class PrisonerMergeService
     ApplicationRecord.transaction do
       canonical_id = record_merge
 
-      # TODO: keep it feature-flagged for a while to make it easier to disable it if needed
-      return unless FeatureFlags.prisoner_merges.enabled?
-
       Auditable.without_audit_events do
         migrate_records(canonical_id)
       end

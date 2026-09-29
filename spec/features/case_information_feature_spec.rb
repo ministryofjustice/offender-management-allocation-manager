@@ -4,13 +4,8 @@ describe 'case information feature' do
     let(:offender) { build(:nomis_offender, prisonId: prison.code) }
     let(:offenders) { [offender] }
     let(:user) { build(:pom) }
-    let(:rosh_level_feature_enabled) { true }
 
     include_context 'with missing information feature defaults'
-
-    before do
-      stub_feature_flag(:rosh_level, enabled: rosh_level_feature_enabled)
-    end
 
     context 'when add missing details the first time (create journey)' do
       before do
@@ -58,18 +53,6 @@ describe 'case information feature' do
         expect(page).to have_content('What is this person’s tier?')
         expect(page).to have_content('What is this person’s ROSH?')
         expect(page).to have_content('What case allocation decision has been made for this person?')
-      end
-
-      context 'when the rosh feature flag is disabled' do
-        let(:rosh_level_feature_enabled) { false }
-
-        it 'does not show the rosh field when editing a manual case' do
-          visit edit_prison_prisoner_case_information_path(prison.code, offender.fetch(:prisonerNumber))
-
-          expect(page).to have_content('What is this person’s tier?')
-          expect(page).to have_no_content('What is this person’s ROSH?')
-          expect(page).to have_content('What case allocation decision has been made for this person?')
-        end
       end
     end
 
@@ -141,32 +124,6 @@ describe 'case information feature' do
       it 'does not allow the user to edit the case information' do
         visit edit_prison_prisoner_case_information_path(prison.code, offender.fetch(:prisonerNumber))
         expect(page).to have_current_path('/404')
-      end
-    end
-
-    context 'when the rosh feature flag is disabled' do
-      let(:rosh_level_feature_enabled) { false }
-
-      it 'allows adding missing details without showing rosh' do
-        start_missing_information_journey(prison_code: prison.code, prisoner_id: offender.fetch(:prisonerNumber))
-
-        expect_case_information_page(
-          prison_code: prison.code,
-          prisoner_id: offender.fetch(:prisonerNumber),
-          show_rosh_level: false
-        )
-
-        fill_in_case_information(resourcing: 'true', tier: 'A')
-        click_button 'Save'
-
-        case_information = CaseInformation.find_by!(nomis_offender_id: offender.fetch(:prisonerNumber))
-
-        aggregate_failures do
-          expect(page).to have_current_path(missing_information_prison_prisoners_path(prison.code), ignore_query: true)
-          expect(case_information.tier).to eq('A')
-          expect(case_information.rosh_level).to be_nil
-          expect(case_information.enhanced_resourcing).to be(true)
-        end
       end
     end
   end

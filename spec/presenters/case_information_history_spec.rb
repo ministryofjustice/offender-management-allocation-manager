@@ -79,26 +79,6 @@ RSpec.describe CaseInformationHistory do
       end
     end
 
-    it 'does not include ROSH details when the rosh_level feature flag is disabled' do
-      stub_feature_flag(:rosh_level, enabled: false)
-
-      version = PaperTrail::Version.new(
-        object_changes: YAML.dump(
-          'tier' => ['A', 'C'],
-          'rosh_level' => ['HIGH', 'VERY_HIGH'],
-          'enhanced_resourcing' => [false, true]
-        )
-      )
-
-      details = described_class.new(version).change_details
-
-      aggregate_failures do
-        expect(details.map(&:label)).to eq(['Tier', 'Resourcing'])
-        expect(details.map(&:from_value)).to eq(['A', 'standard'])
-        expect(details.map(&:to_value)).to eq(['C', 'enhanced'])
-      end
-    end
-
     it 'ignores non-timeline attributes from the PaperTrail changeset' do
       version = PaperTrail::Version.new(
         object_changes: YAML.dump(

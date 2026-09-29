@@ -474,31 +474,6 @@ feature 'Case History' do
       end
     end
 
-    context 'when case information is updated by the system and the rosh feature flag is disabled' do
-      let(:tomorrow) { Time.zone.tomorrow }
-
-      before do
-        stub_feature_flag(:rosh_level, enabled: false)
-
-        Timecop.travel tomorrow do
-          PaperTrail.request(whodunnit: nil, controller_info: {}) do
-            case_info.update!(tier: 'B', rosh_level: 'LOW', enhanced_resourcing: true)
-          end
-        end
-      end
-
-      it 'hides the ROSH change from the case history timeline entry' do
-        visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
-
-        within_timeline_item('Case information updated') do
-          aggregate_failures do
-            expect(page).to have_no_css('.moj-timeline__description', text: 'ROSH: High → Low')
-            expect(page).to have_css('.moj-timeline__description', text: 'Resourcing: standard → enhanced')
-          end
-        end
-      end
-    end
-
     context 'when case allocation decision is cleared by the system' do
       let(:tomorrow) { Time.zone.tomorrow }
 
