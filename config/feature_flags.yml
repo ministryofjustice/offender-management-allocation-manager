@@ -4,3 +4,5 @@
 feature_flags:
   example_feature:
     staging: true
+  change_in_circumstances:
+    staging: false

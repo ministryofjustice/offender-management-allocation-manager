@@ -175,3 +175,9 @@ $purple: govuk-colour("purple");
 .reallocation-cases-table__select-all {
   padding-left: 17px;
 }
+
+// Review allocations table
+//
+.review-allocations-table__nowrap-header {
+  white-space: nowrap;
+}

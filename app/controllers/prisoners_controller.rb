@@ -4,7 +4,7 @@ class PrisonersController < PrisonsApplicationController
   before_action :ensure_spo_user, except: [:show, :image, :search]
 
   before_action :load_prisoner_or_redirect, only: [:show, :review_case_details]
-  before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :search]
+  before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :review_allocations, :search]
   before_action :load_reallocation_alert, only: [:unallocated]
 
   def allocated
@@ -14,6 +14,10 @@ class PrisonersController < PrisonsApplicationController
 
   def missing_information
     load_summary :missing_information
+  end
+
+  def review_allocations
+    redirect_to allocated_prison_prisoners_path(@prison.code) unless FeatureFlags.change_in_circumstances.enabled?
   end
 
   def unallocated
