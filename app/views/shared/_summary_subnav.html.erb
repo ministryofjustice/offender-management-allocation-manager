@@ -22,10 +22,17 @@
     </li>
 
     <% if FeatureFlags.change_in_circumstances.enabled? %>
+      <% review_allocations_count = @review_allocations.size %>
+
       <li class="moj-sub-navigation__item">
         <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :review_allocations %>
            href="<%= review_allocations_prison_prisoners_path(@prison.code) %>">
           Review allocations
+          <% if review_allocations_count.positive? %>
+            <span class="moj-notification-badge moj-notification-badge--red govuk-!-margin-left-1" aria-label="<%= review_allocations_count %> allocations needing attention">
+              <%= review_allocations_count %>
+            </span>
+          <% end %>
         </a>
       </li>
     <% end %>

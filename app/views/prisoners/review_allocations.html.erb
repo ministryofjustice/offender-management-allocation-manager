@@ -24,27 +24,56 @@
            }) %>
 
 <h2 class="govuk-heading-l govuk-!-margin-bottom-4">Review allocations</h2>
-<p class="govuk-!-margin-bottom-8">
-  Select someone’s name to decide if they need to be reallocated following a change to their tier, ROSH or handover date.
-</p>
 
 <section id="review-allocations">
-  <table id="review-allocations-cases" class="govuk-table responsive" data-module="moj-sortable-table">
-    <caption class="govuk-visually-hidden">Allocations to review</caption>
-    <thead class="govuk-table__head">
-      <tr class="govuk-table__row">
-        <th class="govuk-table__header govuk-!-width-one-quarter" scope="col" aria-sort="none">
-          Case
-        </th>
-        <th class="govuk-table__header review-allocations-table__nowrap-header" scope="col" aria-sort="descending">
-          Working days since earliest change
-        </th>
-        <th class="govuk-table__header" scope="col" aria-sort="none">
-          Type of change
-        </th>
-      </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-    </tbody>
-  </table>
+  <% if @offenders.empty? %>
+    <%# TODO: copy to be confirmed %>
+    <p class="govuk-body">There are no allocations to review.</p>
+  <% else %>
+    <p class="govuk-body govuk-!-margin-bottom-8">
+      Select someone’s name to decide if they need to be reallocated following a change to their tier or ROSH.
+    </p>
+
+    <table id="review-allocations-cases" class="govuk-table responsive" data-module="moj-sortable-table">
+      <caption class="govuk-visually-hidden">Allocations to review</caption>
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header govuk-!-width-one-quarter" scope="col" aria-sort="none">
+            Case
+          </th>
+          <th class="govuk-table__header review-allocations-table__nowrap-header" scope="col" aria-sort="descending">
+            Working days since earliest change
+          </th>
+          <th class="govuk-table__header" scope="col" aria-sort="none">
+            Type of change
+          </th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        <% @offenders.each_with_index do |offender, i| %>
+          <tr class="govuk-table__row offender_row_<%= i %>">
+            <td aria-label="Case" class="govuk-table__cell" data-sort-value="<%= offender.full_name %>">
+              <span class="prisoner-name">
+                <%= link_to offender.full_name,
+                            prison_prisoner_allocation_path(@prison.code, prisoner_id: offender.offender_no),
+                            class: 'govuk-link govuk-link--no-visited-state' %>
+              </span>
+              <br/>
+              <span class='govuk-hint govuk-!-margin-bottom-0'>
+                <%= offender.offender_no %>
+              </span>
+            </td>
+            <td aria-label="Working days since earliest change" class="govuk-table__cell">
+              <%= offender.working_days_since_earliest_change %>
+            </td>
+            <td aria-label="Type of change" class="govuk-table__cell" data-sort-value="<%= offender.labels.join(', ') %>">
+              <% offender.labels.each do |label| %>
+                <strong class="moj-badge moj-badge--red"><%= label %></strong>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
 </section>
