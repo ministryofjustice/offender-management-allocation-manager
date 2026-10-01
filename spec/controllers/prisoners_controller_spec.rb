@@ -71,6 +71,28 @@ RSpec.describe PrisonersController, type: :controller do
         check_bucket_counts
       end
 
+      describe 'review allocations' do
+        render_views
+
+        it 'gives you the total count for each bucket and an empty table to review' do
+          get :review_allocations, params: { prison_id: prison.code }
+          expect(response).to be_successful
+
+          page = Capybara.string(response.body)
+          expect(page).to have_css('.moj-sub-navigation__link[aria-current=page]', text: 'Review allocations')
+          expect(page).to have_css('#review-allocations-cases thead th', count: 3)
+          expect(page).not_to have_css('#review-allocations-cases tbody tr')
+          check_bucket_counts
+        end
+
+        it 'redirects to the allocated tab when the feature flag is disabled' do
+          stub_feature_flag(:change_in_circumstances, enabled: false)
+
+          get :review_allocations, params: { prison_id: prison.code }
+          expect(response).to redirect_to(allocated_prison_prisoners_path(prison.code))
+        end
+      end
+
       def check_bucket_counts
         expect(assigns(:missing_info).size).to eq(3)
         expect(assigns(:allocated).size).to eq(2)

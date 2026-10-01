@@ -20,5 +20,14 @@
         See allocations (<%= allocated_count %>)
       </a>
     </li>
+
+    <% if FeatureFlags.change_in_circumstances.enabled? %>
+      <li class="moj-sub-navigation__item">
+        <a class="moj-sub-navigation__link" <%= 'aria-current=page' if active == :review_allocations %>
+           href="<%= review_allocations_prison_prisoners_path(@prison.code) %>">
+          Review allocations
+        </a>
+      </li>
+    <% end %>
   </ul>
 </nav>

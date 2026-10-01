@@ -1,0 +1,50 @@
+<% content_for :title, "Review allocations – Digital Prison Services" %>
+<% content_for :turbolinks_nocache, 'true' %>
+
+<% if notice.present? %>
+  <div class="moj-banner moj-banner--success">
+    <svg class="moj-banner__icon" fill="currentColor" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25">
+      <path d="M25,6.2L8.7,23.2L0,14.1l4-4.2l4.7,4.9L21,2L25,6.2z"></path>
+    </svg>
+
+    <div class="moj-banner__message"><%= notice %></div>
+  </div>
+<% end %>
+
+<h1 class="govuk-heading-xl">Allocations</h1>
+
+<%= render 'search/search_box' %>
+
+<%= render(partial: 'shared/summary_subnav',
+           locals: {
+             active: :review_allocations,
+             unallocated_count: @unallocated.count,
+             missing_info_count: @missing_info.count,
+             allocated_count: @allocated.count
+           }) %>
+
+<h2 class="govuk-heading-l govuk-!-margin-bottom-4">Review allocations</h2>
+<p class="govuk-!-margin-bottom-8">
+  Select someone’s name to decide if they need to be reallocated following a change to their tier, ROSH or handover date.
+</p>
+
+<section id="review-allocations">
+  <table id="review-allocations-cases" class="govuk-table responsive" data-module="moj-sortable-table">
+    <caption class="govuk-visually-hidden">Allocations to review</caption>
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th class="govuk-table__header govuk-!-width-one-quarter" scope="col" aria-sort="none">
+          Case
+        </th>
+        <th class="govuk-table__header review-allocations-table__nowrap-header" scope="col" aria-sort="descending">
+          Working days since earliest change
+        </th>
+        <th class="govuk-table__header" scope="col" aria-sort="none">
+          Type of change
+        </th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    </tbody>
+  </table>
+</section>

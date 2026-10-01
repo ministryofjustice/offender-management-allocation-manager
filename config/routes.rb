@@ -92,6 +92,7 @@ Rails.application.routes.draw do
         get 'allocated'
         get 'unallocated'
         get 'missing_information'
+        get 'review_allocations'
         get 'search'
       end
 
