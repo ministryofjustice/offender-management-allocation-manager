@@ -5,6 +5,7 @@ class PrisonersController < PrisonsApplicationController
 
   before_action :load_prisoner_or_redirect, only: [:show, :review_case_details]
   before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :review_allocations, :search]
+  before_action :load_review_allocations, only: [:allocated, :missing_information, :unallocated, :review_allocations]
   before_action :load_reallocation_alert, only: [:unallocated]
 
   def allocated
@@ -17,7 +18,9 @@ class PrisonersController < PrisonsApplicationController
   end
 
   def review_allocations
-    redirect_to allocated_prison_prisoners_path(@prison.code) unless FeatureFlags.change_in_circumstances.enabled?
+    # Default order. The table can then be re-sorted client-side. Monitor row
+    # counts because this list isn't paginated (and we might not need to)
+    @offenders = @review_allocations.sort_by { [-it.working_days_since_earliest_change, it.full_name] }
   end
 
   def unallocated
@@ -108,6 +111,22 @@ private
     end
   end
 
+  # Needed on every summary tab for the badge count. A failure here shouldn't
+  # break the other tabs, but it should on the review page, where an empty list
+  # would wrongly suggest there's nothing to review
+  def load_review_allocations
+    @review_allocations = []
+    return unless FeatureFlags.change_in_circumstances.enabled?
+
+    @review_allocations = SignificantChanges
+      .for(@prison.allocated, @prison.allocations, poms: -> { all_poms })
+      .select(&:any?)
+  rescue StandardError => e
+    raise if action_name == 'review_allocations'
+
+    Rails.logger.error("event=load_review_allocations_failed,prison=#{@prison.code}|#{e.message}")
+  end
+
   def load_summary(summary_type)
     items = {
       unallocated: @unallocated,
@@ -140,10 +159,14 @@ private
   end
 
   def load_reallocation_alert
-    poms = @prison.get_list_of_poms
+    poms = all_poms.reject(&:deleted?)
     @removed_poms = @prison.get_removed_poms(existing_poms: poms)
   rescue StandardError => e
     Rails.logger.error("event=load_reallocation_alert_failed|#{e.message}")
     @removed_poms = []
+  end
+
+  def all_poms
+    @all_poms ||= @prison.get_list_of_poms(include_deleted: true)
   end
 end

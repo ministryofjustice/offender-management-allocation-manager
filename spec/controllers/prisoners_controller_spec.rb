@@ -72,24 +72,84 @@ RSpec.describe PrisonersController, type: :controller do
       end
 
       describe 'review allocations' do
-        render_views
+        let(:review_today) { Time.zone.local(2026, 9, 10, 12) }
 
-        it 'gives you the total count for each bucket and an empty table to review' do
+        let(:allocated_pom) do
+          instance_double(PomWrapper, staff_id: 485_926, position: RecommendationService::PRISON_POM)
+        end
+
+        before do
+          travel_to(review_today)
+          AllocationHistory.where(nomis_offender_id: allocated_offenders.map { it.fetch(:prisonerNumber) })
+            .update_all(primary_pom_allocated_at: review_today - 9.days)
+          allow_any_instance_of(Prison).to receive(:get_list_of_poms).and_return([allocated_pom])
+        end
+
+        def tier_change(offender, from:, to:, at:)
+          PaperTrail::Version.create!(item_type: 'CaseInformation', item_id: 1, event: 'update',
+                                      nomis_offender_id: offender.fetch(:prisonerNumber), created_at: at,
+                                      object_changes: YAML.dump('tier' => [from, to]))
+        end
+
+        it 'only includes allocated offenders with a significant change since allocation' do
+          tier_change(allocated_offender_one, from: 'B', to: 'A', at: review_today - 1.day)
+
           get :review_allocations, params: { prison_id: prison.code }
           expect(response).to be_successful
 
-          page = Capybara.string(response.body)
-          expect(page).to have_css('.moj-sub-navigation__link[aria-current=page]', text: 'Review allocations')
-          expect(page).to have_css('#review-allocations-cases thead th', count: 3)
-          expect(page).not_to have_css('#review-allocations-cases tbody tr')
+          expect(assigns(:offenders).map(&:offender_no)).to eq([allocated_offender_one.fetch(:prisonerNumber)])
+          expect(assigns(:offenders)).not_to respond_to(:total_pages)
           check_bucket_counts
         end
 
-        it 'redirects to the allocated tab when the feature flag is disabled' do
-          stub_feature_flag(:change_in_circumstances, enabled: false)
+        context 'when rendering the page' do
+          render_views
+
+          let(:page) { Capybara.string(response.body) }
+          let(:tab) { page.find('.moj-sub-navigation__link', text: 'Review allocations') }
+
+          it 'shows the cases to review and a count on the tab' do
+            tier_change(allocated_offender_one, from: 'B', to: 'A', at: review_today - 1.day)
+
+            get :review_allocations, params: { prison_id: prison.code }
+
+            expect(tab).to have_css('.moj-notification-badge', text: '1')
+            expect(page).to have_css('#review-allocations-cases tbody tr', count: 1)
+            expect(page).to have_no_text('There are no allocations to review')
+          end
+
+          it 'shows a message instead of the table, and no count on the tab, when there is nothing to review' do
+            get :review_allocations, params: { prison_id: prison.code }
+
+            expect(tab).to have_no_css('.moj-notification-badge')
+            expect(page).to have_no_css('#review-allocations-cases')
+            expect(page).to have_text('There are no allocations to review')
+          end
+        end
+
+        context 'when the significant changes cannot be loaded' do
+          before { allow(SignificantChanges).to receive(:for).and_raise(StandardError, 'boom') }
+
+          it 'still renders the other tabs, with nothing to review' do
+            get :allocated, params: { prison_id: prison.code }
+
+            expect(response).to be_successful
+            expect(assigns(:review_allocations)).to eq([])
+          end
+
+          it 'raises the error on the review page' do
+            expect { get :review_allocations, params: { prison_id: prison.code } }.to raise_error(StandardError, 'boom')
+          end
+        end
+
+        it 'sorts by working days since earliest change descending by default' do
+          tier_change(allocated_offender_one, from: 'B', to: 'A', at: review_today - 2.days)
+          tier_change(allocated_offender_two, from: 'A', to: 'B', at: review_today - 9.days)
 
           get :review_allocations, params: { prison_id: prison.code }
-          expect(response).to redirect_to(allocated_prison_prisoners_path(prison.code))
+
+          expect(assigns(:offenders).map(&:offender_no))
+            .to eq([allocated_offender_two, allocated_offender_one].map { it.fetch(:prisonerNumber) })
         end
       end
 
