@@ -33,7 +33,15 @@ RSpec.describe SignificantChanges do
   def wrapper(*versions) = described_class.new(offender, allocation, versions, poms:)
 
   it 'runs every detector' do
-    expect(described_class::DETECTORS).to eq([described_class::TierDetector, described_class::RoshDetector])
+    expect(
+      described_class::DETECTORS
+    ).to eq(
+      [
+        described_class::TierDetector,
+        described_class::RoshDetector,
+        described_class::HandoverDetector,
+      ]
+    )
   end
 
   describe '#changes' do
@@ -131,7 +139,7 @@ RSpec.describe SignificantChanges do
       create_version('CaseInformation', {}, allocated_at + 1.day, event: 'destroy')
 
       expect(described_class.load_versions([allocation]).map(&:item_type))
-        .to eq(%w[CaseInformation])
+        .to eq(%w[CaseInformation CalculatedHandoverDate])
     end
   end
 
@@ -174,6 +182,19 @@ RSpec.describe SignificantChanges do
       described_class.for([offender], [allocation], poms:).each(&:changes)
 
       expect(poms).to have_received(:call)
+    end
+
+    it 'uses the allocated POM position when a detector needs it' do
+      create_version(
+        'CalculatedHandoverDate',
+        { 'handover_date' => [Date.new(2026, 9, 1), Date.new(2027, 3, 1)] },
+        allocated_at + 1.day
+      )
+      allow(offender).to receive(:recommended_pom_type).and_return(RecommendationService::PROBATION_POM)
+
+      result = described_class.for([offender], [allocation], poms:)
+
+      expect(result.first.labels).to eq(['Tier', 'Handover date'])
     end
   end
 end
