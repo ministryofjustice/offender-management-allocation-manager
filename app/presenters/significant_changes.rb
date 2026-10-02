@@ -8,7 +8,7 @@
 # a new type of change, add a `Detector` subclass and list it there.
 #
 class SignificantChanges
-  DETECTORS = [TierDetector, RoshDetector].freeze
+  DETECTORS = [TierDetector, RoshDetector, HandoverDetector].freeze
 
   # Only changes within this many days (rolling, up to today) are considered
   LOOKBACK_PERIOD = 30.days

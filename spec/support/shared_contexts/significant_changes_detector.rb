@@ -20,5 +20,6 @@ RSpec.shared_context 'with a significant changes detector' do
   end
 
   def case_info_version(changes, created_at = changed_at) = version('CaseInformation', changes, created_at)
+  def handover_version(changes, created_at = changed_at) = version('CalculatedHandoverDate', changes, created_at)
   def detect(*versions) = described_class.new(review, versions).change
 end
