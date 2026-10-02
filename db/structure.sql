@@ -1470,6 +1470,13 @@ CREATE INDEX index_versions_on_nomis_offender_id ON public.versions USING btree 
 
 
 --
+-- Name: index_versions_on_significant_change_history; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_versions_on_significant_change_history ON public.versions USING btree (nomis_offender_id, created_at) WHERE (((event)::text = 'update'::text) AND ((item_type)::text = ANY ((ARRAY['CaseInformation'::character varying, 'CalculatedHandoverDate'::character varying])::text[])));
+
+
+--
 -- Name: index_victim_liaison_officers_on_nomis_offender_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1499,6 +1506,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261002152102'),
 ('20260904103721'),
 ('20260903090000'),
 ('20260821153518'),
