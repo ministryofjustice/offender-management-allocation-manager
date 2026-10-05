@@ -3,7 +3,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby file: '.ruby-version'
 
-gem 'rails', '~> 8.1.0'
+gem 'rails', '~> 8.1.4'
 
 # Need AWS S3 SDK for processing PPUD exports
 gem 'aws-sdk-s3'
