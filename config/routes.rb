@@ -87,6 +87,7 @@ Rails.application.routes.draw do
       end
 
       get 'review_case_details'
+      get 'review_changes'
 
       collection do
         get 'allocated'

@@ -115,6 +115,9 @@ RSpec.describe PrisonersController, type: :controller do
 
             expect(tab).to have_css('.moj-notification-badge', text: '1')
             expect(page).to have_css('#review-allocations-cases tbody tr', count: 1)
+            expect(page).to have_link(
+              href: prison_prisoner_review_changes_path(prison.code, allocated_offender_one.fetch(:prisonerNumber))
+            )
             expect(page).to have_no_text('There are no allocations to review')
           end
 
@@ -139,6 +142,48 @@ RSpec.describe PrisonersController, type: :controller do
 
           it 'raises the error on the review page' do
             expect { get :review_allocations, params: { prison_id: prison.code } }.to raise_error(StandardError, 'boom')
+          end
+        end
+
+        describe '#review_changes' do
+          let(:offender_no) { allocated_offender_one.fetch(:prisonerNumber) }
+
+          before do
+            tier_change(allocated_offender_one, from: 'B', to: 'A', at: review_today - 1.day)
+          end
+
+          it 'loads only the selected case and presents its outstanding changes' do
+            tier_change(allocated_offender_two, from: 'B', to: 'A', at: review_today - 2.days)
+
+            get :review_changes, params: { prison_id: prison.code, prisoner_id: offender_no }
+
+            expect(response).to be_successful
+            expect(assigns(:prisoner).offender_no).to eq(offender_no)
+            expect(assigns(:changes).map(&:type)).to eq([:tier])
+            expect(assigns(:changes).first).to be_a(SignificantChanges::ChangePresenter)
+            expect(response).to render_template(:review_changes)
+          end
+
+          it 'returns to the list when the case no longer has qualifying changes' do
+            tier_change(allocated_offender_one, from: 'A', to: 'B', at: review_today)
+
+            get :review_changes, params: { prison_id: prison.code, prisoner_id: offender_no }
+
+            expect(response).to redirect_to(review_allocations_prison_prisoners_path(prison))
+          end
+
+          it 'does not show an unallocated case' do
+            get :review_changes, params: { prison_id: prison.code, prisoner_id: unallocated_offenders.first.fetch(:prisonerNumber) }
+
+            expect(response).to redirect_to('/404')
+          end
+
+          it 'requires a HOMD or SPO role' do
+            allow(controller).to receive(:current_user_is_spo?).and_return(false)
+
+            get :review_changes, params: { prison_id: prison.code, prisoner_id: offender_no }
+
+            expect(response).to redirect_to('/401')
           end
         end
 
