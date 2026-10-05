@@ -79,7 +79,10 @@ class Prison < ApplicationRecord
   def unfiltered_offenders
     # Returns all offenders at the provided prison, and does not
     # filter out under 18s or non-sentenced offenders
-    @unfiltered_offenders ||= OffenderService.get_offenders_in_prison(self)
+    # Category is only used by women's prison rules, so men's prisons can skip this slow call
+    @unfiltered_offenders ||= OffenderService.get_offenders_in_prison(
+      self, fetch_categories: PrisonService.womens_prison?(code)
+    )
   end
 
   def all_policy_offenders

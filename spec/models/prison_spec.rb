@@ -49,6 +49,23 @@ RSpec.describe Prison do
       expect(offender_array.length).to eq(3)
     end
 
+    it 'does not fetch categories in a men\'s prison' do
+      subject
+      expect(a_request(:post, /offender-assessments\/CATEGORY/)).not_to have_been_made
+    end
+
+    context 'with a women\'s prison' do
+      subject { prison.unfiltered_offenders }
+
+      let(:prison) { create(:womens_prison) }
+
+      before { stub_offenders_for_prison(prison.code, offenders) }
+
+      it 'fetches categories' do
+        expect(subject.map(&:category_code)).to all(eq('C'))
+      end
+    end
+
     context 'when recall flag set' do
       let(:offenders) { build_list(:nomis_offender, 2, sentence: attributes_for(:sentence_detail, recall: true)) }
 
