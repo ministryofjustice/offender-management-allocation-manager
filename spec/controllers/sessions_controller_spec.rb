@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe SessionsController, type: :controller do
   let(:sso_data) do
-    { 'username' => 'Staff_one' }
+    { 'username' => 'Staff_one', 'user_uuid' => '11111111-2222-3333-4444-555555555555' }
   end
 
   let(:signon_identity) { double(SignonIdentity, attributes: sso_data) }

@@ -6,6 +6,7 @@ describe SignonIdentity, model: true do
     double('user_auth_data',
            username: 'MOIC_POM',
            staff_id: 123_456,
+           user_uuid: '11111111-2222-3333-4444-555555555555',
            first_name: 'MOIC',
            last_name: 'POM',
            active_caseload: 'LEI',
@@ -32,6 +33,7 @@ describe SignonIdentity, model: true do
     session = {
       username: 'MOIC_POM',
       staff_id: 123_456,
+      user_uuid: '11111111-2222-3333-4444-555555555555',
       first_name: 'MOIC',
       last_name: 'POM',
       active_caseload: 'LEI',

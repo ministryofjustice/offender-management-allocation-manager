@@ -13,6 +13,7 @@ describe OmniAuth::Strategies::HmppsSso do
 
   let(:username) { 'MOIC_POM' }
   let(:staff_id) { 485_926 }
+  let(:user_uuid) { '11111111-2222-3333-4444-555555555555' }
 
   before do
     stub_request(:get, "#{ApiHelper::NOMIS_USER_ROLES_API_HOST}/users/staff/#{staff_id}")
@@ -35,12 +36,14 @@ describe OmniAuth::Strategies::HmppsSso do
       allow(strategy).to receive(:username).and_return(username)
       allow(strategy).to receive(:staff_id).and_return(staff_id)
       allow(strategy).to receive(:decode_roles).and_return(['ROLE_ALLOC_MGR'])
+      allow(strategy).to receive(:user_uuid).and_return(user_uuid)
     end
 
     context 'when #info' do
       it 'returns a hash with the username, active caseload, caseloads and email address' do
         expect(strategy.info[:username]).to eq(username)
         expect(strategy.info[:staff_id]).to eq(staff_id)
+        expect(strategy.info[:user_uuid]).to eq(user_uuid)
         expect(strategy.info[:active_caseload]).to eq('LEI')
         expect(strategy.info[:caseloads]).to eq(%w[LEI MDI NWEB])
       end

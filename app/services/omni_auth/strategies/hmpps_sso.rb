@@ -13,6 +13,7 @@ module OmniAuth
         {
           username: user_details.username,
           staff_id: user_details.staff_id,
+          user_uuid: user_uuid,
           first_name: user_details.first_name,
           last_name: user_details.last_name,
           active_caseload: active_caseload.upcase,
@@ -49,10 +50,13 @@ module OmniAuth
 
       # :nocov:
       def decode_roles
-        decoded_token = JwksDecoder.decode_token(access_token.token)
-        decoded_token.first.fetch('authorities', [])
+        token_payload.fetch('authorities', [])
       end
       # :nocov:
+
+      def user_uuid
+        token_payload['user_uuid']
+      end
 
       def active_caseload
         caseload = @user_details.active_case_load_id
@@ -76,6 +80,10 @@ module OmniAuth
 
       def staff_id
         access_token.params.fetch('user_id')
+      end
+
+      def token_payload
+        @token_payload ||= JwksDecoder.decode_token(access_token.token).first
       end
       # :nocov:
     end

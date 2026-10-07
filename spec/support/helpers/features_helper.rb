@@ -34,7 +34,7 @@ module FeaturesHelper
 
   def mock_sso_response(username, roles, prisons, staff_id = 485_926, first_name = 'MOIC', last_name = 'POM')
     hmpps_sso_response = {
-      'info' => double('user_info', username:, staff_id:, first_name:, last_name:, active_caseload: prisons.first, caseloads: prisons, roles: roles),
+      'info' => double('user_info', username:, staff_id:, user_uuid: '11111111-2222-3333-4444-555555555555', first_name:, last_name:, active_caseload: prisons.first, caseloads: prisons, roles: roles),
       'credentials' => double('credentials', expires_at: Time.zone.local(2030, 1, 1).to_i,
                                              authorities: roles,
                                              token: 'access-token'),
