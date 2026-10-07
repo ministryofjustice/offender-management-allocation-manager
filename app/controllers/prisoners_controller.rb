@@ -23,6 +23,16 @@ class PrisonersController < PrisonsApplicationController
     @offenders = @review_allocations.sort_by { [-it.working_days_since_earliest_change, it.full_name] }
   end
 
+  def review_changes
+    @prisoner = @prison.allocated.find { it.offender_no == params[:prisoner_id] }
+    return redirect_to('/404') unless @prisoner
+
+    review = SignificantChanges.for([@prisoner], @prison.allocations, poms: -> { all_poms }).first
+    return redirect_to review_allocations_prison_prisoners_path(@prison) unless review&.any?
+
+    @changes = review.changes.map { SignificantChanges::ChangePresenter.new(it, review:) }
+  end
+
   def unallocated
     retrieve_latest_allocation_details
     load_summary :unallocated

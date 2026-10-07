@@ -55,7 +55,7 @@
             <td aria-label="Case" class="govuk-table__cell" data-sort-value="<%= offender.full_name %>">
               <span class="prisoner-name">
                 <%= link_to offender.full_name,
-                            prison_prisoner_allocation_path(@prison.code, prisoner_id: offender.offender_no),
+                            prison_prisoner_review_changes_path(@prison.code, offender.offender_no),
                             class: 'govuk-link govuk-link--no-visited-state' %>
               </span>
               <br/>

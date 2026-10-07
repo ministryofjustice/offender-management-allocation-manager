@@ -316,3 +316,18 @@ en:
       PRO: "You can choose an available prison POM below or allocate to a probation POM, for example if a particular POM has worked with %{name} before."
       PO: "You can choose an available probation POM below or allocate to a prison POM, for example if a particular POM has worked with %{name} before."
       NOREC: "Choose an available POM below."
+
+  significant_changes:
+    tier:
+      title: Tier change
+    rosh:
+      title: ROSH change
+    handover:
+      title: Change to date when COM becomes responsible
+      explanation:
+        PRO: >-
+          The community probation team will take responsibility for this person later, so they may no longer need a prison POM.
+          Check whether a probation POM should be allocated instead.
+        PO: >-
+          The community probation team will take responsibility for this person later, so they may no longer need a probation POM.
+          Check whether a prison POM should be allocated instead.
