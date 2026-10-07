@@ -14,8 +14,9 @@ class SignonIdentity
 
     @username = info.username
     @staff_id = info.staff_id
-    @first_name = info.first_name if info.respond_to?(:first_name)
-    @last_name = info.last_name if info.respond_to?(:last_name)
+    @user_uuid = info.user_uuid
+    @first_name = info.first_name
+    @last_name = info.last_name
     @token = omniauth_data.fetch('credentials').token
     @active_caseload = info.active_caseload
     @caseloads = info.caseloads
@@ -27,6 +28,7 @@ class SignonIdentity
     {
       username: @username,
       staff_id: @staff_id,
+      user_uuid: @user_uuid,
       first_name: @first_name,
       last_name: @last_name,
       token: @token,
