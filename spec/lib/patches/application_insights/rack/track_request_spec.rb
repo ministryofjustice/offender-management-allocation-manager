@@ -7,6 +7,10 @@ ApplicationInsights::Rack::TrackRequest.prepend(Patches::ApplicationInsights::Tr
   ApplicationInsights::Rack::TrackRequest < Patches::ApplicationInsights::TrackRequest
 
 RSpec.describe ApplicationInsights::Rack::TrackRequest do
+  def build_route(template)
+    double('route', path: double('path', spec: template))
+  end
+
   subject(:middleware) do
     described_class.allocate.tap do |instance|
       instance.instance_variable_set(:@app, app)
@@ -30,17 +34,41 @@ RSpec.describe ApplicationInsights::Rack::TrackRequest do
             'user_uuid' => '11111111-2222-3333-4444-555555555555',
             'active_caseload' => 'LEI'
           }
-        }
+        },
+        'action_dispatch.route' => build_route('/prisons/:prison_id/dashboard(.:format)')
       )
 
       middleware.call(env)
 
       expect(channel).to have_received(:write) do |data, _context, _time|
+        expect(data.name).to eq('GET /prisons/:prison_id/dashboard')
         expect(data.properties).to eq(
           'userId' => '123456',
           'userUuid' => '11111111-2222-3333-4444-555555555555',
           'activeCaseLoadId' => 'LEI'
         )
+      end
+    end
+
+    it 'falls back to the raw request path when no route template is available' do
+      env = Rack::MockRequest.env_for('/prisons/LEI/dashboard')
+
+      middleware.call(env)
+
+      expect(channel).to have_received(:write) do |data, _context, _time|
+        expect(data.name).to eq('GET /prisons/LEI/dashboard')
+      end
+    end
+
+    it 'falls back to the raw request path for the catch-all route' do
+      env = Rack::MockRequest.env_for('/missing/path').merge(
+        'action_dispatch.route' => build_route('/*path(.:format)')
+      )
+
+      middleware.call(env)
+
+      expect(channel).to have_received(:write) do |data, _context, _time|
+        expect(data.name).to eq('GET /missing/path')
       end
     end
 

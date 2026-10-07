@@ -14,7 +14,10 @@ module Patches
     private
 
       def options_hash(request)
-        super.merge(properties: telemetry_properties(request))
+        super.merge(
+          name: request_name(request),
+          properties: telemetry_properties(request)
+        )
       end
 
       # See: https://github.com/ministryofjustice/hmpps-typescript-lib/blob/main/packages/azure-telemetry/src/main/middleware/addUserMetadataToTelemetry.ts
@@ -27,6 +30,23 @@ module Patches
           'userUuid' => sso_data[:user_uuid],
           'activeCaseLoadId' => sso_data[:active_caseload],
         }.compact_blank.transform_values(&:to_s)
+      end
+
+      def request_name(request)
+        "#{request.request_method} #{route_template(request) || request.path}"
+      end
+
+      # Prefer a low-cardinality template like `/prisons/:prison_id/dashboard`
+      # over the raw path. Returns nil when no useful template is available.
+      def route_template(request)
+        route = request.env['action_dispatch.route']
+        template = route&.path&.spec&.to_s
+        return if template.blank?
+
+        normalized_template = template.sub(/\(\.:format\)\z/, '')
+        return if normalized_template == '/*path'
+
+        normalized_template
       end
 
       def ignored_path?(env)
