@@ -25,6 +25,7 @@ describe AllocationService do
              prison: 'LEI',
              nomis_offender_id: nomis_offender_id,
              primary_pom_nomis_id: primary_pom_id,
+             primary_pom_reviewed_at: 1.day.ago,
              primary_pom_name: 'Pom, Moic')
     end
 
@@ -34,6 +35,7 @@ describe AllocationService do
     end
 
     it 'sends an email to both primary and secondary POMS', :aggregate_failures do
+      reviewed_at = allocation.primary_pom_reviewed_at
       described_class.allocate_secondary(nomis_offender_id: nomis_offender_id,
                                          secondary_pom_nomis_id: secondary_pom_id,
                                          created_by_username: 'MOIC_POM',
@@ -41,6 +43,7 @@ describe AllocationService do
                                         )
       expect(allocation.reload.secondary_pom_nomis_id).to eq(secondary_pom_id)
       expect(allocation.reload.secondary_pom_name).to eq('INTEGRATION-TESTS, MOIC')
+      expect(allocation.primary_pom_reviewed_at).to eq(reviewed_at)
 
       expect(EmailService).to have_received(:send_coworking_primary_email).with(
         allocation: allocation, message: message)
@@ -104,6 +107,25 @@ describe AllocationService do
             described_class.create_or_update(update_params)
           }.not_to change(AllocationHistory, :count)
         }.to change { AllocationHistory.find_by(nomis_offender_id: nomis_offender_id).versions.count }.by(1)
+      end
+
+      [:allocate_primary_pom, :reallocate_primary_pom].each do |event|
+        it "clears the previous review when saving #{event}" do
+          allocation = AllocationHistory.find_by!(nomis_offender_id:)
+          allocation.update!(primary_pom_reviewed_at: 1.day.ago)
+
+          described_class.create_or_update(
+            {
+              nomis_offender_id:,
+              primary_pom_nomis_id: nomis_staff_id,
+              event:,
+              created_by_username: 'MOIC_POM'
+            },
+            notify: false
+          )
+
+          expect(allocation.reload.primary_pom_reviewed_at).to be_nil
+        end
       end
     end
   end

@@ -22,6 +22,7 @@ class AllocationHistoryVersion < ApplicationRecord
     event
     event_trigger
     primary_pom_allocated_at
+    primary_pom_reviewed_at
     recommended_pom_type
   ].freeze
 
@@ -49,6 +50,7 @@ class AllocationHistoryVersion < ApplicationRecord
           allocation_updated_at: attrs['updated_at'],
           # below attributes might not exist in previous versions, so we set defaults
           primary_pom_allocated_at: nil,
+          primary_pom_reviewed_at: nil,
           recommended_pom_type: nil,
           allocated_at_rosh: nil,
         }.stringify_keys

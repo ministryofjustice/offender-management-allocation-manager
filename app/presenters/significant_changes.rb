@@ -2,7 +2,8 @@
 
 # Wraps an allocated offender with the outstanding significant changes to their
 # case, derived from PaperTrail versions. A change is outstanding if it happened
-# after the primary POM was allocated, and within the last `LOOKBACK_PERIOD`.
+# after the primary POM was allocated or last reviewed, and within the last
+# `LOOKBACK_PERIOD`.
 #
 # Each type of change is worked out by its own detector in `DETECTORS`. To track
 # a new type of change, add a `Detector` subclass and list it there.
@@ -54,7 +55,7 @@ class SignificantChanges
   end
 
   def self.start_date_for(allocation)
-    [allocation.primary_pom_allocated_at, LOOKBACK_PERIOD.ago.beginning_of_day].max
+    [allocation.primary_pom_allocated_at, allocation.primary_pom_reviewed_at, LOOKBACK_PERIOD.ago.beginning_of_day].compact.max
   end
 
   def initialize(offender, allocation, versions, poms:)
