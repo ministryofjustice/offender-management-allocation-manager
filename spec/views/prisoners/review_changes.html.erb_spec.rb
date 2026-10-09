@@ -58,9 +58,18 @@ RSpec.describe 'prisoners/review_changes', type: :view do
     expect(cards).to all(have_css('dl.govuk-summary-list > div.govuk-summary-list__row > dd.govuk-summary-list__value', count: 3))
   end
 
-  it 'omits source attribution and action buttons' do
+  it 'links to the existing reallocation journey with a primary button below the cards' do
+    expect(page).to have_css(
+      '.govuk-summary-card ~ .govuk-button-group a.govuk-button[role="button"][data-module="govuk-button"]',
+      text: 'Reallocate', exact_text: true
+    )
+    expect(page).to have_link('Reallocate', href: prison_prisoner_review_case_details_path(prison.code, prisoner.offender_no))
+    expect(page).to have_no_css('.govuk-button--secondary')
+  end
+
+  it 'omits source attribution and card actions' do
     expect(page).to have_no_text('Where the change happened')
-    expect(page).to have_no_css('.govuk-button, .govuk-summary-list__actions')
+    expect(page).to have_no_css('.govuk-summary-list__actions')
   end
 
   context 'when only a tier change is outstanding' do

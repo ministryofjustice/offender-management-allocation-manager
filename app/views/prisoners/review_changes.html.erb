@@ -42,5 +42,11 @@
         </div>
       </div>
     <% end %>
+
+    <div class="govuk-button-group govuk-!-margin-top-7">
+      <%= link_to t('significant_changes.cta.reallocate'),
+                  prison_prisoner_review_case_details_path(@prison.code, @prisoner.offender_no),
+                  role: 'button', class: 'govuk-button', data: { module: 'govuk-button' } %>
+    </div>
   </div>
 </div>
