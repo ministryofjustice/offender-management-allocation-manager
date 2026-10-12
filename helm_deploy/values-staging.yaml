@@ -4,7 +4,6 @@ custom_templates_config:
     enabled: true
 
 generic-prometheus-alerts:
-  alertSeverity: mpc-alerts-nonprod-dev
   businessHoursOnly: true
   rdsAlertsDatabases:
     cloud-platform-75ec3c1f26a64520: staging
