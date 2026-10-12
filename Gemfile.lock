@@ -119,7 +119,7 @@ GEM
       debug_inspector (>= 1.2.0)
     bootsnap (1.26.0)
       msgpack (~> 1.5)
-    brakeman (8.0.6)
+    brakeman (8.1.0)
       racc
     builder (3.3.0)
     business_time (0.13.0)
@@ -246,7 +246,7 @@ GEM
     kaminari-core (1.2.2)
     language_server-protocol (3.17.0.6)
     lint_roller (1.1.0)
-    listen (3.10.0)
+    listen (3.10.1)
       logger
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -498,10 +498,9 @@ GEM
     ruby2_keywords (0.0.5)
     rubyzip (3.7.0)
     securerandom (0.4.1)
-    selenium-webdriver (4.49.0)
+    selenium-webdriver (4.50.0)
       base64 (~> 0.2)
       logger (~> 1.4)
-      rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
     sentry-rails (7.1.0)
@@ -527,7 +526,7 @@ GEM
       logger
       rack (>= 2.2.4, < 3.3)
       redis-client (>= 0.23.0, < 1)
-    simplecov (1.3.1)
+    simplecov (1.3.2)
     simplecov-lcov (0.9.0)
     snaky_hash (2.0.7)
       hashie (>= 0.1.0, < 6)
