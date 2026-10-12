@@ -49,7 +49,8 @@ CREATE TABLE public.allocation_history (
     updated_at timestamp without time zone NOT NULL,
     primary_pom_allocated_at timestamp without time zone,
     recommended_pom_type character varying,
-    allocated_at_rosh character varying
+    allocated_at_rosh character varying,
+    primary_pom_reviewed_at timestamp(6) without time zone
 );
 
 
@@ -94,7 +95,8 @@ CREATE TABLE public.allocation_history_versions (
     created_at timestamp(6) without time zone NOT NULL,
     allocation_created_at timestamp(6) without time zone NOT NULL,
     allocation_updated_at timestamp(6) without time zone NOT NULL,
-    allocated_at_rosh character varying
+    allocated_at_rosh character varying,
+    primary_pom_reviewed_at timestamp(6) without time zone
 );
 
 
@@ -1473,7 +1475,7 @@ CREATE INDEX index_versions_on_nomis_offender_id ON public.versions USING btree 
 -- Name: index_versions_on_significant_change_history; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_versions_on_significant_change_history ON public.versions USING btree (nomis_offender_id, created_at) WHERE (((event)::text = 'update'::text) AND ((item_type)::text = ANY ((ARRAY['CaseInformation'::character varying, 'CalculatedHandoverDate'::character varying])::text[])));
+CREATE INDEX index_versions_on_significant_change_history ON public.versions USING btree (nomis_offender_id, created_at) WHERE (((event)::text = 'update'::text) AND ((item_type)::text = ANY (ARRAY[('CaseInformation'::character varying)::text, ('CalculatedHandoverDate'::character varying)::text])));
 
 
 --
@@ -1506,6 +1508,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261008101520'),
 ('20261002152102'),
 ('20260904103721'),
 ('20260903090000'),

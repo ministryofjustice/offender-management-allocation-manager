@@ -642,6 +642,25 @@ RSpec.describe AllocationHistory, :enable_domain_event_publish, type: :model do
         )
       }.not_to change(AllocationHistoryVersion, :count)
     end
+
+    it 'preserves the review timestamp from before the update' do
+      allocation.update!(primary_pom_reviewed_at: 1.day.ago)
+      reviewed_at = allocation.reload.primary_pom_reviewed_at
+
+      allocation.update!(primary_pom_reviewed_at: nil)
+
+      expect(AllocationHistoryVersion.last.primary_pom_reviewed_at).to eq(reviewed_at)
+    end
+
+    it 'defaults the review timestamp to nil for versions predating the column' do
+      allocation.update!(allocated_at_tier: 'B')
+      version = allocation.versions.last
+      attributes = PaperTrail::Serializers::YAML.load(version.object)
+      attributes.delete('primary_pom_reviewed_at')
+      version.object = PaperTrail::Serializers::YAML.dump(attributes)
+
+      expect(AllocationHistoryVersion.attrs_from_papertrail(version)).to include('primary_pom_reviewed_at' => nil)
+    end
   end
 
   describe '#save_audit_event' do

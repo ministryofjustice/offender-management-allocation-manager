@@ -17,6 +17,7 @@ class PrisonerMergeService
   BULK_REASSIGNABLE_MODELS = [
     EarlyAllocation,
     VictimLiaisonOfficer,
+    AllocationHistoryVersion,
   ].freeze
 
   attr_reader :old_offender_id, :new_offender_id, :logger

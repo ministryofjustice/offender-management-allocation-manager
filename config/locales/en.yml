@@ -318,6 +318,8 @@ en:
       NOREC: "Choose an available POM below."
 
   significant_changes:
+    cta:
+      reallocate: Reallocate
     tier:
       title: Tier change
     rosh:

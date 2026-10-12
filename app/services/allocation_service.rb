@@ -38,7 +38,8 @@ class AllocationService
     params_copy = params.except(:created_by_username).merge(
       primary_pom_name: "#{primary_pom.last_name}, #{primary_pom.first_name}",
       created_by_name: created_by_user.full_name_ordered,
-      primary_pom_allocated_at: Time.zone.now.utc
+      primary_pom_allocated_at: Time.zone.now.utc,
+      primary_pom_reviewed_at: nil,
     )
 
     # When we look up the current allocation, we only do this for the current

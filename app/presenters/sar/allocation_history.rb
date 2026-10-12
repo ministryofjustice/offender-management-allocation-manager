@@ -10,6 +10,7 @@ module Sar
           :primary_pom_nomis_id,
           :secondary_pom_nomis_id,
           :created_by_name,
+          :primary_pom_reviewed_at,
         ]
       end
 

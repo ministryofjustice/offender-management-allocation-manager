@@ -93,6 +93,48 @@ RSpec.describe PrisonerMergeService do
   describe 'bulk reassignable model migration' do
     include_context 'with old offender'
 
+    context 'when both IDs have flattened allocation history' do
+      let!(:old_allocation) { create(:allocation_history, nomis_offender_id: old_id, prison: create(:prison).code) }
+      let!(:new_allocation) { create(:allocation_history, nomis_offender_id: new_id, prison: old_allocation.prison) }
+
+      before do
+        old_allocation.update!(allocated_at_tier: 'B')
+        old_allocation.update!(allocated_at_tier: 'C')
+        new_allocation.update!(allocated_at_tier: 'D')
+      end
+
+      it 'moves all flattened allocation history to the canonical ID' do
+        service.process
+
+        expect_migrated_records(AllocationHistoryVersion, count: 3)
+      end
+
+      it 'preserves historical attributes and does not create paper trail versions when bulk repointing' do
+        old_versions = AllocationHistoryVersion.where(nomis_offender_id: old_id).to_a
+        original_attributes = old_versions.map(&:attributes)
+        canonical_version = AllocationHistoryVersion.find_by!(nomis_offender_id: new_id)
+        canonical_attributes = canonical_version.attributes
+        papertrail_count = PaperTrail::Version.count
+
+        service.process
+
+        aggregate_failures do
+          old_versions.zip(original_attributes).each do |version, attributes|
+            expect(version.reload.attributes).to eq(attributes.merge('nomis_offender_id' => new_id))
+          end
+          expect(canonical_version.reload.attributes).to eq(canonical_attributes)
+          expect(old_allocation.reload.nomis_offender_id).to eq(old_id)
+          expect(PaperTrail::Version.count).to eq(papertrail_count)
+        end
+      end
+
+      it 'logs the bulk migration with count' do
+        service.process
+
+        expect_logged_info(/event=migrate_bulk_records.*record=allocation_history_version.*count=2/)
+      end
+    end
+
     context 'when old ID has early allocations' do
       let!(:early_alloc1) { create(:early_allocation, offender: old_offender) }
       let!(:early_alloc2) { create(:early_allocation, offender: old_offender) }

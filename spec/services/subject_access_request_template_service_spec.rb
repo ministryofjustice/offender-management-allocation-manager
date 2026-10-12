@@ -7,7 +7,7 @@ RSpec.describe SubjectAccessRequestTemplateService do
 
   describe 'DB schema change guard' do
     # Keep this updated once any potential SAR drifting is asserted
-    let(:reviewed_version) { '20261002_152102' }
+    let(:reviewed_version) { '20261008_101520' }
 
     let(:current_version) { ActiveRecord::Base.connection_pool.migration_context.current_version }
     let(:message) do

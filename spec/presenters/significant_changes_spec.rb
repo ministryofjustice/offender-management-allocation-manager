@@ -76,6 +76,54 @@ RSpec.describe SignificantChanges do
       expect(wrapper.allocated_pom_position).to eq(RecommendationService::PRISON_POM)
     end
 
+    describe 'review boundary' do
+      let(:reviewed_at) { allocated_at + 3.days }
+
+      before { allocation.primary_pom_reviewed_at = reviewed_at }
+
+      it 'ignores reviewed tier, ROSH and handover changes' do
+        review = wrapper(
+          case_info_version({ 'tier' => %w[B A], 'rosh_level' => %w[LOW HIGH] }, reviewed_at - 1.day),
+          version('CalculatedHandoverDate', { 'handover_date' => [Date.new(2026, 9, 10), Date.new(2027, 3, 1)] }, reviewed_at - 1.day)
+        )
+
+        expect(review).not_to be_any
+        expect(allocation.primary_pom_allocated_at).to eq(allocated_at)
+      end
+
+      it 'detects subsequent changes against the values after the review' do
+        review = wrapper(
+          case_info_version({ 'tier' => %w[B A] }, reviewed_at - 1.day),
+          case_info_version({ 'tier' => %w[A B] }, reviewed_at + 1.day),
+          case_info_version({ 'rosh_level' => %w[LOW HIGH] }, reviewed_at + 1.day),
+          version('CalculatedHandoverDate', { 'handover_date' => [Date.new(2026, 9, 10), Date.new(2027, 3, 1)] }, reviewed_at + 1.day)
+        )
+
+        expect(review.changes.map(&:type)).to eq(%i[tier rosh handover])
+        expect(review.changes.first.from_value).to eq('A')
+        expect(review.changes.first.to_value).to eq('B')
+      end
+
+      it 'does not load versions before the review' do
+        create_version('CaseInformation', { 'tier' => %w[B A] }, reviewed_at - 1.day)
+        later_version = create_version('CaseInformation', { 'tier' => %w[A B] }, reviewed_at + 1.day)
+
+        expect(described_class.load_versions([allocation])).to eq([later_version])
+      end
+
+      it 'uses a subsequent allocation date rather than an older review date' do
+        allocation.primary_pom_allocated_at = reviewed_at + 2.days
+
+        expect(described_class.start_date_for(allocation)).to eq(allocation.primary_pom_allocated_at)
+      end
+
+      it 'still applies the lookback period when the review is older' do
+        travel_to(reviewed_at + described_class::LOOKBACK_PERIOD + 1.day)
+
+        expect(described_class.start_date_for(allocation)).to eq(described_class::LOOKBACK_PERIOD.ago.beginning_of_day)
+      end
+    end
+
     it 'is nil when the allocated primary POM is not in the list' do
       allow(allocated_pom).to receive(:staff_id).and_return(1)
 
@@ -182,6 +230,18 @@ RSpec.describe SignificantChanges do
       described_class.for([offender], [allocation], poms:).each(&:changes)
 
       expect(poms).to have_received(:call)
+    end
+
+    it "only uses changes since each offender's own review" do
+      allocation.primary_pom_reviewed_at = allocated_at + 2.days
+      other_allocation = build(:allocation_history, nomis_offender_id: 'Z9999ZZ', primary_pom_allocated_at: allocated_at,
+                                                    primary_pom_nomis_id: 485_927)
+      other_pom = instance_double(PomWrapper, staff_id: 485_927, position: RecommendationService::PROBATION_POM)
+      create_version('CaseInformation', { 'tier' => %w[B A] }, allocated_at + 1.day, nomis_offender_id: 'Z9999ZZ')
+
+      result = described_class.for([offender, other_offender], [allocation, other_allocation], poms: -> { [allocated_pom, other_pom] })
+
+      expect(result.map { [it.offender_no, it.labels] }).to eq([[nomis_offender_id, []], ['Z9999ZZ', %w[Tier]]])
     end
 
     it 'uses the allocated POM position when a detector needs it' do

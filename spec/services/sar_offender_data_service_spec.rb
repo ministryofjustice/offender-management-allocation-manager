@@ -36,7 +36,8 @@ RSpec.describe SarOffenderDataService do
         create(
           :allocation_history, :override, prison: 'LEI', nomis_offender_id: nomis_offender_id,
                                           primary_pom_name: 'OLD_NAME, MOIC', secondary_pom_name: 'SEC_SURNAME, POM',
-                                          recommended_pom_type: 'prison', created_by_name: 'JOHN DOE'
+                                          recommended_pom_type: 'prison', created_by_name: 'JOHN DOE',
+                                          primary_pom_reviewed_at: REFERENCE_TIME
         )
       end
 
@@ -47,7 +48,8 @@ RSpec.describe SarOffenderDataService do
                 updated_at: REFERENCE_TIME - i.days,
                 prison: 'LEI',
                 nomis_offender_id: nomis_offender_id,
-                primary_pom_name: 'Conder, Anna')
+                primary_pom_name: 'Conder, Anna',
+                primary_pom_reviewed_at: REFERENCE_TIME - i.days)
         end
       end
 
@@ -59,6 +61,10 @@ RSpec.describe SarOffenderDataService do
         it 'returns all has_many data' do
           expect(result[:allocationHistory].size).to eq(HISTORY_SIZE)
           expect(result[:earlyAllocations].size).to eq(HISTORY_SIZE)
+        end
+
+        it 'omits the primary POM review timestamp from current and historic allocations' do
+          expect(result[:allocationHistory]).to all(satisfy { |entry| !entry.key?('primaryPomReviewedAt') })
         end
 
         it 'returns all has_one data' do
