@@ -29,6 +29,6 @@
   },
   "homepage": "https://github.com/ministryofjustice/offender-management-allocation-manager#readme",
   "resolutions": {
-    "immutable": ">=5.1.8"
+    "@parcel/watcher": "^2.6.0"
   }
 }
