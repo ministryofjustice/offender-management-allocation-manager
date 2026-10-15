@@ -47,6 +47,46 @@ RSpec.describe AllocationHistory, :enable_domain_event_publish, type: :model do
     end
   end
 
+  describe 'review metadata on deallocation' do
+    let(:allocation) { create(:allocation_history, :primary, prison: create(:prison).code) }
+    let(:reviewed_at) { 1.day.ago.change(usec: 0) }
+
+    before do
+      allocation.update!(primary_pom_reviewed_at: reviewed_at, reviewed_recommended_pom_type: 'probation')
+    end
+
+    [
+      [:deallocate_primary_pom, {}],
+      [:deallocate_offender_after_release, { send_email: false }],
+      [:deallocate_offender_after_transfer, { send_email: false }],
+    ].each do |method, options|
+      it "clears review metadata on #{method} while preserving review history" do
+        allocation.public_send(method, **options)
+
+        expect(allocation.reload).to have_attributes(
+          primary_pom_reviewed_at: nil, reviewed_recommended_pom_type: nil
+        )
+        previous_allocation = allocation.versions.last.reify
+        expect(previous_allocation).to have_attributes(
+          primary_pom_reviewed_at: reviewed_at, reviewed_recommended_pom_type: 'probation'
+        )
+        history = AllocationService.history(allocation)
+        expect(history[-2].to_partial_path).to eq('case_history/allocation/retain_primary_pom')
+        expect(history.last.to_partial_path).not_to eq('case_history/allocation/retain_primary_pom')
+      end
+    end
+
+    it 'preserves review metadata when only the secondary POM is deallocated' do
+      allocation.update!(secondary_pom_nomis_id: 987_654)
+
+      allocation.deallocate_secondary_pom
+
+      expect(allocation.reload).to have_attributes(
+        primary_pom_reviewed_at: reviewed_at, reviewed_recommended_pom_type: 'probation'
+      )
+    end
+  end
+
   describe 'Validations' do
     subject do
       build(
@@ -643,23 +683,27 @@ RSpec.describe AllocationHistory, :enable_domain_event_publish, type: :model do
       }.not_to change(AllocationHistoryVersion, :count)
     end
 
-    it 'preserves the review timestamp from before the update' do
-      allocation.update!(primary_pom_reviewed_at: 1.day.ago)
+    it 'preserves the review timestamp and recommendation from before the update' do
+      allocation.update!(primary_pom_reviewed_at: 1.day.ago, reviewed_recommended_pom_type: 'probation')
       reviewed_at = allocation.reload.primary_pom_reviewed_at
 
-      allocation.update!(primary_pom_reviewed_at: nil)
+      allocation.update!(primary_pom_reviewed_at: nil, reviewed_recommended_pom_type: nil)
 
       expect(AllocationHistoryVersion.last.primary_pom_reviewed_at).to eq(reviewed_at)
+      expect(AllocationHistoryVersion.last.reviewed_recommended_pom_type).to eq('probation')
     end
 
-    it 'defaults the review timestamp to nil for versions predating the column' do
+    it 'defaults review attributes to nil for versions predating the columns' do
       allocation.update!(allocated_at_tier: 'B')
       version = allocation.versions.last
       attributes = PaperTrail::Serializers::YAML.load(version.object)
       attributes.delete('primary_pom_reviewed_at')
+      attributes.delete('reviewed_recommended_pom_type')
       version.object = PaperTrail::Serializers::YAML.dump(attributes)
 
-      expect(AllocationHistoryVersion.attrs_from_papertrail(version)).to include('primary_pom_reviewed_at' => nil)
+      expect(AllocationHistoryVersion.attrs_from_papertrail(version)).to include(
+        'primary_pom_reviewed_at' => nil, 'reviewed_recommended_pom_type' => nil
+      )
     end
   end
 

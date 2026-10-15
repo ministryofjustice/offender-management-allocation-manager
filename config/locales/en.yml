@@ -320,6 +320,7 @@ en:
   significant_changes:
     cta:
       reallocate: Reallocate
+      retain: Keep current allocation
     tier:
       title: Tier change
     rosh:

@@ -88,6 +88,7 @@ Rails.application.routes.draw do
 
       get 'review_case_details'
       get 'review_changes'
+      resource :allocation_retention, only: %i[new create]
 
       collection do
         get 'allocated'

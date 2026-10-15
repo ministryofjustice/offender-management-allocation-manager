@@ -3,8 +3,8 @@
 class CaseHistory < BaseHistoryPresenter
   delegate :primary_pom_nomis_id, :event_trigger, :secondary_pom_nomis_id,
            :allocated_at_tier, :allocated_at_rosh, :nomis_offender_id, :primary_pom_name,
-           :override_reasons, :suitability_detail, :override_detail,
-           :recommended_pom_type, :secondary_pom_name, :prison, to: :@allocation
+           :override_reasons, :suitability_detail, :override_detail, :last_allocation_event_at,
+           :recommended_pom_type, :reviewed_recommended_pom_type, :secondary_pom_name, :prison, to: :@allocation
 
   def initialize(prev_allocation, allocation, version)
     super()
@@ -40,8 +40,9 @@ class CaseHistory < BaseHistoryPresenter
     end
   end
 
-  # don't allow auto-deallocations to say that a person did it
   def created_by_name
+    return paper_trail_created_by_name(@version) if retention?
+
     if @allocation.event_trigger == 'user'
       @allocation.created_by_name
     else
@@ -78,6 +79,14 @@ class CaseHistory < BaseHistoryPresenter
 
   # render a different partial depending on the type of event
   def to_partial_path
+    return 'case_history/allocation/retain_primary_pom' if retention?
+
     "case_history/allocation/#{event}"
+  end
+
+private
+
+  def retention?
+    @version.changeset['primary_pom_reviewed_at']&.last.present?
   end
 end

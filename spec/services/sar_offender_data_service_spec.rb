@@ -37,7 +37,7 @@ RSpec.describe SarOffenderDataService do
           :allocation_history, :override, prison: 'LEI', nomis_offender_id: nomis_offender_id,
                                           primary_pom_name: 'OLD_NAME, MOIC', secondary_pom_name: 'SEC_SURNAME, POM',
                                           recommended_pom_type: 'prison', created_by_name: 'JOHN DOE',
-                                          primary_pom_reviewed_at: REFERENCE_TIME
+                                          primary_pom_reviewed_at: REFERENCE_TIME, reviewed_recommended_pom_type: 'probation'
         )
       end
 
@@ -49,7 +49,8 @@ RSpec.describe SarOffenderDataService do
                 prison: 'LEI',
                 nomis_offender_id: nomis_offender_id,
                 primary_pom_name: 'Conder, Anna',
-                primary_pom_reviewed_at: REFERENCE_TIME - i.days)
+                primary_pom_reviewed_at: REFERENCE_TIME - i.days,
+                reviewed_recommended_pom_type: 'prison')
         end
       end
 

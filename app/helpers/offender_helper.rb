@@ -34,7 +34,9 @@ module OffenderHelper
 
   def last_event(allocation)
     event = event_type(allocation.event)
-    timestamp = if allocation.respond_to?(:updated_at) && allocation.updated_at.present?
+    timestamp = if allocation.respond_to?(:last_allocation_event_at)
+                  allocation.last_allocation_event_at
+                elsif allocation.respond_to?(:updated_at) && allocation.updated_at.present?
                   allocation.updated_at
                 else
                   allocation.created_at
