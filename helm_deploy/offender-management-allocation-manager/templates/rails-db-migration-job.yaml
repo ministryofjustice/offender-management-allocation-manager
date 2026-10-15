@@ -3,9 +3,13 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rails-db-migration
+  name: rails-db-migration-hook
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
 spec:
-  ttlSecondsAfterFinished: 120
+  ttlSecondsAfterFinished: 3600
+  activeDeadlineSeconds: 180
   completions: 1
   parallelism: 1
   backoffLimit: 4
