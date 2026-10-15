@@ -108,6 +108,23 @@ class AllocationHistory < ApplicationRecord
     versions.map(&:reify).compact
   end
 
+  def last_allocation_event_at
+    timestamp = updated_at || created_at
+
+    versions.reverse_each do |version|
+      changes = version.changeset
+
+      if version.event == 'create' ||
+          changes.keys.intersect?(%w[event prison primary_pom_nomis_id secondary_pom_nomis_id primary_pom_allocated_at])
+        return changes['updated_at']&.last || version.created_at
+      end
+
+      timestamp = changes['updated_at']&.first || timestamp
+    end
+
+    timestamp
+  end
+
   def previously_allocated_poms
     get_old_versions.map { |h| [h.primary_pom_nomis_id, h.secondary_pom_nomis_id] }.flatten.compact.uniq
   end
@@ -135,6 +152,8 @@ class AllocationHistory < ApplicationRecord
     self.primary_pom_name = nil
     self.recommended_pom_type = nil
     self.primary_pom_allocated_at = nil
+    self.primary_pom_reviewed_at = nil
+    self.reviewed_recommended_pom_type = nil
     self.event = DEALLOCATE_PRIMARY_POM
     self.event_trigger = event_trigger
     save!
@@ -205,6 +224,8 @@ private
       primary_pom_nomis_id: nil,
       primary_pom_name: nil,
       primary_pom_allocated_at: nil,
+      primary_pom_reviewed_at: nil,
+      reviewed_recommended_pom_type: nil,
       secondary_pom_nomis_id: nil,
       secondary_pom_name: nil,
       recommended_pom_type: nil,

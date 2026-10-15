@@ -1,0 +1,26 @@
+<% content_for :title, "Why are you allocating to this POM? – Digital Prison Services" %>
+
+<%= link_to 'Back', prison_prisoner_review_changes_path(@prison, @prisoner.offender_no),
+            class: 'govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6' %>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <%= form_for @override, url: prison_prisoner_allocation_retention_path(@prison, @prisoner.offender_no),
+                           builder: GOVUKDesignSystemFormBuilder::FormBuilder do |form| %>
+      <%= form.govuk_error_summary %>
+
+      <h1 class="govuk-heading-l">
+        Why are you allocating a <%= pom_level(@pom.position, titleize: false) %> to <%= @prisoner.full_name_ordered %> (<%= @prisoner.offender_no %>)?
+      </h1>
+
+      <%= render 'shared/override_reasons_form', form: form, offender: @prisoner, pom: @pom %>
+
+      <div class="govuk-button-group">
+        <%= form.submit 'Continue', class: 'govuk-button', data: { module: 'govuk-button' } %>
+        <%= link_to 'Allocate to someone else',
+                    prison_prisoner_review_case_details_path(@prison, @prisoner.offender_no),
+                    role: 'button', class: 'govuk-button govuk-button--secondary', data: { module: 'govuk-button' } %>
+      </div>
+    <% end %>
+  </div>
+</div>

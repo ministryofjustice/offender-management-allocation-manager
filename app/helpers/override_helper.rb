@@ -11,12 +11,12 @@ module OverrideHelper
     end
   end
 
-  def display_override_details(reason, allocation)
+  def display_override_details(reason, allocation, recommended_pom_type: allocation.recommended_pom_type)
     case reason
     when 'no_staff'
-      no_staff_detail(allocation)
+      no_staff_detail(recommended_pom_type)
     when 'suitability'
-      suitability_detail(allocation)
+      suitability_detail(allocation, recommended_pom_type)
     when 'continuity'
       tag.p('- This POM has worked with the prisoner before')
     when 'other'
@@ -27,18 +27,18 @@ module OverrideHelper
 
 private
 
-  def no_staff_detail(allocation)
-    if allocation.recommended_pom_type.present?
-      tag.p("- No available #{allocation.recommended_pom_type} POMs")
+  def no_staff_detail(recommended_pom_type)
+    if recommended_pom_type.present?
+      tag.p("- No available #{recommended_pom_type} POMs")
     else
       tag.p('- No available POMs of the other type')
     end
   end
 
-  def suitability_detail(allocation)
-    if allocation.recommended_pom_type == 'prison'
+  def suitability_detail(allocation, recommended_pom_type)
+    if recommended_pom_type == 'prison'
       tag.p('- Assessed as not suitable for a prison POM')
-    elsif allocation.recommended_pom_type == 'probation'
+    elsif recommended_pom_type == 'probation'
       tag.p('- Assessed as not suitable for a probation POM')
     else
       tag.p('- Assessed as suitable for the allocated POM type')

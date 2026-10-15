@@ -11,6 +11,7 @@ module Sar
           :secondary_pom_nomis_id,
           :created_by_name,
           :primary_pom_reviewed_at,
+          :reviewed_recommended_pom_type,
         ]
       end
 

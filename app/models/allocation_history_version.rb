@@ -24,6 +24,7 @@ class AllocationHistoryVersion < ApplicationRecord
     primary_pom_allocated_at
     primary_pom_reviewed_at
     recommended_pom_type
+    reviewed_recommended_pom_type
   ].freeze
 
   class << self
@@ -52,6 +53,7 @@ class AllocationHistoryVersion < ApplicationRecord
           primary_pom_allocated_at: nil,
           primary_pom_reviewed_at: nil,
           recommended_pom_type: nil,
+          reviewed_recommended_pom_type: nil,
           allocated_at_rosh: nil,
         }.stringify_keys
       )

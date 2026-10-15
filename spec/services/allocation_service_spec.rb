@@ -12,6 +12,104 @@ describe AllocationService do
     stub_filtered_pom(prison_code, pom)
   end
 
+  describe '.retain' do
+    subject(:retain) { described_class.retain(allocation:, override:, recommended_pom_type:) }
+
+    let(:allocation) do
+      create(:allocation_history, :primary, prison: prison.code, primary_pom_name: 'Smith, Jane',
+                                            primary_pom_allocated_at: 10.days.ago, recommended_pom_type: 'prison')
+    end
+    let(:override) { OverrideForm.new(override_reasons: ['other'], more_detail: 'Continuity is important') }
+    let(:recommended_pom_type) { RecommendationService::PROBATION_POM }
+
+    before do
+      allocation
+      allow(EmailService).to receive(:send_email)
+      allow(DomainEvents::Event).to receive(:new)
+    end
+
+    it 'records the review without changing the assignment or its dates' do
+      travel_to(Time.current.change(usec: 0))
+      before_attributes = allocation.reload.attributes
+
+      retain
+
+      expect(
+        allocation.reload.attributes.except(
+          'primary_pom_reviewed_at', 'reviewed_recommended_pom_type', 'override_reasons', 'override_detail', 'suitability_detail', 'updated_at'
+        )
+      ).to eq(
+        before_attributes.except(
+          'primary_pom_reviewed_at', 'reviewed_recommended_pom_type', 'override_reasons', 'override_detail', 'suitability_detail', 'updated_at'
+        )
+      )
+      expect(allocation.primary_pom_reviewed_at).to eq(Time.current)
+      expect(allocation).to have_attributes(
+        override_reasons: ['other'], override_detail: 'Continuity is important', reviewed_recommended_pom_type: 'probation'
+      )
+    end
+
+    it 'does not send emails or publish an allocation change event' do
+      retain
+
+      expect(EmailService).not_to have_received(:send_email)
+      expect(DomainEvents::Event).not_to have_received(:new)
+    end
+
+    it 'saves an audit event for the review' do
+      expect {
+        PaperTrail.request(whodunnit: 'HOMD_USER') { retain }
+      }.to change(AuditEvent, :count).by(1)
+
+      audit = AuditEvent.find_by!(username: 'HOMD_USER')
+      expect(audit).to have_attributes(
+        nomis_offender_id: allocation.nomis_offender_id,
+        username: 'HOMD_USER'
+      )
+      expect(audit.data['after']).to have_key('primary_pom_reviewed_at')
+      expect(audit.data['after']['reviewed_recommended_pom_type']).to eq('probation')
+    end
+
+    it 'saves suitability details when that reason is selected' do
+      override.override_reasons = ['suitability']
+      override.suitability_detail = 'The current POM is best suited to this case'
+
+      retain
+
+      expect(allocation.reload).to have_attributes(
+        override_reasons: ['suitability'], suitability_detail: 'The current POM is best suited to this case'
+      )
+    end
+
+    it 'replaces the recommendation snapshot on a subsequent review' do
+      allocation.update!(reviewed_recommended_pom_type: 'prison', primary_pom_reviewed_at: 1.day.ago)
+
+      retain
+
+      expect(allocation.reload.reviewed_recommended_pom_type).to eq('probation')
+    end
+
+    context 'when a prison POM is recommended' do
+      let(:recommended_pom_type) { RecommendationService::PRISON_POM }
+
+      it 'saves the prison recommendation snapshot' do
+        retain
+
+        expect(allocation.reload.reviewed_recommended_pom_type).to eq('prison')
+      end
+    end
+
+    it 'clears details for reasons which were not selected' do
+      allocation.update!(suitability_detail: 'Old reason', override_detail: 'Old detail')
+      override.override_reasons = ['continuity']
+
+      retain
+
+      expect(allocation.reload.suitability_detail).to be_nil
+      expect(allocation.override_detail).to be_nil
+    end
+  end
+
   describe '#allocate_secondary', :queueing do
     let(:moic_test_id) { 485_758 }
     let(:ross_id) { 485_926 }
@@ -26,6 +124,7 @@ describe AllocationService do
              nomis_offender_id: nomis_offender_id,
              primary_pom_nomis_id: primary_pom_id,
              primary_pom_reviewed_at: 1.day.ago,
+             reviewed_recommended_pom_type: 'probation',
              primary_pom_name: 'Pom, Moic')
     end
 
@@ -44,6 +143,7 @@ describe AllocationService do
       expect(allocation.reload.secondary_pom_nomis_id).to eq(secondary_pom_id)
       expect(allocation.reload.secondary_pom_name).to eq('INTEGRATION-TESTS, MOIC')
       expect(allocation.primary_pom_reviewed_at).to eq(reviewed_at)
+      expect(allocation.reviewed_recommended_pom_type).to eq('probation')
 
       expect(EmailService).to have_received(:send_coworking_primary_email).with(
         allocation: allocation, message: message)
@@ -112,7 +212,7 @@ describe AllocationService do
       [:allocate_primary_pom, :reallocate_primary_pom].each do |event|
         it "clears the previous review when saving #{event}" do
           allocation = AllocationHistory.find_by!(nomis_offender_id:)
-          allocation.update!(primary_pom_reviewed_at: 1.day.ago)
+          allocation.update!(primary_pom_reviewed_at: 1.day.ago, reviewed_recommended_pom_type: 'probation')
 
           described_class.create_or_update(
             {
@@ -125,6 +225,7 @@ describe AllocationService do
           )
 
           expect(allocation.reload.primary_pom_reviewed_at).to be_nil
+          expect(allocation.reviewed_recommended_pom_type).to be_nil
         end
       end
     end
@@ -252,6 +353,51 @@ describe AllocationService do
         { started_at: '2022-10-26T11:41', ended_at: '2023-02-16T12:13', name: 'ADAMS:', email: 'adams@x.com' },
         { started_at: '2023-02-16T12:13', ended_at: nil, name: 'DUCKETT', email: nil },
       ])
+    end
+
+    context 'when an allocation is retained before being reallocated' do
+      before do
+        allow(described_class).to receive(:history).and_call_original
+        allow(HmppsApi::NomisUserRolesApi).to receive(:email_address).and_return('pom@example.com')
+      end
+
+      it 'keeps the original term until the actual reallocation date' do
+        travel_to(Time.zone.local(2026, 10, 1, 10))
+        allocated_at = Time.current
+        allocation = create(:allocation_history, :primary, prison: prison.code,
+                                                           primary_pom_name: 'Smith, Jane',
+                                                           primary_pom_allocated_at: allocated_at)
+        original_terms = described_class.pom_terms(allocation)
+        expect(original_terms).to eq([
+          { name: 'Smith, Jane', started_at: allocated_at, ended_at: nil, email: 'pom@example.com' }
+        ])
+
+        travel 2.days
+        described_class.retain(
+          allocation:,
+          override: OverrideForm.new(override_reasons: ['continuity']),
+          recommended_pom_type: RecommendationService::PROBATION_POM
+        )
+
+        expect(described_class.pom_terms(allocation.reload)).to eq(original_terms)
+        expect(described_class.recent_pom_history(allocation)).to be_empty
+
+        travel 3.days
+        reallocated_at = Time.current
+        allocation.update!(
+          event: :reallocate_primary_pom, primary_pom_name: 'Jones, Alex',
+          primary_pom_nomis_id: allocation.primary_pom_nomis_id + 1,
+          primary_pom_allocated_at: reallocated_at,
+          primary_pom_reviewed_at: nil, reviewed_recommended_pom_type: nil
+        )
+
+        completed_term = original_terms.first.merge(ended_at: reallocated_at)
+        expect(described_class.pom_terms(allocation.reload)).to eq([
+          completed_term,
+          { name: 'Jones, Alex', started_at: reallocated_at, ended_at: nil, email: 'pom@example.com' }
+        ])
+        expect(described_class.recent_pom_history(allocation)).to eq([completed_term])
+      end
     end
 
     context 'when the current primary POM is deallocated without a replacement' do

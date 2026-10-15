@@ -43,10 +43,41 @@
       </div>
     <% end %>
 
+    <h2 class="govuk-heading-l govuk-!-margin-top-9">Do you want to reallocate to a different type of POM?</h2>
+    <h3 class="govuk-heading-m"><%= pom_level(@prisoner.recommended_pom_type) %> recommended</h3>
+    <div class="govuk-inset-text govuk-!-margin-top-0">
+      <p><%= RecommendationService.recommended_pom_type_reason(@prisoner) %></p>
+    </div>
+
+    <div class="govuk-summary-card" aria-labelledby="review-case-details">
+      <div class="govuk-summary-card__title-wrapper">
+        <h3 class="govuk-summary-card__title" id="review-case-details">Case details</h3>
+      </div>
+      <div class="govuk-summary-card__content">
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Current POM name</dt>
+            <dd class="govuk-summary-list__value"><%= @review.allocation.formatted_primary_pom_name %></dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Current POM type</dt>
+            <dd class="govuk-summary-list__value"><%= pom_level(@review.allocated_pom_position) %></dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Earliest release date</dt>
+            <dd class="govuk-summary-list__value"><%= @prisoner.earliest_release&.fetch(:date)&.strftime('%-d %B %Y') %></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
     <div class="govuk-button-group govuk-!-margin-top-7">
       <%= link_to t('significant_changes.cta.reallocate'),
                   prison_prisoner_review_case_details_path(@prison.code, @prisoner.offender_no),
                   role: 'button', class: 'govuk-button', data: { module: 'govuk-button' } %>
+      <%= link_to t('significant_changes.cta.retain'),
+                  new_prison_prisoner_allocation_retention_path(@prison.code, @prisoner.offender_no),
+                  role: 'button', class: 'govuk-button govuk-button--secondary', data: { module: 'govuk-button' } %>
     </div>
   </div>
 </div>

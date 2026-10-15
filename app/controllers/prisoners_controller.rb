@@ -27,10 +27,10 @@ class PrisonersController < PrisonsApplicationController
     @prisoner = @prison.allocated.find { it.offender_no == params[:prisoner_id] }
     return redirect_to('/404') unless @prisoner
 
-    review = SignificantChanges.for([@prisoner], @prison.allocations, poms: -> { all_poms }).first
-    return redirect_to review_allocations_prison_prisoners_path(@prison) unless review&.any?
+    @review = SignificantChanges.for([@prisoner], @prison.allocations, poms: -> { all_poms }).first
+    return redirect_to review_allocations_prison_prisoners_path(@prison) unless @review&.any?
 
-    @changes = review.changes.map { SignificantChanges::ChangePresenter.new(it, review:) }
+    @changes = @review.changes.map { SignificantChanges::ChangePresenter.new(it, review: @review) }
   end
 
   def unallocated

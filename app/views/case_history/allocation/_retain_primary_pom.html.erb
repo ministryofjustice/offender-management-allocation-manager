@@ -1,0 +1,13 @@
+<% description = capture do %>
+  Prisoner allocated to <%= retain_primary_pom.primary_pom_name.titleize %> retained.
+  <p class="govuk-body govuk-!-margin-bottom-1 govuk-!-margin-top-3">Reason(s):</p>
+  <div class="app-override-reasons">
+    <% retain_primary_pom.override_reasons.to_a.each do |reason| %>
+      <%= display_override_details(reason, retain_primary_pom, recommended_pom_type: retain_primary_pom.reviewed_recommended_pom_type) %>
+    <% end %>
+  </div>
+<% end %>
+
+<%= render 'case_history/case_history',
+           title: 'Current allocation reviewed',
+           description: description, object: retain_primary_pom %>

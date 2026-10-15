@@ -14,10 +14,6 @@ RSpec.describe OffenderHelper do
 
   describe '#last_event' do
     let(:nomis_staff_id) { 456_789 }
-    let(:nomis_offender_id) { 123_456 }
-    let(:first_allocation_date) { Time.zone.local(2026, 1, 10, 9, 0, 0) }
-    let(:last_allocation_event_date) { Time.zone.local(2026, 2, 20, 14, 30, 0) }
-
     let!(:allocation) do
       create(
         :allocation_history,
@@ -27,6 +23,16 @@ RSpec.describe OffenderHelper do
         event: 'allocate_primary_pom',
         created_at: first_allocation_date,
         updated_at: last_allocation_event_date
+      )
+    end
+    let(:nomis_offender_id) { 123_456 }
+    let(:first_allocation_date) { Time.zone.local(2026, 1, 10, 9, 0, 0) }
+    let(:last_allocation_event_date) { Time.zone.local(2026, 2, 20, 14, 30, 0) }
+
+    def retain_allocation
+      AllocationService.retain(
+        allocation:, override: OverrideForm.new(override_reasons: ['continuity']),
+        recommended_pom_type: RecommendationService::PROBATION_POM
       )
     end
 
@@ -42,6 +48,77 @@ RSpec.describe OffenderHelper do
       )
 
       expect(helper.last_event(allocation_history)).to eq("POM allocated - #{last_allocation_event_date.strftime('%d/%m/%Y')}")
+    end
+
+    it 'keeps the original allocation date after repeated retention reviews' do
+      travel_to(last_allocation_event_date + 2.days)
+      2.times do
+        retain_allocation
+        travel 1.day
+      end
+
+      expect(helper.last_event(allocation.reload)).to eq('POM allocated - 20/02/2026')
+      presenter = CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
+      expect(helper.last_event(presenter)).to eq('POM allocated - 20/02/2026')
+      expect(presenter.created_at.to_date).to eq(Date.new(2026, 2, 23))
+    end
+
+    it 'keeps the coworking action date after a retention review' do
+      travel_to(last_allocation_event_date + 1.day)
+      allocation.update!(event: :allocate_secondary_pom, secondary_pom_nomis_id: 987_654)
+      travel 1.day
+      retain_allocation
+
+      expect(helper.last_event(allocation.reload)).to eq('Co-working POM allocated - 21/02/2026')
+      presenter = CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)
+      expect(helper.last_event(presenter)).to eq('Co-working POM allocated - 21/02/2026')
+
+      travel 1.day
+      allocation.deallocate_secondary_pom
+
+      expect(helper.last_event(allocation.reload)).to eq('Co-working POM removed - 23/02/2026')
+    end
+
+    it 'shows the removal date when a reviewed primary allocation ends' do
+      travel_to(last_allocation_event_date + 1.day)
+      retain_allocation
+      travel 1.day
+      allocation.deallocate_primary_pom
+
+      expect(helper.last_event(allocation.reload)).to eq('POM removed - 22/02/2026')
+    end
+
+    it 'ignores unrelated updates before and after a review' do
+      travel_to(last_allocation_event_date + 1.day)
+      allocation.update!(created_by_name: 'Updated name')
+      travel 1.day
+      retain_allocation
+      travel 1.day
+      allocation.update!(message: 'Updated note')
+
+      expect(helper.last_event(allocation.reload)).to eq('POM allocated - 20/02/2026')
+    end
+
+    it 'uses the recorded action date even if updated_at was changed without versioning' do
+      travel_to(last_allocation_event_date + 1.day)
+      allocation.update_columns(updated_at: Time.current)
+      travel 1.day
+      retain_allocation
+
+      expect(helper.last_event(allocation.reload)).to eq('POM allocated - 20/02/2026')
+    end
+
+    it 'detects a new allocation even when the event value stays the same' do
+      travel_to(last_allocation_event_date + 1.day)
+      allocation.update!(event: :reallocate_primary_pom, primary_pom_nomis_id: 987_654)
+      travel 1.day
+      allocation.update!(primary_pom_nomis_id: 987_655)
+      travel 1.day
+      retain_allocation
+      travel 1.day
+      allocation.update!(message: 'Updated note')
+
+      expect(helper.last_event(allocation.reload)).to eq('POM re-allocated - 22/02/2026')
     end
   end
 

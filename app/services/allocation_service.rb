@@ -3,6 +3,16 @@
 class AllocationService
   MAX_RECENT_POM_HISTORY = 3
 
+  def self.retain(allocation:, override:, recommended_pom_type:)
+    allocation.update!(
+      primary_pom_reviewed_at: Time.current,
+      reviewed_recommended_pom_type: RecommendationService::POM_TYPE_LABELS.fetch(recommended_pom_type),
+      override_reasons: override.override_reasons.to_json,
+      suitability_detail: (override.suitability_detail if override.override_reasons.include?('suitability')),
+      override_detail: (override.more_detail if override.override_reasons.include?('other')),
+    )
+  end
+
   def self.allocate_secondary(
     nomis_offender_id:,
     secondary_pom_nomis_id:,
@@ -40,6 +50,7 @@ class AllocationService
       created_by_name: created_by_user.full_name_ordered,
       primary_pom_allocated_at: Time.zone.now.utc,
       primary_pom_reviewed_at: nil,
+      reviewed_recommended_pom_type: nil,
     )
 
     # When we look up the current allocation, we only do this for the current
