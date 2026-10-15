@@ -22,8 +22,8 @@ permissions:
   packages: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ contains(fromJSON('["refs/heads/main", "refs/heads/staging"]'), github.ref) && 'deployments' || github.ref }}
-  cancel-in-progress: ${{ !contains(fromJSON('["refs/heads/main", "refs/heads/staging"]'), github.ref) }}
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   helm_lint:
