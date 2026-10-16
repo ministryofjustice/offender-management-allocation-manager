@@ -29,6 +29,7 @@ RSpec.describe AllocationRetentionsController, type: :controller do
   end
 
   it 'loads the allocated POM when evaluating real significant changes' do
+    allow(offender).to receive(:offender).and_return(build(:offender, nomis_offender_id: offender_no))
     allocation.primary_pom_allocated_at = 2.days.ago
     pom = instance_double(PomWrapper, staff_id: allocation.primary_pom_nomis_id, position: RecommendationService::PRISON_POM)
     allow_any_instance_of(Prison).to receive(:get_list_of_poms).with(include_deleted: true).and_return([pom])

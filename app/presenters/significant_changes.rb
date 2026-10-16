@@ -33,6 +33,15 @@ class SignificantChanges
     versions_by_offender = load_versions(allocations_by_offender.values_at(*allocated_offenders.map(&:offender_no)))
       .group_by(&:nomis_offender_id)
 
+    # Batch responsibility lookups only for cases with history inside their own review window
+    offenders_with_history = allocated_offenders.select do |offender|
+      start_date = start_date_for(allocations_by_offender.fetch(offender.offender_no))
+      versions_by_offender.fetch(offender.offender_no, []).any? { it.created_at >= start_date }
+    end
+    ActiveRecord::Associations::Preloader.new(
+      records: offenders_with_history.map(&:offender), associations: :calculated_handover_date
+    ).call
+
     allocated_offenders.map do |offender|
       new(offender,
           allocations_by_offender.fetch(offender.offender_no),
@@ -86,10 +95,12 @@ class SignificantChanges
   end
 
   def recommendation_differs_from_allocation?
+    return @recommendation_differs_from_allocation if defined?(@recommendation_differs_from_allocation)
+
     pom_types = [RecommendationService::PRISON_POM, RecommendationService::PROBATION_POM]
     recommended = offender.recommended_pom_type
     allocated = allocated_pom_position
 
-    recommended.in?(pom_types) && allocated.in?(pom_types) && recommended != allocated
+    @recommendation_differs_from_allocation = recommended.in?(pom_types) && allocated.in?(pom_types) && recommended != allocated
   end
 end

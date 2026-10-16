@@ -2,11 +2,17 @@
 
 class PrisonersController < PrisonsApplicationController
   before_action :ensure_spo_user, except: [:show, :image, :search]
-
   before_action :load_prisoner_or_redirect, only: [:show, :review_case_details]
-  before_action :load_all_offenders, only: [:allocated, :missing_information, :unallocated, :review_allocations, :search]
-  before_action :load_review_allocations, only: [:allocated, :missing_information, :unallocated, :review_allocations]
-  before_action :load_reallocation_alert, only: [:unallocated]
+
+  before_action only: [:allocated, :missing_information, :unallocated, :review_allocations, :search] do
+    log_duration(:load_all_offenders) { load_all_offenders }
+  end
+  before_action only: [:allocated, :missing_information, :unallocated, :review_allocations] do
+    log_duration(:load_review_allocations) { load_review_allocations }
+  end
+  before_action only: [:unallocated] do
+    log_duration(:load_reallocation_alert) { load_reallocation_alert }
+  end
 
   def allocated
     retrieve_latest_allocation_details
@@ -101,6 +107,16 @@ class PrisonersController < PrisonsApplicationController
 
 private
 
+  def log_duration(method_name)
+    started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    yield
+  ensure
+    duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round(2)
+    Rails.logger.info(
+      "event=benchmark,prison=#{@prison.code},action=#{action_name},method=#{method_name},duration_ms=#{duration_ms}"
+    )
+  end
+
   def load_prisoner_or_redirect
     offender_id = params[:prisoner_id] || params[:id]
     @prisoner = OffenderService.get_offender(offender_id)
@@ -116,8 +132,9 @@ private
   def load_all_offenders
     @missing_info = @prison.missing_info
     @unallocated = @prison.unallocated
+    allocations_by_offender_id = @prison.allocations.index_by(&:nomis_offender_id)
     @allocated = @prison.allocated.map do |offender|
-      OffenderWithAllocationPresenter.new(offender, @prison.allocations.detect { |a| a.nomis_offender_id == offender.offender_no })
+      OffenderWithAllocationPresenter.new(offender, allocations_by_offender_id[offender.offender_no])
     end
   end
 
