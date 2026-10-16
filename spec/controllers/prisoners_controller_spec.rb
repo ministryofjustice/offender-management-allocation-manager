@@ -113,20 +113,21 @@ RSpec.describe PrisonersController, type: :controller do
 
             get :review_allocations, params: { prison_id: prison.code }
 
-            expect(tab).to have_css('.moj-notification-badge', text: '1')
+            expect(tab).to have_css('.moj-notification-badge--red', text: '1')
             expect(page).to have_css('#review-allocations-cases tbody tr', count: 1)
             expect(page).to have_link(
               href: prison_prisoner_review_changes_path(prison.code, allocated_offender_one.fetch(:prisonerNumber))
             )
-            expect(page).to have_no_text('There are no allocations to review')
+            expect(page).to have_no_text('No allocations to review')
           end
 
-          it 'shows a message instead of the table, and no count on the tab, when there is nothing to review' do
+          it 'shows an empty-state message and a plain zero count on the tab when there is nothing to review' do
             get :review_allocations, params: { prison_id: prison.code }
 
             expect(tab).to have_no_css('.moj-notification-badge')
+            expect(tab).to have_text('Review allocations (0)', normalize_ws: true, exact: true)
             expect(page).to have_no_css('#review-allocations-cases')
-            expect(page).to have_text('There are no allocations to review')
+            expect(page).to have_css('p.govuk-body', text: 'No allocations to review', exact_text: true)
           end
         end
 

@@ -64,7 +64,8 @@ describe AllocationService do
       audit = AuditEvent.find_by!(username: 'HOMD_USER')
       expect(audit).to have_attributes(
         nomis_offender_id: allocation.nomis_offender_id,
-        username: 'HOMD_USER'
+        username: 'HOMD_USER',
+        tags: %w[record allocation retain_primary_pom changed]
       )
       expect(audit.data['after']).to have_key('primary_pom_reviewed_at')
       expect(audit.data['after']['reviewed_recommended_pom_type']).to eq('probation')
