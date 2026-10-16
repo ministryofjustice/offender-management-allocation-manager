@@ -731,7 +731,7 @@ RSpec.describe AllocationHistory, :enable_domain_event_publish, type: :model do
       expect(AuditEvent).to have_received(:publish).once do |payload|
         expect(payload).to include(
           nomis_offender_id: allocation.nomis_offender_id,
-          tags: %w[record allocation allocate_primary_pom changed],
+          tags: %w[record allocation changed],
           system_event: false,
           username: 'HOMD_USER',
           data: {
@@ -746,6 +746,68 @@ RSpec.describe AllocationHistory, :enable_domain_event_publish, type: :model do
           }
         )
       end
+    end
+
+    it 'tags the initial allocation on creation' do
+      create(:allocation_history, prison: prison.code)
+
+      expect(AuditEvent).to have_received(:publish).with(hash_including(tags: %w[record allocation allocate_primary_pom created]))
+    end
+
+    {
+      event: :reallocate_primary_pom,
+      primary_pom_nomis_id: 123_456,
+      secondary_pom_nomis_id: 123_456,
+      primary_pom_allocated_at: 1.day.from_now,
+      prison: 'LEI',
+    }.each do |attribute, value|
+      it "keeps the action tag when #{attribute} changes" do
+        allocation.update!(attribute => value)
+
+        expect(AuditEvent).to have_received(:publish).with(hash_including(tags: ['record', 'allocation', allocation.event, 'changed']))
+      end
+    end
+
+    it 'tags repeated reallocations even when the event stays the same' do
+      allocation.update_columns(event: :reallocate_primary_pom)
+
+      allocation.update!(primary_pom_nomis_id: 123_456)
+
+      expect(AuditEvent).to have_received(:publish).with(hash_including(tags: %w[record allocation reallocate_primary_pom changed]))
+    end
+
+    [nil, 1.day.ago].each do |previous_review|
+      it "tags retention when the previous review timestamp is #{previous_review.nil? ? 'absent' : 'present'}" do
+        allocation.update_columns(primary_pom_reviewed_at: previous_review)
+
+        allocation.update!(primary_pom_reviewed_at: Time.current)
+
+        expect(AuditEvent).to have_received(:publish).with(hash_including(tags: %w[record allocation retain_primary_pom changed]))
+      end
+    end
+
+    it 'does not tag subsequent metadata updates as retention or allocation actions' do
+      allocation.update_columns(primary_pom_reviewed_at: 1.day.ago)
+
+      allocation.update!(allocated_at_tier: 'B')
+
+      expect(AuditEvent).to have_received(:publish).with(hash_including(tags: %w[record allocation changed]))
+    end
+
+    it 'tags coworking changes after a review as allocation actions, not retention' do
+      allocation.update_columns(primary_pom_reviewed_at: 1.day.ago)
+
+      allocation.update!(event: :allocate_secondary_pom, secondary_pom_nomis_id: 123_456)
+
+      expect(AuditEvent).to have_received(:publish).with(hash_including(tags: %w[record allocation allocate_secondary_pom changed]))
+    end
+
+    it 'tags deallocation that clears the review timestamp as deallocation, not retention' do
+      allocation.update_columns(primary_pom_reviewed_at: 1.day.ago)
+
+      allocation.deallocate_primary_pom
+
+      expect(AuditEvent).to have_received(:publish).with(hash_including(tags: %w[record allocation deallocate_primary_pom changed]))
     end
   end
 end

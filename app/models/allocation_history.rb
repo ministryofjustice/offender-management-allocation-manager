@@ -25,6 +25,9 @@ class AllocationHistory < ApplicationRecord
   LEGAL_STATUS_CHANGED = 4
   INACTIVE_POM = 5
 
+  # Changes to these attributes identify allocation actions for audit tags and dates
+  ALLOCATION_ACTION_ATTRIBUTES = %w[event prison primary_pom_nomis_id secondary_pom_nomis_id primary_pom_allocated_at].freeze
+
   # IMPORTANT:
   # Dirty changes are reset every time the model saves, not just when a transaction is closed.
   # When the `after_commit` callback is executed, we can only enquiry about the most recent saved attributes.
@@ -114,8 +117,7 @@ class AllocationHistory < ApplicationRecord
     versions.reverse_each do |version|
       changes = version.changeset
 
-      if version.event == 'create' ||
-          changes.keys.intersect?(%w[event prison primary_pom_nomis_id secondary_pom_nomis_id primary_pom_allocated_at])
+      if version.event == 'create' || changes.keys.intersect?(ALLOCATION_ACTION_ATTRIBUTES)
         return changes['updated_at']&.last || version.created_at
       end
 
@@ -265,7 +267,13 @@ private
   end
 
   def audit_event_tags
-    ['record', 'allocation', event].freeze
+    action = if saved_change_to_primary_pom_reviewed_at? && primary_pom_reviewed_at.present?
+               'retain_primary_pom'
+             elsif previous_changes.keys.intersect?(ALLOCATION_ACTION_ATTRIBUTES + ['id'])
+               event
+             end
+
+    ['record', 'allocation', action].compact.freeze
   end
 
   def audit_excluded_keys
