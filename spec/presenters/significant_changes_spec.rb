@@ -132,6 +132,17 @@ RSpec.describe SignificantChanges do
   end
 
   describe '#recommendation_differs_from_allocation?' do
+    [RecommendationService::PRISON_POM, RecommendationService::PROBATION_POM].each do |recommendation|
+      it "caches the comparison when the recommendation is #{recommendation}" do
+        review = wrapper
+        expect(offender).to receive(:recommended_pom_type).once.and_return(recommendation)
+        expect(review).to receive(:allocated_pom_position).once.and_call_original
+
+        expected = recommendation != RecommendationService::PRISON_POM
+        2.times { expect(review.recommendation_differs_from_allocation?).to be(expected) }
+      end
+    end
+
     it 'returns true when MPC recommends a different POM type from the allocated POM' do
       allow(offender).to receive(:recommended_pom_type).and_return(RecommendationService::PROBATION_POM)
 
@@ -192,11 +203,58 @@ RSpec.describe SignificantChanges do
   end
 
   describe '.for' do
+    let(:local_offender) { build(:offender, nomis_offender_id:) }
+    let(:other_local_offender) { build(:offender, nomis_offender_id: 'Z9999ZZ') }
     let(:other_offender) do
-      instance_double(MpcOffender, offender_no: 'Z9999ZZ', recommended_pom_type: RecommendationService::PRISON_POM)
+      instance_double(MpcOffender, offender_no: 'Z9999ZZ', offender: other_local_offender,
+                                   recommended_pom_type: RecommendationService::PRISON_POM)
     end
 
-    before { create_version('CaseInformation', { 'tier' => %w[B A] }, allocated_at + 1.day) }
+    before do
+      allow(offender).to receive(:offender).and_return(local_offender)
+      create_version('CaseInformation', { 'tier' => %w[B A] }, allocated_at + 1.day)
+    end
+
+    it 'loads handover dates in one query and reuses them, including missing records' do
+      local_offender.save!
+      other_local_offender.save!
+      create(:calculated_handover_date, offender: local_offender, handover_date: Date.new(2027, 3, 1))
+      local_offender.reload
+      other_allocation = build(:allocation_history, nomis_offender_id: 'Z9999ZZ', primary_pom_allocated_at: allocated_at)
+      create_version('CaseInformation', { 'tier' => %w[B A] }, allocated_at + 1.day, nomis_offender_id: 'Z9999ZZ')
+      queries = []
+      subscriber = lambda do |*args|
+        sql = args.last.fetch(:sql)
+        queries << sql if sql.match?(/SELECT.*"calculated_handover_dates"/)
+      end
+
+      ActiveSupport::Notifications.subscribed(subscriber, 'sql.active_record') do
+        described_class.for([offender, other_offender], [allocation, other_allocation], poms:)
+
+        expect(local_offender.association(:calculated_handover_date)).to be_loaded
+        expect(other_local_offender.association(:calculated_handover_date)).to be_loaded
+        expect(local_offender.calculated_handover_date.handover_date).to eq(Date.new(2027, 3, 1))
+        expect(other_local_offender.calculated_handover_date).to be_nil
+      end
+
+      expect(queries.size).to eq(1)
+    end
+
+    it 'does not preload handover dates when history predates the review' do
+      allocation.primary_pom_reviewed_at = allocated_at + 2.days
+
+      described_class.for([offender], [allocation], poms:)
+
+      expect(local_offender.association(:calculated_handover_date)).not_to be_loaded
+    end
+
+    it 'does not preload handover dates when there is no history' do
+      allow(described_class).to receive(:load_versions).and_return(PaperTrail::Version.none)
+
+      described_class.for([offender], [allocation], poms:)
+
+      expect(local_offender.association(:calculated_handover_date)).not_to be_loaded
+    end
 
     it 'builds a wrapper for each allocated offender with their versions' do
       result = described_class.for([offender, other_offender], [allocation], poms:)
