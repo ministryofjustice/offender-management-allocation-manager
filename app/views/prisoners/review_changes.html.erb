@@ -73,7 +73,7 @@
 
     <div class="govuk-button-group govuk-!-margin-top-7">
       <%= link_to t('significant_changes.cta.reallocate'),
-                  prison_prisoner_review_case_details_path(@prison.code, @prisoner.offender_no),
+                  prison_prisoner_review_case_details_path(@prison.code, @prisoner.offender_no, from: :review_allocations),
                   role: 'button', class: 'govuk-button', data: { module: 'govuk-button' } %>
       <%= link_to t('significant_changes.cta.retain'),
                   new_prison_prisoner_allocation_retention_path(@prison.code, @prisoner.offender_no),

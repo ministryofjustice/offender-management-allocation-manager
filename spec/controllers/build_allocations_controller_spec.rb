@@ -347,6 +347,39 @@ RSpec.describe BuildAllocationsController, type: :controller do
           expect(allocation.allocated_at_rosh).to eq('HIGH')
         end
       end
+
+      context 'with a different POM when the journey started from Review allocations' do
+        let(:pom_nomis_id) { poms.last.staffId }
+
+        before do
+          stub_user('user', pom.staffId)
+          session[JourneyReturn::SESSION_KEY] = {
+            "allocation:#{prison.code}:#{offender_no}" => {
+              'source' => 'review_allocations', 'expires_at' => JourneyReturn::SOURCE_TTL.from_now.to_i
+            }
+          }
+
+          put :update, params: {
+            allocation_form: { message: notes },
+            prison_id: prison.code,
+            prisoner_id: offender_no,
+            staff_id: pom.staffId,
+            id: 'allocate'
+          }
+        end
+
+        it 'redirects back to Review allocations' do
+          expect(response).to redirect_to(review_allocations_prison_prisoners_path(prison.code))
+        end
+
+        it 'forgets the journey source' do
+          expect(session[JourneyReturn::SESSION_KEY]).to be_empty
+        end
+
+        it 'keeps the allocation details for the success banner' do
+          expect(session[:latest_allocation_details]).to include(prisoner_number: offender_no)
+        end
+      end
     end
   end
 end

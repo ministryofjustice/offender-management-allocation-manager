@@ -65,7 +65,7 @@ RSpec.describe 'prisoners/review_changes', type: :view do
       '.govuk-summary-card ~ .govuk-button-group a.govuk-button[role="button"][data-module="govuk-button"]',
       text: 'Reallocate', exact_text: true
     )
-    expect(page).to have_link('Reallocate', href: prison_prisoner_review_case_details_path(prison.code, prisoner.offender_no))
+    expect(page).to have_link('Reallocate', href: prison_prisoner_review_case_details_path(prison.code, prisoner.offender_no, from: :review_allocations))
     expect(page).to have_link('Keep current allocation', href: new_prison_prisoner_allocation_retention_path(prison.code, prisoner.offender_no))
   end
 

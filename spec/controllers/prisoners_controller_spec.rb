@@ -129,6 +129,20 @@ RSpec.describe PrisonersController, type: :controller do
             expect(page).to have_no_css('#review-allocations-cases')
             expect(page).to have_css('p.govuk-body', text: 'No allocations to review', exact_text: true)
           end
+
+          it 'shows the latest allocation once, after returning from a reallocation' do
+            session[:latest_allocation_details] = %i[
+              active_alerts last_oasys_completed handover_completion_date ldu_name ldu_email com_name com_email
+            ].index_with('Unknown').merge(
+              offender_name: 'John Smith', prisoner_number: 'A1234BC', pom_name: 'Jane Doe',
+              prev_pom_name: 'Bob Brown', co_working_pom_name: nil, pom_role: 'Responsible', additional_notes: nil
+            )
+
+            get :review_allocations, params: { prison_id: prison.code }
+
+            expect(page).to have_css('.moj-banner--success .message', text: 'John Smith allocated to Jane Doe')
+            expect(session).not_to have_key(:latest_allocation_details)
+          end
         end
 
         context 'when the significant changes cannot be loaded' do
@@ -845,6 +859,30 @@ RSpec.describe PrisonersController, type: :controller do
       expect(response).to have_http_status(:ok)
       expect(assigns(:coworking)).to be(false)
       expect(response.body).not_to include('Primary POM:')
+    end
+
+    describe 'remembering where the allocation journey started' do
+      let(:journey_key) { "allocation:#{prison.code}:#{offender_id}" }
+
+      before do
+        stub_poms(prison.code, [])
+        allow(AllocationService).to receive(:pom_terms).and_return([])
+        allow(OffenderService).to receive(:get_mappa_details).and_return({ status: :not_found })
+        allow(RoshSummary).to receive(:for).and_return(RoshSummary.unable)
+        allow(HmppsApi::PrisonAlertsApi).to receive(:alerts_for).and_return([])
+      end
+
+      it 'remembers Review allocations as the source' do
+        get :review_case_details, params: { prison_id: prison.code, prisoner_id: offender_id, from: 'review_allocations' }
+
+        expect(session[JourneyReturn::SESSION_KEY]).to include(journey_key => include('source' => 'review_allocations'))
+      end
+
+      it 'does not remember an unknown source' do
+        get :review_case_details, params: { prison_id: prison.code, prisoner_id: offender_id, from: '//evil.example' }
+
+        expect(session[JourneyReturn::SESSION_KEY]).to be_nil
+      end
     end
   end
 

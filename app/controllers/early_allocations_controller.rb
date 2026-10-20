@@ -100,7 +100,6 @@ class EarlyAllocationsController < PrisonsApplicationController
 
   def show
     @early_allocation = EarlyAllocation.where(id: params[:id]).where(offender_id_from_url).first!
-    @referrer = request.referer
 
     respond_to do |format|
       format.pdf do
