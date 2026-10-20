@@ -3,6 +3,7 @@
 # This class is inherited by all controllers under the /prisons route
 # so that they have @prison and active_prison_id available
 class PrisonsApplicationController < ApplicationController
+  include JourneyReturn
   include Sorting
 
   before_action :authenticate_user, :check_active_caseload, :check_prison_access,
@@ -97,10 +98,6 @@ private
   def service_notifications
     roles = [current_user_is_spo? ? 'SPO' : nil, sso_identity.current_user_is_pom? ? 'POM' : nil].compact
     @service_notifications = ServiceNotificationsService.notifications(roles)
-  end
-
-  def set_referrer
-    @referrer = referrer
   end
 
   def referrer

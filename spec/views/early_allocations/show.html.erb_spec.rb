@@ -12,7 +12,6 @@ RSpec.describe "early_allocations/show", type: :view do
   end
 
   let(:page) { Nokogiri::HTML(rendered) }
-  let(:referrer) { nil }
 
   context 'when reviewing an eligible early assessment' do
     let(:early_allocation) {  create(:early_allocation, :eligible, created_at: '05/11/2021', created_by_firstname: 'Olivia', created_by_lastname: 'Mann') }

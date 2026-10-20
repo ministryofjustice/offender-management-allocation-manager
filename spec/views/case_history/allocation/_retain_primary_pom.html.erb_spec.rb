@@ -11,7 +11,7 @@ RSpec.describe 'case_history/allocation/_retain_primary_pom', type: :view do
     render partial: 'case_history/allocation/retain_primary_pom', locals: { retain_primary_pom: allocation }
 
     expect(page).to have_text('Current allocation reviewed')
-    expect(page).to have_text('Prisoner allocated to Smith, Jane retained.')
+    expect(page).to have_text('Allocation to Smith, Jane retained.')
     expect(page).to have_text('Jones, Alex')
     expect(page).to have_no_text('allocated instead of recommended')
     expect(page).to have_no_text('Tier:')

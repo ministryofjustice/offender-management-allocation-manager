@@ -11,6 +11,10 @@
   </div>
 <% end %>
 
+<% if @latest_allocation_details.present? %>
+  <%= render partial: 'allocations/allocated_notice', locals: @latest_allocation_details %>
+<% end %>
+
 <h1 class="govuk-heading-xl">Allocations</h1>
 
 <%= render 'search/search_box' %>

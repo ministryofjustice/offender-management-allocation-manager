@@ -1,5 +1,5 @@
 <% description = capture do %>
-  Prisoner allocated to <%= retain_primary_pom.primary_pom_name.titleize %> retained.
+  Allocation to <%= retain_primary_pom.primary_pom_name.titleize %> retained.
   <p class="govuk-body govuk-!-margin-bottom-1 govuk-!-margin-top-3">Reason(s):</p>
   <div class="app-override-reasons">
     <% retain_primary_pom.override_reasons.to_a.each do |reason| %>

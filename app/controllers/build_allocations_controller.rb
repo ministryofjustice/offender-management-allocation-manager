@@ -6,7 +6,6 @@ class BuildAllocationsController < PrisonsApplicationController
   before_action :ensure_spo_user
   before_action :load_prisoner
   before_action :ensure_target_pom_is_eligible, :load_pom
-  before_action :set_referrer
 
   include Wicked::Wizard
   steps :override, :allocate
@@ -77,7 +76,8 @@ class BuildAllocationsController < PrisonsApplicationController
       session.delete :allocation_override
       store_latest_allocation_details!(allocation_details, additional_notes: allocation_params[:message])
 
-      redirect_to (event(history) == :allocate_primary_pom) ? unallocated_prison_prisoners_path : allocated_prison_prisoners_path
+      default_path = event(history) == :allocate_primary_pom ? unallocated_prison_prisoners_path : allocated_prison_prisoners_path
+      redirect_to stored_journey_path_for(:allocation, offender_id: nomis_offender_id_from_url, default: default_path)
     end
   end
 

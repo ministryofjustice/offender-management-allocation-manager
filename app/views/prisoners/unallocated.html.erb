@@ -1,8 +1,6 @@
 <% content_for :title, "Make allocations – Digital Prison Services" %>
 <% content_for :turbolinks_nocache, 'true' %>
 
-<h1 class="govuk-heading-xl">Allocations</h1>
-
 <% if notice.present? %>
   <p class="notification govuk-!-margin-bottom-9" role="group" aria-labelledby="notice-heading">
     <%= notice %>
@@ -18,6 +16,8 @@
     <%= alert %>
   </p>
 <% end %>
+
+<h1 class="govuk-heading-xl">Allocations</h1>
 
 <%= render 'reallocation_alert' %>
 

@@ -24,6 +24,8 @@ class PrisonersController < PrisonsApplicationController
   end
 
   def review_allocations
+    retrieve_latest_allocation_details
+
     # Default order. The table can then be re-sorted client-side. Monitor row
     # counts because this list isn't paginated (and we might not need to)
     @offenders = @review_allocations.sort_by { [-it.working_days_since_earliest_change, it.full_name] }
@@ -54,6 +56,8 @@ class PrisonersController < PrisonsApplicationController
   end
 
   def review_case_details
+    remember_journey_source(:allocation, offender_id: @prisoner.offender_no)
+
     @alerts = @prisoner.active_alert_labels
     @mappa = @prisoner.mappa_details
     @rosh = @prisoner.rosh_summary

@@ -4,7 +4,6 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
   before_action :load_offender
   before_action :find_vlo, only: [:edit, :update, :destroy, :delete]
   before_action :store_referrer_in_session, only: [:new, :edit, :delete]
-  before_action :set_referrer
 
   def new
     @vlo = @offender.victim_liaison_officers.new
