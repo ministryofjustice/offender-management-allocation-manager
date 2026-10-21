@@ -15,47 +15,45 @@
   <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-5">
   <div class="govuk-grid-row card-group">
     <%= render 'dashboard_partition',
-               title: "Make allocations",
+               title: t('.tiles.make_allocations.title'),
                link: unallocated_prison_prisoners_path(@prison.code),
-               content: display_content(@unallocated_cases_count,
-                                        no_cases: "You don’t have any cases to allocate currently.",
-                                        one_case: "You have 1 case to allocate.",
-                                        multiple_cases: "You have #{@unallocated_cases_count} cases to allocate.")
+               content: t('.tiles.make_allocations.content')
     %>
 
     <%= render 'dashboard_partition',
-               title: "All allocated cases",
+               title: t('.tiles.all_allocated_cases.title'),
                link: allocated_prison_prisoners_path(@prison.code),
-               content: "Everyone who has been allocated to POMs in this prison."
+               content: t('.tiles.all_allocated_cases.content')
     %>
 
     <%= render 'dashboard_partition',
-               title: "Add missing details",
+               title: t('.tiles.add_missing_details.title'),
                link: missing_information_prison_prisoners_path(@prison.code),
-               content: display_content(@missing_details_cases_count,
-                                        no_cases: "No cases are missing information right now.",
-                                        one_case: "Missing details need to be added to 1 case before it can be allocated to a POM.",
-                                        multiple_cases: "Missing details need to be added to #{@missing_details_cases_count} cases before they can be allocated to POMs.")
+               content: t('.tiles.add_missing_details.content')
     %>
-  </div>
 
-  <div class="govuk-grid-row card-group">
     <%= render 'dashboard_partition',
-               title: "View all handover cases",
+               title: t('.tiles.review_allocations.title'),
+               link: review_allocations_prison_prisoners_path(@prison.code),
+               content: t('.tiles.review_allocations.content') if FeatureFlags.change_in_circumstances.enabled?
+    %>
+
+    <%= render 'dashboard_partition',
+               title: t('.tiles.all_handover_cases.title'),
                link: upcoming_prison_handovers_path(@prison.code),
-               content: "Track the progress of cases being handed over to the community probation team."
+               content: t('.tiles.all_handover_cases.content')
     %>
 
     <%= render 'dashboard_partition',
-               title: "Parole cases",
+               title: t('.tiles.parole_cases.title'),
                link: prison_parole_cases_path(@prison.code),
                content: t('parole.upcoming.spo')
     %>
 
     <%= render 'dashboard_partition',
-               title: "Get help with this service",
+               title: t('.tiles.help.title'),
                link: help_dashboard_path,
-               content: "Adding staff members, missing cases and problems with case responsibility."
+               content: t('.tiles.help.content')
     %>
   </div>
 
@@ -63,15 +61,15 @@
   <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-5">
   <div class="govuk-grid-row card-group">
     <%= render 'dashboard_partition',
-               title: "View all POMs",
+               title: t('.tiles.all_poms.title'),
                link: prison_poms_path(@prison.code),
-               content: "See what POMs are working on and change their availability."
+               content: t('.tiles.all_poms.content')
     %>
 
     <%= render 'dashboard_partition',
-               title: "Add a POM",
+               title: t('.tiles.add_a_pom.title'),
                link: search_prison_onboarding_index_path(@prison.code, from: :home),
-               content: "Add a POM so you can allocate to them."
+               content: t('.tiles.add_a_pom.content')
     %>
   </div>
 <% end %>
@@ -81,50 +79,45 @@
   <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-5">
   <div class="govuk-grid-row card-group">
     <%= render 'dashboard_partition',
-               title: "Your cases",
+               title: t('.tiles.your_cases.title'),
                link: prison_staff_caseload_path(@prison.code, @staff_id),
-               content: "All cases allocated to you."
+               content: t('.tiles.your_cases.content')
     %>
 
     <%= render 'dashboard_partition',
-               title: "New allocations",
+               title: t('.tiles.new_allocations.title'),
                link: prison_staff_caseload_cases_path(@prison.code, @staff_id, anchor: 'recent-allocations'),
-               content: "Cases allocated to you in the last 7 days."
+               content: t('.tiles.new_allocations.content')
     %>
 
     <%= render 'dashboard_partition',
-               title: "View your handover cases",
+               title: t('.tiles.your_handover_cases.title'),
                link: upcoming_prison_handovers_path(@prison.code, pom: 'user'),
-               content: "Keep track of your cases that must be handed over to the community probation team."
+               content: t('.tiles.your_handover_cases.content')
     %>
-  </div>
 
-  <div class="govuk-grid-row card-group">
     <%= render 'dashboard_partition',
-               title: 'Parole cases',
+               title: t('.tiles.parole_cases.title'),
                link: prison_staff_caseload_parole_cases_path(@prison.code, @staff_id),
                content: t('parole.upcoming.pom')
     %>
 
     <%= render 'dashboard_partition',
-               title: "Case updates needed",
+               title: t('.tiles.case_updates_needed.title'),
                link: prison_staff_caseload_updates_required_path(@prison.code, @staff_id),
-               content: display_content(@case_updates_needed_count,
-                                        no_cases: "You do not have any cases to update right now.",
-                                        one_case: "Enter some information to ensure responsibility for this case is correct.",
-                                        multiple_cases: "Enter some information to ensure responsibility for these cases is correct.")
+               content: t('.tiles.case_updates_needed.content')
     %>
 
     <%= render 'dashboard_partition',
-               title: "All allocations in this prison",
+               title: t('.tiles.all_allocations.title'),
                link: prison_staff_caseload_global_path(@prison.code, @staff_id),
-               content: "Cases allocated to all POMs."
+               content: t('.tiles.all_allocations.content')
     %>
 
     <%= render 'dashboard_partition',
-               title: "Get help with this service",
+               title: t('.tiles.help.title'),
                link: help_dashboard_path,
-               content: "Adding staff members, missing cases and problems with case responsibility." unless @is_spo
+               content: t('.tiles.help.content') unless @is_spo
     %>
   </div>
 <% end %>

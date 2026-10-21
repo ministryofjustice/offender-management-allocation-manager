@@ -78,6 +78,9 @@
       <%= link_to t('significant_changes.cta.retain'),
                   new_prison_prisoner_allocation_retention_path(@prison.code, @prisoner.offender_no),
                   role: 'button', class: 'govuk-button govuk-button--secondary', data: { module: 'govuk-button' } %>
+      <%= link_to t('significant_changes.cta.view_allocation'),
+                  prison_prisoner_allocation_path(@prison.code, @prisoner.offender_no),
+                  class: 'govuk-link' %>
     </div>
   </div>
 </div>

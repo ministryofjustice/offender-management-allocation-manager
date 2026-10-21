@@ -51,10 +51,56 @@ en:
 
   parole:
     upcoming:
-      pom: Cases with a target hearing date, PED or TED in the next 10 months
-      spo: All cases in this prison with a target hearing date, PED or TED in the next 10 months
+      pom: Cases with a target hearing date, PED or TED in the next 10 months.
+      spo: All cases in this prison with a target hearing date, PED or TED in the next 10 months.
 
   service_name: 'POM cases'
+
+  dashboard:
+    index:
+      tiles:
+        make_allocations:
+          title: Make allocations
+          content: Allocate people in this prison to POMs.
+        all_allocated_cases:
+          title: All allocated cases
+          content: Everyone who has been allocated to POMs in this prison.
+        add_missing_details:
+          title: Add missing details
+          content: Missing details need to be added for these people before they can be allocated.
+        review_allocations:
+          title: Review allocations
+          content: Check if anyone needs to be reallocated following a change to their tier, ROSH or handover date.
+        all_handover_cases:
+          title: View all handover cases
+          content: Track the progress of cases being handed over to the community probation team.
+        parole_cases:
+          title: Parole cases
+          # Content uses the shared `parole.upcoming.pom` and `parole.upcoming.spo` translations
+        help:
+          title: Get help with this service
+          content: Find information about dealing with missing cases and problems with case responsibility.
+        all_poms:
+          title: View all POMs
+          content: See what POMs are working on and change their availability.
+        add_a_pom:
+          title: Add a POM
+          content: Add a POM so you can allocate to them.
+        your_cases:
+          title: Your cases
+          content: All cases allocated to you.
+        new_allocations:
+          title: New allocations
+          content: Cases allocated to you in the last 7 days.
+        your_handover_cases:
+          title: View your handover cases
+          content: Keep track of your cases that must be handed over to the community probation team.
+        case_updates_needed:
+          title: Case updates needed
+          content: View and complete updates needed for your cases.
+        all_allocations:
+          title: All allocations in this prison
+          content: Cases allocated to all POMs.
 
   pom:
     working_pattern:
@@ -321,6 +367,7 @@ en:
     cta:
       reallocate: Reallocate
       retain: Keep current allocation
+      view_allocation: View allocation information
     tier:
       title: Tier change
     rosh:
