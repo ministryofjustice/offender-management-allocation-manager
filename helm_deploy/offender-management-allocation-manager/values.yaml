@@ -200,6 +200,8 @@ generic-service:
       DOMAIN_EVENTS_SQS_QUEUE_ARN: DOMAIN_EVENTS_SQS_QUEUE_ARN
       DOMAIN_EVENTS_SQS_QUEUE_NAME: DOMAIN_EVENTS_SQS_QUEUE_NAME
       DOMAIN_EVENTS_SQS_QUEUE_URL: DOMAIN_EVENTS_SQS_QUEUE_URL
+    sqs-hmpps-audit-secret:
+      AUDIT_SQS_QUEUE_URL: sqs_queue_url
     allocation-rds-instance-output:
       POSTGRES_HOST: rds_instance_address
       POSTGRES_USER: postgres_user
