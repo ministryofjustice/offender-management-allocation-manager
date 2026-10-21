@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe DashboardController, type: :controller do
-  let(:offenders) { build_list(:nomis_offender, 3) }
   let(:prison) { create(:prison).code }
   let(:poms) do
     [
@@ -17,10 +16,44 @@ RSpec.describe DashboardController, type: :controller do
 
   before do
     stub_poms(prison, poms)
-    stub_offenders_for_prison(prison, offenders)
   end
 
   describe '#index' do
+    {
+      'SPO' => { roles: [SsoIdentity::SPO_ROLE], groups: [6, 2], flagged_groups: [7, 2] },
+      'POM' => { roles: [SsoIdentity::POM_ROLE], groups: [7], flagged_groups: [7] },
+      'SPO and POM' => {
+        roles: [SsoIdentity::SPO_ROLE, SsoIdentity::POM_ROLE],
+        groups: [6, 2, 6],
+        flagged_groups: [7, 2, 6]
+      }
+    }.each do |role, configuration|
+      context "when displaying tiles for #{role}" do
+        render_views
+
+        [false, true].each do |enabled|
+          it "groups tiles by section with the change in circumstances flag #{enabled ? 'enabled' : 'disabled'}" do
+            stub_sso_data(prison, staff_id: 1, roles: configuration.fetch(:roles))
+            stub_feature_flag(:change_in_circumstances, enabled:)
+
+            get :index, params: { prison_id: prison }
+
+            page = Nokogiri::HTML(response.body)
+            groups = page.css('.card-group').map { |group| group.css('.card-group__item').size }
+            expect(groups).to eq(configuration.fetch(enabled ? :flagged_groups : :groups))
+            expect(page.css('.card-group__item').all? { |tile| tile['class'].split.include?('govuk-grid-column-one-third') }).to be true
+            expect(page.css('.card__link').map(&:text).count('Get help with this service')).to eq(1)
+
+            if enabled && configuration.fetch(:roles).include?(SsoIdentity::SPO_ROLE)
+              expect(response.body).to have_link('Review allocations', href: review_allocations_prison_prisoners_path(prison))
+            else
+              expect(response.body).not_to have_link('Review allocations')
+            end
+          end
+        end
+      end
+    end
+
     context 'when the live active caseload differs from the prison in the URL', skip_active_caseload_check_stubbing: true do
       let(:prison) { create(:prison, code: 'RSI').code }
 
@@ -57,7 +90,7 @@ RSpec.describe DashboardController, type: :controller do
           expect(response.body).to have_content('Your cases')
           expect(response.body).to have_content('New allocations')
           expect(response.body).to have_text('View your handover cases')
-          expect(response.body).to have_content('Case updates needed')
+          expect(response.body).to have_link('Case updates needed', href: prison_staff_caseload_updates_required_path(prison, 1))
           expect(response.body).to have_content('All allocations in this prison')
 
           expect(response.body).not_to have_content('All allocated cases')
@@ -66,6 +99,30 @@ RSpec.describe DashboardController, type: :controller do
           expect(response.body).not_to have_content('View all POMs')
           expect(response.body).not_to have_content('View all handover cases')
         end
+      end
+
+      it 'shows a static task description without loading prisoners or tasks' do
+        get :index, params: { prison_id: prison }
+
+        expect(response.body).to have_content('View and complete updates needed for your cases.')
+      end
+    end
+
+    context 'when logged in as both SPO and POM' do
+      render_views
+
+      before do
+        stub_signed_in_spo_pom(prison, 1, 'alice')
+      end
+
+      it 'shows static allocation and task descriptions without loading prisoners or tasks' do
+        get :index, params: { prison_id: prison }
+
+        expect(assigns(:is_pom)).to be true
+        expect(assigns(:is_spo)).to be true
+        expect(response.body).to have_content('Allocate people in this prison to POMs.')
+        expect(response.body).to have_content('Missing details need to be added for these people before they can be allocated.')
+        expect(response.body).to have_content('View and complete updates needed for your cases.')
       end
     end
 
@@ -90,129 +147,17 @@ RSpec.describe DashboardController, type: :controller do
         expect(response.body).not_to have_content('All allocations in this prison')
 
         expect(response.body).to have_content('All allocated cases')
-        expect(response.body).to have_content('Make allocations')
-        expect(response.body).to have_content('Add missing details')
+        expect(response.body).to have_link('Make allocations', href: unallocated_prison_prisoners_path(prison))
+        expect(response.body).to have_link('Add missing details', href: missing_information_prison_prisoners_path(prison))
         expect(response.body).to have_content('View all POMs')
         expect(response.body).to have_text('View all handover cases')
       end
 
-      describe 'Make allocations tab' do
-        context 'when the count is more than 0' do
-          # create offenders with case_information so that they display as un-allocated
-          before do
-            offenders.each do |offender|
-              create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
-            end
-          end
+      it 'shows static allocation descriptions without loading prisoners or tasks' do
+        get :index, params: { prison_id: prison }
 
-          it 'displays the number of cases that need to be allocated' do
-            get :index, params: { prison_id: prison }
-            expect(assigns(:unallocated_cases_count)).to eq 3
-          end
-
-          context 'with render views' do
-            render_views
-            it 'displays the number of cases that need to be allocated' do
-              get :index, params: { prison_id: prison }
-              expect(response.body).to include 'You have 3 cases to allocate.'
-            end
-          end
-        end
-
-        context 'when the count is 0' do
-          it 'displays the number of cases that need to be allocated' do
-            get :index, params: { prison_id: prison }
-            expect(assigns(:unallocated_cases_count)).to eq 0
-          end
-
-          context 'with render views' do
-            render_views
-            it 'displays the number of cases that need to be allocated' do
-              get :index, params: { prison_id: prison }
-              expect(response.body).to include 'You don’t have any cases to allocate currently.'
-            end
-          end
-        end
-
-        context 'when the count is 1' do
-          let(:offenders) { build_list(:nomis_offender, 1) }
-
-          before do
-            offenders.each do |offender|
-              create(:case_information, offender: build(:offender, nomis_offender_id: offender.fetch(:prisonerNumber)))
-            end
-          end
-
-          it 'displays the number of cases that need to be allocated' do
-            get :index, params: { prison_id: prison }
-            expect(assigns(:unallocated_cases_count)).to eq 1
-          end
-
-          context 'with render views' do
-            render_views
-            it 'displays the number of cases that need to be allocated' do
-              get :index, params: { prison_id: prison }
-              expect(response.body).to include 'You have 1 case to allocate.'
-            end
-          end
-        end
-      end
-
-      describe 'Add missing details tab' do
-        context 'when the count is more than 1' do
-          # create offenders with no case_information so that they display as having missing details
-
-          it 'displays the number of cases that have missing details' do
-            get :index, params: { prison_id: prison }
-            expect(assigns(:missing_details_cases_count)).to eq 3
-          end
-
-          context 'with render views' do
-            render_views
-            it 'displays the number of cases that having missing details' do
-              get :index, params: { prison_id: prison }
-              expect(response.body).to include 'Missing details need to be added to 3 cases before they can be allocated to POMs.'
-            end
-          end
-        end
-
-        context 'when the count is 0' do
-          # creates no offenders
-          let(:offenders) { build_list(:nomis_offender, 0) }
-
-          it 'displays the number of cases that have missing details' do
-            get :index, params: { prison_id: prison }
-            expect(assigns(:missing_details_cases_count)).to eq 0
-          end
-
-          context 'with render views' do
-            render_views
-            it 'displays the number of cases that having missing details' do
-              get :index, params: { prison_id: prison }
-              expect(response.body).to include 'No cases are missing information right now.'
-            end
-          end
-        end
-
-        context 'when the count is 1' do
-          context 'when the count is 1' do
-            # creates no offenders
-            let(:offenders) { build_list(:nomis_offender, 1) }
-
-            it 'displays the number of cases that have missing details' do
-              get :index, params: { prison_id: prison }
-              expect(assigns(:missing_details_cases_count)).to eq 1
-            end
-
-            context 'with render views' do
-              render_views
-              it 'displays the number of cases that having missing details' do
-                get :index, params: { prison_id: prison }
-                expect(response.body).to include 'Missing details need to be added to 1 case before it can be allocated to a POM.'
-              end
-            end
-          end
-        end
+        expect(response.body).to have_content('Allocate people in this prison to POMs.')
+        expect(response.body).to have_content('Missing details need to be added for these people before they can be allocated.')
       end
     end
   end

@@ -69,6 +69,14 @@ RSpec.describe 'prisoners/review_changes', type: :view do
     expect(page).to have_link('Keep current allocation', href: new_prison_prisoner_allocation_retention_path(prison.code, prisoner.offender_no))
   end
 
+  it 'links to allocation information alongside the buttons' do
+    expect(page.find('.govuk-button-group')).to have_link(
+      'View allocation information',
+      href: prison_prisoner_allocation_path(prison.code, prisoner.offender_no),
+      class: 'govuk-link'
+    )
+  end
+
   it 'shows the recommendation and current case details between the changes and the buttons' do
     expect(page).to have_css('h2.govuk-heading-l', text: 'Do you want to reallocate to a different type of POM?')
     expect(page).to have_css('h3', text: 'Probation POM recommended')
