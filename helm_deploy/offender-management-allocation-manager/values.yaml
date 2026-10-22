@@ -177,6 +177,9 @@ generic-service:
     RAILS_SERVE_STATIC_FILES: on
     PROMETHEUS_METRICS: "on" # do not remove quotes!
     PROMETHEUS_EXPORTER_HOST: offender-management-prometheus-exporter
+    # Service identifier used for AppInsights and HMPPS Audit
+    # This should match the name of the component on the Developer Portal
+    AUDIT_SERVICE_NAME: offender-management-allocation-manager
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:

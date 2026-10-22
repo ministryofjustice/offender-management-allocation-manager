@@ -41,6 +41,7 @@ module OffenderManagementAllocationClient
     config.sentry_dsn = ENV['SENTRY_DSN']&.strip
 
     config.env_name = ENV.fetch('ENV_NAME', 'dev')&.strip
+    config.service_name = ENV.fetch('AUDIT_SERVICE_NAME', 'offender-management-allocation-manager')
 
     config.keyworker_api_host = ENV['KEYWORKER_API_HOST']&.strip
     config.digital_prison_service_host = ENV['DIGITAL_PRISON_SERVICE_HOST']&.strip

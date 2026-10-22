@@ -43,12 +43,22 @@ RSpec.describe HmppsAudit::Client do
     )
   end
 
-  it 'allows omitted subject fields through the public API' do
-    client.publish(what: 'LOGIN', who: 'test-user')
+  it 'allows an omitted subject ID through the public API' do
+    client.publish(what: 'LOGIN', who: 'test-user', subject_type: 'NOT_APPLICABLE')
 
     payload = JSON.parse(sqs_client.api_requests.last.fetch(:params).fetch(:message_body))
-    expect(payload).not_to have_key('subjectType')
+    expect(payload.fetch('subjectType')).to eq('NOT_APPLICABLE')
     expect(payload).not_to have_key('subjectId')
+  end
+
+  it 'requires the subject_type keyword' do
+    expect { client.publish(**event.except(:subject_type)) }.to raise_error(ArgumentError, /subject_type/)
+    expect(sqs_client.api_requests).to be_empty
+  end
+
+  it 'rejects unsupported subject types before sending' do
+    expect { client.publish(**event.merge(subject_type: 'FOOBAR')) }.to raise_error(ArgumentError, /subject_type/)
+    expect(sqs_client.api_requests).to be_empty
   end
 
   it 'creates and reuses an AWS client using the SDK configuration' do
