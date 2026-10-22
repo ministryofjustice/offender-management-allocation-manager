@@ -7,9 +7,11 @@ gem 'rails', '~> 8.1.0'
 
 # Need AWS S3 SDK for processing PPUD exports
 gem 'aws-sdk-s3'
-# Need AWS SNS SDK for publishing events
+# Need AWS SNS SDK for publishing domain events
 gem 'aws-sdk-sns'
-# Need Shoryuken for consuming domain events (includes aws-sdk-sqs)
+# Need AWS SQS SDK for publishing HMPPS audit events
+gem 'aws-sdk-sqs'
+# Need Shoryuken for consuming domain events
 gem 'shoryuken', '~> 7.0'
 
 gem 'bootsnap', '>= 1.1.0', require: false

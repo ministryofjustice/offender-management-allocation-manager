@@ -7,3 +7,5 @@ feature_flags:
   change_in_circumstances:
     staging: true
     preprod: true
+  hmpps_audit:
+    staging: true
