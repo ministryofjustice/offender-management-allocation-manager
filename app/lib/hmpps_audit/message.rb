@@ -3,7 +3,7 @@
 class HmppsAudit::Message
   SUBJECT_TYPES = %w[NOT_APPLICABLE CRN PRISONER_ID SEARCH_TERM USER_ID REPORT_ID].freeze
 
-  attr_reader :what, :correlation_id
+  attr_reader :what, :subject_type, :correlation_id
 
   def initialize(what:, who:, subject_type:, subject_id: nil, correlation_id: nil, details: nil)
     validate_string!(:what, what)

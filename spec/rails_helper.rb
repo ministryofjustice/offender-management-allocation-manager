@@ -110,6 +110,10 @@ RSpec.configure do |config|
       allow_any_instance_of(DomainEvents::Event).to receive(:publish)
     end
 
+    if example.metadata[:enable_hmpps_audit_publish].blank?
+      allow_any_instance_of(HmppsAudit::Client).to receive(:publish)
+    end
+
     if example.metadata[:skip_active_caseload_check_stubbing].blank?
       if example.metadata[:type] == :controller
         allow(controller).to receive(:check_active_caseload) if controller.respond_to?(:check_active_caseload, true)
