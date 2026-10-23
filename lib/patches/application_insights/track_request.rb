@@ -22,10 +22,10 @@ module Patches
 
       # See: https://github.com/ministryofjustice/hmpps-typescript-lib/blob/main/packages/azure-telemetry/src/main/middleware/addUserMetadataToTelemetry.ts
       def telemetry_properties(request)
-        sso_data = (request.session[:sso_data] || request.session['sso_data'])&.symbolize_keys
-        return {} if sso_data.blank?
+        sso_data = (request.session[:sso_data] || request.session['sso_data'] || {}).symbolize_keys
 
         {
+          'requestId' => request.env['action_dispatch.request_id'],
           'userId' => sso_data[:staff_id],
           'userUuid' => sso_data[:user_uuid],
           'activeCaseLoadId' => sso_data[:active_caseload],

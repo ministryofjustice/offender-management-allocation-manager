@@ -72,6 +72,11 @@ class ApplicationController < ActionController::Base
 
 private
 
+  def append_info_to_payload(payload)
+    super
+    payload[:request_id] = request.request_id
+  end
+
   def store_original_path_and_redirect
     session[:redirect_path] = request.original_fullpath
     redirect_to '/auth/hmpps_sso'

@@ -6,7 +6,7 @@ class HmppsAudit::Client
     @sqs_client = sqs_client
   end
 
-  def publish(what:, who:, subject_type: nil, subject_id: nil, correlation_id: nil, details: nil)
+  def publish(what:, who:, subject_type:, subject_id: nil, correlation_id: nil, details: nil)
     return unless FeatureFlags.hmpps_audit.enabled?
 
     message = HmppsAudit::Message.new(

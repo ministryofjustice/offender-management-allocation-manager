@@ -35,6 +35,7 @@ RSpec.describe ApplicationInsights::Rack::TrackRequest do
             'active_caseload' => 'LEI'
           }
         },
+        'action_dispatch.request_id' => 'request-123',
         'action_dispatch.route' => build_route('/prisons/:prison_id/dashboard(.:format)')
       )
 
@@ -43,10 +44,28 @@ RSpec.describe ApplicationInsights::Rack::TrackRequest do
       expect(channel).to have_received(:write) do |data, _context, _time|
         expect(data.name).to eq('GET /prisons/:prison_id/dashboard')
         expect(data.properties).to eq(
+          'requestId' => 'request-123',
           'userId' => '123456',
           'userUuid' => '11111111-2222-3333-4444-555555555555',
           'activeCaseLoadId' => 'LEI'
         )
+      end
+    end
+
+    context 'when Rails assigns the request ID while handling the request' do
+      let(:app) do
+        lambda do |env|
+          env['action_dispatch.request_id'] = 'rails-request-id'
+          [200, { 'Content-Type' => 'text/plain' }, ['ok']]
+        end
+      end
+
+      it 'records that ID without requiring a signed-in user' do
+        middleware.call(Rack::MockRequest.env_for('/prisons/LEI/dashboard').merge('rack.session' => {}))
+
+        expect(channel).to have_received(:write) do |data, _context, _time|
+          expect(data.properties).to eq('requestId' => 'rails-request-id')
+        end
       end
     end
 

@@ -1,6 +1,10 @@
 RSpec.describe HmppsAudit::Message do
   subject(:message) { described_class.new(**event) }
 
+  before do
+    allow(Rails.configuration).to receive(:service_name).and_return('service-name')
+  end
+
   let(:event) do
     {
       what: 'VIEW_PRISONER',
@@ -21,7 +25,7 @@ RSpec.describe HmppsAudit::Message do
         subjectId: 'A1234BC',
         correlationId: 'request-123',
         details: '{"page":"prisoner-profile"}',
-        service: 'offender-management-allocation-manager',
+        service: 'service-name',
         when: '2026-10-21T12:00:00.000Z',
       )
       expect(JSON.parse(message.to_h.to_json).fetch('details')).to eq('{"page":"prisoner-profile"}')
@@ -34,9 +38,9 @@ RSpec.describe HmppsAudit::Message do
   end
 
   it 'omits absent optional fields' do
-    without_subject = described_class.new(what: 'LOGIN', who: 'test-user')
+    without_subject = described_class.new(what: 'LOGIN', who: 'test-user', subject_type: 'NOT_APPLICABLE')
 
-    expect(without_subject.to_h.keys).to contain_exactly(:what, :who, :service, :when)
+    expect(without_subject.to_h.keys).to contain_exactly(:what, :who, :subjectType, :service, :when)
   end
 
   it 'preserves empty details as a JSON string' do
@@ -64,10 +68,14 @@ RSpec.describe HmppsAudit::Message do
     expect(message.to_h.fetch(:what)).to eq('VIEW_PRISONER')
   end
 
-  %w[PRISONER_ID CRN SEARCH_TERM USER_ID NOT_APPLICABLE CUSTOM_TYPE].each do |subject_type|
+  %w[PRISONER_ID CRN SEARCH_TERM USER_ID NOT_APPLICABLE REPORT_ID].each do |subject_type|
     it "accepts #{subject_type} with a subject ID" do
       expect(described_class.new(**event.merge(subject_type:)).to_h.fetch(:subjectType)).to eq(subject_type)
     end
+  end
+
+  it 'requires the subject_type keyword' do
+    expect { described_class.new(**event.except(:subject_type)) }.to raise_error(ArgumentError, /subject_type/)
   end
 
   [
@@ -75,13 +83,10 @@ RSpec.describe HmppsAudit::Message do
     { what: ' ' },
     { who: '' },
     { who: ' ' },
-    { subject_type: '' },
-    { subject_type: nil },
     { subject_id: nil },
     { subject_id: '' },
     { subject_id: ' ' },
     { subject_type: 'NOT_APPLICABLE', subject_id: nil },
-    { subject_type: nil, subject_id: 'A1234BC' },
     { correlation_id: '' },
     { correlation_id: ' ' },
   ].each do |allowed_attributes|
@@ -103,6 +108,11 @@ RSpec.describe HmppsAudit::Message do
     [{ who: nil }, /who/],
     [{ who: 123 }, /who/],
     [{ subject_type: 123 }, /subject_type/],
+    [{ subject_type: nil }, /subject_type/],
+    [{ subject_type: '' }, /subject_type/],
+    [{ subject_type: ' ' }, /subject_type/],
+    [{ subject_type: 'CUSTOM_TYPE' }, /subject_type/],
+    [{ subject_type: 'FOOBAR' }, /subject_type/],
     [{ subject_id: 123 }, /subject_id/],
     [{ correlation_id: 123 }, /correlation_id/],
     [{ details: [] }, /details/],

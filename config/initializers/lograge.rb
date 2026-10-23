@@ -9,14 +9,15 @@ Rails.application.configure do
   ]
 
   config.lograge.custom_options = lambda do |event|
+    context = { request_id: event.payload[:request_id] }
     ex = event.payload[:exception_object]
     if ex
-      {
+      context.merge(
         exception: event.payload[:exception],
         backtrace: event.payload[:exception_object].backtrace,
-      }
+      )
     else
-      {}
+      context
     end
   end
 end
