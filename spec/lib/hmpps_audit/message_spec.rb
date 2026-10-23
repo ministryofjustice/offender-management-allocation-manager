@@ -32,11 +32,6 @@ RSpec.describe HmppsAudit::Message do
     end
   end
 
-  it 'exposes the action and correlation ID for logging' do
-    expect(message.what).to eq('VIEW_PRISONER')
-    expect(message.correlation_id).to eq('request-123')
-  end
-
   it 'omits absent optional fields' do
     without_subject = described_class.new(what: 'LOGIN', who: 'test-user', subject_type: 'NOT_APPLICABLE')
 

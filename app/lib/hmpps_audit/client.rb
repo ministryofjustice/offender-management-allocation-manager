@@ -17,17 +17,26 @@ class HmppsAudit::Client
       response = sqs_client.send_message(queue_url:, message_body: message.to_h.to_json)
     end
 
-    log(:info, 'hmpps_audit', what: message.what, correlation_id: message.correlation_id, sqs_message_id: response&.message_id)
+    log(
+      :info, 'hmpps_audit',
+      what: message.what, subject_type: message.subject_type, correlation_id: message.correlation_id,
+      sqs_message_id: response&.message_id, failure_reason: details&.fetch('failureReason', nil),
+    )
     response
   rescue Aws::SQS::Errors::ServiceError, Seahorse::Client::NetworkingError => e
-    log(:error, 'hmpps_audit_failed', what:, correlation_id:, error_class: e.class.name)
+    log(:error, 'hmpps_audit_failed', what:, subject_type:, correlation_id:, error_class: e.class.name)
     raise
   end
 
 private
 
   def sqs_client
-    @sqs_client ||= Aws::SQS::Client.new
+    @sqs_client ||= Aws::SQS::Client.new(
+      http_open_timeout: 3,
+      http_read_timeout: 3,
+      retry_mode: 'standard',
+      max_attempts: 2,
+    )
   end
 
   def queue_url
@@ -36,7 +45,7 @@ private
 
   def log(level, event_name, **attributes)
     Rails.logger.public_send(
-      level, "event=#{event_name}|#{attributes.compact.to_json}"
+      level, "event=#{event_name}|#{attributes.compact_blank.to_json}"
     )
   end
 end

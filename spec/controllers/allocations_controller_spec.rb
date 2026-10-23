@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe AllocationsController, type: :controller do
+  include_context 'with audit event capture'
+
   let(:poms) do
     [
       build(:pom, :prison_officer),
@@ -32,6 +34,9 @@ RSpec.describe AllocationsController, type: :controller do
     it 'is not visible' do
       get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
       expect(response).to redirect_to('/401')
+      expect(audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_INFORMATION_ATTEMPT VIEW_ALLOCATION_INFORMATION_FAILURE])
+      expect(audit_events.last[:subject_id]).to eq(offender_no)
+      expect(audit_events.last[:details]).to include('failureReason' => 'User does not have access to this data')
     end
 
     it 'allows access for anyone in the POMs caseload' do
@@ -64,6 +69,8 @@ RSpec.describe AllocationsController, type: :controller do
           get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
 
           expect(response).to redirect_to('/404')
+          expect(audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_INFORMATION_ATTEMPT VIEW_ALLOCATION_INFORMATION_FAILURE])
+          expect(audit_events.last[:details]).to include('failureReason' => 'Resource not found')
         end
       end
 
@@ -72,6 +79,8 @@ RSpec.describe AllocationsController, type: :controller do
           get :show, params: { prison_id: prison_code, prisoner_id: offender_no }
 
           expect(response).to redirect_to('/404')
+          expect(audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_INFORMATION_ATTEMPT VIEW_ALLOCATION_INFORMATION_FAILURE])
+          expect(audit_events.last[:details]).to include('failureReason' => 'Resource not found')
         end
       end
 
@@ -93,6 +102,9 @@ RSpec.describe AllocationsController, type: :controller do
           expect(response.body).to include('Unknown')
           expect(response.body).to include('Reallocate')
           expect(response.body).not_to include(prison_pom_path(prison_code, nomis_staff_id: inactive_pom_staff_id))
+          expect(audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_INFORMATION_ATTEMPT VIEW_ALLOCATION_INFORMATION_SUCCESS])
+          expect(audit_events.first[:subject_id]).to eq(offender_no)
+          expect(audit_events).to all(include(who: 'user'))
         end
       end
 
