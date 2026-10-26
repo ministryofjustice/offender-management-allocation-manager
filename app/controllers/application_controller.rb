@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  include HmppsAuditing
+
   before_action :set_paper_trail_whodunnit
 
   delegate :default_prison_code, :caseloads, :current_user_is_spo?, to: :sso_identity

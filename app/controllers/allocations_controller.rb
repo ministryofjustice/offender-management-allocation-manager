@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class AllocationsController < PrisonsApplicationController
+  audit_action :show, what: 'VIEW_ALLOCATION_INFORMATION', subject_type: 'PRISONER_ID',
+                      subject_id: -> { request.path_parameters.fetch(:prisoner_id) }
+
   before_action :ensure_spo_user, except: :history
   before_action :load_prisoner
 

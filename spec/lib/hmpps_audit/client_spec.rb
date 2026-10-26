@@ -1,4 +1,4 @@
-RSpec.describe HmppsAudit::Client do
+RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
   subject(:client) { described_class.new(sqs_client:) }
 
   let(:sqs_client) { Aws::SQS::Client.new(region: 'eu-west-2', stub_responses: true) }
@@ -35,12 +35,32 @@ RSpec.describe HmppsAudit::Client do
     end
   end
 
-  it 'logs SQS acceptance without logging usernames, subjects or details' do
+  it 'logs SQS acceptance and subject type without logging usernames, subject IDs or details' do
     client.publish(**event)
 
     expect(Rails.logger).to have_received(:info).with(
-      'event=hmpps_audit|{"what":"VIEW_PRISONER","correlation_id":"request-123","sqs_message_id":"message-123"}'
+      'event=hmpps_audit|{"what":"VIEW_PRISONER","subject_type":"PRISONER_ID","correlation_id":"request-123","sqs_message_id":"message-123"}'
     )
+  end
+
+  [true, false].each do |local|
+    it "logs only the failure reason from details when local is #{local}" do
+      allow(HostEnv).to receive(:local?).and_return(local)
+
+      client.publish(**event.merge(
+        what: 'VIEW_CASE_INFORMATION_FAILURE',
+        details: { 'failureReason' => 'Resource not found', 'privateData' => 'must not be logged' }
+      ))
+
+      attributes = {
+        what: 'VIEW_CASE_INFORMATION_FAILURE',
+        subject_type: 'PRISONER_ID',
+        correlation_id: 'request-123',
+        sqs_message_id: local ? nil : 'message-123',
+        failure_reason: 'Resource not found',
+      }.compact
+      expect(Rails.logger).to have_received(:info).with("event=hmpps_audit|#{attributes.to_json}")
+    end
   end
 
   it 'allows an omitted subject ID through the public API' do
@@ -61,13 +81,14 @@ RSpec.describe HmppsAudit::Client do
     expect(sqs_client.api_requests).to be_empty
   end
 
-  it 'creates and reuses an AWS client using the SDK configuration' do
-    allow(Aws::SQS::Client).to receive(:new).with(no_args).and_return(sqs_client)
+  it 'creates and reuses an AWS client with custom timeout and retry config' do
+    options = { http_open_timeout: 3, http_read_timeout: 3, retry_mode: 'standard', max_attempts: 2 }
+    allow(Aws::SQS::Client).to receive(:new).with(**options).and_return(sqs_client)
     default_client = described_class.new
 
     2.times { default_client.publish(**event) }
 
-    expect(Aws::SQS::Client).to have_received(:new).with(no_args).once
+    expect(Aws::SQS::Client).to have_received(:new).with(**options).once
     expect(sqs_client.api_requests.size).to eq(2)
   end
 
@@ -96,7 +117,7 @@ RSpec.describe HmppsAudit::Client do
 
       expect(described_class.new.publish(**event)).to be_nil
       expect(Rails.logger).to have_received(:info).with(
-        'event=hmpps_audit|{"what":"VIEW_PRISONER","correlation_id":"request-123"}'
+        'event=hmpps_audit|{"what":"VIEW_PRISONER","subject_type":"PRISONER_ID","correlation_id":"request-123"}'
       )
     end
 
@@ -124,6 +145,7 @@ RSpec.describe HmppsAudit::Client do
       expect(Rails.logger).to have_received(:error).with(
         "event=hmpps_audit_failed|#{{
           what: 'VIEW_PRISONER',
+          subject_type: 'PRISONER_ID',
           correlation_id: 'request-123',
           error_class: error.class.name,
         }.to_json}"
