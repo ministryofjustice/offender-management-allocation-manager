@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe PrisonersController, type: :controller do
+  include_context 'with audit event capture'
+
   context 'with a womens prison' do
     let(:prison) { create(:womens_prison) }
 
@@ -698,6 +700,17 @@ RSpec.describe PrisonersController, type: :controller do
         stub_offender(offender)
       end
 
+      it 'audits a signed-in POM viewing case information using their username' do
+        stub_signed_in_pom(prison, 485_926, 'pom-user')
+        allow(HmppsApi::AssessRisksAndNeedsApi).to receive(:get_latest_oasys_date).with(offender_no).and_return(nil)
+
+        get :show, params: { prison_id: prison, id: offender_no }
+
+        expect(response).to have_http_status(:ok)
+        expect(audit_events.map { it[:what] }).to eq(%w[VIEW_CASE_INFORMATION_ATTEMPT VIEW_CASE_INFORMATION_SUCCESS])
+        expect(audit_events).to all(include(who: 'pom-user', subject_id: offender_no))
+      end
+
       context 'when an offender has a previous LAYER_3 OASys assessments' do
         let(:completed_date) { '2021-06-02'.to_date }
 
@@ -946,6 +959,8 @@ RSpec.describe PrisonersController, type: :controller do
         it 'redirects to 404' do
           get :show, params: { prison_id: prison.code, id: 'NONEXIST' }
           expect(response).to redirect_to('/404')
+          expect(audit_events.map { it[:what] }).to eq(%w[VIEW_CASE_INFORMATION_ATTEMPT VIEW_CASE_INFORMATION_FAILURE])
+          expect(audit_events.last[:subject_id]).to eq('NONEXIST')
         end
       end
 
@@ -958,7 +973,67 @@ RSpec.describe PrisonersController, type: :controller do
         it 'renders the outside OMIC policy page' do
           get :show, params: { prison_id: prison.code, id: offender_no }
           expect(response).to render_template('show_outside_omic_policy')
+          expect(response).to have_http_status(:forbidden)
+          expect(audit_events.map { it[:what] }).to eq(%w[VIEW_CASE_INFORMATION_ATTEMPT VIEW_CASE_INFORMATION_FAILURE])
+          expect(audit_events.last[:details]).to include('failureReason' => 'Prisoner outside OMIC policy')
         end
+      end
+    end
+
+    describe '#image' do
+      let(:image) { HmppsApi::PrisonApi::OffenderApi::FacialImageResult.new(data: 'image bytes', available: true) }
+      let(:prisoner) { instance_double(MpcOffender, get_image: image) }
+
+      before do
+        allow(OffenderService).to receive(:get_offender).with('A1234BC').and_return(prisoner)
+      end
+
+      it 'audits a direct image request independently of the case page' do
+        get :image, params: { prison_id: prison.code, prisoner_id: 'A1234BC', format: :jpg }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to eq('image bytes')
+        expect(response.media_type).to eq('image/jpg')
+        expect(audit_events.map { it[:what] }).to eq(%w[VIEW_PRISONER_PHOTO_ATTEMPT VIEW_PRISONER_PHOTO_SUCCESS])
+        expect(audit_events).to all(include(subject_type: 'PRISONER_ID', subject_id: 'A1234BC'))
+      end
+
+      it 'redirects to 404 and audits a missing prisoner without attempting to send an image' do
+        allow(OffenderService).to receive(:get_offender).with('A1234BC').and_return(nil)
+        expect(controller).not_to receive(:send_data)
+
+        get :image, params: { prison_id: prison.code, prisoner_id: 'A1234BC', format: :jpg }
+
+        expect(response).to redirect_to('/404')
+        expect(audit_events.map { it[:what] }).to eq(%w[VIEW_PRISONER_PHOTO_ATTEMPT VIEW_PRISONER_PHOTO_FAILURE])
+        expect(audit_events.last).to include(
+          subject_id: 'A1234BC', details: { 'failureReason' => 'Resource not found' }
+        )
+      end
+
+      it 'audits an image retrieval failure without changing the application exception' do
+        allow(prisoner).to receive(:get_image).and_raise(Faraday::TimeoutError)
+
+        expect {
+          get :image, params: { prison_id: prison.code, prisoner_id: 'A1234BC', format: :jpg }
+        }.to raise_error(Faraday::TimeoutError)
+
+        expect(audit_events.map { it[:what] }).to eq(%w[VIEW_PRISONER_PHOTO_ATTEMPT VIEW_PRISONER_PHOTO_FAILURE])
+        expect(audit_events.last[:details]).to include(
+          'failureReason' => 'Application failed to complete the operation: Faraday::TimeoutError'
+        )
+      end
+
+      it 'serves the placeholder while auditing that the prisoner photo was unavailable' do
+        image.available = false
+
+        get :image, params: { prison_id: prison.code, prisoner_id: 'A1234BC', format: :jpg }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to eq(image.data)
+        expect(response.media_type).to eq('image/jpg')
+        expect(audit_events.map { it[:what] }).to eq(%w[VIEW_PRISONER_PHOTO_ATTEMPT VIEW_PRISONER_PHOTO_FAILURE])
+        expect(audit_events.last[:details]).to eq('failureReason' => 'Prisoner photo not available')
       end
     end
 
@@ -981,6 +1056,7 @@ RSpec.describe PrisonersController, type: :controller do
         it 'renders the outside OMIC policy page' do
           get :review_case_details, params: { prison_id: prison.code, prisoner_id: offender_no }
           expect(response).to render_template('show_outside_omic_policy')
+          expect(response).to have_http_status(:forbidden)
         end
       end
     end

@@ -349,7 +349,8 @@ describe HmppsApi::PrisonApi::OffenderApi do
       stub_request(:get, images_uri).to_return(body: 'image')
 
       response = described_class.get_image(booking_id)
-      expect(response).to eq('image')
+      expect(response.data).to eq('image')
+      expect(response).to be_available
     end
 
     context 'when image is not found' do
@@ -360,7 +361,8 @@ describe HmppsApi::PrisonApi::OffenderApi do
         stub_request(:get, images_uri).to_return(status: 404)
 
         response = described_class.get_image(booking_id)
-        expect(response).to eq(default_image_file)
+        expect(response.data).to eq(default_image_file)
+        expect(response).not_to be_available
       end
     end
 
@@ -372,7 +374,8 @@ describe HmppsApi::PrisonApi::OffenderApi do
         stub_request(:get, images_uri).to_return(body: '')
 
         response = described_class.get_image(booking_id)
-        expect(response).to eq(default_image_file)
+        expect(response.data).to eq(default_image_file)
+        expect(response).not_to be_available
       end
     end
 
@@ -383,7 +386,8 @@ describe HmppsApi::PrisonApi::OffenderApi do
         )
 
         response = described_class.get_image(booking_id)
-        expect(response).to eq(default_image_file)
+        expect(response.data).to eq(default_image_file)
+        expect(response).not_to be_available
       end
     end
   end

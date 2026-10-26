@@ -82,6 +82,11 @@ class PrisonersController < PrisonsApplicationController
     @coworking = params[:coworking].present? && @allocation&.active?
   end
 
+  audit_action :show, what: 'VIEW_CASE_INFORMATION', subject_type: 'PRISONER_ID',
+                      subject_id: -> { request.path_parameters.fetch(:id) },
+                      failure_reason: lambda {
+                        'Prisoner outside OMIC policy' if response.forbidden? && @prisoner&.inside_omic_policy? == false
+                      }
   def show
     @tasks = @prisoner.pom_tasks
 
@@ -102,11 +107,19 @@ class PrisonersController < PrisonsApplicationController
     @keyworker = KeyworkerService.get_keyworker(@prisoner.offender_no)
   end
 
+  audit_action :image, what: 'VIEW_PRISONER_PHOTO', subject_type: 'PRISONER_ID',
+                       subject_id: -> { request.path_parameters.fetch(:prisoner_id) },
+                       success: -> { response.successful? && @prisoner_image&.available? },
+                       failure_reason: lambda {
+                         'Prisoner photo not available' if response.successful? && @prisoner_image&.available? == false
+                       }
   def image
-    prisoner = OffenderService.get_offender(params[:prisoner_id])
+    prisoner = get_offender_or_404(params[:prisoner_id])
+    return unless prisoner
 
-    response.headers['Expires'] = 6.months.from_now.httpdate
-    send_data prisoner.get_image, type: 'image/jpg', disposition: 'inline'
+    @prisoner_image = prisoner.get_image
+
+    send_data @prisoner_image.data, type: 'image/jpg', disposition: 'inline'
   end
 
 private
@@ -129,7 +142,7 @@ private
       redirect_to '/404'
     elsif !@prisoner.inside_omic_policy?
       Rails.logger.warn("event=outside_omic_policy,nomis_offender_id=#{offender_id},prison_id=#{@prison.code}")
-      render 'show_outside_omic_policy'
+      render 'show_outside_omic_policy', status: :forbidden
     end
   end
 

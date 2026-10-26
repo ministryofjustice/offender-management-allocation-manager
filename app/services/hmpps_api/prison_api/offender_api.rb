@@ -28,6 +28,10 @@ module HmppsApi
         lastMovementTypeCode
       ].freeze
 
+      FacialImageResult = Struct.new(:data, :available, keyword_init: true) do
+        alias_method :available?, :available
+      end
+
       def self.get_offenders_in_prison(prison, **options)
         offenders = get_search_api_offenders_in_prison(prison)
 
@@ -101,22 +105,24 @@ module HmppsApi
       end
 
       def self.get_image(booking_id)
-        # This method returns the raw bytes of an image, the equivalent of loading the
-        # image from file on disk.
         details_route = '/offender-sentences/bookings'
         details = client.post(details_route, [booking_id], cache: true)
 
-        return default_image if details.first['facialImageId'].blank?
+        return FacialImageResult.new(data: default_image, available: false) if details.first['facialImageId'].blank?
 
         image_route = "/images/#{details.first['facialImageId']}/data"
         image = client.raw_get(image_route)
 
-        image.presence || default_image
+        if image.present?
+          FacialImageResult.new(data: image, available: true)
+        else
+          FacialImageResult.new(data: default_image, available: false)
+        end
       rescue Faraday::ResourceNotFound
         # It's possible that the offender does not yet have an image of their
         # face, and so when an image can't be found, we will return the default
         # image instead.
-        default_image
+        FacialImageResult.new(data: default_image, available: false)
       end
 
       def self.get_offender_sentences_and_offences(booking_id)
