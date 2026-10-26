@@ -3,7 +3,7 @@
   "private": true,
   "dependencies": {
     "@ministryofjustice/frontend": "11.2.0-beta.1",
-    "govuk-frontend": "6.5.1",
+    "govuk-frontend": "6.6.0",
     "sass": "^1.105.2"
   },
   "description": "This README would normally document whatever steps are necessary to get the application up and running.",
