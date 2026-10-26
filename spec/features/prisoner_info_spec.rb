@@ -156,11 +156,13 @@ describe 'View a prisoner profile page' do
   end
 
   context 'when case is outside omic policy' do
-    let(:offender) { build(:stubbed_offender, nomis_id: 'G1234AB', first_name: 'Any', last_name: 'Case', sentence_type: :outside_omic_policy) }
+    let(:offender) { build(:stubbed_offender, nomis_id: 'G1234AB', first_name: 'Jane', last_name: 'Doe', sentence_type: :outside_omic_policy) }
 
     it 'informs the user' do
       visit prison_prisoner_path(prison.code, 'G1234AB')
-      expect(page).to have_content("Outside OMIC policy\nAny Case cannot be displayed because they don't fall under OMIC policy")
+      expect(page.status_code).to eq(403)
+      expect(page).to have_content("Outside OMIC policy\nCase information cannot be displayed because this person does not fall under OMIC policy.")
+      expect(page).not_to have_content('Jane Doe')
     end
   end
 
