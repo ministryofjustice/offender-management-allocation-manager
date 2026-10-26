@@ -1,7 +1,7 @@
 FROM ruby:4.0.7-alpine3.24 AS base
 
-# Increment to bust Docker layer cache
-ENV DOCKER_CACHE_BUSTER=1
+# Increment to refresh OS packages and CA trust in both build stages
+ENV DOCKER_CACHE_BUSTER=2
 
 ENV \
   LANG=C.UTF-8 \
