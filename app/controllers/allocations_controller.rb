@@ -6,8 +6,6 @@ class AllocationsController < PrisonsApplicationController
 
   rescue_from ActiveRecord::RecordNotFound, with: :render_404
 
-  audit_action :show, what: 'VIEW_ALLOCATION_INFORMATION', subject_type: 'PRISONER_ID',
-                      subject_id: -> { request.path_parameters.fetch(:prisoner_id) }
   def show
     allocation = AllocationHistory.active.find_by!(nomis_offender_id: @prisoner.offender_no)
     @allocation = CaseHistory.new(allocation.get_old_versions.last, allocation, allocation.versions.last)

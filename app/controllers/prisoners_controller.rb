@@ -4,7 +4,7 @@ class PrisonersController < PrisonsApplicationController
   before_action :ensure_spo_user, except: [:show, :image, :search]
   before_action :load_prisoner_or_redirect, only: [:show, :review_case_details]
 
-  before_action only: [:allocated, :missing_information, :unallocated, :review_allocations, :search] do
+  before_action only: [:allocated, :missing_information, :unallocated, :review_allocations] do
     log_duration(:load_all_offenders) { load_all_offenders }
   end
   before_action only: [:allocated, :missing_information, :unallocated, :review_allocations] do
@@ -47,10 +47,19 @@ class PrisonersController < PrisonsApplicationController
   end
 
   def search
-    @q = search_term
+    @q = search_form.q
+    if search_form.invalid?
+      @offenders = []
+      return render 'search', status: :unprocessable_entity
+    end
+
+    load_all_offenders
     offenders = SearchService.search_for_offenders(@q, @prison.all_policy_offenders)
     @offenders, @user_allocations = get_slice_for_page(offenders, @current_user.staff_id)
     MetricsService.instance.increment_search_count
+
+    returned_ids = (@user_allocations + @offenders).map(&:offender_no)
+    audit(details: { 'results' => { 'resultCount' => returned_ids.size, 'returnedSubjectIds' => returned_ids } })
 
     render @current_user.allocations.empty? ? 'search' : 'search_global'
   end
@@ -82,11 +91,6 @@ class PrisonersController < PrisonsApplicationController
     @coworking = params[:coworking].present? && @allocation&.active?
   end
 
-  audit_action :show, what: 'VIEW_CASE_INFORMATION', subject_type: 'PRISONER_ID',
-                      subject_id: -> { request.path_parameters.fetch(:id) },
-                      failure_reason: lambda {
-                        'Prisoner outside OMIC policy' if response.forbidden? && @prisoner&.inside_omic_policy? == false
-                      }
   def show
     @tasks = @prisoner.pom_tasks
 
@@ -107,17 +111,12 @@ class PrisonersController < PrisonsApplicationController
     @keyworker = KeyworkerService.get_keyworker(@prisoner.offender_no)
   end
 
-  audit_action :image, what: 'VIEW_PRISONER_PHOTO', subject_type: 'PRISONER_ID',
-                       subject_id: -> { request.path_parameters.fetch(:prisoner_id) },
-                       success: -> { response.successful? && @prisoner_image&.available? },
-                       failure_reason: lambda {
-                         'Prisoner photo not available' if response.successful? && @prisoner_image&.available? == false
-                       }
   def image
     prisoner = get_offender_or_404(params[:prisoner_id])
     return unless prisoner
 
     @prisoner_image = prisoner.get_image
+    audit(failure: 'Prisoner photo not available') unless @prisoner_image.available?
 
     send_data @prisoner_image.data, type: 'image/jpg', disposition: 'inline'
   end
@@ -142,6 +141,7 @@ private
       redirect_to '/404'
     elsif !@prisoner.inside_omic_policy?
       Rails.logger.warn("event=outside_omic_policy,nomis_offender_id=#{offender_id},prison_id=#{@prison.code}")
+      audit(failure: 'Prisoner outside OMIC policy')
       render 'show_outside_omic_policy', status: :forbidden
     end
   end
@@ -197,9 +197,8 @@ private
     [paginate_array(offenders), paginate_array(user_allocations)]
   end
 
-  def search_term
-    # defaults to an empty string if the key 'q' can't be found
-    params.fetch('q', '').strip
+  def search_form
+    @search_form ||= PrisonerSearchForm.new(q: params[:q])
   end
 
   def load_reallocation_alert

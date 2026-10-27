@@ -13,6 +13,11 @@ class HmppsAudit::Interaction
     @client = client
   end
 
+  # Adds details only known once the operation completes, such as search results
+  def add_details(details)
+    @attributes[:details] = @attributes.fetch(:details).merge(details)
+  end
+
   # The block returns nil on success, or a safe failure reason for a handled outcome
   def record
     publish(OUTCOME::ATTEMPT)

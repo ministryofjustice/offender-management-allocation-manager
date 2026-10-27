@@ -1,18 +1,13 @@
 <div class="govuk-grid-row govuk-!-margin-bottom-4">
   <div class="govuk-grid-column-one-half">
     <search class="moj-search govuk-!-margin-bottom-6">
-      <%= form_tag(search_prison_prisoners_path(@prison.code), method: :get, id: "search_form") do %>
-        <div class="govuk-form-group">
-          <label class="govuk-label moj-search__label govuk-!-font-weight-bold" for="search">
-            Find a case
-          </label>
-          <div class="govuk-input__wrapper moj-search__input-wrapper">
-            <input class="govuk-input moj-search__input" id="search" name="q" type="search" value="<%= params[:q] %>">
-            <button type="submit" id="search-button" class="govuk-button moj-search__button" data-module="govuk-button">
-              Search
-            </button>
-          </div>
-        </div>
+      <%= form_with(model: @search_form || PrisonerSearchForm.new(q: params[:q]), scope: '',
+                    url: search_prison_prisoners_path(@prison.code), method: :get, id: 'search_form',
+                    builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
+        <%= f.govuk_text_field :q, type: :search, class: 'moj-search__input',
+                               label: { text: 'Find a case', class: 'moj-search__label govuk-!-font-weight-bold' },
+                               form_group: { class: 'app-search__form-group' },
+                               after_input: -> { f.govuk_submit('Search', class: 'moj-search__button') } %>
       <% end %>
     </search>
   </div>

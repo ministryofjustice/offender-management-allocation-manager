@@ -637,6 +637,18 @@ RSpec.describe PrisonersController, type: :controller do
           expect(assigns(:offenders).size).to eq(0)
         end
 
+        it 'rejects a search term shorter than 3 characters without searching' do
+          allow(SearchService).to receive(:search_for_offenders)
+
+          get :search, params: { prison_id: prison, q: ' Ca ' }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(SearchService).not_to have_received(:search_for_offenders)
+          expect(audit_events.map { it[:what] }).to eq(%w[SEARCH_PRISONER_ATTEMPT SEARCH_PRISONER_FAILURE])
+          expect(audit_events.last).to include(subject_id: 'Ca')
+          expect(audit_events.last[:details]).to include('failureReason' => 'Request failed validation')
+        end
+
         context "with 3 offenders", :allocation do
           let(:first_offender) { build(:nomis_offender, firstName: 'Alice', lastName: 'Bloggs') }
           let(:first_offender_no) { first_offender.fetch(:prisonerNumber) }
@@ -673,6 +685,30 @@ RSpec.describe PrisonersController, type: :controller do
               get :search, params: { prison_id: prison, q: 'Alice' }
 
               expect(updated_offenders.count).to eq(1)
+            end
+
+            it 'audits the requested results page' do
+              get :search, params: { prison_id: prison, q: 'Blog', page: '2' }
+
+              expect(audit_events.map { it[:details]['queryParams'] }).to all(eq('prisonId' => prison, 'page' => '2'))
+            end
+
+            it 'audits the search term, prison and every returned prisoner' do
+              get :search, params: { prison_id: prison, q: ' Blog ' }
+
+              returned_ids = (assigns(:user_allocations) + updated_offenders).map(&:offender_no)
+              expect(returned_ids).to include(first_offender_no)
+              expect(audit_events.map { it[:what] }).to eq(%w[SEARCH_PRISONER_ATTEMPT SEARCH_PRISONER_SUCCESS])
+              expect(audit_events).to all(include(subject_type: 'SEARCH_TERM', subject_id: 'Blog'))
+              expect(audit_events.map { it[:details] }).to eq(
+                [
+                  { 'queryParams' => { 'prisonId' => prison } },
+                  {
+                    'queryParams' => { 'prisonId' => prison },
+                    'results' => { 'resultCount' => 3, 'returnedSubjectIds' => returned_ids },
+                  },
+                ]
+              )
             end
           end
 

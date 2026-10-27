@@ -1,0 +1,86 @@
+# Every routed controller action must be declared here, keyed by `controller_path#action`,
+# either as audited by HMPPS Audit or as exempt with a reason.
+#
+# Audited actions:
+# what:          event name prefix, sent with _ATTEMPT, _SUCCESS or _FAILURE appended
+# subject_type:  one of HmppsAudit::Message::SUBJECT_TYPES
+# subject_id:    request param holding the subject (path or query string), optional
+# query_params:  request params sent as details.queryParams when present, optional
+#
+allocations#show:
+  what: VIEW_ALLOCATION_INFORMATION
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+
+prisoners#show:
+  what: VIEW_CASE_INFORMATION
+  subject_type: PRISONER_ID
+  subject_id: id
+
+prisoners#image:
+  what: VIEW_PRISONER_PHOTO
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+
+prisoners#search:
+  what: SEARCH_PRISONER
+  subject_type: SEARCH_TERM
+  subject_id: q
+  query_params: [prison_id, page]
+
+errors#unauthorized:
+  exempt: Static error page with no prisoner or staff data
+errors#not_found:
+  exempt: Static error page with no prisoner or staff data
+errors#internal_server_error:
+  exempt: Static error page with no prisoner or staff data
+
+health#index:
+  exempt: Infrastructure health check
+health#ping:
+  exempt: Infrastructure health check
+status#index:
+  exempt: Infrastructure status check
+info#index:
+  exempt: Infrastructure build information
+
+api/api#index:
+  exempt: API called by other services with a token
+api/allocation_api#show:
+  exempt: API called by other services with a token
+api/allocation_api#primary_pom:
+  exempt: API called by other services with a token
+api/handovers_api#show:
+  exempt: API called by other services with a token
+api/sar#show:
+  exempt: API called by other services with a token
+api/sar#template:
+  exempt: API called by other services with a token
+
+sre_swagger_docs#swagger_ui:
+  exempt: API documentation
+sre_swagger_docs#open_api_json:
+  exempt: API documentation
+
+sessions#create:
+  exempt: Sign-in handled by HMPPS Auth
+sessions#failure:
+  exempt: Sign-in handled by HMPPS Auth
+sessions#destroy:
+  exempt: Sign-out with no prisoner or staff data
+
+help#dashboard:
+  exempt: Static help page with no prisoner or staff data
+help#missing_cases:
+  exempt: Static help page with no prisoner or staff data
+help#case_responsibility:
+  exempt: Static help page with no prisoner or staff data
+
+dashboard#index:
+  exempt: Navigation page with links only
+
+root#index:
+  exempt: Redirect to the default prison dashboard
+
+root#handovers_email_preferences:
+  exempt: Redirect from email links to the email preferences page
