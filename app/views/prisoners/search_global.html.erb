@@ -1,6 +1,6 @@
 <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
-<h1 class="govuk-heading-xl"><%= "Search results for #{@q}" %></h1>
+<h1 class="govuk-heading-xl">Search results for ‘<%= @q %>’</h1>
 
 <%= render 'search/search_box' %>
 
@@ -92,7 +92,8 @@
 
 <% if @user_allocations.empty? %>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    // wait for the full page load
+    window.addEventListener('load', function () {
       const tab = document.querySelector('#tab_global-results');
       if (tab) tab.click();
     });

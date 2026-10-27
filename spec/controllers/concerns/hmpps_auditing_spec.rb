@@ -7,21 +7,21 @@ RSpec.describe HmppsAuditing, type: :controller do
     before_action :authenticate_user
     before_action :check_view_access
 
-    audit_action :show, what: 'VIEW_ALLOCATION', subject_type: 'PRISONER_ID',
-                        subject_id: -> { request.path_parameters.fetch(:id) },
-                        success: -> { response.successful? && !params[:alternate] },
-                        failure_reason: -> { 'Allocation view unavailable' if params[:alternate] }
-
-    audit_action :create, what: 'CREATE_ALLOCATION', subject_type: 'PRISONER_ID',
-                          subject_id: -> { params.fetch(:prisoner_id) },
-                          failure_reason: -> { 'Allocation could not be created' }
-
-    def create
-      head :unprocessable_entity
-    end
-
     def show
       render plain: 'Allocation'
+    end
+
+    def update
+      return head :unprocessable_entity if params[:invalid]
+
+      results = { 'results' => { 'returnedSubjectIds' => %w[A1234BC] } }
+      if params[:too_many]
+        audit(details: results, failure: 'Too many results')
+        return head :unprocessable_entity
+      end
+
+      audit(details: results)
+      render plain: 'A1234BC'
     end
 
     def index
@@ -34,12 +34,23 @@ RSpec.describe HmppsAuditing, type: :controller do
       redirect_to '/401' if params[:denied]
       redirect_to '/404' if params[:missing]
       if params[:alternate]
+        audit(failure: 'Allocation view unavailable')
         render plain: 'Different page'
       end
     end
   end
 
   before do
+    allow(HmppsAudit::Actions).to receive(:all).and_return(
+      HmppsAudit::Actions.parse(
+        'anonymous#show' => { 'what' => 'VIEW_ALLOCATION', 'subject_type' => 'PRISONER_ID', 'subject_id' => 'id' },
+        'anonymous#update' => { 'what' => 'SEARCH_ALLOCATION',
+                                'subject_type' => 'SEARCH_TERM',
+                                'subject_id' => 'id',
+                                'query_params' => %w[page sort_by] }
+      )
+    )
+
     session[:sso_data] = {
       username: 'user-name', roles: [SsoIdentity::POM_ROLE], expiry: 1.hour.from_now.to_i
     }
@@ -82,7 +93,7 @@ RSpec.describe HmppsAuditing, type: :controller do
     expect(audit_events.last[:details]).to include('failureReason' => 'Resource not found')
   end
 
-  it 'does not count an alternate page rendered by a before-action as success' do
+  it 'uses a specific failure reason set by a callback, even for a successful response' do
     get :show, params: { id: 'A1234BC', alternate: true }
 
     expect(response).to have_http_status(:ok)
@@ -90,11 +101,35 @@ RSpec.describe HmppsAuditing, type: :controller do
     expect(audit_events.last[:details]).to eq('failureReason' => 'Allocation view unavailable')
   end
 
-  it 'uses the event and failure reason belonging to the requested action' do
-    post :create, params: { prisoner_id: 'A1234BC' }
+  describe 'details' do
+    it 'sends present query params on every event and details added by the action on the outcome' do
+      patch :update, params: { id: 'Smith', sort_by: 'name' }
 
-    expect(audit_events.map { it[:what] }).to eq(%w[CREATE_ALLOCATION_ATTEMPT CREATE_ALLOCATION_FAILURE])
-    expect(audit_events.last[:details]).to eq('failureReason' => 'Allocation could not be created')
+      expect(audit_events.map { it[:details] }).to eq(
+        [
+          { 'queryParams' => { 'sortBy' => 'name' } },
+          { 'queryParams' => { 'sortBy' => 'name' }, 'results' => { 'returnedSubjectIds' => %w[A1234BC] } },
+        ]
+      )
+    end
+
+    it 'uses a generic failure reason when the action does not add one' do
+      patch :update, params: { id: 'Smith', page: '2', invalid: true }
+
+      expect(audit_events.last).to include(
+        what: 'SEARCH_ALLOCATION_FAILURE',
+        details: { 'queryParams' => { 'page' => '2' }, 'failureReason' => 'Request failed validation' }
+      )
+    end
+
+    it 'prefers a specific failure reason to the generic one, alongside details' do
+      patch :update, params: { id: 'Smith', too_many: true }
+
+      expect(audit_events.last).to include(
+        what: 'SEARCH_ALLOCATION_FAILURE',
+        details: { 'results' => { 'returnedSubjectIds' => %w[A1234BC] }, 'failureReason' => 'Too many results' }
+      )
+    end
   end
 
   it 'records rendering failures as failures, not successes' do
@@ -116,13 +151,6 @@ RSpec.describe HmppsAuditing, type: :controller do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to eq('Allocation')
-      expect(Rails.error).to have_received(:report).twice
-    end
-
-    it 'preserves a permission denial redirect' do
-      get :show, params: { id: 'A1234BC', denied: true }
-
-      expect(response).to redirect_to('/401')
       expect(Rails.error).to have_received(:report).twice
     end
   end

@@ -1,41 +1,64 @@
 # frozen_string_literal: true
 
+# Audits every request to a controller action declared in config/hmpps_audit.yml.
+# Actions can call `audit` to add details only they know, or a specific failure reason;
+# otherwise the outcome is inferred from the response.
+#
 module HmppsAuditing
   extend ActiveSupport::Concern
 
-  class_methods do
-    def audit_action(action, what:, subject_type:, subject_id:, success: -> { response.successful? }, failure_reason: nil)
-      # Wrap authorisation and loading callbacks as well as the action and rendering
-      prepend_around_action(only: action) do |controller, operation|
-        controller.send(:audit_user_action, what:, subject_type:, subject_id:, success:, failure_reason:, &operation)
-      end
-    end
+  included do
+    # Wraps authorisation and loading callbacks as well as the action and rendering
+    prepend_around_action :audit_request, if: :audit_config
   end
 
 private
 
-  def audit_user_action(what:, subject_type:, subject_id:, success:, failure_reason:)
+  def audit_config
+    HmppsAudit::Actions.find(controller_path, action_name)
+  end
+
+  # `details` are sent on the outcome event
+  # `failure` makes the outcome a failure with that reason
+  def audit(details: nil, failure: nil)
+    @audit_interaction&.add_details(details) if details
+    @audit_failure_reason = failure if failure
+  end
+
+  def audit_request
     return yield unless FeatureFlags.hmpps_audit.enabled?
 
     identity = sso_identity
     return yield if identity.absent? || identity.session_expired?
 
-    interaction = HmppsAudit::Interaction.new(
-      what:,
+    config = audit_config
+    @audit_interaction = HmppsAudit::Interaction.new(
+      what: config.fetch(:what),
       who: identity.current_user,
-      subject_type:,
-      subject_id: instance_exec(&subject_id),
+      subject_type: config.fetch(:subject_type),
+      subject_id: audit_param(config[:subject_id]),
       correlation_id: request.request_id,
+      details: audit_query_params(config.fetch(:query_params)),
     )
-    interaction.record do
+    @audit_interaction.record do
       yield
-      unless instance_exec(&success)
-        (instance_exec(&failure_reason) if failure_reason) || audit_failure_reason
-      end
+      @audit_failure_reason || (generic_audit_failure_reason unless response.successful?)
     end
   end
 
-  def audit_failure_reason
+  def audit_param(key)
+    value = params[key] if key
+    value.squish.presence if value.is_a?(String)
+  end
+
+  def audit_query_params(keys)
+    query_params = keys.index_with { audit_param(it) }.compact
+    return {} if query_params.empty?
+
+    { 'queryParams' => query_params.transform_keys { it.to_s.camelize(:lower) } }
+  end
+
+  def generic_audit_failure_reason
     if response.redirect?
       case URI.parse(response.location).path
       when '/401' then 'User does not have access to this data'
@@ -46,6 +69,8 @@ private
       'User does not have access to this data'
     elsif response.not_found?
       'Resource not found'
+    elsif response.unprocessable?
+      'Request failed validation'
     else
       'Requested view was not available'
     end

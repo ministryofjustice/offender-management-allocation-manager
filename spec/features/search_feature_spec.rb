@@ -65,4 +65,16 @@ feature 'Search for offenders' do
     expect(page).to have_current_path(search_prison_prisoners_path(prison_code), ignore_query: true)
     expect(all('[aria-label="Prisoner name"]').map(&:text)).to eq(['Doe, Jane T0000AC'])
   end
+
+  it 'Requires at least 3 characters' do
+    visit root_path
+    fill_in 'Find a case', with: 'Ja'
+    click_on 'Search'
+
+    expect(page).to have_css('.govuk-error-message', text: 'Enter at least 3 characters')
+    expect(page).to have_css('h1', text: '0 results for ‘Ja’')
+    expect(page).to have_field('Find a case', with: 'Ja')
+    expect(page).to have_content('Search again')
+    expect(page).to have_no_css('[aria-label="Prisoner name"]')
+  end
 end

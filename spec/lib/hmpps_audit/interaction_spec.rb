@@ -25,6 +25,18 @@ RSpec.describe HmppsAudit::Interaction do
     interaction.record { operation.call }
   end
 
+  it 'adds details known after the operation to the outcome only' do
+    interaction.record do
+      interaction.add_details('results' => { 'resultCount' => 0 })
+      nil
+    end
+
+    expect(client).to have_received(:publish).with(**attributes, what: 'VIEW_ALLOCATION_ATTEMPT')
+    expect(client).to have_received(:publish).with(
+      **attributes, what: 'VIEW_ALLOCATION_SUCCESS', details: { 'results' => { 'resultCount' => 0 } }
+    )
+  end
+
   it 'records a reported failure with the same context and a failureReason' do
     interaction.record { 'User does not have access to this data' }
 

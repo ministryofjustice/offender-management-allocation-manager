@@ -142,6 +142,11 @@ en:
               inclusion: Select full time or part time
             working_pattern:
               inclusion: Select how many days they will work
+        prisoner_search_form:
+          format: "%{message}"
+          attributes:
+            q:
+              too_short: Enter at least 3 characters
         confirm_delete_pom_form:
           format: "%{message}"
           attributes:

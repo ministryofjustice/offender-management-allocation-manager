@@ -26,12 +26,13 @@
     margin-left: 0;
 }
 
-.app-onboarding-search__form-group {
+.app-search__form-group {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
 
     > .govuk-label-wrapper,
+    > .govuk-label,
     > .govuk-hint,
     > .govuk-error-message,
     > p {
@@ -50,7 +51,7 @@
 }
 
 @media (max-width: 19.99em) {
-    .app-onboarding-search__form-group {
+    .app-search__form-group {
         > .govuk-input.moj-search__input {
             flex-basis: 100%;
             width: 100%;
