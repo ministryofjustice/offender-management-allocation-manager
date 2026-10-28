@@ -10,6 +10,7 @@ RSpec.describe ApplicationController, type: :controller do
   end
 
   it 'includes request correlation in structured logs on success and failure' do
+    allow(HmppsAudit::Actions).to receive(:find).and_return(nil)
     allow_any_instance_of(ActionDispatch::Request).to receive(:request_id).and_return('request-id')
     payloads = []
     subscriber = ActiveSupport::Notifications.subscribe('process_action.action_controller') { |event| payloads << event.payload }

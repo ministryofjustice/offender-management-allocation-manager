@@ -3,7 +3,11 @@
 class CaseloadController < PrisonStaffApplicationController
   before_action :ensure_signed_in_pom_is_this_pom, :load_and_validate_pom, :pom_allocations_summary
 
+  def index; end
+
   def cases; end
+
+  def parole_cases; end
 
   def new_cases
     @new_cases = sort_allocations(@pom.allocations.select(&:new_case?))

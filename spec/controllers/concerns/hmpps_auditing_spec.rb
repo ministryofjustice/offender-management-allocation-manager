@@ -28,6 +28,10 @@ RSpec.describe HmppsAuditing, type: :controller do
       render plain: 'Not audited'
     end
 
+    def destroy
+      head :ok
+    end
+
   private
 
     def check_view_access
@@ -47,7 +51,8 @@ RSpec.describe HmppsAuditing, type: :controller do
         'anonymous#update' => { 'what' => 'SEARCH_ALLOCATION',
                                 'subject_type' => 'SEARCH_TERM',
                                 'subject_id' => 'id',
-                                'query_params' => %w[page sort_by] }
+                                'query_params' => %w[page sort_by] },
+        'anonymous#index' => { 'todo' => true }
       )
     )
 
@@ -155,10 +160,15 @@ RSpec.describe HmppsAuditing, type: :controller do
     end
   end
 
-  it 'does not audit undeclared actions' do
+  it 'does not audit actions that are not declared as audited' do
     get :index
 
+    expect(response).to have_http_status(:ok)
     expect(audit_events).to be_empty
+  end
+
+  it 'raises for undeclared actions' do
+    expect { delete :destroy, params: { id: 'A1234BC' } }.to raise_error(HmppsAudit::Actions::UndeclaredActionError)
   end
 
   it 'does not audit an unauthenticated user or change the authentication redirect' do
@@ -179,12 +189,20 @@ RSpec.describe HmppsAuditing, type: :controller do
     expect(audit_events).to be_empty
   end
 
-  it 'leaves the normal request unchanged when auditing is disabled' do
-    allow(FeatureFlags).to receive(:hmpps_audit).and_return(double(enabled?: false))
+  context 'when auditing is disabled' do
+    before { stub_feature_flag(:hmpps_audit, enabled: false) }
 
-    get :show, params: { id: 'A1234BC' }
+    it 'leaves the normal request unchanged' do
+      get :show, params: { id: 'A1234BC' }
 
-    expect(response).to have_http_status(:ok)
-    expect(audit_events).to be_empty
+      expect(response).to have_http_status(:ok)
+      expect(audit_events).to be_empty
+    end
+
+    it 'does not raise for undeclared actions' do
+      delete :destroy, params: { id: 'A1234BC' }
+
+      expect(response).to have_http_status(:ok)
+    end
   end
 end

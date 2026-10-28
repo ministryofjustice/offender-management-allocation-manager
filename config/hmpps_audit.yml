@@ -1,5 +1,6 @@
 # Every routed controller action must be declared here, keyed by `controller_path#action`,
-# either as audited by HMPPS Audit or as exempt with a reason.
+# either as audited by HMPPS Audit, exempt with a reason, or `todo: true` until evaluated.
+# When auditing is enabled, requests to an undeclared action raise HmppsAudit::Actions::UndeclaredActionError
 #
 # Audited actions:
 # what:          event name prefix, sent with _ATTEMPT, _SUCCESS or _FAILURE appended
@@ -84,3 +85,229 @@ root#index:
 
 root#handovers_email_preferences:
   exempt: Redirect from email links to the email preferences page
+
+# Not yet evaluated below.
+# Replace each with an audit, or an exemption with a real reason.
+
+allocation_retentions#create:
+  todo: true
+allocation_retentions#new:
+  todo: true
+
+allocation_staff#check_compare_list:
+  todo: true
+allocation_staff#compare_poms:
+  todo: true
+allocation_staff#index:
+  todo: true
+
+allocations#history:
+  todo: true
+
+build_allocations#new:
+  todo: true
+build_allocations#show:
+  todo: true
+build_allocations#update:
+  todo: true
+
+case_information#create:
+  todo: true
+case_information#edit:
+  todo: true
+case_information#new:
+  todo: true
+case_information#update:
+  todo: true
+
+caseload#cases:
+  todo: true
+caseload#index:
+  todo: true
+caseload#new_cases:
+  todo: true
+caseload#parole_cases:
+  todo: true
+caseload#updates_required:
+  todo: true
+
+caseload_global#index:
+  todo: true
+
+complexity_levels#edit:
+  todo: true
+complexity_levels#update:
+  todo: true
+
+coworking#confirm:
+  todo: true
+coworking#confirm_removal:
+  todo: true
+coworking#create:
+  todo: true
+coworking#destroy:
+  todo: true
+
+debugging#debugging:
+  todo: true
+debugging#timeline:
+  todo: true
+
+early_allocations#confirm_with_reason:
+  todo: true
+early_allocations#discretionary:
+  todo: true
+early_allocations#edit:
+  todo: true
+early_allocations#eligible:
+  todo: true
+early_allocations#index:
+  todo: true
+early_allocations#new:
+  todo: true
+early_allocations#oasys_date:
+  todo: true
+early_allocations#show:
+  todo: true
+early_allocations#update:
+  todo: true
+
+female_missing_infos#new:
+  todo: true
+female_missing_infos#update:
+  todo: true
+
+handover_progress_checklists#edit:
+  todo: true
+handover_progress_checklists#update:
+  todo: true
+
+handovers#com_allocation_overdue:
+  todo: true
+handovers#in_progress:
+  todo: true
+handovers#overdue_tasks:
+  todo: true
+handovers#upcoming:
+  todo: true
+
+handovers/email_preferences#edit:
+  todo: true
+handovers/email_preferences#update:
+  todo: true
+
+manage/audit_events#index:
+  todo: true
+
+manage/deallocate_poms#confirm:
+  todo: true
+manage/deallocate_poms#search:
+  todo: true
+manage/deallocate_poms#update:
+  todo: true
+
+manage/handover_changes#historic:
+  todo: true
+manage/handover_changes#live:
+  todo: true
+
+onboarding#check_answers:
+  todo: true
+onboarding#confirmation:
+  todo: true
+onboarding#error:
+  todo: true
+onboarding#position:
+  todo: true
+onboarding#search:
+  todo: true
+onboarding#working_pattern:
+  todo: true
+
+parole_cases#index:
+  todo: true
+
+parole_reviews#edit:
+  todo: true
+parole_reviews#update:
+  todo: true
+
+poms#confirm_delete:
+  todo: true
+poms#confirm_removal:
+  todo: true
+poms#destroy:
+  todo: true
+poms#edit:
+  todo: true
+poms#index:
+  todo: true
+poms#reallocate:
+  todo: true
+poms#show:
+  todo: true
+poms#show_non_pom:
+  todo: true
+poms#update:
+  todo: true
+
+prisoners#allocated:
+  todo: true
+prisoners#missing_information:
+  todo: true
+prisoners#review_allocations:
+  todo: true
+prisoners#review_case_details:
+  todo: true
+prisoners#review_changes:
+  todo: true
+prisoners#unallocated:
+  todo: true
+
+reallocations/journey#complete:
+  todo: true
+reallocations/journey#confirmation:
+  todo: true
+reallocations/journey#override:
+  todo: true
+reallocations/journey#summary:
+  todo: true
+reallocations/journey#update_override:
+  todo: true
+
+reallocations/selection#caseload:
+  todo: true
+reallocations/selection#check_compare_list:
+  todo: true
+reallocations/selection#compare_poms:
+  todo: true
+reallocations/selection#create:
+  todo: true
+reallocations/selection#error:
+  todo: true
+reallocations/selection#index:
+  todo: true
+
+responsibilities#confirm:
+  todo: true
+responsibilities#confirm_removal:
+  todo: true
+responsibilities#create:
+  todo: true
+responsibilities#destroy:
+  todo: true
+responsibilities#new:
+  todo: true
+
+victim_liaison_officers#create:
+  todo: true
+victim_liaison_officers#delete:
+  todo: true
+victim_liaison_officers#destroy:
+  todo: true
+victim_liaison_officers#edit:
+  todo: true
+victim_liaison_officers#new:
+  todo: true
+victim_liaison_officers#update:
+  todo: true

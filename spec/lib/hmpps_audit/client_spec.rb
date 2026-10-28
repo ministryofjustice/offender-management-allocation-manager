@@ -92,20 +92,6 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
     expect(sqs_client.api_requests.size).to eq(2)
   end
 
-  context 'when the feature flag is disabled' do
-    before do
-      allow(FeatureFlags).to receive(:hmpps_audit).and_return(double(enabled?: false))
-    end
-
-    it 'does not validate, fetch configuration, create a client or log' do
-      expect(ENV).not_to receive(:fetch).with('AUDIT_SQS_QUEUE_URL')
-      expect(Aws::SQS::Client).not_to receive(:new)
-
-      expect(described_class.new.publish(**event.merge(who: nil))).to be_nil
-      expect(Rails.logger).not_to have_received(:info)
-    end
-  end
-
   context 'when running locally' do
     before do
       allow(HostEnv).to receive(:local?).and_return(true)

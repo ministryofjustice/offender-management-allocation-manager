@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-# Audits every request to a controller action declared in config/hmpps_audit.yml.
+# Audits every request to a controller action declared as audited in config/hmpps_audit.yml.
+# When auditing is enabled, requests to actions that aren't declared there at all raise.
+# The spec for config/hmpps_audit.yml catches these in CI regardless.
 # Actions can call `audit` to add details only they know, or a specific failure reason;
 # otherwise the outcome is inferred from the response.
 #
@@ -9,14 +11,10 @@ module HmppsAuditing
 
   included do
     # Wraps authorisation and loading callbacks as well as the action and rendering
-    prepend_around_action :audit_request, if: :audit_config
+    prepend_around_action :audit_request
   end
 
 private
-
-  def audit_config
-    HmppsAudit::Actions.find(controller_path, action_name)
-  end
 
   # `details` are sent on the outcome event
   # `failure` makes the outcome a failure with that reason
@@ -28,10 +26,12 @@ private
   def audit_request
     return yield unless FeatureFlags.hmpps_audit.enabled?
 
+    config = HmppsAudit::Actions.find(controller_path, action_name)
+    return yield unless config
+
     identity = sso_identity
     return yield if identity.absent? || identity.session_expired?
 
-    config = audit_config
     @audit_interaction = HmppsAudit::Interaction.new(
       what: config.fetch(:what),
       who: identity.current_user,
