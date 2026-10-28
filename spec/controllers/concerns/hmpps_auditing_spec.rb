@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe HmppsAuditing, type: :controller do
-  include_context 'with audit event capture'
+  include_context 'with HMPPS audit event capture'
 
   controller(ApplicationController) do
     before_action :authenticate_user
@@ -65,19 +65,19 @@ RSpec.describe HmppsAuditing, type: :controller do
   it 'captures actor, requested subject and correlation for both events' do
     get :show, params: { id: 'A1234BC' }
 
-    expect(audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_SUCCESS])
-    expect(audit_events).to all(include(
-                                  who: 'user-name', subject_type: 'PRISONER_ID', subject_id: 'A1234BC', correlation_id: 'request-id',
-                                  details: {}
-                                ))
+    expect(hmpps_audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_SUCCESS])
+    expect(hmpps_audit_events).to all(include(
+                                        who: 'user-name', subject_type: 'PRISONER_ID', subject_id: 'A1234BC', correlation_id: 'request-id',
+                                        details: {}
+                                      ))
   end
 
   it 'audits denial before the action runs' do
     get :show, params: { id: 'A1234BC', denied: true }
 
     expect(response).to redirect_to('/401')
-    expect(audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_FAILURE])
-    expect(audit_events.last[:details]).to eq(
+    expect(hmpps_audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_FAILURE])
+    expect(hmpps_audit_events.last[:details]).to eq(
       'failureReason' => 'User does not have access to this data'
     )
   end
@@ -88,29 +88,29 @@ RSpec.describe HmppsAuditing, type: :controller do
     get :show, params: { id: 'A1234BC' }
 
     expect(response).to redirect_to('/401')
-    expect(audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_FAILURE])
+    expect(hmpps_audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_FAILURE])
   end
 
   it 'audits a missing requested resource without loading its subject' do
     get :show, params: { id: 'A1234BC', missing: true }
 
-    expect(audit_events.last[:subject_id]).to eq('A1234BC')
-    expect(audit_events.last[:details]).to include('failureReason' => 'Resource not found')
+    expect(hmpps_audit_events.last[:subject_id]).to eq('A1234BC')
+    expect(hmpps_audit_events.last[:details]).to include('failureReason' => 'Resource not found')
   end
 
   it 'uses a specific failure reason set by a callback, even for a successful response' do
     get :show, params: { id: 'A1234BC', alternate: true }
 
     expect(response).to have_http_status(:ok)
-    expect(audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_FAILURE])
-    expect(audit_events.last[:details]).to eq('failureReason' => 'Allocation view unavailable')
+    expect(hmpps_audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_FAILURE])
+    expect(hmpps_audit_events.last[:details]).to eq('failureReason' => 'Allocation view unavailable')
   end
 
   describe 'details' do
     it 'sends present query params on every event and details added by the action on the outcome' do
       patch :update, params: { id: 'Smith', sort_by: 'name' }
 
-      expect(audit_events.map { it[:details] }).to eq(
+      expect(hmpps_audit_events.map { it[:details] }).to eq(
         [
           { 'queryParams' => { 'sortBy' => 'name' } },
           { 'queryParams' => { 'sortBy' => 'name' }, 'results' => { 'resultCount' => 1, 'returnedSubjectIds' => %w[A1234BC] } },
@@ -121,13 +121,13 @@ RSpec.describe HmppsAuditing, type: :controller do
     it 'records empty results with a zero count' do
       patch :update, params: { id: 'Smith', empty: true }
 
-      expect(audit_events.last[:details]).to eq('results' => { 'resultCount' => 0, 'returnedSubjectIds' => [] })
+      expect(hmpps_audit_events.last[:details]).to eq('results' => { 'resultCount' => 0, 'returnedSubjectIds' => [] })
     end
 
     it 'uses a generic failure reason when the action does not add one' do
       patch :update, params: { id: 'Smith', page: '2', invalid: true }
 
-      expect(audit_events.last).to include(
+      expect(hmpps_audit_events.last).to include(
         what: 'SEARCH_ALLOCATION_FAILURE',
         details: { 'queryParams' => { 'page' => '2' }, 'failureReason' => 'Request failed validation' }
       )
@@ -136,7 +136,7 @@ RSpec.describe HmppsAuditing, type: :controller do
     it 'prefers a specific failure reason to the generic one, alongside details' do
       patch :update, params: { id: 'Smith', too_many: true }
 
-      expect(audit_events.last).to include(
+      expect(hmpps_audit_events.last).to include(
         what: 'SEARCH_ALLOCATION_FAILURE',
         details: {
           'limit' => 0,
@@ -152,12 +152,12 @@ RSpec.describe HmppsAuditing, type: :controller do
 
     expect { get :show, params: { id: 'A1234BC' } }.to raise_error(RuntimeError, 'rendering failed')
 
-    expect(audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_FAILURE])
+    expect(hmpps_audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_FAILURE])
   end
 
   context 'when audit delivery fails' do
     before do
-      allow(audit_client).to receive(:publish).and_raise(IOError, 'delivery failed')
+      allow(hmpps_audit_client).to receive(:publish).and_raise(IOError, 'delivery failed')
       allow(Rails.error).to receive(:report)
     end
 
@@ -174,7 +174,7 @@ RSpec.describe HmppsAuditing, type: :controller do
     get :index
 
     expect(response).to have_http_status(:ok)
-    expect(audit_events).to be_empty
+    expect(hmpps_audit_events).to be_empty
   end
 
   it 'raises for undeclared actions' do
@@ -187,7 +187,7 @@ RSpec.describe HmppsAuditing, type: :controller do
     get :show, params: { id: 'A1234BC' }
 
     expect(response).to redirect_to('/auth/hmpps_sso')
-    expect(audit_events).to be_empty
+    expect(hmpps_audit_events).to be_empty
   end
 
   it 'does not audit expired identities' do
@@ -196,7 +196,7 @@ RSpec.describe HmppsAuditing, type: :controller do
     get :show, params: { id: 'A1234BC' }
 
     expect(response).to redirect_to('/auth/hmpps_sso')
-    expect(audit_events).to be_empty
+    expect(hmpps_audit_events).to be_empty
   end
 
   context 'when auditing is disabled' do
@@ -206,7 +206,7 @@ RSpec.describe HmppsAuditing, type: :controller do
       get :show, params: { id: 'A1234BC' }
 
       expect(response).to have_http_status(:ok)
-      expect(audit_events).to be_empty
+      expect(hmpps_audit_events).to be_empty
     end
 
     it 'does not raise for undeclared actions' do

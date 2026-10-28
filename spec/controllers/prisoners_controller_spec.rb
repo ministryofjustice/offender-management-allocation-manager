@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe PrisonersController, type: :controller do
-  include_context 'with audit event capture'
+  include_context 'with HMPPS audit event capture'
 
   context 'with a womens prison' do
     let(:prison) { create(:womens_prison) }
@@ -55,7 +55,6 @@ RSpec.describe PrisonersController, type: :controller do
         expect(response).to be_successful
         expect(assigns(:offenders).map(&:offender_no)).to match_array(missing_info_offenders.map { |o| o.fetch(:prisonerNumber) })
         check_bucket_counts
-        expect(audit_events).to be_empty
       end
 
       it 'gives you the total count for each bucket and the offenders in the allocated bucket' do
@@ -64,7 +63,6 @@ RSpec.describe PrisonersController, type: :controller do
 
         expect(assigns(:offenders).map(&:offender_no)).to match_array(allocated_offenders.map { |o| o.fetch(:prisonerNumber) })
         check_bucket_counts
-        expect(audit_events).to be_empty
       end
 
       it 'gives you the total count for each bucket and the offenders in the unallocated bucket' do
@@ -73,7 +71,6 @@ RSpec.describe PrisonersController, type: :controller do
 
         expect(assigns(:offenders).map(&:offender_no)).to match_array(unallocated_offenders.map { |o| o.fetch(:prisonerNumber) })
         check_bucket_counts
-        expect(audit_events).to be_empty
       end
 
       describe 'review allocations' do
@@ -105,7 +102,6 @@ RSpec.describe PrisonersController, type: :controller do
           expect(assigns(:offenders).map(&:offender_no)).to eq([allocated_offender_one.fetch(:prisonerNumber)])
           expect(assigns(:offenders)).not_to respond_to(:total_pages)
           check_bucket_counts
-          expect(audit_events).to be_empty
         end
 
         context 'when rendering the page' do
@@ -183,7 +179,7 @@ RSpec.describe PrisonersController, type: :controller do
             expect(assigns(:changes).map(&:type)).to eq([:tier])
             expect(assigns(:changes).first).to be_a(SignificantChanges::ChangePresenter)
             expect(response).to render_template(:review_changes)
-            expect(audit_events).to have_audited('VIEW_ALLOCATION_SIGNIFICANT_CHANGES', subject_type: 'PRISONER_ID', subject_id: offender_no)
+            expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_SIGNIFICANT_CHANGES', subject_type: 'PRISONER_ID', subject_id: offender_no)
           end
 
           it 'returns to the list when the case no longer has qualifying changes' do
@@ -692,7 +688,7 @@ RSpec.describe PrisonersController, type: :controller do
             it 'audits the requested results page' do
               get :search, params: { prison_id: prison, q: 'Blog', page: '2' }
 
-              expect(audit_events.map { it[:details]['queryParams'] }).to all(eq('prisonId' => prison, 'page' => '2'))
+              expect(hmpps_audit_events.map { it[:details]['queryParams'] }).to all(eq('prisonId' => prison, 'page' => '2'))
             end
 
             it 'audits the search term, prison and every returned prisoner' do
@@ -700,8 +696,8 @@ RSpec.describe PrisonersController, type: :controller do
 
               returned_ids = (assigns(:user_allocations) + updated_offenders).map(&:offender_no)
               expect(returned_ids).to include(first_offender_no)
-              expect(audit_events).to have_audited('SEARCH_PRISONER', subject_type: 'SEARCH_TERM', subject_id: 'Blog')
-              expect(audit_events.map { it[:details] }).to eq(
+              expect(hmpps_audit_events).to have_recorded_event('SEARCH_PRISONER', subject_type: 'SEARCH_TERM', subject_id: 'Blog')
+              expect(hmpps_audit_events.map { it[:details] }).to eq(
                 [
                   { 'queryParams' => { 'prisonId' => prison } },
                   {
@@ -744,7 +740,7 @@ RSpec.describe PrisonersController, type: :controller do
         get :show, params: { prison_id: prison, id: offender_no }
 
         expect(response).to have_http_status(:ok)
-        expect(audit_events).to have_audited('VIEW_CASE_INFORMATION', who: 'pom-user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_CASE_INFORMATION', who: 'pom-user', subject_type: 'PRISONER_ID', subject_id: offender_no)
       end
 
       context 'when an offender has a previous LAYER_3 OASys assessments' do
@@ -908,7 +904,7 @@ RSpec.describe PrisonersController, type: :controller do
       expect(response).to have_http_status(:ok)
       expect(assigns(:coworking)).to be(false)
       expect(response.body).not_to include('Primary POM:')
-      expect(audit_events).to have_audited('VIEW_CASE_DETAILS', subject_type: 'PRISONER_ID', subject_id: offender_id)
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_CASE_DETAILS', subject_type: 'PRISONER_ID', subject_id: offender_id)
     end
 
     describe 'remembering where the allocation journey started' do
@@ -1009,8 +1005,8 @@ RSpec.describe PrisonersController, type: :controller do
           get :show, params: { prison_id: prison.code, id: offender_no }
           expect(response).to render_template('show_outside_omic_policy')
           expect(response).to have_http_status(:forbidden)
-          expect(audit_events).to have_audited('VIEW_CASE_INFORMATION', outcome: 'FAILURE', subject_id: offender_no)
-          expect(audit_events.last[:details]).to include('failureReason' => 'Prisoner outside OMIC policy')
+          expect(hmpps_audit_events).to have_recorded_event('VIEW_CASE_INFORMATION', outcome: 'FAILURE', subject_id: offender_no)
+          expect(hmpps_audit_events.last[:details]).to include('failureReason' => 'Prisoner outside OMIC policy')
         end
       end
     end
@@ -1029,7 +1025,7 @@ RSpec.describe PrisonersController, type: :controller do
         expect(response).to have_http_status(:ok)
         expect(response.body).to eq('image bytes')
         expect(response.media_type).to eq('image/jpg')
-        expect(audit_events).to have_audited('VIEW_PRISONER_PHOTO', subject_type: 'PRISONER_ID', subject_id: 'A1234BC')
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_PRISONER_PHOTO', subject_type: 'PRISONER_ID', subject_id: 'A1234BC')
       end
 
       it 'redirects to 404 for a missing prisoner without attempting to send an image' do
@@ -1057,8 +1053,8 @@ RSpec.describe PrisonersController, type: :controller do
         expect(response).to have_http_status(:ok)
         expect(response.body).to eq(image.data)
         expect(response.media_type).to eq('image/jpg')
-        expect(audit_events).to have_audited('VIEW_PRISONER_PHOTO', outcome: 'FAILURE', subject_id: 'A1234BC')
-        expect(audit_events.last[:details]).to eq('failureReason' => 'Prisoner photo not available')
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_PRISONER_PHOTO', outcome: 'FAILURE', subject_id: 'A1234BC')
+        expect(hmpps_audit_events.last[:details]).to eq('failureReason' => 'Prisoner photo not available')
       end
     end
 

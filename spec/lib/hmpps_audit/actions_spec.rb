@@ -8,7 +8,7 @@ RSpec.describe HmppsAudit::Actions do
       "#{controller_path}##{action}" if controller && controller < ApplicationController
     }.uniq
 
-    it 'declares every routed action as audited or exempt' do
+    it 'declares every routed action as audited, exempt or todo' do
       missing = routed_actions - described_class.all.keys
 
       expect(missing).to be_empty, "Declare these actions in config/hmpps_audit.yml: #{missing.join(', ')}"

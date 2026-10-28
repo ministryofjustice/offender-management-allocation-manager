@@ -1,4 +1,4 @@
-RSpec::Matchers.define :have_audited do |event, outcome: 'SUCCESS', **attributes|
+RSpec::Matchers.define :have_recorded_event do |event, outcome: 'SUCCESS', **attributes|
   match do |events|
     values_match?(
       [
@@ -10,6 +10,6 @@ RSpec::Matchers.define :have_audited do |event, outcome: 'SUCCESS', **attributes
   end
 
   failure_message do |events|
-    "expected #{event}_ATTEMPT and #{event}_#{outcome} with #{attributes.inspect}, got #{events.inspect}"
+    "expected HMPPS audit events #{event}_ATTEMPT and #{event}_#{outcome} with #{attributes.inspect}, got #{events.inspect}"
   end
 end
