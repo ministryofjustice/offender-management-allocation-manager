@@ -14,13 +14,13 @@ RSpec.describe HmppsAuditing, type: :controller do
     def update
       return head :unprocessable_entity if params[:invalid]
 
-      results = { 'results' => { 'returnedSubjectIds' => %w[A1234BC] } }
+      results = params[:empty] ? [] : %w[A1234BC]
       if params[:too_many]
-        audit(details: results, failure: 'Too many results')
+        audit(details: { 'limit' => 0 }, results:, failure: 'Too many results')
         return head :unprocessable_entity
       end
 
-      audit(details: results)
+      audit(results:)
       render plain: 'A1234BC'
     end
 
@@ -113,9 +113,15 @@ RSpec.describe HmppsAuditing, type: :controller do
       expect(audit_events.map { it[:details] }).to eq(
         [
           { 'queryParams' => { 'sortBy' => 'name' } },
-          { 'queryParams' => { 'sortBy' => 'name' }, 'results' => { 'returnedSubjectIds' => %w[A1234BC] } },
+          { 'queryParams' => { 'sortBy' => 'name' }, 'results' => { 'resultCount' => 1, 'returnedSubjectIds' => %w[A1234BC] } },
         ]
       )
+    end
+
+    it 'records empty results with a zero count' do
+      patch :update, params: { id: 'Smith', empty: true }
+
+      expect(audit_events.last[:details]).to eq('results' => { 'resultCount' => 0, 'returnedSubjectIds' => [] })
     end
 
     it 'uses a generic failure reason when the action does not add one' do
@@ -132,7 +138,11 @@ RSpec.describe HmppsAuditing, type: :controller do
 
       expect(audit_events.last).to include(
         what: 'SEARCH_ALLOCATION_FAILURE',
-        details: { 'results' => { 'returnedSubjectIds' => %w[A1234BC] }, 'failureReason' => 'Too many results' }
+        details: {
+          'limit' => 0,
+          'results' => { 'resultCount' => 1, 'returnedSubjectIds' => %w[A1234BC] },
+          'failureReason' => 'Too many results'
+        }
       )
     end
   end

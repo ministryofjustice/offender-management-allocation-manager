@@ -58,9 +58,7 @@ class PrisonersController < PrisonsApplicationController
     @offenders, @user_allocations = get_slice_for_page(offenders, @current_user.staff_id)
     MetricsService.instance.increment_search_count
 
-    returned_ids = (@user_allocations + @offenders).map(&:offender_no)
-    audit(details: { 'results' => { 'resultCount' => returned_ids.size, 'returnedSubjectIds' => returned_ids } })
-
+    audit(results: (@user_allocations + @offenders).map(&:offender_no))
     render @current_user.allocations.empty? ? 'search' : 'search_global'
   end
 

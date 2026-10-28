@@ -17,9 +17,11 @@ module HmppsAuditing
 private
 
   # `details` are sent on the outcome event
+  # `results` are the displayed subject IDs, sent with their count on the outcome event
   # `failure` makes the outcome a failure with that reason
-  def audit(details: nil, failure: nil)
+  def audit(details: nil, results: nil, failure: nil)
     @audit_interaction&.add_details(details) if details
+    @audit_interaction&.add_details('results' => { 'resultCount' => results.size, 'returnedSubjectIds' => results }) if results
     @audit_failure_reason = failure if failure
   end
 
