@@ -23,6 +23,16 @@ prisoners#image:
   subject_type: PRISONER_ID
   subject_id: prisoner_id
 
+prisoners#review_case_details:
+  what: VIEW_CASE_DETAILS
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+
+prisoners#review_changes:
+  what: VIEW_ALLOCATION_SIGNIFICANT_CHANGES
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+
 prisoners#search:
   what: SEARCH_PRISONER
   subject_type: SEARCH_TERM
@@ -206,11 +216,6 @@ manage/deallocate_poms#search:
 manage/deallocate_poms#update:
   todo: true
 
-manage/handover_changes#historic:
-  todo: true
-manage/handover_changes#live:
-  todo: true
-
 onboarding#check_answers:
   todo: true
 onboarding#confirmation:
@@ -256,10 +261,6 @@ prisoners#allocated:
 prisoners#missing_information:
   todo: true
 prisoners#review_allocations:
-  todo: true
-prisoners#review_case_details:
-  todo: true
-prisoners#review_changes:
   todo: true
 prisoners#unallocated:
   todo: true
