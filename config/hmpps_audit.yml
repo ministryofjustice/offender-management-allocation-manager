@@ -99,10 +99,6 @@ victim_liaison_officers#edit:
   what: VIEW_VLO_DETAILS_FORM
   subject_type: PRISONER_ID
   subject_id: prisoner_id
-victim_liaison_officers#delete:
-  what: VIEW_VLO_REMOVAL_CONFIRMATION
-  subject_type: PRISONER_ID
-  subject_id: prisoner_id
 
 # Exempted actions
 
@@ -121,6 +117,16 @@ reallocations/selection#error:
 
 poms#show_non_pom:
   exempt: Static troubleshooting page with no prisoner or staff data
+poms#confirm_delete:
+  exempt: Intermediate confirmation page
+poms#confirm_removal:
+  exempt: Intermediate confirmation page
+
+coworking#confirm_removal:
+  exempt: Intermediate confirmation page
+
+victim_liaison_officers#delete:
+  exempt: Intermediate confirmation page
 
 health#index:
   exempt: Infrastructure health check
@@ -216,8 +222,6 @@ complexity_levels#update:
 
 coworking#confirm:
   todo: true
-coworking#confirm_removal:
-  todo: true
 coworking#create:
   todo: true
 coworking#destroy:
@@ -264,13 +268,6 @@ handovers/email_preferences#update:
 manage/audit_events#index:
   todo: true
 
-manage/deallocate_poms#confirm:
-  todo: true
-manage/deallocate_poms#search:
-  todo: true
-manage/deallocate_poms#update:
-  todo: true
-
 onboarding#check_answers:
   todo: true
 onboarding#confirmation:
@@ -288,10 +285,6 @@ parole_cases#index:
 parole_reviews#update:
   todo: true
 
-poms#confirm_delete:
-  todo: true
-poms#confirm_removal:
-  todo: true
 poms#destroy:
   todo: true
 poms#edit:

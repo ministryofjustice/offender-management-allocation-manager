@@ -210,10 +210,6 @@ Rails.application.routes.draw do
   # '/admin' was taken by ActiveAdmin in the past
   namespace :manage do
     resources :audit_events, only: %i[index]
-
-    get 'deallocate_poms', to: 'deallocate_poms#search'
-    patch 'deallocate_poms/confirm', to: 'deallocate_poms#confirm'
-    patch 'deallocate_poms', to: 'deallocate_poms#update', as: :deallocate_poms_update
   end
 
   mount Rswag::Ui::Engine => '/api-docs'

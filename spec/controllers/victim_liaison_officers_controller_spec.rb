@@ -37,12 +37,12 @@ RSpec.describe VictimLiaisonOfficersController, type: :controller do
   end
 
   describe '#delete' do
-    it 'displays the removal confirmation and audits the prisoner viewed' do
+    it 'displays the removal confirmation' do
       get :delete, params: { prison_id: prison.code, prisoner_id: offender_no, id: vlo.id }
 
       expect(response).to have_http_status(:ok)
       expect(assigns(:vlo)).to eq(vlo)
-      expect(hmpps_audit_events).to have_recorded_event('VIEW_VLO_REMOVAL_CONFIRMATION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+      expect(hmpps_audit_events).to be_empty
     end
   end
 end
