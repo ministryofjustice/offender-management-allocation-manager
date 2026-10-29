@@ -6,7 +6,6 @@ feature 'admin urls' do
     [
       '/sidekiq',
       '/manage/audit_events',
-      '/manage/deallocate_poms',
       "/prisons/#{prison_code}/debugging",
     ]
   end
