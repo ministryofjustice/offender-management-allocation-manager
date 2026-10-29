@@ -41,6 +41,7 @@ RSpec.describe AllocationsController, type: :controller do
       create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no, primary_pom_nomis_id: poms.last.staffId)
       get :history, params: { prison_id: prison_code, prisoner_id: offender_no }
       expect(response).to have_http_status(:ok)
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_CASE_HISTORY', who: 'Alice', subject_type: 'PRISONER_ID', subject_id: offender_no)
     end
   end
 

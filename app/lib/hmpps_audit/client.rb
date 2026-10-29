@@ -12,17 +12,22 @@ class HmppsAudit::Client
     )
 
     unless HostEnv.local?
-      response = sqs_client.send_message(queue_url:, message_body: message.to_h.to_json)
+      started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      begin
+        response = sqs_client.send_message(queue_url:, message_body: message.to_h.to_json)
+      ensure
+        send_duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round(2)
+      end
     end
 
     log(
       :info, 'hmpps_audit',
       what: message.what, subject_type: message.subject_type, correlation_id: message.correlation_id,
-      sqs_message_id: response&.message_id, failure_reason: details&.fetch('failureReason', nil),
+      sqs_message_id: response&.message_id, failure_reason: details&.fetch('failureReason', nil), send_duration_ms:,
     )
     response
   rescue Aws::SQS::Errors::ServiceError, Seahorse::Client::NetworkingError => e
-    log(:error, 'hmpps_audit_failed', what:, subject_type:, correlation_id:, error_class: e.class.name)
+    log(:error, 'hmpps_audit_failed', what:, subject_type:, correlation_id:, error_class: e.class.name, send_duration_ms:)
     raise
   end
 

@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe AllocationRetentionsController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let(:prison) { create(:prison) }
   let(:offender_no) { 'A1234BC' }
   let(:offender) do
@@ -26,6 +28,7 @@ RSpec.describe AllocationRetentionsController, type: :controller do
     expect(response).to be_successful
     expect(assigns(:override)).to be_a(OverrideForm)
     expect(assigns(:override).override_reasons).to be_empty
+    expect(hmpps_audit_events).to have_recorded_event('VIEW_NEW_ALLOCATION_RETENTION_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
   end
 
   it 'loads the allocated POM when evaluating real significant changes' do

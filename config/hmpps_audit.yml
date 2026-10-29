@@ -8,8 +8,60 @@
 # subject_id:    request param holding the subject (path or query string), optional
 # query_params:  request params sent as details.queryParams when present, optional
 #
+allocation_retentions#new:
+  what: VIEW_NEW_ALLOCATION_RETENTION_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+
 allocations#show:
   what: VIEW_ALLOCATION_INFORMATION
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+
+allocations#history:
+  what: VIEW_CASE_HISTORY
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+
+case_information#edit:
+  what: VIEW_CASE_INFORMATION_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+case_information#new:
+  what: VIEW_NEW_CASE_INFORMATION_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+
+complexity_levels#edit:
+  what: VIEW_COMPLEXITY_LEVEL_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+
+early_allocations#index:
+  what: VIEW_EARLY_ALLOCATION_ASSESSMENTS
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+early_allocations#edit:
+  what: VIEW_EARLY_ALLOCATION_DECISION_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+early_allocations#new:
+  what: VIEW_EARLY_ALLOCATION_ASSESSMENT_START
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+
+female_missing_infos#new:
+  what: VIEW_NEW_COMPLEXITY_LEVEL_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+
+handover_progress_checklists#edit:
+  what: VIEW_HANDOVER_PROGRESS_CHECKLIST
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+
+parole_reviews#edit:
+  what: VIEW_PAROLE_HEARING_OUTCOME_FORM
   subject_type: PRISONER_ID
   subject_id: prisoner_id
 
@@ -39,12 +91,36 @@ prisoners#search:
   subject_id: q
   query_params: [prison_id, page]
 
+victim_liaison_officers#new:
+  what: VIEW_NEW_VLO_DETAILS_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+victim_liaison_officers#edit:
+  what: VIEW_VLO_DETAILS_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+victim_liaison_officers#delete:
+  what: VIEW_VLO_REMOVAL_CONFIRMATION
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+
+# Exempted actions
+
 errors#unauthorized:
   exempt: Static error page with no prisoner or staff data
 errors#not_found:
   exempt: Static error page with no prisoner or staff data
 errors#internal_server_error:
   exempt: Static error page with no prisoner or staff data
+
+onboarding#error:
+  exempt: Static error page with no prisoner or staff data
+
+reallocations/selection#error:
+  exempt: Static error page with no prisoner or staff data
+
+poms#show_non_pom:
+  exempt: Static troubleshooting page with no prisoner or staff data
 
 health#index:
   exempt: Infrastructure health check
@@ -96,12 +172,10 @@ root#index:
 root#handovers_email_preferences:
   exempt: Redirect from email links to the email preferences page
 
-# Not yet evaluated below.
+# TODO actions: not yet evaluated.
 # Replace each with an audit, or an exemption with a real reason.
 
 allocation_retentions#create:
-  todo: true
-allocation_retentions#new:
   todo: true
 
 allocation_staff#check_compare_list:
@@ -109,9 +183,6 @@ allocation_staff#check_compare_list:
 allocation_staff#compare_poms:
   todo: true
 allocation_staff#index:
-  todo: true
-
-allocations#history:
   todo: true
 
 build_allocations#new:
@@ -122,10 +193,6 @@ build_allocations#update:
   todo: true
 
 case_information#create:
-  todo: true
-case_information#edit:
-  todo: true
-case_information#new:
   todo: true
 case_information#update:
   todo: true
@@ -144,8 +211,6 @@ caseload#updates_required:
 caseload_global#index:
   todo: true
 
-complexity_levels#edit:
-  todo: true
 complexity_levels#update:
   todo: true
 
@@ -167,13 +232,7 @@ early_allocations#confirm_with_reason:
   todo: true
 early_allocations#discretionary:
   todo: true
-early_allocations#edit:
-  todo: true
 early_allocations#eligible:
-  todo: true
-early_allocations#index:
-  todo: true
-early_allocations#new:
   todo: true
 early_allocations#oasys_date:
   todo: true
@@ -182,13 +241,9 @@ early_allocations#show:
 early_allocations#update:
   todo: true
 
-female_missing_infos#new:
-  todo: true
 female_missing_infos#update:
   todo: true
 
-handover_progress_checklists#edit:
-  todo: true
 handover_progress_checklists#update:
   todo: true
 
@@ -220,8 +275,6 @@ onboarding#check_answers:
   todo: true
 onboarding#confirmation:
   todo: true
-onboarding#error:
-  todo: true
 onboarding#position:
   todo: true
 onboarding#search:
@@ -232,8 +285,6 @@ onboarding#working_pattern:
 parole_cases#index:
   todo: true
 
-parole_reviews#edit:
-  todo: true
 parole_reviews#update:
   todo: true
 
@@ -250,8 +301,6 @@ poms#index:
 poms#reallocate:
   todo: true
 poms#show:
-  todo: true
-poms#show_non_pom:
   todo: true
 poms#update:
   todo: true
@@ -284,8 +333,6 @@ reallocations/selection#compare_poms:
   todo: true
 reallocations/selection#create:
   todo: true
-reallocations/selection#error:
-  todo: true
 reallocations/selection#index:
   todo: true
 
@@ -302,13 +349,7 @@ responsibilities#new:
 
 victim_liaison_officers#create:
   todo: true
-victim_liaison_officers#delete:
-  todo: true
 victim_liaison_officers#destroy:
-  todo: true
-victim_liaison_officers#edit:
-  todo: true
-victim_liaison_officers#new:
   todo: true
 victim_liaison_officers#update:
   todo: true

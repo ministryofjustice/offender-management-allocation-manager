@@ -21,6 +21,8 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
     allow(Rails.logger).to receive(:info)
     allow(Rails.logger).to receive(:error)
     sqs_client.stub_responses(:send_message, message_id: 'message-123')
+    allow(Process).to receive(:clock_gettime).and_call_original
+    allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC).and_return(100.0, 100.125)
   end
 
   it 'sends the serialised message directly to SQS' do
@@ -39,7 +41,7 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
     client.publish(**event)
 
     expect(Rails.logger).to have_received(:info).with(
-      'event=hmpps_audit|{"what":"VIEW_PRISONER","subject_type":"PRISONER_ID","correlation_id":"request-123","sqs_message_id":"message-123"}'
+      'event=hmpps_audit|{"what":"VIEW_PRISONER","subject_type":"PRISONER_ID","correlation_id":"request-123","sqs_message_id":"message-123","send_duration_ms":125.0}'
     )
   end
 
@@ -58,6 +60,7 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
         correlation_id: 'request-123',
         sqs_message_id: local ? nil : 'message-123',
         failure_reason: 'Resource not found',
+        send_duration_ms: local ? nil : 125.0,
       }.compact
       expect(Rails.logger).to have_received(:info).with("event=hmpps_audit|#{attributes.to_json}")
     end
@@ -134,6 +137,7 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
           subject_type: 'PRISONER_ID',
           correlation_id: 'request-123',
           error_class: error.class.name,
+          send_duration_ms: 125.0,
         }.to_json}"
       )
       expect(Rails.logger).not_to have_received(:info)
