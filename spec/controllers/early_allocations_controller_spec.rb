@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe EarlyAllocationsController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   # any date less than 3 months in the past
   let(:valid_date) { Time.zone.today - 2.months }
   let(:s1_boolean_param_names) { [:convicted_under_terrorisom_act_2000, :high_profile, :serious_crime_prevention_order, :mappa_level_3, :cppc_case] }
@@ -69,12 +71,23 @@ RSpec.describe EarlyAllocationsController, type: :controller do
         assigned_early_allocations = assigns(:early_allocations)
         expect(assigned_early_allocations.size).to eq(5)
         expect(assigned_early_allocations.map(&:nomis_offender_id).uniq).to eq([nomis_offender_id])
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_EARLY_ALLOCATION_ASSESSMENTS', who: 'alice', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
       end
 
       it 'sorts the Early Allocations in descending date order' do
         expected_order = early_allocations.map { |ea| ea.created_at.to_date }.sort.reverse
         actual_order = assigns(:early_allocations).map { |ea| ea.created_at.to_date }
         expect(actual_order).to eq(expected_order)
+      end
+    end
+
+    describe '#edit' do
+      it 'displays the latest assessment decision form and audits the prisoner viewed' do
+        get :edit, params: { prison_id: prison, prisoner_id: nomis_offender_id }
+
+        expect(response).to have_http_status(:ok)
+        expect(assigns(:early_allocation)).to eq(early_allocations.last)
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_EARLY_ALLOCATION_DECISION_FORM', who: 'alice', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
       end
     end
 
@@ -126,6 +139,13 @@ RSpec.describe EarlyAllocationsController, type: :controller do
   describe '#new' do
     let(:release_date) { Time.zone.today + 17.months }
 
+    it 'displays the assessment form and audits the prisoner viewed' do
+      get :new, params: { prison_id: prison, prisoner_id: nomis_offender_id }
+
+      expect(response).to render_template(:new)
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_EARLY_ALLOCATION_ASSESSMENT_START', who: 'alice', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
+    end
+
     context 'with no ldu email address' do
       before do
         mpc_offender.model.case_information.update!(local_delivery_unit: nil)
@@ -136,6 +156,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
                             prisoner_id: nomis_offender_id }
 
         assert_template 'dead_end'
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_EARLY_ALLOCATION_ASSESSMENT_START', who: 'alice', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
       end
     end
   end

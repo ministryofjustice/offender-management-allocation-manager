@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe CaseInformationController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let(:prison) { create(:prison) }
   let(:offender) { build(:nomis_offender, prisonId: prison.code) }
   let(:offender_no) { offender.fetch(:prisonerNumber) }
@@ -13,6 +15,17 @@ RSpec.describe CaseInformationController, type: :controller do
     stub_offender(offender)
     stub_sso_data(prison.code)
     stub_poms(prison.code, [pom])
+  end
+
+  describe '#edit' do
+    it 'displays the manual-entry form and audits the prisoner viewed' do
+      create(:case_information, :manual_entry, offender: offender_record)
+
+      get :edit, params: { prison_id: prison.code, prisoner_id: offender_no }
+
+      expect(response).to have_http_status(:ok)
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_CASE_INFORMATION_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+    end
   end
 
   describe '#create' do
@@ -271,6 +284,7 @@ RSpec.describe CaseInformationController, type: :controller do
           get :new, params: { prison_id: prison.code, prisoner_id: offender_no }
 
           expect(response).to have_http_status(:ok)
+          expect(hmpps_audit_events).to have_recorded_event('VIEW_NEW_CASE_INFORMATION_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
         end
       end
 

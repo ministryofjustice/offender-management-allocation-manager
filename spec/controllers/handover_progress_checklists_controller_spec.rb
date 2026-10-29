@@ -1,4 +1,6 @@
 RSpec.describe HandoverProgressChecklistsController do
+  include_context 'with HMPPS audit event capture'
+
   let(:prison) { FactoryBot.create :prison }
   let(:prison_code) { prison.code }
   let(:current_pom) { instance_double(StaffMember, :pom_staff_member, staff_id: 'STAFF1', has_allocation?: false) }
@@ -33,9 +35,11 @@ RSpec.describe HandoverProgressChecklistsController do
       end
 
       it 'assigns the offender' do
+        stub_sso_data(prison_code)
         get :edit, params: default_params
 
         expect(assigns(:offender)).to eq offender
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_HANDOVER_PROGRESS_CHECKLIST', who: 'user', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
       end
 
       it 'assigns existing record if that exists' do

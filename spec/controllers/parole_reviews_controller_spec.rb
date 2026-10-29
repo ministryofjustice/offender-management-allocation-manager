@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe ParoleReviewsController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let(:prison) { create(:prison).code }
   let(:offender) { build(:mpc_offender, :with_persona, :robin_hoodwink) }
   let(:parole_review) { build(:parole_review, :pom_task) }
@@ -20,6 +22,7 @@ RSpec.describe ParoleReviewsController, type: :controller do
     it 'assigns the requested parole review as @parole_review' do
       get :edit, params: { prison_id: prison, prisoner_id: offender.offender_no, id: parole_review.review_id }
       expect(assigns(:parole_review)).to eq(parole_review)
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_PAROLE_HEARING_OUTCOME_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender.offender_no)
     end
 
     it 'scopes the lookup by review_id and prisoner NOMIS ID' do

@@ -13,6 +13,22 @@ feature "womens missing info journey" do
 
   include_context 'with missing information feature defaults'
 
+  context 'when viewing the missing complexity form' do
+    include_context 'with HMPPS audit event capture'
+
+    let(:complexity) { nil }
+
+    it 'audits the redirected case information view separately from the displayed complexity form' do
+      start_missing_information_journey(prison_code: prison.code, prisoner_id: prisoner_id)
+
+      expect(page).to have_content('Add complexity of need level')
+      expect(hmpps_audit_events.size).to eq(4)
+      expect(hmpps_audit_events.first(2)).to have_recorded_event('VIEW_NEW_CASE_INFORMATION_FORM', outcome: 'FAILURE', who: username, subject_type: 'PRISONER_ID', subject_id: prisoner_id)
+      expect(hmpps_audit_events.last(2)).to have_recorded_event('VIEW_NEW_COMPLEXITY_LEVEL_FORM', who: username, subject_type: 'PRISONER_ID', subject_id: prisoner_id)
+      expect(hmpps_audit_events[1].fetch(:details)).to include('failureReason' => 'Request redirected before completing the operation')
+    end
+  end
+
   context 'without any data' do
     let(:complexity) { nil }
 

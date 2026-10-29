@@ -1,4 +1,6 @@
 RSpec.describe ComplexityLevelsController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let(:offender) { build(:nomis_offender, complexityLevel: 'medium', prisonId: womens_prison.code, firstName: 'Sally', lastName: 'Albright') }
   let(:womens_prison) { create(:womens_prison) }
   let(:offenders) { [offender] }
@@ -21,6 +23,7 @@ RSpec.describe ComplexityLevelsController, type: :controller do
       get :edit,  params: { prison_id: womens_prison.code, prisoner_id: offender_no }
       expect(response).to be_successful
       expect(assigns(:complexity).level).to eq('medium')
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_COMPLEXITY_LEVEL_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
       expect(assigns(:return_path)).to eq(
         prison_prisoner_review_case_details_path(prison_id: womens_prison.code, prisoner_id: offender_no)
       )
