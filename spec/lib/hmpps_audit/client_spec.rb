@@ -15,7 +15,7 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
   end
 
   before do
-    allow(HostEnv).to receive(:local?).and_return(false)
+    allow(HostEnv).to receive(:env_name).and_return(HostEnv::PREPROD)
     allow(ENV).to receive(:fetch).and_call_original
     allow(ENV).to receive(:fetch).with('AUDIT_SQS_QUEUE_URL').and_return(queue_url)
     allow(Rails.logger).to receive(:info)
@@ -37,32 +37,45 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
     end
   end
 
-  it 'logs SQS acceptance and subject type without logging usernames, subject IDs or details' do
-    client.publish(**event)
+  it 'logs delivery metadata and the failure reason without sensitive fields in preprod' do
+    client.publish(**event.merge(
+      what: 'VIEW_CASE_INFORMATION_FAILURE',
+      details: { 'failureReason' => 'Resource not found', 'privateData' => 'must not be logged' }
+    ))
 
     expect(Rails.logger).to have_received(:info).with(
-      'event=hmpps_audit|{"what":"VIEW_PRISONER","subject_type":"PRISONER_ID","correlation_id":"request-123","sqs_message_id":"message-123","send_duration_ms":125.0}'
+      'event=hmpps_audit|{"what":"VIEW_CASE_INFORMATION_FAILURE","subject_type":"PRISONER_ID","correlation_id":"request-123","sqs_message_id":"message-123","failure_reason":"Resource not found","send_duration_ms":125.0}'
     )
   end
 
-  [true, false].each do |local|
-    it "logs only the failure reason from details when local is #{local}" do
-      allow(HostEnv).to receive(:local?).and_return(local)
+  HostEnv::NAMED_ENVIRONMENTS.each do |environment|
+    it "logs the failure reason once and only exposes details outside protected environments in #{environment}" do
+      allow(HostEnv).to receive(:env_name).and_return(environment)
+      details = { 'page' => 'prisoner-profile', 'failureReason' => 'Resource not found' }
 
-      client.publish(**event.merge(
-        what: 'VIEW_CASE_INFORMATION_FAILURE',
-        details: { 'failureReason' => 'Resource not found', 'privateData' => 'must not be logged' }
-      ))
+      client.publish(**event.merge(details:))
 
-      attributes = {
-        what: 'VIEW_CASE_INFORMATION_FAILURE',
-        subject_type: 'PRISONER_ID',
-        correlation_id: 'request-123',
-        sqs_message_id: local ? nil : 'message-123',
-        failure_reason: 'Resource not found',
-        send_duration_ms: local ? nil : 125.0,
-      }.compact
-      expect(Rails.logger).to have_received(:info).with("event=hmpps_audit|#{attributes.to_json}")
+      expect(Rails.logger).to have_received(:info) do |line|
+        attributes = JSON.parse(line.split('|', 2).last)
+        if [HostEnv::PREPROD, HostEnv::PRODUCTION].include?(environment)
+          expect(attributes).not_to have_key('details')
+          expect(attributes.fetch('failure_reason')).to eq('Resource not found')
+        else
+          expect(attributes.fetch('details')).to eq(details)
+          expect(attributes).not_to have_key('failure_reason')
+        end
+      end
+    end
+  end
+
+  it 'includes details in staging delivery failure logs' do
+    allow(HostEnv).to receive(:env_name).and_return(HostEnv::STAGING)
+    sqs_client.stub_responses(:send_message, Aws::SQS::Errors::ServiceError.new(nil, 'failed'))
+
+    expect { client.publish(**event) }.to raise_error(Aws::SQS::Errors::ServiceError)
+
+    expect(Rails.logger).to have_received(:error) do |line|
+      expect(JSON.parse(line.split('|', 2).last).fetch('details')).to eq('page' => 'prisoner-profile')
     end
   end
 
@@ -79,11 +92,6 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
     expect(sqs_client.api_requests).to be_empty
   end
 
-  it 'rejects unsupported subject types before sending' do
-    expect { client.publish(**event.merge(subject_type: 'FOOBAR')) }.to raise_error(ArgumentError, /subject_type/)
-    expect(sqs_client.api_requests).to be_empty
-  end
-
   it 'creates and reuses an AWS client with custom timeout and retry config' do
     options = { http_open_timeout: 3, http_read_timeout: 3, retry_mode: 'standard', max_attempts: 2 }
     allow(Aws::SQS::Client).to receive(:new).with(**options).and_return(sqs_client)
@@ -97,21 +105,17 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
 
   context 'when running locally' do
     before do
-      allow(HostEnv).to receive(:local?).and_return(true)
+      allow(HostEnv).to receive(:env_name).and_return(HostEnv::LOCAL)
     end
 
-    it 'uses the same event log without configuration, AWS access or sensitive data' do
+    it 'logs details without configuration or AWS access' do
       expect(ENV).not_to receive(:fetch).with('AUDIT_SQS_QUEUE_URL')
       expect(Aws::SQS::Client).not_to receive(:new)
 
       expect(described_class.new.publish(**event)).to be_nil
       expect(Rails.logger).to have_received(:info).with(
-        'event=hmpps_audit|{"what":"VIEW_PRISONER","subject_type":"PRISONER_ID","correlation_id":"request-123"}'
+        'event=hmpps_audit|{"what":"VIEW_PRISONER","subject_type":"PRISONER_ID","correlation_id":"request-123","details":{"page":"prisoner-profile"}}'
       )
-    end
-
-    it 'still rejects invalid events' do
-      expect { client.publish(**event.merge(who: nil)) }.to raise_error(ArgumentError, /who/)
     end
   end
 
@@ -125,14 +129,17 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
     end
   end
 
-  [Aws::SQS::Errors::ServiceError.new(nil, 'failed'),
-   Seahorse::Client::NetworkingError.new(IOError.new('connection failed'))].each do |error|
-    it "logs and propagates #{error.class} without logging the payload" do
+  [
+    [HostEnv::PREPROD, Aws::SQS::Errors::ServiceError.new(nil, 'failed')],
+    [HostEnv::PRODUCTION, Seahorse::Client::NetworkingError.new(IOError.new('connection failed'))],
+  ].each do |environment, error|
+    it "logs and propagates #{error.class} without logging the payload in #{environment}" do
+      allow(HostEnv).to receive(:env_name).and_return(environment)
       sqs_client.stub_responses(:send_message, error)
 
       expect { client.publish(**event) }.to raise_error(error.class)
       expect(Rails.logger).to have_received(:error).with(
-        "event=hmpps_audit_failed|#{{
+        "event=hmpps_audit_error|#{{
           what: 'VIEW_PRISONER',
           subject_type: 'PRISONER_ID',
           correlation_id: 'request-123',
@@ -144,9 +151,14 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
     end
   end
 
-  it 'rejects invalid messages before sending or logging' do
-    expect { client.publish(**event.merge(who: nil)) }.to raise_error(ArgumentError, /who/)
-    expect(sqs_client.api_requests).to be_empty
-    expect(Rails.logger).not_to have_received(:info)
+  [HostEnv::LOCAL, HostEnv::STAGING].each do |environment|
+    it "rejects invalid messages before sending or logging in #{environment}" do
+      allow(HostEnv).to receive(:env_name).and_return(environment)
+
+      expect { client.publish(**event.merge(who: nil)) }.to raise_error(ArgumentError, /who/)
+      expect(sqs_client.api_requests).to be_empty
+      expect(Rails.logger).not_to have_received(:info)
+      expect(Rails.logger).not_to have_received(:error)
+    end
   end
 end

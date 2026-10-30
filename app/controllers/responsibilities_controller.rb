@@ -13,7 +13,7 @@ class ResponsibilitiesController < PrisonsApplicationController
     if @offender.ldu_email_address.present?
       @responsibility = Responsibility.new(nomis_offender_id:)
     else
-      render 'error'
+      render 'error', status: :unprocessable_entity
     end
   end
 
@@ -100,7 +100,9 @@ class ResponsibilitiesController < PrisonsApplicationController
 private
 
   def check_existing_responsibility
-    render 'responsibilities/presence_error' if Responsibility.exists?(nomis_offender_id:)
+    return unless Responsibility.exists?(nomis_offender_id:)
+
+    render 'responsibilities/presence_error', status: :unprocessable_entity
   end
 
   def redirect_back_to_origin

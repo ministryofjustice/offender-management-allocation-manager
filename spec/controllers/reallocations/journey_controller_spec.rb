@@ -6,6 +6,7 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
   render_views
 
   include_context 'with reallocation controller defaults'
+  include_context 'with HMPPS audit event capture'
 
   let(:route_params) do
     {
@@ -45,6 +46,9 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
       expect(response.body).to include("Why are you allocating a probation POM to #{override_offender[:firstName]} #{override_offender[:lastName]} (#{override_offender_no})?")
       expect(response.body).to include('Allocate to someone else')
       expect(response.body).to include('Choose all that apply')
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_NEW_REALLOCATION_OVERRIDE_FORM', who: 'spo-user', subject_type: 'PRISONER_ID', subject_id: override_offender_no)
+      expected_details = { 'queryParams' => { 'nomisStaffId' => old_pom.staffId.to_s, 'newPom' => new_pom.staffId.to_s } }
+      expect(hmpps_audit_events.pluck(:details)).to all(eq(expected_details))
     end
   end
 

@@ -11,6 +11,10 @@ class HmppsAudit::Client
       what:, who:, subject_type:, subject_id:, correlation_id:, details:
     )
 
+    log_attributes = {
+      what:, subject_type:, correlation_id:, details: (details unless HostEnv.preprod? || HostEnv.production?),
+    }
+
     unless HostEnv.local?
       started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       begin
@@ -21,13 +25,14 @@ class HmppsAudit::Client
     end
 
     log(
-      :info, 'hmpps_audit',
-      what: message.what, subject_type: message.subject_type, correlation_id: message.correlation_id,
-      sqs_message_id: response&.message_id, failure_reason: details&.fetch('failureReason', nil), send_duration_ms:,
+      :info, 'hmpps_audit', **log_attributes,
+      sqs_message_id: response&.message_id,
+      failure_reason: (details&.fetch('failureReason', nil) unless log_attributes[:details]),
+      send_duration_ms:
     )
     response
   rescue Aws::SQS::Errors::ServiceError, Seahorse::Client::NetworkingError => e
-    log(:error, 'hmpps_audit_failed', what:, subject_type:, correlation_id:, error_class: e.class.name, send_duration_ms:)
+    log(:error, 'hmpps_audit_error', **log_attributes, error_class: e.class.name, send_duration_ms:)
     raise
   end
 

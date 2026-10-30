@@ -17,7 +17,6 @@ allocations#show:
   what: VIEW_ALLOCATION_INFORMATION
   subject_type: PRISONER_ID
   subject_id: prisoner_id
-
 allocations#history:
   what: VIEW_CASE_HISTORY
   subject_type: PRISONER_ID
@@ -41,12 +40,37 @@ early_allocations#index:
   what: VIEW_EARLY_ALLOCATION_ASSESSMENTS
   subject_type: PRISONER_ID
   subject_id: prisoner_id
+early_allocations#new:
+  what: VIEW_EARLY_ALLOCATION_ASSESSMENT_START
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+early_allocations#oasys_date:
+  what: VIEW_EARLY_ALLOCATION_ELIGIBILITY_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+early_allocations#eligible:
+  what: SUBMIT_EARLY_ALLOCATION_ELIGIBILITY
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+early_allocations#discretionary:
+  what: SUBMIT_EARLY_ALLOCATION_DISCRETIONARY
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+early_allocations#confirm_with_reason:
+  what: CREATE_EARLY_ALLOCATION_ASSESSMENT
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+early_allocations#show:
+  what: VIEW_EARLY_ALLOCATION_ASSESSMENT
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+  query_params: [id, format]
 early_allocations#edit:
   what: VIEW_EARLY_ALLOCATION_DECISION_FORM
   subject_type: PRISONER_ID
   subject_id: prisoner_id
-early_allocations#new:
-  what: VIEW_EARLY_ALLOCATION_ASSESSMENT_START
+early_allocations#update:
+  what: EDIT_EARLY_ALLOCATION_DECISION
   subject_type: PRISONER_ID
   subject_id: prisoner_id
 
@@ -64,32 +88,41 @@ parole_reviews#edit:
   what: VIEW_PAROLE_HEARING_OUTCOME_FORM
   subject_type: PRISONER_ID
   subject_id: prisoner_id
+  query_params: [id]
 
 prisoners#show:
   what: VIEW_CASE_INFORMATION
   subject_type: PRISONER_ID
   subject_id: id
-
 prisoners#image:
   what: VIEW_PRISONER_PHOTO
   subject_type: PRISONER_ID
   subject_id: prisoner_id
-
 prisoners#review_case_details:
   what: VIEW_CASE_DETAILS
   subject_type: PRISONER_ID
   subject_id: prisoner_id
-
+  query_params: [coworking]
 prisoners#review_changes:
   what: VIEW_ALLOCATION_SIGNIFICANT_CHANGES
   subject_type: PRISONER_ID
   subject_id: prisoner_id
-
 prisoners#search:
   what: SEARCH_PRISONER
   subject_type: SEARCH_TERM
   subject_id: q
   query_params: [prison_id, page]
+
+reallocations/journey#override:
+  what: VIEW_NEW_REALLOCATION_OVERRIDE_FORM
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+  query_params: [nomis_staff_id, new_pom]
+
+responsibilities#new:
+  what: VIEW_NEW_RESPONSIBILITY_FORM
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
 
 victim_liaison_officers#new:
   what: VIEW_NEW_VLO_DETAILS_FORM
@@ -99,6 +132,21 @@ victim_liaison_officers#edit:
   what: VIEW_VLO_DETAILS_FORM
   subject_type: PRISONER_ID
   subject_id: prisoner_id
+  query_params: [id]
+victim_liaison_officers#create:
+  what: CREATE_VLO_DETAILS
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+victim_liaison_officers#update:
+  what: EDIT_VLO_DETAILS
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+  query_params: [id]
+victim_liaison_officers#destroy:
+  what: DELETE_VLO_DETAILS
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+  query_params: [id]
 
 # Exempted actions
 
@@ -174,7 +222,6 @@ dashboard#index:
 
 root#index:
   exempt: Redirect to the default prison dashboard
-
 root#handovers_email_preferences:
   exempt: Redirect from email links to the email preferences page
 
@@ -230,19 +277,6 @@ coworking#destroy:
 debugging#debugging:
   todo: true
 debugging#timeline:
-  todo: true
-
-early_allocations#confirm_with_reason:
-  todo: true
-early_allocations#discretionary:
-  todo: true
-early_allocations#eligible:
-  todo: true
-early_allocations#oasys_date:
-  todo: true
-early_allocations#show:
-  todo: true
-early_allocations#update:
   todo: true
 
 female_missing_infos#update:
@@ -311,8 +345,6 @@ reallocations/journey#complete:
   todo: true
 reallocations/journey#confirmation:
   todo: true
-reallocations/journey#override:
-  todo: true
 reallocations/journey#summary:
   todo: true
 reallocations/journey#update_override:
@@ -336,13 +368,4 @@ responsibilities#confirm_removal:
 responsibilities#create:
   todo: true
 responsibilities#destroy:
-  todo: true
-responsibilities#new:
-  todo: true
-
-victim_liaison_officers#create:
-  todo: true
-victim_liaison_officers#destroy:
-  todo: true
-victim_liaison_officers#update:
   todo: true

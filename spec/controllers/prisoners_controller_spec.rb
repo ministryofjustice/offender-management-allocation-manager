@@ -905,6 +905,7 @@ RSpec.describe PrisonersController, type: :controller do
       expect(assigns(:coworking)).to be(false)
       expect(response.body).not_to include('Primary POM:')
       expect(hmpps_audit_events).to have_recorded_event('VIEW_CASE_DETAILS', subject_type: 'PRISONER_ID', subject_id: offender_id)
+      expect(hmpps_audit_events.pluck(:details)).to all(eq('queryParams' => { 'coworking' => 'true' }))
     end
 
     describe 'remembering where the allocation journey started' do

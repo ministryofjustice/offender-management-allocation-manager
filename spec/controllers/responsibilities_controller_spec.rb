@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe ResponsibilitiesController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let!(:case_info) { create(:case_information, local_delivery_unit: build(:local_delivery_unit)) }
   let(:offender_no) { case_info.nomis_offender_id }
   let(:responsibility) { Responsibility.last }
@@ -53,7 +55,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
       perform_request
 
       aggregate_failures do
-        expect(response).to have_http_status(:ok)
+        expect(response).to have_http_status(:unprocessable_entity)
         expect(response).to render_template(:presence_error)
         expect(response.body).to include(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
       end
@@ -73,7 +75,40 @@ RSpec.describe ResponsibilitiesController, type: :controller do
   describe '#new' do
     subject(:perform_request) { get :new, params: { prison_id: prison.code, nomis_offender_id: offender_no, from: from_param } }
 
-    include_examples 'renders the presence error page'
+    context 'when a responsibility override already exists' do
+      include_examples 'renders the presence error page'
+
+      it 'records a failed form view' do
+        perform_request
+
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_NEW_RESPONSIBILITY_FORM', outcome: 'FAILURE', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+        expect(hmpps_audit_events.last.fetch(:details)).to include('failureReason' => 'Request failed validation')
+      end
+    end
+
+    context 'when there is no responsibility override' do
+      before do
+        stub_offender(nomis_offender)
+      end
+
+      it 'displays the reasons form and audits the prisoner' do
+        perform_request
+
+        expect(response).to render_template(:new)
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_NEW_RESPONSIBILITY_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+      end
+
+      it 'records a failed form view when LDU contact details are missing' do
+        case_info.update!(local_delivery_unit: nil)
+
+        perform_request
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to render_template(:error)
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_NEW_RESPONSIBILITY_FORM', outcome: 'FAILURE', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+        expect(hmpps_audit_events.last.fetch(:details)).to include('failureReason' => 'Request failed validation')
+      end
+    end
   end
 
   describe '#confirm' do
