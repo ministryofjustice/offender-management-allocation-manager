@@ -12,6 +12,15 @@ RSpec.describe HmppsAuditing, type: :controller do
     end
 
     def update
+      if params[:saved]
+        audit(success: true)
+        audit(details: { 'saved' => true })
+        audit(failure: 'Operation failed') if params[:failed]
+        raise 'After save failed' if params[:raise_after_save]
+
+        return redirect_to '/completed'
+      end
+
       return head :unprocessable_entity if params[:invalid]
 
       results = params[:empty] ? [] : %w[A1234BC]
@@ -153,6 +162,62 @@ RSpec.describe HmppsAuditing, type: :controller do
     expect { get :show, params: { id: 'A1234BC' } }.to raise_error(RuntimeError, 'rendering failed')
 
     expect(hmpps_audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_FAILURE])
+  end
+
+  it 'allows an explicitly successful operation to redirect' do
+    patch :update, params: { id: 'Smith', saved: true }
+
+    expect(response).to redirect_to('/completed')
+    expect(hmpps_audit_events).to have_recorded_event('SEARCH_ALLOCATION', subject_id: 'Smith')
+    expect(hmpps_audit_events.last[:details]).to eq('saved' => true)
+  end
+
+  it 'prefers explicit failure over explicit success' do
+    patch :update, params: { id: 'Smith', saved: true, failed: true }
+
+    expect(hmpps_audit_events).to have_recorded_event('SEARCH_ALLOCATION', outcome: 'FAILURE')
+    expect(hmpps_audit_events.last[:details]).to eq('saved' => true, 'failureReason' => 'Operation failed')
+  end
+
+  it 'records and propagates an exception even after explicit success' do
+    expect {
+      patch :update, params: { id: 'Smith', saved: true, raise_after_save: true }
+    }.to raise_error(RuntimeError, 'After save failed')
+
+    expect(hmpps_audit_events).to have_recorded_event('SEARCH_ALLOCATION', outcome: 'FAILURE')
+  end
+
+  describe 'entity_for_audit' do
+    it 'ignores unsaved records and form objects' do
+      [build(:early_allocation, id: 123), EarlyAllocationDateForm.new].each do |entity|
+        allow(controller).to receive(:entity_for_audit).and_return(entity)
+
+        get :show, params: { id: 'A1234BC' }
+
+        expect(hmpps_audit_events.last[:details]).to eq({})
+      end
+    end
+
+    it 'includes the entity ID only on the outcome, even after deletion' do
+      entity = create(:early_allocation)
+      entity.destroy!
+      allow(controller).to receive(:entity_for_audit).and_return(entity)
+
+      get :show, params: { id: 'A1234BC' }
+
+      expect(hmpps_audit_events.map { it[:details] }).to eq([{}, { 'entityId' => entity.id }])
+    end
+
+    it 'includes the entity ID when the application raises' do
+      entity = create(:early_allocation)
+      allow(controller).to receive(:entity_for_audit).and_return(entity)
+
+      expect {
+        patch :update, params: { id: 'Smith', saved: true, raise_after_save: true }
+      }.to raise_error(RuntimeError, 'After save failed')
+
+      expect(hmpps_audit_events.last[:details]).to include('entityId' => entity.id)
+    end
   end
 
   context 'when audit delivery fails' do

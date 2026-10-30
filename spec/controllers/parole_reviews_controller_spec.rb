@@ -23,6 +23,7 @@ RSpec.describe ParoleReviewsController, type: :controller do
       get :edit, params: { prison_id: prison, prisoner_id: offender.offender_no, id: parole_review.review_id }
       expect(assigns(:parole_review)).to eq(parole_review)
       expect(hmpps_audit_events).to have_recorded_event('VIEW_PAROLE_HEARING_OUTCOME_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender.offender_no)
+      expect(hmpps_audit_events.pluck(:details)).to all(eq('queryParams' => { 'id' => parole_review.review_id.to_s }))
     end
 
     it 'scopes the lookup by review_id and prisoner NOMIS ID' do

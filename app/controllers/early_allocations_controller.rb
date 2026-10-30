@@ -24,7 +24,7 @@ class EarlyAllocationsController < PrisonsApplicationController
       render 'eligible'
     else
       @early_allocation = form
-      render 'new'
+      render 'new', status: :unprocessable_entity
     end
   end
 
@@ -35,6 +35,7 @@ class EarlyAllocationsController < PrisonsApplicationController
       @early_allocation = EarlyAllocation.new form_params.merge(default_params)
       if @early_allocation.eligible?
         @early_allocation.save!
+        audit(details: { 'assessmentCreated' => true })
         RecalculateHandoverDateJob.perform_now(@prisoner.nomis_offender_id, trigger_method: 'early_allocation')
         if @prisoner.within_early_allocation_window?
           AutoEarlyAllocationEmailJob.perform_later(@prison, @prisoner.offender_no, Base64.encode64(pdf_as_string))
@@ -42,11 +43,12 @@ class EarlyAllocationsController < PrisonsApplicationController
         render 'landing_eligible'
       else
         @early_allocation = EarlyAllocationDiscretionaryForm.new form_params
+        audit(details: { 'assessmentCreated' => false })
         render 'discretionary'
       end
     else
       @early_allocation = form
-      render 'eligible'
+      render 'eligible', status: :unprocessable_entity
     end
   end
 
@@ -56,20 +58,23 @@ class EarlyAllocationsController < PrisonsApplicationController
     if form.valid?
       @early_allocation = EarlyAllocation.new form_params.merge(default_params)
       if @early_allocation.discretionary?
+        audit(details: { 'assessmentCreated' => false })
         render 'confirm_with_reason'
       else
         @early_allocation.save!
+        audit(details: { 'assessmentCreated' => true })
         render 'landing_ineligible'
       end
     else
       @early_allocation = form
-      render 'discretionary'
+      render 'discretionary', status: :unprocessable_entity
     end
   end
 
   def confirm_with_reason
     @early_allocation = EarlyAllocation.new early_allocation_params.merge(offender_id_from_url)
     if @early_allocation.save
+      audit(details: { 'assessmentCreated' => true })
       if @prisoner.within_early_allocation_window?
         CommunityEarlyAllocationEmailJob.perform_later(@prison,
                                                        @prisoner.offender_no,
@@ -77,7 +82,7 @@ class EarlyAllocationsController < PrisonsApplicationController
       end
       render 'landing_discretionary'
     else
-      render
+      render status: :unprocessable_entity
     end
   end
 
@@ -91,10 +96,11 @@ class EarlyAllocationsController < PrisonsApplicationController
     @early_allocation = @prisoner.early_allocations.last
 
     if @early_allocation.update(community_decision_params)
+      audit(success: true, details: { 'decisionUpdated' => true })
       RecalculateHandoverDateJob.perform_now(@prisoner.nomis_offender_id, trigger_method: 'early_allocation')
       redirect_to prison_prisoner_path(@prison.code, @early_allocation.nomis_offender_id)
     else
-      render 'edit'
+      render 'edit', status: :unprocessable_entity
     end
   end
 
@@ -111,6 +117,8 @@ class EarlyAllocationsController < PrisonsApplicationController
   end
 
 private
+
+  def entity_for_audit = @early_allocation
 
   def load_prisoner
     @prisoner = get_offender_or_404(params[:prisoner_id])
