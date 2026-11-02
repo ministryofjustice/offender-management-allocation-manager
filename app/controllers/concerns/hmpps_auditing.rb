@@ -78,7 +78,14 @@ private
   end
 
   def audit_query_params(keys)
-    query_params = keys.index_with { audit_param(it) }.compact
+    query_params = keys.index_with { |key|
+      value = params[key]
+      if value.is_a?(Array)
+        value.filter_map { it.squish.presence if it.is_a?(String) }.presence
+      else
+        audit_param(key)
+      end
+    }.compact
     return {} if query_params.empty?
 
     { 'queryParams' => query_params.transform_keys { it.to_s.camelize(:lower) } }

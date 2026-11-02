@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe AllocationStaffController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let(:poms) do
     [
       build(:pom, :prison_officer),
@@ -24,6 +26,41 @@ RSpec.describe AllocationStaffController, type: :controller do
   context 'when user is an SPO' do
     before do
       stub_sso_data(prison_code)
+    end
+
+    context 'when the allocated primary POM is unavailable' do
+      let!(:allocation) do
+        create(:allocation_history, prison: prison_code, nomis_offender_id: offender_no,
+                                    primary_pom_nomis_id: poms.last.staff_id)
+      end
+
+      before do
+        create(:case_information, offender: build(:offender, nomis_offender_id: offender_no))
+        stub_offenders_for_prison(prison_code, [offender])
+        allow_any_instance_of(Prison).to receive(:get_single_pom).with(poms.last.staff_id, safe: true).and_return(nil)
+      end
+
+      it 'renders account help instead of co-working selection' do
+        get :index, params: { prison_id: prison_code, prisoner_id: offender_no, coworking: 'true' }
+
+        expect(response).to render_template('poms/show_non_pom')
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'still allows normal allocation selection' do
+        get :index, params: { prison_id: prison_code, prisoner_id: offender_no }
+
+        expect(response).to be_successful
+      end
+
+      it 'renders account help when no primary POM is assigned' do
+        allocation.update!(primary_pom_nomis_id: nil)
+
+        get :index, params: { prison_id: prison_code, prisoner_id: offender_no, coworking: 'true' }
+
+        expect(response).to render_template('poms/show_non_pom')
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
     end
 
     describe '#compare_poms' do
@@ -51,6 +88,8 @@ RSpec.describe AllocationStaffController, type: :controller do
 
         expect(response).to redirect_to(prison_prisoner_staff_index_path(prison_code, offender_no, coworking: false))
         expect(flash[:alert]).to eq('Choose POMs from the available list to compare workloads')
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_POM_COMPARISON', outcome: 'FAILURE', subject_id: offender_no)
+        expect(hmpps_audit_events.last[:details]).to include('failureReason' => 'Invalid POM selection')
       end
 
       it 'renders the shared comparison rows and allocation-specific actions for available POMs' do
@@ -66,6 +105,8 @@ RSpec.describe AllocationStaffController, type: :controller do
         expect(response.body).to include('Case mix by tier')
         expect(response.body).to include('Current workload')
         expect(response.body).to include('Allocate')
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_POM_COMPARISON', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+        expect(hmpps_audit_events.pluck(:details)).to all(eq('queryParams' => { 'pomIds' => [poms.second.staff_id.to_s, poms.last.staff_id.to_s] }))
       end
     end
 
@@ -155,6 +196,8 @@ RSpec.describe AllocationStaffController, type: :controller do
             expect(response).to be_successful
             expect(page.at_css("a[href='#{confirm_prison_coworking_path(prison_code, offender_no, secondary_pom_nomis_id: poms.first.staff_id)}']").text)
               .to eq(poms.first.full_name_ordered)
+            expect(hmpps_audit_events.last(2)).to have_recorded_event('VIEW_ALLOCATION_POM_SELECTION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+            expect(hmpps_audit_events.last[:details]).to eq('queryParams' => { 'coworking' => 'true' })
           end
 
           it 'sorts by POM name rather than POM type because co-working has no recommendation' do

@@ -60,7 +60,7 @@ RSpec.describe HmppsAuditing, type: :controller do
         'anonymous#update' => { 'what' => 'SEARCH_ALLOCATION',
                                 'subject_type' => 'SEARCH_TERM',
                                 'subject_id' => 'id',
-                                'query_params' => %w[page sort_by] },
+                                'query_params' => %w[page sort_by pom_ids] },
         'anonymous#index' => { 'todo' => true }
       )
     )
@@ -115,6 +115,12 @@ RSpec.describe HmppsAuditing, type: :controller do
   end
 
   describe 'details' do
+    it 'captures flat string arrays without including blank values or nested structures' do
+      patch :update, params: { id: 'Smith', pom_ids: [' 123 ', '', '456', { private: 'notes' }, ['789']] }
+
+      expect(hmpps_audit_events).to all(include(details: hash_including('queryParams' => { 'pomIds' => %w[123 456] })))
+    end
+
     it 'sends present query params on every event and details added by the action on the outcome' do
       patch :update, params: { id: 'Smith', sort_by: 'name' }
 

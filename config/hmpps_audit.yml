@@ -8,6 +8,17 @@
 # subject_id:    request param holding the subject (path or query string), optional
 # query_params:  request params sent as details.queryParams when present, optional
 #
+allocation_staff#index:
+  what: VIEW_ALLOCATION_POM_SELECTION
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+  query_params: [coworking]
+allocation_staff#compare_poms:
+  what: VIEW_ALLOCATION_POM_COMPARISON
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+  query_params: [coworking, pom_ids]
+
 allocation_retentions#new:
   what: VIEW_NEW_ALLOCATION_RETENTION_FORM
   subject_type: PRISONER_ID
@@ -227,6 +238,9 @@ onboarding#error:
 reallocations/selection#error:
   exempt: Static error page with no prisoner or staff data
 
+allocation_staff#check_compare_list:
+  exempt: Validation checks and redirect
+
 poms#show_non_pom:
   exempt: Static troubleshooting page with no prisoner or staff data
 poms#confirm_delete:
@@ -288,13 +302,6 @@ root#handovers_email_preferences:
 
 # TODO actions: not yet evaluated.
 # Replace each with an audit, or an exemption with a real reason.
-
-allocation_staff#check_compare_list:
-  todo: true
-allocation_staff#compare_poms:
-  todo: true
-allocation_staff#index:
-  todo: true
 
 build_allocations#new:
   todo: true
