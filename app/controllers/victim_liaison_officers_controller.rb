@@ -13,7 +13,6 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
     @vlo = @offender.victim_liaison_officers.new vlo_parameters
 
     if @vlo.save
-      audit(success: true)
       redirect_to referrer, notice: 'VLO contact added'
     else
       render 'new', status: :unprocessable_entity
@@ -24,7 +23,6 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
 
   def update
     if @vlo.update vlo_parameters
-      audit(success: true)
       redirect_to referrer, notice: 'VLO contact updated'
     else
       render 'edit', status: :unprocessable_entity
@@ -36,7 +34,6 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
   def destroy
     if params[:delete_confirm] == 'yes'
       @vlo.destroy!
-      audit(success: true)
       flash[:notice] = 'VLO contact removed'
     else
       audit(failure: HmppsAuditing::USER_CANCELLED)
@@ -47,7 +44,7 @@ class VictimLiaisonOfficersController < PrisonsApplicationController
 
 private
 
-  def entity_for_audit = @vlo
+  def auditable_entity = @vlo
 
   def find_vlo
     @vlo = VictimLiaisonOfficer.find params[:id]

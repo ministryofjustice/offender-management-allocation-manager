@@ -30,9 +30,21 @@ case_information#new:
   what: VIEW_NEW_CASE_INFORMATION_FORM
   subject_type: PRISONER_ID
   subject_id: prisoner_id
+case_information#create:
+  what: CREATE_CASE_INFORMATION
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+case_information#update:
+  what: EDIT_CASE_INFORMATION
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
 
 complexity_levels#edit:
   what: VIEW_COMPLEXITY_LEVEL_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+complexity_levels#update:
+  what: EDIT_COMPLEXITY_LEVEL
   subject_type: PRISONER_ID
   subject_id: prisoner_id
 
@@ -78,6 +90,10 @@ female_missing_infos#new:
   what: VIEW_NEW_COMPLEXITY_LEVEL_FORM
   subject_type: PRISONER_ID
   subject_id: prisoner_id
+female_missing_infos#update:
+  what: CREATE_COMPLEXITY_LEVEL
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
 
 handover_progress_checklists#edit:
   what: VIEW_HANDOVER_PROGRESS_CHECKLIST
@@ -121,6 +137,22 @@ reallocations/journey#override:
 
 responsibilities#new:
   what: VIEW_NEW_RESPONSIBILITY_FORM
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+responsibilities#confirm:
+  what: SUBMIT_RESPONSIBILITY_OVERRIDE_REASON
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+responsibilities#confirm_removal:
+  what: VIEW_REMOVE_RESPONSIBILITY_FORM
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+responsibilities#create:
+  what: CREATE_RESPONSIBILITY_OVERRIDE
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+responsibilities#destroy:
+  what: DELETE_RESPONSIBILITY_OVERRIDE
   subject_type: PRISONER_ID
   subject_id: nomis_offender_id
 
@@ -245,11 +277,6 @@ build_allocations#show:
 build_allocations#update:
   todo: true
 
-case_information#create:
-  todo: true
-case_information#update:
-  todo: true
-
 caseload#cases:
   todo: true
 caseload#index:
@@ -264,9 +291,6 @@ caseload#updates_required:
 caseload_global#index:
   todo: true
 
-complexity_levels#update:
-  todo: true
-
 coworking#confirm:
   todo: true
 coworking#create:
@@ -277,9 +301,6 @@ coworking#destroy:
 debugging#debugging:
   todo: true
 debugging#timeline:
-  todo: true
-
-female_missing_infos#update:
   todo: true
 
 handover_progress_checklists#update:
@@ -359,13 +380,4 @@ reallocations/selection#compare_poms:
 reallocations/selection#create:
   todo: true
 reallocations/selection#index:
-  todo: true
-
-responsibilities#confirm:
-  todo: true
-responsibilities#confirm_removal:
-  todo: true
-responsibilities#create:
-  todo: true
-responsibilities#destroy:
   todo: true

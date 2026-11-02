@@ -30,7 +30,7 @@ class FemaleMissingInfosController < PrisonsApplicationController
         redirect_to prison_prisoner_review_case_details_path(prison_id: active_prison_id, prisoner_id: @missing_info.nomis_offender_id)
       end
     else
-      render :complexity_level
+      render :complexity_level, status: :unprocessable_entity
     end
   end
 

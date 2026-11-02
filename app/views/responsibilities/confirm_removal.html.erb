@@ -10,7 +10,6 @@
                  method: :delete,
                  builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
       <%= hidden_field_tag('from', @source_page) %>
-      <%= f.hidden_field :nomis_offender_id %>
       <%= f.govuk_error_summary %>
 
       <h1 class="govuk-heading-l">Confirm change of responsibility for this case</h1>

@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe FemaleMissingInfosController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let(:prison) { create(:womens_prison) }
   let(:offender) { build(:nomis_offender, prisonId: prison.code, complexityLevel: complexity_level) }
   let(:offender_no) { offender.fetch(:prisonerNumber) }
@@ -31,6 +33,22 @@ RSpec.describe FemaleMissingInfosController, type: :controller do
       allow(HmppsApi::ComplexityApi).to receive(:save)
     end
 
+    context 'when the submission cannot be saved' do
+      let(:complexity_level) { nil }
+
+      it 'renders validation errors without calling the API' do
+        put :update, params: {
+          prison_id: prison.code,
+          prisoner_id: offender_no,
+          complexity_form: { complexity_level: '' }
+        }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to render_template(:complexity_level)
+        expect(HmppsApi::ComplexityApi).not_to have_received(:save)
+      end
+    end
+
     context 'when case information is still missing' do
       let(:complexity_level) { nil }
 
@@ -53,6 +71,8 @@ RSpec.describe FemaleMissingInfosController, type: :controller do
           )
           expect(session["female_missing_info_complexity_saved_#{offender_no}"]).to eq(true)
           expect(response).to redirect_to(new_prison_prisoner_case_information_path(prison.code, prisoner_id: offender_no, sort: 'last_name', page: '2'))
+          expect(hmpps_audit_events).to have_recorded_event('CREATE_COMPLEXITY_LEVEL', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+          expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
         end
       end
     end

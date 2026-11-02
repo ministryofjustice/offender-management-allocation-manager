@@ -63,7 +63,7 @@ RSpec.describe VictimLiaisonOfficersController, type: :controller do
       expect(hmpps_audit_events.last[:details]).to eq('entityId' => assigns(:vlo).id)
     end
 
-    it 'audits validation failure without creating a VLO' do
+    it 'renders validation errors without creating a VLO' do
       expect {
         post :create, params: {
           prison_id: prison.code,
@@ -74,8 +74,6 @@ RSpec.describe VictimLiaisonOfficersController, type: :controller do
 
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response).to render_template(:new)
-      expect(hmpps_audit_events).to have_recorded_event('CREATE_VLO_DETAILS', outcome: 'FAILURE', subject_id: offender_no)
-      expect(hmpps_audit_events.last[:details]).to eq('failureReason' => 'Request failed validation')
     end
   end
 
@@ -95,7 +93,7 @@ RSpec.describe VictimLiaisonOfficersController, type: :controller do
       expect(hmpps_audit_events.last[:details]).to eq('queryParams' => { 'id' => vlo.id.to_s }, 'entityId' => vlo.id)
     end
 
-    it 'audits validation failure without changing the VLO' do
+    it 'renders validation errors without changing the VLO' do
       original_email = vlo.email
       patch :update, params: {
         prison_id: prison.code,
@@ -107,8 +105,6 @@ RSpec.describe VictimLiaisonOfficersController, type: :controller do
       expect(vlo.reload.email).to eq(original_email)
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response).to render_template(:edit)
-      expect(hmpps_audit_events).to have_recorded_event('EDIT_VLO_DETAILS', outcome: 'FAILURE', subject_id: offender_no)
-      expect(hmpps_audit_events.last[:details]).to eq('queryParams' => { 'id' => vlo.id.to_s }, 'entityId' => vlo.id, 'failureReason' => 'Request failed validation')
     end
   end
 

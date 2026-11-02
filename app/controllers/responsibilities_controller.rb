@@ -4,8 +4,7 @@ class ResponsibilitiesController < PrisonsApplicationController
   include PrisonerPageNavigation
 
   before_action :ensure_spo_user
-  before_action :load_offender_from_url, only: [:new, :confirm_removal, :destroy]
-  before_action :load_offender_from_responsibility_params, only: [:confirm, :create]
+  before_action :load_offender_from_url
   before_action :set_navigation_context
   before_action :check_existing_responsibility, only: [:new, :confirm]
 
@@ -23,20 +22,24 @@ class ResponsibilitiesController < PrisonsApplicationController
     if @responsibility.valid?
       @ldu_email_address = @offender.ldu_email_address
     else
-      render 'new'
+      render 'new', status: :unprocessable_entity
     end
   end
 
   def create
     emails = [@current_user.email_address, @offender.ldu_email_address].compact_blank
 
-    @responsibility = Responsibility.find_or_initialize_by(nomis_offender_id:)
+    @responsibility = @responsibility_record = Responsibility.find_or_initialize_by(nomis_offender_id:)
 
     # Treat repeated submits as a no-op so we don't create duplicate overrides or emails.
-    return redirect_back_to_origin unless @responsibility.new_record?
+    unless @responsibility.new_record?
+      audit(failure: 'Responsibility override already exists')
+      return redirect_back_to_origin
+    end
 
     @responsibility.assign_attributes(responsibility_params.slice(:reason, :reason_text, :value))
     @responsibility.save!
+    audit(details: { 'responsibilityCreated' => true })
 
     # GovUk notify can only deliver to 1 address at a time.
     emails.each do |email|
@@ -51,9 +54,10 @@ class ResponsibilitiesController < PrisonsApplicationController
 
     redirect_back_to_origin
   rescue ActiveRecord::RecordInvalid
-    @responsibility = Responsibility.find_by(nomis_offender_id:)
+    @responsibility = @responsibility_record = Responsibility.find_by(nomis_offender_id:)
     raise unless @responsibility
 
+    audit(failure: 'Responsibility override already exists')
     redirect_back_to_origin
   end
 
@@ -66,7 +70,9 @@ class ResponsibilitiesController < PrisonsApplicationController
     @responsibility = RemoveResponsibilityForm.new(responsibility_params)
 
     if @responsibility.valid?
-      Responsibility.find_by!(nomis_offender_id:).destroy!
+      @responsibility_record = Responsibility.find_by!(nomis_offender_id:)
+      @responsibility_record.destroy!
+      audit(details: { 'responsibilityDeleted' => true })
 
       emails = [@current_user.email_address, @offender.ldu_email_address]
       allocation = AllocationHistory.find_by(nomis_offender_id:)
@@ -93,11 +99,13 @@ class ResponsibilitiesController < PrisonsApplicationController
       end
       redirect_back_to_origin
     else
-      render :confirm_removal
+      render :confirm_removal, status: :unprocessable_entity
     end
   end
 
 private
+
+  def auditable_entity = @responsibility_record
 
   def check_existing_responsibility
     return unless Responsibility.exists?(nomis_offender_id:)
@@ -117,11 +125,6 @@ private
     @offender = get_offender_or_404(nomis_offender_id_from_url)
   end
 
-  def load_offender_from_responsibility_params
-    offender_id = responsibility_params.fetch(:nomis_offender_id)
-    @offender = get_offender_or_404(offender_id)
-  end
-
   def nomis_offender_id
     @offender.offender_no
   end
@@ -134,8 +137,8 @@ private
   def responsibility_params
     params
       .require(:responsibility)
-      .permit(:nomis_offender_id, :reason, :reason_text, :message)
-      .merge(value: Responsibility::PROBATION)
+      .permit(:reason, :reason_text, :message)
+      .merge(nomis_offender_id:, value: Responsibility::PROBATION)
   end
 
   def safe_primary_pom_email_for(allocation)

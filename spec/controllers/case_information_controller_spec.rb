@@ -19,12 +19,13 @@ RSpec.describe CaseInformationController, type: :controller do
 
   describe '#edit' do
     it 'displays the manual-entry form and audits the prisoner viewed' do
-      create(:case_information, :manual_entry, offender: offender_record)
+      case_information = create(:case_information, :manual_entry, offender: offender_record)
 
       get :edit, params: { prison_id: prison.code, prisoner_id: offender_no }
 
       expect(response).to have_http_status(:ok)
       expect(hmpps_audit_events).to have_recorded_event('VIEW_CASE_INFORMATION_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+      expect(hmpps_audit_events.last[:details]).to eq('entityId' => case_information.id)
     end
   end
 
@@ -49,7 +50,23 @@ RSpec.describe CaseInformationController, type: :controller do
         expect(case_information.tier).to eq('A')
         expect(case_information.rosh_level).to eq('HIGH')
         expect(case_information.enhanced_resourcing).to be(true)
+        expect(hmpps_audit_events).to have_recorded_event('CREATE_CASE_INFORMATION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+        expect(hmpps_audit_events.first[:details]).to eq({})
+        expect(hmpps_audit_events.last[:details]).to eq('entityId' => case_information.id)
       end
+    end
+
+    it 'renders validation errors without saving a record' do
+      expect {
+        post :create, params: {
+          prison_id: prison.code,
+          prisoner_id: offender_no,
+          case_information: { tier: 'A', rosh_level: '', enhanced_resourcing: 'true' }
+        }
+      }.not_to change(CaseInformation, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to render_template(:new)
     end
 
     it 'publishes an audit event on successful create' do
@@ -150,6 +167,8 @@ RSpec.describe CaseInformationController, type: :controller do
             expect(case_information.tier).to eq('B')
             expect(case_information.rosh_level).to eq('HIGH')
             expect(case_information.enhanced_resourcing).to be(false)
+            expect(hmpps_audit_events).to have_recorded_event('CREATE_CASE_INFORMATION', subject_id: offender_no)
+            expect(hmpps_audit_events.last[:details]).to eq('entityId' => case_information.id)
           end
         end
 
@@ -204,7 +223,7 @@ RSpec.describe CaseInformationController, type: :controller do
             }
 
             aggregate_failures do
-              expect(response).to have_http_status(:ok)
+              expect(response).to have_http_status(:unprocessable_entity)
               expect(case_information.reload.manual_entry?).to be(false)
               expect(case_information.rosh_level).to be_nil
               expect(case_information.enhanced_resourcing).to be_nil
@@ -366,6 +385,9 @@ RSpec.describe CaseInformationController, type: :controller do
         aggregate_failures do
           expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
           expect(case_information.reload.rosh_level).to eq('HIGH')
+          expect(hmpps_audit_events).to have_recorded_event('EDIT_CASE_INFORMATION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+          expect(hmpps_audit_events.first[:details]).to eq({})
+          expect(hmpps_audit_events.last[:details]).to eq('entityId' => case_information.id)
         end
       end
 
@@ -382,6 +404,18 @@ RSpec.describe CaseInformationController, type: :controller do
         }
 
         expect(response).to redirect_to(prison_prisoner_allocation_path(prison.code, prisoner_id: offender_no))
+      end
+
+      it 'renders validation errors without changing the saved record' do
+        put :update, params: {
+          prison_id: prison.code,
+          prisoner_id: offender_no,
+          case_information: { tier: 'A', rosh_level: '', enhanced_resourcing: 'true' }
+        }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to render_template(:edit)
+        expect(case_information.reload).to have_attributes(tier: 'B', rosh_level: 'LOW', enhanced_resourcing: false)
       end
     end
 

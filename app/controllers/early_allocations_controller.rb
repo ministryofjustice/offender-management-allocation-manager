@@ -96,7 +96,7 @@ class EarlyAllocationsController < PrisonsApplicationController
     @early_allocation = @prisoner.early_allocations.last
 
     if @early_allocation.update(community_decision_params)
-      audit(success: true, details: { 'decisionUpdated' => true })
+      audit(details: { 'decisionUpdated' => true })
       RecalculateHandoverDateJob.perform_now(@prisoner.nomis_offender_id, trigger_method: 'early_allocation')
       redirect_to prison_prisoner_path(@prison.code, @early_allocation.nomis_offender_id)
     else
@@ -118,7 +118,7 @@ class EarlyAllocationsController < PrisonsApplicationController
 
 private
 
-  def entity_for_audit = @early_allocation
+  def auditable_entity = @early_allocation
 
   def load_prisoner
     @prisoner = get_offender_or_404(params[:prisoner_id])

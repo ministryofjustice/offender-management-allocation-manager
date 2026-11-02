@@ -188,6 +188,7 @@ RSpec.describe PrisonersController, type: :controller do
             get :review_changes, params: { prison_id: prison.code, prisoner_id: offender_no }
 
             expect(response).to redirect_to(review_allocations_prison_prisoners_path(prison))
+            expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_SIGNIFICANT_CHANGES', outcome: 'FAILURE', subject_id: offender_no)
           end
 
           it 'does not show an unallocated case' do

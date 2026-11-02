@@ -46,7 +46,7 @@ RSpec.describe ComplexityLevelsController, type: :controller do
     context 'when complexity level increases from medium to high' do
       let(:updated_complexity_level) { 'high' }
 
-      it 'saves the complexity level and renders the renders the confirmation page' do
+      it 'saves the complexity level and renders the confirmation page' do
         post :update,  params: { complexity: { level: updated_complexity_level, reason: 'Just because' }, prison_id: womens_prison.code, prisoner_id: offender_no }
         aggregate_failures do
           expect(response).to have_http_status(:ok)
@@ -55,6 +55,8 @@ RSpec.describe ComplexityLevelsController, type: :controller do
           expect(assigns(:offender_id)).to eq(offender_no)
           expect(assigns(:prisoner).first_name).to eq('Sally')
           expect(assigns(:prisoner).last_name).to eq('Albright')
+          expect(hmpps_audit_events).to have_recorded_event('EDIT_COMPLEXITY_LEVEL', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+          expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
 
           expect(HmppsApi::ComplexityApi).to have_received(:save).with(
             offender_no,
@@ -86,6 +88,18 @@ RSpec.describe ComplexityLevelsController, type: :controller do
 
         expect(response).to redirect_to(prison_prisoner_allocation_path(womens_prison.code, offender_no))
       end
+    end
+
+    it 'renders validation errors without calling the API' do
+      post :update, params: {
+        prison_id: womens_prison.code,
+        prisoner_id: offender_no,
+        complexity: { level: '', reason: 'Private notes' }
+      }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to render_template(:edit)
+      expect(HmppsApi::ComplexityApi).not_to have_received(:save)
     end
   end
 end
