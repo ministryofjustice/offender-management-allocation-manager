@@ -32,7 +32,7 @@ class CaseInformationController < PrisonsApplicationController
         redirect_to prison_prisoner_review_case_details_path(prison_id: active_prison_id, prisoner_id:)
       end
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -42,11 +42,13 @@ class CaseInformationController < PrisonsApplicationController
     if @case_info.save(context: :manual_entry)
       redirect_to @back_path
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
 private
+
+  def auditable_entity = @case_info
 
   def set_prisoner
     @prisoner = get_offender_or_404(prisoner_id)

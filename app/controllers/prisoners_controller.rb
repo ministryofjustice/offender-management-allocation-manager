@@ -36,7 +36,10 @@ class PrisonersController < PrisonsApplicationController
     return redirect_to('/404') unless @prisoner
 
     @review = SignificantChanges.for([@prisoner], @prison.allocations, poms: -> { all_poms }).first
-    return redirect_to review_allocations_prison_prisoners_path(@prison) unless @review&.any?
+    unless @review&.any?
+      audit(failure: 'No significant changes to review')
+      return redirect_to review_allocations_prison_prisoners_path(@prison)
+    end
 
     @changes = @review.changes.map { SignificantChanges::ChangePresenter.new(it, review: @review) }
   end

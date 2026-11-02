@@ -166,13 +166,12 @@ Rails.application.routes.draw do
 
     get '/poms/:nomis_staff_id/non_pom' => 'poms#show_non_pom', as: 'pom_non_pom'
 
-    resources :responsibilities, only: %i[create destroy], param: :nomis_offender_id do
+    resources :responsibilities, only: [:destroy], param: :nomis_offender_id do
       member do
         get :new, path: :new, as: :new
+        post '', action: :create
+        post :confirm
         get :confirm_removal
-      end
-      collection do
-        post('confirm' => 'responsibilities#confirm')
       end
     end
 

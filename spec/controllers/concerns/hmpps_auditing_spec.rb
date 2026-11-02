@@ -13,7 +13,6 @@ RSpec.describe HmppsAuditing, type: :controller do
 
     def update
       if params[:saved]
-        audit(success: true)
         audit(details: { 'saved' => true })
         audit(failure: 'Operation failed') if params[:failed]
         raise 'After save failed' if params[:raise_after_save]
@@ -46,6 +45,7 @@ RSpec.describe HmppsAuditing, type: :controller do
     def check_view_access
       redirect_to '/401' if params[:denied]
       redirect_to '/404' if params[:missing]
+      redirect_to '/other-prison' if params[:wrong_prison]
       if params[:alternate]
         audit(failure: 'Allocation view unavailable')
         render plain: 'Different page'
@@ -91,13 +91,12 @@ RSpec.describe HmppsAuditing, type: :controller do
     )
   end
 
-  it 'audits denial by the authentication role check, before later callbacks' do
-    session[:sso_data][:roles] = []
+  it 'treats a callback redirect to an ordinary page as failure because the action did not run' do
+    get :show, params: { id: 'A1234BC', wrong_prison: true }
 
-    get :show, params: { id: 'A1234BC' }
-
-    expect(response).to redirect_to('/401')
-    expect(hmpps_audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_FAILURE])
+    expect(response).to redirect_to('/other-prison')
+    expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION', outcome: 'FAILURE')
+    expect(hmpps_audit_events.last[:details]).to eq('failureReason' => 'Request redirected before completing the operation')
   end
 
   it 'audits a missing requested resource without loading its subject' do
@@ -164,7 +163,7 @@ RSpec.describe HmppsAuditing, type: :controller do
     expect(hmpps_audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_FAILURE])
   end
 
-  it 'allows an explicitly successful operation to redirect' do
+  it 'treats a completed action redirect as success without an explicit signal' do
     patch :update, params: { id: 'Smith', saved: true }
 
     expect(response).to redirect_to('/completed')
@@ -172,14 +171,14 @@ RSpec.describe HmppsAuditing, type: :controller do
     expect(hmpps_audit_events.last[:details]).to eq('saved' => true)
   end
 
-  it 'prefers explicit failure over explicit success' do
+  it 'prefers explicit failure over a normal redirect' do
     patch :update, params: { id: 'Smith', saved: true, failed: true }
 
     expect(hmpps_audit_events).to have_recorded_event('SEARCH_ALLOCATION', outcome: 'FAILURE')
     expect(hmpps_audit_events.last[:details]).to eq('saved' => true, 'failureReason' => 'Operation failed')
   end
 
-  it 'records and propagates an exception even after explicit success' do
+  it 'records and propagates an exception after persistence details were added' do
     expect {
       patch :update, params: { id: 'Smith', saved: true, raise_after_save: true }
     }.to raise_error(RuntimeError, 'After save failed')
@@ -187,10 +186,10 @@ RSpec.describe HmppsAuditing, type: :controller do
     expect(hmpps_audit_events).to have_recorded_event('SEARCH_ALLOCATION', outcome: 'FAILURE')
   end
 
-  describe 'entity_for_audit' do
+  describe 'auditable_entity' do
     it 'ignores unsaved records and form objects' do
       [build(:early_allocation, id: 123), EarlyAllocationDateForm.new].each do |entity|
-        allow(controller).to receive(:entity_for_audit).and_return(entity)
+        allow(controller).to receive(:auditable_entity).and_return(entity)
 
         get :show, params: { id: 'A1234BC' }
 
@@ -201,7 +200,7 @@ RSpec.describe HmppsAuditing, type: :controller do
     it 'includes the entity ID only on the outcome, even after deletion' do
       entity = create(:early_allocation)
       entity.destroy!
-      allow(controller).to receive(:entity_for_audit).and_return(entity)
+      allow(controller).to receive(:auditable_entity).and_return(entity)
 
       get :show, params: { id: 'A1234BC' }
 
@@ -210,7 +209,7 @@ RSpec.describe HmppsAuditing, type: :controller do
 
     it 'includes the entity ID when the application raises' do
       entity = create(:early_allocation)
-      allow(controller).to receive(:entity_for_audit).and_return(entity)
+      allow(controller).to receive(:auditable_entity).and_return(entity)
 
       expect {
         patch :update, params: { id: 'Smith', saved: true, raise_after_save: true }

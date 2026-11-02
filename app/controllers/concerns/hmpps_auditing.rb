@@ -4,8 +4,9 @@
 # When auditing is enabled, requests to actions that aren't declared there at all raise.
 # The spec for config/hmpps_audit.yml catches these in CI regardless.
 # Actions can call `audit` to add details only they know, or a specific failure reason;
-# otherwise the outcome is inferred from the response.
-# Controllers can override `entity_for_audit` to add the record's ID to outcome details.
+# Otherwise 2xx responses and normal redirects succeed; error responses and
+# redirects that halt a before-action callback fail.
+# Controllers can override `auditable_entity` to add the record's ID to outcome details.
 #
 module HmppsAuditing
   extend ActiveSupport::Concern
@@ -20,17 +21,15 @@ module HmppsAuditing
 private
 
   # Override with the current ActiveRecord entity. Unsaved records and form objects are ignored
-  def entity_for_audit = nil
+  def auditable_entity = nil
 
   # `details` are sent on the outcome event
   # `results` are the displayed subject IDs, sent with their count on the outcome event
   # `failure` makes the outcome a failure with that reason
-  # `success` allows completed writes to succeed even when followed by a redirect
-  def audit(details: nil, results: nil, failure: nil, success: false)
+  def audit(details: nil, results: nil, failure: nil)
     @audit_interaction&.add_details(details) if details
     @audit_interaction&.add_details('results' => { 'resultCount' => results.size, 'returnedSubjectIds' => results }) if results
     @audit_failure_reason = failure if failure
-    @audit_success = true if success
   end
 
   def audit_request
@@ -56,12 +55,18 @@ private
       ensure
         audit_entity_details
       end
-      @audit_failure_reason || (generic_audit_failure_reason unless @audit_success || response.successful?)
+      @audit_failure_reason || generic_audit_failure_reason
     end
   end
 
+  # Rails calls this when a before-action response prevents the action from running
+  def halted_callback_hook(filter, name)
+    @audit_callback_halted = true
+    super
+  end
+
   def audit_entity_details
-    entity = entity_for_audit
+    entity = auditable_entity
     return unless entity.is_a?(ActiveRecord::Base) && !entity.new_record? && entity.id.present?
 
     @audit_interaction.add_details('entityId' => entity.id)
@@ -84,7 +89,8 @@ private
       case URI.parse(response.location).path
       when '/401' then 'User does not have access to this data'
       when '/404' then 'Resource not found'
-      else 'Request redirected before completing the operation'
+      else
+        'Request redirected before completing the operation' if @audit_callback_halted
       end
     elsif response.forbidden? || response.unauthorized?
       'User does not have access to this data'
@@ -92,7 +98,7 @@ private
       'Resource not found'
     elsif response.unprocessable?
       'Request failed validation'
-    else
+    elsif !response.successful?
       'Requested view was not available'
     end
   end

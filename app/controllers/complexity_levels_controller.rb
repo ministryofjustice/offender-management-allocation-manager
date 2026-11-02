@@ -24,7 +24,7 @@ class ComplexityLevelsController < PrisonsApplicationController
         render :confirm_complexity_changed
       end
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 

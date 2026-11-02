@@ -6,10 +6,9 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <%= form_for(@responsibility,
-                 url: confirm_prison_responsibilities_path(@prison.code),
+                 url: confirm_prison_responsibility_path(@prison.code, @offender.offender_no),
                  builder: GOVUKDesignSystemFormBuilder::FormBuilder) do |f| %>
       <%= hidden_field_tag('from', @source_page) %>
-      <%= f.hidden_field(:nomis_offender_id) %>
       <%= f.govuk_error_summary %>
 
       <%= f.govuk_radio_buttons_fieldset(

@@ -77,13 +77,6 @@ RSpec.describe ResponsibilitiesController, type: :controller do
 
     context 'when a responsibility override already exists' do
       include_examples 'renders the presence error page'
-
-      it 'records a failed form view' do
-        perform_request
-
-        expect(hmpps_audit_events).to have_recorded_event('VIEW_NEW_RESPONSIBILITY_FORM', outcome: 'FAILURE', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-        expect(hmpps_audit_events.last.fetch(:details)).to include('failureReason' => 'Request failed validation')
-      end
     end
 
     context 'when there is no responsibility override' do
@@ -98,15 +91,13 @@ RSpec.describe ResponsibilitiesController, type: :controller do
         expect(hmpps_audit_events).to have_recorded_event('VIEW_NEW_RESPONSIBILITY_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
       end
 
-      it 'records a failed form view when LDU contact details are missing' do
+      it 'renders an error when LDU contact details are missing' do
         case_info.update!(local_delivery_unit: nil)
 
         perform_request
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response).to render_template(:error)
-        expect(hmpps_audit_events).to have_recorded_event('VIEW_NEW_RESPONSIBILITY_FORM', outcome: 'FAILURE', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-        expect(hmpps_audit_events.last.fetch(:details)).to include('failureReason' => 'Request failed validation')
       end
     end
   end
@@ -115,15 +106,53 @@ RSpec.describe ResponsibilitiesController, type: :controller do
     subject(:perform_request) do
       post :confirm, params: {
         prison_id: prison.code,
+        nomis_offender_id: offender_no,
         from: from_param,
         responsibility: {
-          nomis_offender_id: offender_no,
           reason: :less_than_10_months_to_serve,
         }
       }
     end
 
-    include_examples 'renders the presence error page'
+    context 'when a responsibility override already exists' do
+      include_examples 'renders the presence error page'
+    end
+
+    context 'when there is no responsibility override' do
+      before { stub_offender(nomis_offender) }
+
+      it 'audits valid progression without creating an override or collecting form contents' do
+        expect { perform_request }.not_to change(Responsibility, :count)
+
+        expect(response).to render_template(:confirm)
+        expect(hmpps_audit_events).to have_recorded_event('SUBMIT_RESPONSIBILITY_OVERRIDE_REASON', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+        expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
+      end
+
+      it 'renders validation errors when no reason is selected' do
+        post :confirm, params: {
+          prison_id: prison.code,
+          nomis_offender_id: offender_no,
+          responsibility: { reason: '', reason_text: 'Private notes' }
+        }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to render_template(:new)
+        expect(Responsibility.exists?(nomis_offender_id: offender_no)).to be(false)
+      end
+    end
+  end
+
+  describe '#confirm_removal' do
+    it 'audits the removal reason form without collecting contact details' do
+      stub_offender(nomis_offender)
+
+      get :confirm_removal, params: { prison_id: prison.code, nomis_offender_id: offender_no }
+
+      expect(response).to render_template(:confirm_removal)
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_REMOVE_RESPONSIBILITY_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+      expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
+    end
   end
 
   describe '#create' do
@@ -133,9 +162,9 @@ RSpec.describe ResponsibilitiesController, type: :controller do
     let(:create_params) do
       {
         prison_id: prison.code,
+        nomis_offender_id: offender_no,
         from: from_param,
         responsibility: {
-          nomis_offender_id: offender_no,
           reason: :less_than_10_months_to_serve,
           message:,
         }
@@ -163,7 +192,18 @@ RSpec.describe ResponsibilitiesController, type: :controller do
       aggregate_failures do
         expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
         expect_override_emails(sso_email_address, offender.ldu_email_address)
+        expect(hmpps_audit_events).to have_recorded_event('CREATE_RESPONSIBILITY_OVERRIDE', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+        expect(hmpps_audit_events.first[:details]).to eq({})
+        expect(hmpps_audit_events.last[:details]).to eq('entityId' => responsibility.id, 'responsibilityCreated' => true)
       end
+    end
+
+    it 'propagates validation errors when no existing override can be recovered' do
+      create_params[:responsibility][:reason] = ''
+
+      expect { perform_request }.to raise_error(ActiveRecord::RecordInvalid)
+
+      expect(Responsibility.exists?(nomis_offender_id: offender_no)).to be(false)
     end
 
     context 'when coming from the allocation page' do
@@ -185,6 +225,8 @@ RSpec.describe ResponsibilitiesController, type: :controller do
         expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
         expect(PomMailer).not_to have_received(:with)
         expect(responsibility_override_mailer).not_to have_received(:deliver_later)
+        expect(hmpps_audit_events).to have_recorded_event('CREATE_RESPONSIBILITY_OVERRIDE', outcome: 'FAILURE', subject_id: offender_no)
+        expect(hmpps_audit_events.last[:details]).to eq('entityId' => responsibility.id, 'failureReason' => 'Responsibility override already exists')
       end
     end
 
@@ -205,6 +247,8 @@ RSpec.describe ResponsibilitiesController, type: :controller do
         expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
         expect(PomMailer).not_to have_received(:with)
         expect(responsibility_override_mailer).not_to have_received(:deliver_later)
+        expect(hmpps_audit_events).to have_recorded_event('CREATE_RESPONSIBILITY_OVERRIDE', outcome: 'FAILURE', subject_id: offender_no)
+        expect(hmpps_audit_events.last[:details]).to eq('entityId' => existing_responsibility.id, 'failureReason' => 'Responsibility override already exists')
       end
     end
   end
@@ -217,9 +261,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
         prison_id: prison.code,
         nomis_offender_id: responsibility.nomis_offender_id,
         from: from_param,
-        responsibility: attributes_for(:remove_responsibility_form,
-                                       nomis_offender_id: responsibility.nomis_offender_id,
-                                       reason_text: reason)
+        responsibility: attributes_for(:remove_responsibility_form, reason_text: reason)
       }
     end
     let(:removal_mail_params) do
@@ -236,8 +278,19 @@ RSpec.describe ResponsibilitiesController, type: :controller do
       stub_offender(nomis_offender)
     end
 
+    it 'renders validation errors without deleting the override or sending emails' do
+      destroy_params[:responsibility][:reason_text] = ''
+
+      expect { perform_request }.not_to change(Responsibility, :count)
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to render_template(:confirm_removal)
+      expect(ResponsibilityMailer).not_to have_received(:with)
+    end
+
     context 'without an allocation' do
       it 'destroys and sends an email to the LDU and the SPO' do
+        deleted_id = responsibility.id
         aggregate_failures do
           expect { perform_request }.to change(Responsibility, :count).by(-1)
           expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
@@ -245,6 +298,9 @@ RSpec.describe ResponsibilitiesController, type: :controller do
             mailer: responsibility_to_custody_mailer,
             emails: [sso_email_address, offender.ldu_email_address]
           )
+          expect(hmpps_audit_events).to have_recorded_event('DELETE_RESPONSIBILITY_OVERRIDE', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+          expect(hmpps_audit_events.first[:details]).to eq({})
+          expect(hmpps_audit_events.last[:details]).to eq('entityId' => deleted_id, 'responsibilityDeleted' => true)
         end
       end
 

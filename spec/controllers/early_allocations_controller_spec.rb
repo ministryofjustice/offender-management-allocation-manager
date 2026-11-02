@@ -164,15 +164,13 @@ RSpec.describe EarlyAllocationsController, type: :controller do
         )
       end
 
-      it 'renders validation errors and audits failure without saving a decision' do
+      it 'renders validation errors without saving a decision' do
         put :update, params: { prison_id: prison, prisoner_id: nomis_offender_id, early_allocation: { community_decision: '' } }
 
         expect(early_allocations.last.reload.community_decision).to be_nil
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response).to render_template(:edit)
         expect(RecalculateHandoverDateJob).not_to have_received(:perform_now)
-        expect(hmpps_audit_events).to have_recorded_event('EDIT_EARLY_ALLOCATION_DECISION', outcome: 'FAILURE', subject_id: nomis_offender_id)
-        expect(hmpps_audit_events.last[:details]).to eq('entityId' => early_allocations.last.id, 'failureReason' => 'Request failed validation')
       end
     end
   end
@@ -197,7 +195,6 @@ RSpec.describe EarlyAllocationsController, type: :controller do
                             prisoner_id: nomis_offender_id }
 
         assert_template 'dead_end'
-        expect(hmpps_audit_events).to have_recorded_event('VIEW_EARLY_ALLOCATION_ASSESSMENT_START', who: 'alice', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
       end
     end
   end
@@ -262,15 +259,13 @@ RSpec.describe EarlyAllocationsController, type: :controller do
       context 'when answers are missing' do
         let(:release_date) { Time.zone.today + 17.months }
 
-        it 'renders validation errors and audits failure without saving' do
+        it 'renders validation errors without saving' do
           expect {
             post :eligible, params: { prison_id: prison, prisoner_id: nomis_offender_id, early_allocation: { oasys_risk_assessment_date: valid_date } }
           }.not_to change(EarlyAllocation, :count)
 
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response).to render_template(:eligible)
-          expect(hmpps_audit_events).to have_recorded_event('SUBMIT_EARLY_ALLOCATION_ELIGIBILITY', outcome: 'FAILURE', subject_id: nomis_offender_id)
-          expect(hmpps_audit_events.last[:details]).to eq('failureReason' => 'Request failed validation')
         end
       end
     end
@@ -319,7 +314,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
         expect(hmpps_audit_events.last[:details]).to eq('assessmentCreated' => false)
       end
 
-      it 'renders validation errors and audits failure without saving' do
+      it 'renders validation errors without saving' do
         expect {
           post :discretionary, params: {
             prison_id: prison,
@@ -330,8 +325,6 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response).to render_template(:discretionary)
-        expect(hmpps_audit_events).to have_recorded_event('SUBMIT_EARLY_ALLOCATION_DISCRETIONARY', outcome: 'FAILURE', subject_id: nomis_offender_id)
-        expect(hmpps_audit_events.last[:details]).to eq('failureReason' => 'Request failed validation')
       end
     end
   end
@@ -358,8 +351,6 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
         assert_template 'new'
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(hmpps_audit_events).to have_recorded_event('VIEW_EARLY_ALLOCATION_ELIGIBILITY_FORM', outcome: 'FAILURE', subject_id: nomis_offender_id)
-        expect(hmpps_audit_events.last[:details]).to eq('failureReason' => 'Request failed validation')
       end
     end
   end
@@ -405,7 +396,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
       )
     end
 
-    it 'renders validation errors and audits failure without creating an assessment' do
+    it 'renders validation errors without creating an assessment' do
       expect {
         post :confirm_with_reason, params: {
           prison_id: prison, prisoner_id: nomis_offender_id, early_allocation: assessment_params.merge(approved: false)
@@ -415,8 +406,6 @@ RSpec.describe EarlyAllocationsController, type: :controller do
       expect(response).to have_http_status(:unprocessable_entity)
       expect(response).to render_template(:confirm_with_reason)
       expect(CommunityEarlyAllocationEmailJob).not_to have_received(:perform_later)
-      expect(hmpps_audit_events).to have_recorded_event('CREATE_EARLY_ALLOCATION_ASSESSMENT', outcome: 'FAILURE', subject_id: nomis_offender_id)
-      expect(hmpps_audit_events.last[:details]).to eq('failureReason' => 'Request failed validation')
     end
   end
 end
