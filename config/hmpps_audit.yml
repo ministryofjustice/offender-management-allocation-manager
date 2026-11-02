@@ -109,6 +109,11 @@ parole_reviews#edit:
   subject_type: PRISONER_ID
   subject_id: prisoner_id
   query_params: [id]
+parole_reviews#update:
+  what: EDIT_PAROLE_HEARING_OUTCOME
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+  query_params: [id]
 
 prisoners#show:
   what: VIEW_CASE_INFORMATION
@@ -336,9 +341,6 @@ onboarding#working_pattern:
   todo: true
 
 parole_cases#index:
-  todo: true
-
-parole_reviews#update:
   todo: true
 
 poms#destroy:

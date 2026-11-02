@@ -64,6 +64,8 @@ RSpec.describe ParoleReviewsController, type: :controller do
         }
 
         expect(response).to redirect_to('/dynamic-prisoner-path')
+        expect(hmpps_audit_events).to have_recorded_event('EDIT_PAROLE_HEARING_OUTCOME', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender.offender_no)
+        expect(hmpps_audit_events.pluck(:details)).to all(eq('queryParams' => { 'id' => parole_review.review_id.to_s }))
       end
     end
 
@@ -79,6 +81,7 @@ RSpec.describe ParoleReviewsController, type: :controller do
           prison_id: prison, prisoner_id: offender.offender_no, id: parole_review.review_id, parole_review: invalid_params.to_h
         }
         expect(response).to render_template(:edit)
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
 
