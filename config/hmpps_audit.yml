@@ -99,6 +99,10 @@ handover_progress_checklists#edit:
   what: VIEW_HANDOVER_PROGRESS_CHECKLIST
   subject_type: PRISONER_ID
   subject_id: nomis_offender_id
+handover_progress_checklists#update:
+  what: EDIT_HANDOVER_PROGRESS_CHECKLIST
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
 
 parole_reviews#edit:
   what: VIEW_PAROLE_HEARING_OUTCOME_FORM
@@ -301,9 +305,6 @@ coworking#destroy:
 debugging#debugging:
   todo: true
 debugging#timeline:
-  todo: true
-
-handover_progress_checklists#update:
   todo: true
 
 handovers#com_allocation_overdue:
