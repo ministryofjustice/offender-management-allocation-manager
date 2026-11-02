@@ -1,5 +1,4 @@
 <% journey ||= nil %>
-<% current_pom_id ||= nil %>
 <% previous_pom_ids ||= [] %>
 <% coworking ||= false %>
 <% recommended_pom_type ||= nil %>
@@ -9,7 +8,7 @@
       caseload_prison_reallocation_path(@prison.code, @pom.staff_id, pom.staff_id)
     else
       if coworking
-        prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, current_pom_id, pom.staff_id)
+        confirm_prison_coworking_path(@prison.code, @prisoner.offender_no, secondary_pom_nomis_id: pom.staff_id)
       else
         new_prison_prisoner_staff_build_allocation_path(@prison.code, @prisoner.offender_no, pom.staff_id)
       end

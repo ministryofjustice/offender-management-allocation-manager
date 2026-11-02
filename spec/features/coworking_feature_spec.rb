@@ -55,9 +55,9 @@ feature 'Co-working' do
     end
 
     scenario 'show confirm co-working POM allocation page' do
-      visit prison_confirm_coworking_allocation_path(
+      visit confirm_prison_coworking_path(
         prison.code,
-        nomis_offender_id, prison_pom[:staff_id], secondary_pom[:staff_id]
+        nomis_offender_id, secondary_pom_nomis_id: secondary_pom[:staff_id]
       )
 
       expect(page).to have_content("Check co-working allocation details")
@@ -105,7 +105,7 @@ feature 'Co-working' do
         click_link 'Remove'
       end
 
-      expect(page).to have_current_path("/prisons/#{prison.code}/coworking/G4273GI/confirm_coworking_removal")
+      expect(page).to have_current_path(confirm_removal_prison_coworking_path(prison.code, nomis_offender_id))
       expect(page).to have_content "You are removing co-working POM #{secondary_pom[:pom_name]} who was working with #{prisoner_name}. The Responsible POM is #{prison_pom[:pom_name]}."
       expect(page).to have_content "We will send a confirmation email to #{prison_pom[:email]}"
     end
@@ -117,7 +117,7 @@ feature 'Co-working' do
         click_link 'Remove'
       end
 
-      expect(page).to have_current_path("/prisons/#{prison.code}/coworking/G4273GI/confirm_coworking_removal")
+      expect(page).to have_current_path(confirm_removal_prison_coworking_path(prison.code, nomis_offender_id))
       click_link 'Cancel'
 
       expect(page).to have_current_path(prison_prisoner_allocation_path(prison.code, nomis_offender_id))
@@ -134,7 +134,7 @@ feature 'Co-working' do
         click_link 'Remove'
       end
 
-      expect(page).to have_current_path("/prisons/#{prison.code}/coworking/G4273GI/confirm_coworking_removal")
+      expect(page).to have_current_path(confirm_removal_prison_coworking_path(prison.code, nomis_offender_id))
 
       click_button 'Confirm'
       expect(page).to have_current_path(prison_prisoner_allocation_path(prison.code, 'G4273GI'))

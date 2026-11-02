@@ -153,7 +153,7 @@ RSpec.describe AllocationStaffController, type: :controller do
 
           it 'links each POM name to the co-working confirmation page' do
             expect(response).to be_successful
-            expect(page.at_css("a[href='#{prison_confirm_coworking_allocation_path(prison_code, offender_no, poms.last.staff_id, poms.first.staff_id)}']").text)
+            expect(page.at_css("a[href='#{confirm_prison_coworking_path(prison_code, offender_no, secondary_pom_nomis_id: poms.first.staff_id)}']").text)
               .to eq(poms.first.full_name_ordered)
           end
 

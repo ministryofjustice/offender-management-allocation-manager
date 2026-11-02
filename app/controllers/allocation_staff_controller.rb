@@ -48,7 +48,6 @@ class AllocationStaffController < PrisonsApplicationController
     end
 
     if params[:prisoner_id].present? && allocation
-      @primary_pom_id = allocation.primary_pom_nomis_id
       @previous_pom_ids = allocation.previously_allocated_poms
 
       # Make previous POMs appear first.

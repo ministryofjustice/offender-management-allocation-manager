@@ -37,7 +37,7 @@
   <%= render layout: 'shared/pom_comparison/grid_compare_row', locals: { poms: @poms } do |pom| %>
     <% if @coworking %>
       <%= link_to 'Allocate co-working POM',
-                  prison_confirm_coworking_allocation_path(@prison.code, @prisoner.offender_no, @primary_pom_id, pom.staff_id),
+                  confirm_prison_coworking_path(@prison.code, @prisoner.offender_no, secondary_pom_nomis_id: pom.staff_id),
                   class: 'govuk-button' %>
     <% else %>
       <%= link_to 'Allocate',

@@ -52,6 +52,25 @@ complexity_levels#update:
   subject_type: PRISONER_ID
   subject_id: prisoner_id
 
+coworking#confirm:
+  what: VIEW_NEW_COWORKING_ALLOCATION_FORM
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+  query_params: [secondary_pom_nomis_id]
+coworking#create:
+  what: CREATE_COWORKING_ALLOCATION
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+  query_params: [secondary_pom_nomis_id]
+coworking#confirm_removal:
+  what: VIEW_REMOVE_COWORKING_ALLOCATION_FORM
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+coworking#destroy:
+  what: DELETE_COWORKING_ALLOCATION
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+
 early_allocations#index:
   what: VIEW_EARLY_ALLOCATION_ASSESSMENTS
   subject_type: PRISONER_ID
@@ -215,9 +234,6 @@ poms#confirm_delete:
 poms#confirm_removal:
   exempt: Intermediate confirmation page
 
-coworking#confirm_removal:
-  exempt: Intermediate confirmation page
-
 victim_liaison_officers#delete:
   exempt: Intermediate confirmation page
 
@@ -299,13 +315,6 @@ caseload#updates_required:
   todo: true
 
 caseload_global#index:
-  todo: true
-
-coworking#confirm:
-  todo: true
-coworking#create:
-  todo: true
-coworking#destroy:
   todo: true
 
 debugging#debugging:

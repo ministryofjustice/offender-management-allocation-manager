@@ -6,20 +6,19 @@ class CoworkingController < PrisonsApplicationController
 
     @prisoner = offender(nomis_offender_id_from_url)
     @primary_pom = @prison.get_single_pom(allocation_for!(nomis_offender_id_from_url).primary_pom_nomis_id)
-    @secondary_pom = @prison.get_single_pom(secondary_pom_id_from_url)
+    @secondary_pom = @prison.get_single_pom(secondary_pom_nomis_id)
     @latest_allocation_details = build_latest_allocation_details(
       offender: @prisoner, pom: @primary_pom, co_working_pom: @secondary_pom
     )
   end
 
   def create
-    nomis_offender_id = allocation_params[:nomis_offender_id]
-    nomis_staff_id = allocation_params[:nomis_staff_id]
+    nomis_offender_id = nomis_offender_id_from_url
     additional_notes = allocation_params[:message]
 
     AllocationService.allocate_secondary(
-      nomis_offender_id: nomis_offender_id,
-      secondary_pom_nomis_id: nomis_staff_id,
+      nomis_offender_id:,
+      secondary_pom_nomis_id:,
       created_by_username: current_user,
       message: additional_notes
     )
@@ -27,7 +26,7 @@ class CoworkingController < PrisonsApplicationController
     prisoner = offender(nomis_offender_id)
     allocation = allocation_for!(prisoner.offender_no)
     primary_pom = @prison.get_single_pom(allocation.primary_pom_nomis_id)
-    secondary_pom = @prison.get_single_pom(nomis_staff_id)
+    secondary_pom = @prison.get_single_pom(secondary_pom_nomis_id)
 
     allocation_details = build_latest_allocation_details(
       offender: prisoner,
@@ -41,7 +40,7 @@ class CoworkingController < PrisonsApplicationController
   end
 
   def confirm_removal
-    @allocation = allocation_for!(coworking_nomis_offender_id_from_url)
+    @allocation = allocation_for!(nomis_offender_id_from_url)
     @prisoner = offender(@allocation.nomis_offender_id)
 
     if @allocation.primary_pom_nomis_id
@@ -82,23 +81,18 @@ private
   end
 
   def allocation_params
-    params.require(:coworking_allocations)
-      .permit(:message, :nomis_offender_id, :nomis_staff_id)
+    params.fetch(:coworking_allocations, ActionController::Parameters.new).permit(:message)
   end
 
   def offender(nomis_offender_id)
     OffenderService.get_offender(nomis_offender_id)
   end
 
-  def coworking_nomis_offender_id_from_url
-    params.require(:coworking_nomis_offender_id)
-  end
-
   def nomis_offender_id_from_url
     params.require(:nomis_offender_id)
   end
 
-  def secondary_pom_id_from_url
-    params.require(:secondary_pom_id)
+  def secondary_pom_nomis_id
+    params.require(:secondary_pom_nomis_id)
   end
 end

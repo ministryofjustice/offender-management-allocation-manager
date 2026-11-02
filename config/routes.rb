@@ -148,10 +148,13 @@ Rails.application.routes.draw do
       get 'compare_poms', to: 'allocation_staff#compare_poms'
     end
 
-    resources :coworking, only: [:create, :destroy], param: :nomis_offender_id do
-      get('confirm_coworking_removal' => 'coworking#confirm_removal', as: 'confirm_removal')
+    resources :coworking, only: [:destroy], param: :nomis_offender_id do
+      member do
+        post '', action: :create
+        get 'confirm/:secondary_pom_nomis_id', action: :confirm, as: :confirm
+        get :confirm_removal
+      end
     end
-    get('/coworking/confirm/:nomis_offender_id/:primary_pom_id/:secondary_pom_id' => 'coworking#confirm', as: 'confirm_coworking_allocation')
 
     resources :poms, only: %i[index show edit update destroy], param: :nomis_staff_id do
       member do
