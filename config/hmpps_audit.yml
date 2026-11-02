@@ -12,6 +12,10 @@ allocation_retentions#new:
   what: VIEW_NEW_ALLOCATION_RETENTION_FORM
   subject_type: PRISONER_ID
   subject_id: prisoner_id
+allocation_retentions#create:
+  what: CREATE_ALLOCATION_RETENTION
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
 
 allocations#show:
   what: VIEW_ALLOCATION_INFORMATION
@@ -268,9 +272,6 @@ root#handovers_email_preferences:
 
 # TODO actions: not yet evaluated.
 # Replace each with an audit, or an exemption with a real reason.
-
-allocation_retentions#create:
-  todo: true
 
 allocation_staff#check_compare_list:
   todo: true
