@@ -8,8 +8,23 @@
 # subject_id:    request param holding the subject (path or query string), optional
 # query_params:  request params sent as details.queryParams when present, optional
 #
+allocation_staff#index:
+  what: VIEW_ALLOCATION_POM_SELECTION
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+  query_params: [coworking]
+allocation_staff#compare_poms:
+  what: VIEW_ALLOCATION_POM_COMPARISON
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+  query_params: [coworking, pom_ids]
+
 allocation_retentions#new:
   what: VIEW_NEW_ALLOCATION_RETENTION_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+allocation_retentions#create:
+  what: CREATE_ALLOCATION_RETENTION
   subject_type: PRISONER_ID
   subject_id: prisoner_id
 
@@ -47,6 +62,25 @@ complexity_levels#update:
   what: EDIT_COMPLEXITY_LEVEL
   subject_type: PRISONER_ID
   subject_id: prisoner_id
+
+coworking#confirm:
+  what: VIEW_NEW_COWORKING_ALLOCATION_FORM
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+  query_params: [secondary_pom_nomis_id]
+coworking#create:
+  what: CREATE_COWORKING_ALLOCATION
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+  query_params: [secondary_pom_nomis_id]
+coworking#confirm_removal:
+  what: VIEW_REMOVE_COWORKING_ALLOCATION_FORM
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
+coworking#destroy:
+  what: DELETE_COWORKING_ALLOCATION
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
 
 early_allocations#index:
   what: VIEW_EARLY_ALLOCATION_ASSESSMENTS
@@ -99,9 +133,18 @@ handover_progress_checklists#edit:
   what: VIEW_HANDOVER_PROGRESS_CHECKLIST
   subject_type: PRISONER_ID
   subject_id: nomis_offender_id
+handover_progress_checklists#update:
+  what: EDIT_HANDOVER_PROGRESS_CHECKLIST
+  subject_type: PRISONER_ID
+  subject_id: nomis_offender_id
 
 parole_reviews#edit:
   what: VIEW_PAROLE_HEARING_OUTCOME_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+  query_params: [id]
+parole_reviews#update:
+  what: EDIT_PAROLE_HEARING_OUTCOME
   subject_type: PRISONER_ID
   subject_id: prisoner_id
   query_params: [id]
@@ -195,14 +238,14 @@ onboarding#error:
 reallocations/selection#error:
   exempt: Static error page with no prisoner or staff data
 
+allocation_staff#check_compare_list:
+  exempt: Validation checks and redirect
+
 poms#show_non_pom:
   exempt: Static troubleshooting page with no prisoner or staff data
 poms#confirm_delete:
   exempt: Intermediate confirmation page
 poms#confirm_removal:
-  exempt: Intermediate confirmation page
-
-coworking#confirm_removal:
   exempt: Intermediate confirmation page
 
 victim_liaison_officers#delete:
@@ -260,16 +303,6 @@ root#handovers_email_preferences:
 # TODO actions: not yet evaluated.
 # Replace each with an audit, or an exemption with a real reason.
 
-allocation_retentions#create:
-  todo: true
-
-allocation_staff#check_compare_list:
-  todo: true
-allocation_staff#compare_poms:
-  todo: true
-allocation_staff#index:
-  todo: true
-
 build_allocations#new:
   todo: true
 build_allocations#show:
@@ -291,19 +324,9 @@ caseload#updates_required:
 caseload_global#index:
   todo: true
 
-coworking#confirm:
-  todo: true
-coworking#create:
-  todo: true
-coworking#destroy:
-  todo: true
-
 debugging#debugging:
   todo: true
 debugging#timeline:
-  todo: true
-
-handover_progress_checklists#update:
   todo: true
 
 handovers#com_allocation_overdue:
@@ -335,9 +358,6 @@ onboarding#working_pattern:
   todo: true
 
 parole_cases#index:
-  todo: true
-
-parole_reviews#update:
   todo: true
 
 poms#destroy:

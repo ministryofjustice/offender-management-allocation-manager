@@ -8,6 +8,7 @@ class AllocationStaffController < PrisonsApplicationController
   before_action :ensure_spo_user
   before_action :load_pom_types
   before_action :load_prisoner_via_prisoner_id
+  before_action :ensure_coworking_primary_pom_available, if: :coworking?
 
   def index
     previous_pom_ids = allocation ? allocation.previously_allocated_poms : []
@@ -44,11 +45,11 @@ class AllocationStaffController < PrisonsApplicationController
     pom_ids = selected_compare_pom_ids
 
     if compare_selection_contains_unavailable_poms?
+      audit(failure: 'Invalid POM selection')
       redirect_to(check_compare_error_route, alert: 'Choose POMs from the available list to compare workloads') and return
     end
 
     if params[:prisoner_id].present? && allocation
-      @primary_pom_id = allocation.primary_pom_nomis_id
       @previous_pom_ids = allocation.previously_allocated_poms
 
       # Make previous POMs appear first.
@@ -62,6 +63,14 @@ class AllocationStaffController < PrisonsApplicationController
   end
 
 private
+
+  def ensure_coworking_primary_pom_available
+    primary_pom_id = allocation&.primary_pom_nomis_id
+    return if primary_pom_id.present? && @prison.get_single_pom(primary_pom_id, safe: true)
+
+    Rails.logger.warn("event=coworking_primary_pom_missing,nomis_offender_id=#{prisoner_id_from_url},prison=#{@prison.code}")
+    render 'poms/show_non_pom', status: :unprocessable_entity
+  end
 
   def prisoner_id_from_url
     params.require(:prisoner_id)

@@ -48,8 +48,6 @@ class CaseInformationController < PrisonsApplicationController
 
 private
 
-  def auditable_entity = @case_info
-
   def set_prisoner
     @prisoner = get_offender_or_404(prisoner_id)
   end

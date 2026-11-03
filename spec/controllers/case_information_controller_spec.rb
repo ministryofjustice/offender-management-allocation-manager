@@ -19,13 +19,12 @@ RSpec.describe CaseInformationController, type: :controller do
 
   describe '#edit' do
     it 'displays the manual-entry form and audits the prisoner viewed' do
-      case_information = create(:case_information, :manual_entry, offender: offender_record)
+      create(:case_information, :manual_entry, offender: offender_record)
 
       get :edit, params: { prison_id: prison.code, prisoner_id: offender_no }
 
       expect(response).to have_http_status(:ok)
       expect(hmpps_audit_events).to have_recorded_event('VIEW_CASE_INFORMATION_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-      expect(hmpps_audit_events.last[:details]).to eq('entityId' => case_information.id)
     end
   end
 
@@ -51,8 +50,7 @@ RSpec.describe CaseInformationController, type: :controller do
         expect(case_information.rosh_level).to eq('HIGH')
         expect(case_information.enhanced_resourcing).to be(true)
         expect(hmpps_audit_events).to have_recorded_event('CREATE_CASE_INFORMATION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-        expect(hmpps_audit_events.first[:details]).to eq({})
-        expect(hmpps_audit_events.last[:details]).to eq('entityId' => case_information.id)
+        expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
       end
     end
 
@@ -168,7 +166,6 @@ RSpec.describe CaseInformationController, type: :controller do
             expect(case_information.rosh_level).to eq('HIGH')
             expect(case_information.enhanced_resourcing).to be(false)
             expect(hmpps_audit_events).to have_recorded_event('CREATE_CASE_INFORMATION', subject_id: offender_no)
-            expect(hmpps_audit_events.last[:details]).to eq('entityId' => case_information.id)
           end
         end
 
@@ -386,8 +383,7 @@ RSpec.describe CaseInformationController, type: :controller do
           expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
           expect(case_information.reload.rosh_level).to eq('HIGH')
           expect(hmpps_audit_events).to have_recorded_event('EDIT_CASE_INFORMATION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-          expect(hmpps_audit_events.first[:details]).to eq({})
-          expect(hmpps_audit_events.last[:details]).to eq('entityId' => case_information.id)
+          expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
         end
       end
 

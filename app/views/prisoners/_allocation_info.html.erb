@@ -23,7 +23,7 @@
                        prison_pom_path(allocation.prison, nomis_staff_id: @coworker.staff_id), class: "govuk-link" %>
       </span>
       <% if current_user_is_spo? %>
-        <%= link_to 'Remove', prison_coworking_confirm_removal_path(allocation.prison, allocation.nomis_offender_id), class: "govuk-link pull-right" %>
+        <%= link_to 'Remove', confirm_removal_prison_coworking_path(allocation.prison, allocation.nomis_offender_id), class: "govuk-link pull-right" %>
       <% end %>
     <% else %>
       <% if current_user_is_spo? %>

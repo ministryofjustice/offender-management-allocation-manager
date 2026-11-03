@@ -11,7 +11,7 @@ class ParoleReviewsController < PrisonsApplicationController
     if @parole_review.save(context: :manual_update)
       redirect_to helpers.prisoner_path_for_role(@prison, @offender)
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 

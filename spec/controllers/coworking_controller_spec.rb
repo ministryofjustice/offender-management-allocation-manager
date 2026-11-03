@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe CoworkingController, :allocation, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let(:prison) { create(:prison).code }
   let(:primary_pom) { build(:pom) }
   let(:offender) { build(:nomis_offender, prisonId: prison) }
@@ -35,7 +37,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
     end
 
     it 'allocates' do
-      post :create, params: { prison_id: prison, coworking_allocations: { nomis_offender_id: offender_no, nomis_staff_id: new_secondary_pom.staffId } }
+      post :create, params: { prison_id: prison, nomis_offender_id: offender_no, secondary_pom_nomis_id: new_secondary_pom.staffId }
       expect(response).to redirect_to(allocated_prison_prisoners_path(prison))
       expect(allocation.reload.secondary_pom_nomis_id).to eq(new_secondary_pom.staffId)
     end
@@ -51,10 +53,17 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
         )
       ).and_call_original
 
-      post :create, params: { prison_id: prison, coworking_allocations: { nomis_offender_id: offender_no, nomis_staff_id: new_secondary_pom.staffId, message: message } }
+      post :create, params: {
+        prison_id: prison,
+        nomis_offender_id: offender_no,
+        secondary_pom_nomis_id: new_secondary_pom.staffId,
+        coworking_allocations: { message: message }
+      }
 
       expect(session[:latest_allocation_details][:additional_notes]).to eq(message)
       expect(session[:latest_allocation_details]).to include(prisoner_number: offender_no)
+      expect(hmpps_audit_events).to have_recorded_event('CREATE_COWORKING_ALLOCATION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+      expect(hmpps_audit_events.pluck(:details)).to all(eq('queryParams' => { 'secondaryPomNomisId' => new_secondary_pom.staffId.to_s }))
     end
   end
 
@@ -72,13 +81,14 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
       get :confirm, params: {
         "prison_id" => prison,
         "nomis_offender_id" => offender_no,
-        "primary_pom_id" => new_secondary_pom.staffId,
-        "secondary_pom_id" => new_secondary_pom.staffId
+        "secondary_pom_nomis_id" => new_secondary_pom.staffId
       }
     end
 
     it 'returns success' do
       expect(response.code).to eq('200')
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_NEW_COWORKING_ALLOCATION_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+      expect(hmpps_audit_events.pluck(:details)).to all(eq('queryParams' => { 'secondaryPomNomisId' => new_secondary_pom.staffId.to_s }))
     end
 
     it 'does not leave offender details in the session' do
@@ -89,7 +99,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
       expect(assigns(:latest_allocation_details)).to include(prisoner_number: offender_no)
     end
 
-    it 'uses the persisted primary POM rather than the submitted primary_pom_id' do
+    it 'uses the persisted primary POM' do
       expect(assigns(:primary_pom).staff_id).to eq(allocation.primary_pom_nomis_id)
     end
   end
@@ -120,7 +130,17 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
         )
         expect(flash[:notice]).to include(secondary_pom_name)
         expect(flash[:notice]).to include('removed as co-working POM')
+        expect(hmpps_audit_events).to have_recorded_event('DELETE_COWORKING_ALLOCATION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+        expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
       end
+    end
+
+    it 'audits the removal form using the prisoner ID from its route' do
+      get :confirm_removal, params: { prison_id: prison, nomis_offender_id: offender_no }
+
+      expect(response).to render_template(:confirm_removal)
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_REMOVE_COWORKING_ALLOCATION_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
+      expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
     end
 
     context 'when the secondary pom name is missing' do

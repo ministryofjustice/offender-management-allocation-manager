@@ -112,6 +112,7 @@ RSpec.describe HandoverProgressChecklistsController do
 
         describe 'when checklist does not exist' do
           before do
+            stub_sso_data(prison_code)
             tasks = {
               reviewed_oasys: true,
               contacted_com: true,
@@ -127,6 +128,8 @@ RSpec.describe HandoverProgressChecklistsController do
               contacted_com: true,
               attended_handover_meeting: true,
             )
+            expect(hmpps_audit_events).to have_recorded_event('EDIT_HANDOVER_PROGRESS_CHECKLIST', who: 'user', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
+            expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
           end
 
           it 'redirects to the correct handovers url' do
