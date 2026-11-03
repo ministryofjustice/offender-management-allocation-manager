@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe PomsController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let(:prison) { create(:prison) }
   let(:a_offenders) { build_list(:nomis_offender, 2) }
   let(:b_offenders) { build_list(:nomis_offender, 4) }
@@ -61,6 +63,9 @@ RSpec.describe PomsController, type: :controller do
     it 'does omit the allocation which does not show up in Prison#offenders' do
       get :index, params: { prison_id: prison.code }
       expect(response).to be_successful
+      expect(hmpps_audit_events).to have_recorded_event(
+        'VIEW_PRISON_POMS', subject_type: 'NOT_APPLICABLE', subject_id: nil, details: { 'queryParams' => { 'prisonId' => prison.code } }
+      )
 
       expect(inactive_poms.count).to eq(1)
       expect(response.body).not_to include('No POMs away from work.')
@@ -103,6 +108,14 @@ RSpec.describe PomsController, type: :controller do
                                                                 "C",
                                                                 "C",
                                                                 "D"])
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_POM_PROFILE', who: 'user', subject_type: 'USER_ID', subject_id: active_staff_id.to_s)
+    end
+
+    it 'does not audit the caseload tab while list auditing is deferred' do
+      get :show, params: { prison_id: prison.code, nomis_staff_id: active_staff_id, tab: 'caseload' }
+
+      expect(response).to be_successful
+      expect(hmpps_audit_events).to be_empty
     end
   end
 
@@ -119,12 +132,49 @@ RSpec.describe PomsController, type: :controller do
     end
   end
 
+  describe 'GET #reallocate' do
+    before do
+      stub_offenders_for_prison(prison.code, a_offenders + b_offenders + c_offenders + d_offenders)
+    end
+
+    it 'audits viewing an inactive POM allocation summary' do
+      staff_id = PomDetail.find_by!(status: 'inactive').nomis_staff_id
+
+      get :reallocate, params: { prison_id: prison.code, nomis_staff_id: staff_id }
+
+      expect(response).to render_template(:reallocate)
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_POM_REALLOCATION_SUMMARY', subject_type: 'USER_ID', subject_id: staff_id.to_s)
+    end
+
+    it 'audits rejection of an ineligible POM' do
+      staff_id = PomDetail.find_by!(status: 'active').nomis_staff_id
+
+      get :reallocate, params: { prison_id: prison.code, nomis_staff_id: staff_id }
+
+      expect(response).to redirect_to(prison_pom_path(prison.code, nomis_staff_id: staff_id))
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_POM_REALLOCATION_SUMMARY', outcome: 'FAILURE', subject_id: staff_id.to_s)
+      expect(hmpps_audit_events.last[:details]).to eq('failureReason' => 'POM is not eligible for bulk case reallocation')
+    end
+  end
+
   describe 'PUT #update' do
     let(:updated_staff_id) { 123_456 }
 
     before do
       create(:pom_detail, :active, prison_code: prison.code, nomis_staff_id: updated_staff_id)
       stub_poms(prison.code, [build(:pom, staffId: updated_staff_id, firstName: 'Mateo', lastName: 'Example')])
+    end
+
+    it 'renders validation errors without changing the profile' do
+      put :update, params: {
+        prison_id: prison.code,
+        nomis_staff_id: updated_staff_id,
+        edit_pom: { status: 'inactive', description: 'PT', working_pattern: '' },
+      }
+
+      expect(response).to render_template(:edit)
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(PomDetail.find_by!(nomis_staff_id: updated_staff_id).status).to eq('active')
     end
 
     context 'when the update is valid' do
@@ -137,6 +187,9 @@ RSpec.describe PomsController, type: :controller do
 
         expect(response).to redirect_to(prison_pom_path(prison.code, nomis_staff_id: updated_staff_id))
         expect(flash[:notice]).to eq('Profile updated for Mateo Example')
+        expect(PomDetail.find_by!(nomis_staff_id: updated_staff_id)).to have_attributes(status: 'active', working_pattern: 0.8)
+        expect(hmpps_audit_events).to have_recorded_event('EDIT_POM_PROFILE', subject_type: 'USER_ID', subject_id: updated_staff_id.to_s)
+        expect(hmpps_audit_events.last[:details]).to eq('workingPattern' => '0.8', 'status' => 'active')
       end
     end
 
@@ -150,6 +203,7 @@ RSpec.describe PomsController, type: :controller do
 
         expect(response).to redirect_to(confirm_delete_prison_pom_path(prison.code, updated_staff_id))
         expect(PomDetail.find_by(nomis_staff_id: updated_staff_id).status).to eq('active')
+        expect(hmpps_audit_events.last[:details]).to eq('workingPattern' => '1.0', 'status' => 'deleted')
       end
     end
   end
@@ -251,6 +305,7 @@ RSpec.describe PomsController, type: :controller do
           expect(NomisUserRolesService).to have_received(:remove_pom).with(prison, removed_staff_id)
           expect(PomDetail.find_by!(nomis_staff_id: removed_staff_id).status).to eq('deleted')
           expect(response).to redirect_to(prison_poms_path(prison.code))
+          expect(hmpps_audit_events).to have_recorded_event('DELETE_POM_PROFILE', subject_type: 'USER_ID', subject_id: removed_staff_id.to_s)
         end
       end
 
@@ -290,6 +345,8 @@ RSpec.describe PomsController, type: :controller do
           expect(PomDetail.find_by(nomis_staff_id: removed_staff_id).status).to eq('inactive')
           expect(NomisUserRolesService).not_to have_received(:remove_pom)
           expect(response).to redirect_to(edit_prison_pom_path(prison.code, removed_staff_id))
+          expect(hmpps_audit_events).to have_recorded_event('DELETE_POM_PROFILE', outcome: 'FAILURE')
+          expect(hmpps_audit_events.last[:details]).to eq('failureReason' => HmppsAuditing::USER_CANCELLED)
         end
       end
 
@@ -301,7 +358,7 @@ RSpec.describe PomsController, type: :controller do
             confirm_delete_pom: { confirmation: '' },
           }
 
-          expect(response).to be_successful
+          expect(response).to have_http_status(:unprocessable_entity)
           expect(response.body).to include('Select yes if you want to remove this POM')
         end
       end

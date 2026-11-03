@@ -49,7 +49,7 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
   end
 
   HostEnv::NAMED_ENVIRONMENTS.each do |environment|
-    it "logs the failure reason once and only exposes details outside protected environments in #{environment}" do
+    it "logs the failure reason once and only exposes details and subject ID outside protected environments in #{environment}" do
       allow(HostEnv).to receive(:env_name).and_return(environment)
       details = { 'page' => 'prisoner-profile', 'failureReason' => 'Resource not found' }
 
@@ -59,23 +59,27 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
         attributes = JSON.parse(line.split('|', 2).last)
         if [HostEnv::PREPROD, HostEnv::PRODUCTION].include?(environment)
           expect(attributes).not_to have_key('details')
+          expect(attributes).not_to have_key('subject_id')
           expect(attributes.fetch('failure_reason')).to eq('Resource not found')
         else
           expect(attributes.fetch('details')).to eq(details)
+          expect(attributes.fetch('subject_id')).to eq(event[:subject_id])
           expect(attributes).not_to have_key('failure_reason')
         end
       end
     end
   end
 
-  it 'includes details in staging delivery failure logs' do
+  it 'includes details and subject ID in staging delivery failure logs' do
     allow(HostEnv).to receive(:env_name).and_return(HostEnv::STAGING)
     sqs_client.stub_responses(:send_message, Aws::SQS::Errors::ServiceError.new(nil, 'failed'))
 
     expect { client.publish(**event) }.to raise_error(Aws::SQS::Errors::ServiceError)
 
     expect(Rails.logger).to have_received(:error) do |line|
-      expect(JSON.parse(line.split('|', 2).last).fetch('details')).to eq('page' => 'prisoner-profile')
+      attributes = JSON.parse(line.split('|', 2).last)
+      expect(attributes.fetch('details')).to eq('page' => 'prisoner-profile')
+      expect(attributes.fetch('subject_id')).to eq(event[:subject_id])
     end
   end
 
@@ -114,7 +118,7 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
 
       expect(described_class.new.publish(**event)).to be_nil
       expect(Rails.logger).to have_received(:info).with(
-        'event=hmpps_audit|{"what":"VIEW_PRISONER","subject_type":"PRISONER_ID","correlation_id":"request-123","details":{"page":"prisoner-profile"}}'
+        'event=hmpps_audit|{"what":"VIEW_PRISONER","subject_type":"PRISONER_ID","subject_id":"A1234BC","details":{"page":"prisoner-profile"},"correlation_id":"request-123"}'
       )
     end
   end

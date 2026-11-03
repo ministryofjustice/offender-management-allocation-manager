@@ -1,7 +1,7 @@
 <% content_for :title, "What type of POM is this person? – Digital Prison Services" %>
 
 <%= form_for(@onboarding_form, url: search_prison_onboarding_index_path, method: :post) do |f| %>
-  <%= f.hidden_field :search_query %>
+  <%= f.hidden_field :search_query, name: :search_query %>
   <%= f.button 'Back', type: 'submit', class: 'app-button--back-link govuk-back-link govuk-!-margin-bottom-6' %>
 <% end %>
 

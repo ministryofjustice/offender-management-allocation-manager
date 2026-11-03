@@ -12,8 +12,10 @@ class HmppsAudit::Client
     )
 
     log_attributes = {
-      what:, subject_type:, correlation_id:, details: (details unless HostEnv.preprod? || HostEnv.production?),
-    }
+      what:, subject_type:, subject_id:, details:, correlation_id:
+    }.tap do |attrs|
+      attrs.except!(:subject_id, :details) if HostEnv.preprod? || HostEnv.production?
+    end
 
     unless HostEnv.local?
       started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)

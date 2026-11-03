@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class PomsController < PrisonStaffApplicationController
+  # TODO: list-tab auditing is deferred pending clarification
+  skip_around_action :audit_request, if: -> { action_name == 'show' && %w[caseload handover parole].include?(params[:tab]) }
+
   before_action :ensure_spo_user
 
   before_action :load_pom_staff_member, except: [:index, :show_non_pom]
@@ -49,6 +52,8 @@ class PomsController < PrisonStaffApplicationController
     @edit_pom_form = PomProfileForm.new(edit_pom_params.to_h)
 
     if @edit_pom_form.valid?
+      audit(details: { 'workingPattern' => @edit_pom_form.working_pattern_ratio, 'status' => @edit_pom_form.status })
+
       if @edit_pom_form.deleting?
         redirect_to confirm_delete_prison_pom_path(active_prison_id, nomis_staff_id) and return
       end
@@ -71,13 +76,13 @@ class PomsController < PrisonStaffApplicationController
       redirect_to prison_pom_path(active_prison_id, nomis_staff_id:),
                   notice: "Profile updated for #{helpers.full_name_ordered(@pom)}"
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def reallocate
     unless @pom.inactive? || @pom.in_limbo?
-      # TODO: maybe design a nicer informational page?
+      audit(failure: 'POM is not eligible for bulk case reallocation')
       redirect_to prison_pom_path, notice: 'Only inactive POMs are eligible for bulk case reallocation.'
       return
     end
@@ -107,10 +112,11 @@ class PomsController < PrisonStaffApplicationController
                       notice: "#{@pom.full_name_or_staff_id} successfully removed from this service"
         end
       else
+        audit(failure: HmppsAuditing::USER_CANCELLED)
         redirect_to edit_prison_pom_path(active_prison_id, nomis_staff_id)
       end
     else
-      render :confirm_delete
+      render :confirm_delete, status: :unprocessable_entity
     end
   end
 
