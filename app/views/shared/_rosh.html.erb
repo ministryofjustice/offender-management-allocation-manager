@@ -18,7 +18,7 @@
     </p>
     <%= render 'shared/rosh_mismatch_warning', ndelius_rosh_level:, oasys_rosh_level: rosh.overall %>
     <% if rosh.custody || rosh.community %>
-      <div class="moj-scrollable-pane">
+      <div class="moj-scrollable-pane" role="region" tabindex="0" aria-label="Risk of serious harm">
         <table class="govuk-table rosh-widget__table">
           <caption class="govuk-visually-hidden">Risk of serious harm in Community</caption>
           <thead class="govuk-table__head">
