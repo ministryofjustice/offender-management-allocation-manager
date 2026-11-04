@@ -202,7 +202,7 @@ feature 'POM onboarding' do
           'SEARCH_POM_ONBOARDING_STAFF', subject_type: 'SEARCH_TERM', subject_id: 'bloggs'
         )
         expect(hmpps_audit_events.last[:details]).to eq(
-          'queryParams' => { 'prisonId' => prison.code },
+          'prisonId' => prison.code,
           'results' => { 'resultCount' => 1, 'returnedSubjectIds' => ['321555'] }
         )
       end
@@ -369,7 +369,7 @@ feature 'POM onboarding' do
         )
         expect(hmpps_audit_events).to include(a_hash_including(
                                                 what: 'CREATE_POM_POSITION_SUCCESS',
-                                                details: { 'queryParams' => { 'prisonId' => prison.code }, 'position' => 'PO', 'workingPattern' => 1.0 }
+                                                details: { 'prisonId' => prison.code, 'position' => 'PO', 'workingPattern' => 1.0 }
                                               ))
       end
 

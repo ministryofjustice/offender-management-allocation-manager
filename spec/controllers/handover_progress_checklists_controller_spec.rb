@@ -129,7 +129,7 @@ RSpec.describe HandoverProgressChecklistsController do
               attended_handover_meeting: true,
             )
             expect(hmpps_audit_events).to have_recorded_event('EDIT_HANDOVER_PROGRESS_CHECKLIST', who: 'user', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
-            expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
+            expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison_code))
           end
 
           it 'redirects to the correct handovers url' do

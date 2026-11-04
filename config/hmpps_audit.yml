@@ -170,7 +170,7 @@ prisoners#search:
   what: SEARCH_PRISONER
   subject_type: SEARCH_TERM
   subject_id: q
-  query_params: [prison_id, page]
+  query_params: [page]
 
 reallocations/journey#override:
   what: VIEW_NEW_REALLOCATION_OVERRIDE_FORM
@@ -182,17 +182,14 @@ onboarding#search:
   what: SEARCH_POM_ONBOARDING_STAFF
   subject_type: SEARCH_TERM
   subject_id: search_query
-  query_params: [prison_id]
 onboarding#create:
   what: CREATE_POM_POSITION
   subject_type: USER_ID
   subject_id: staff_id
-  query_params: [prison_id]
 
 poms#index:
   what: VIEW_PRISON_POMS
   subject_type: NOT_APPLICABLE
-  query_params: [prison_id]
 poms#show:
   what: VIEW_POM_PROFILE
   subject_type: USER_ID

@@ -106,7 +106,7 @@ RSpec.describe AllocationStaffController, type: :controller do
         expect(response.body).to include('Current workload')
         expect(response.body).to include('Allocate')
         expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_POM_COMPARISON', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-        expect(hmpps_audit_events.pluck(:details)).to all(eq('queryParams' => { 'pomIds' => [poms.second.staff_id.to_s, poms.last.staff_id.to_s] }))
+        expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison_code, 'queryParams' => { 'pomIds' => [poms.second.staff_id.to_s, poms.last.staff_id.to_s] }))
       end
     end
 
@@ -197,7 +197,7 @@ RSpec.describe AllocationStaffController, type: :controller do
             expect(page.at_css("a[href='#{confirm_prison_coworking_path(prison_code, offender_no, secondary_pom_nomis_id: poms.first.staff_id)}']").text)
               .to eq(poms.first.full_name_ordered)
             expect(hmpps_audit_events.last(2)).to have_recorded_event('VIEW_ALLOCATION_POM_SELECTION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-            expect(hmpps_audit_events.last[:details]).to eq('queryParams' => { 'coworking' => 'true' })
+            expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison_code, 'queryParams' => { 'coworking' => 'true' })
           end
 
           it 'sorts by POM name rather than POM type because co-working has no recommendation' do

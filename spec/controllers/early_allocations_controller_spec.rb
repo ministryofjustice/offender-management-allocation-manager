@@ -89,7 +89,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
         expect(response).to render_template(:edit)
         expect(assigns(:early_allocation)).to eq(early_allocations.last)
         expect(hmpps_audit_events).to have_recorded_event('VIEW_EARLY_ALLOCATION_DECISION_FORM', who: 'alice', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
-        expect(hmpps_audit_events.last[:details]).to eq('entityId' => early_allocations.last.id)
+        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison, 'entityId' => early_allocations.last.id)
       end
     end
 
@@ -106,9 +106,9 @@ RSpec.describe EarlyAllocationsController, type: :controller do
               'VIEW_EARLY_ALLOCATION_ASSESSMENT',
               who: 'alice', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id
             )
-            expect(hmpps_audit_events.first[:details]).to eq('queryParams' => { 'id' => record.id.to_s, 'format' => format.to_s })
+            expect(hmpps_audit_events.first[:details]).to eq('prisonId' => prison, 'queryParams' => { 'id' => record.id.to_s, 'format' => format.to_s })
             expect(hmpps_audit_events.last[:details]).to eq(
-              'queryParams' => { 'id' => record.id.to_s, 'format' => format.to_s }, 'entityId' => record.id
+              'prisonId' => prison, 'queryParams' => { 'id' => record.id.to_s, 'format' => format.to_s }, 'entityId' => record.id
             )
           end
 
@@ -145,7 +145,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
           expect(RecalculateHandoverDateJob).to have_received(:perform_now).with(nomis_offender_id, trigger_method: 'early_allocation')
           expect(response).to redirect_to(prison_prisoner_path(prison, nomis_offender_id))
           expect(hmpps_audit_events).to have_recorded_event('EDIT_EARLY_ALLOCATION_DECISION', who: 'alice', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
-          expect(hmpps_audit_events.last[:details]).to eq('decisionUpdated' => true, 'entityId' => early_allocations.last.id)
+          expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison, 'decisionUpdated' => true, 'entityId' => early_allocations.last.id)
         end
       end
 
@@ -159,7 +159,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
         expect(early_allocations.last.reload.community_decision).to be(true)
         expect(hmpps_audit_events).to have_recorded_event('EDIT_EARLY_ALLOCATION_DECISION', outcome: 'FAILURE', subject_id: nomis_offender_id)
         expect(hmpps_audit_events.last[:details]).to eq(
-          'decisionUpdated' => true, 'entityId' => early_allocations.last.id,
+          'prisonId' => prison, 'decisionUpdated' => true, 'entityId' => early_allocations.last.id,
           'failureReason' => 'Application failed to complete the operation: RuntimeError'
         )
       end
@@ -217,7 +217,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
           assert_template('landing_eligible')
           expect(early_allocation.created_within_referral_window).to eq(false)
           expect(hmpps_audit_events).to have_recorded_event('SUBMIT_EARLY_ALLOCATION_ELIGIBILITY', who: 'alice', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
-          expect(hmpps_audit_events.last[:details]).to eq('assessmentCreated' => true, 'entityId' => early_allocation.id)
+          expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison, 'assessmentCreated' => true, 'entityId' => early_allocation.id)
         end
       end
 
@@ -251,7 +251,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
             expect(response.body).to include('Extremism separation centres')
             expect(EarlyAllocation.count).to eq(0)
             expect(hmpps_audit_events).to have_recorded_event('SUBMIT_EARLY_ALLOCATION_ELIGIBILITY', subject_id: nomis_offender_id)
-            expect(hmpps_audit_events.last[:details]).to eq('assessmentCreated' => false)
+            expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison, 'assessmentCreated' => false)
           end
         end
       end
@@ -296,7 +296,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
         assert_template 'landing_ineligible'
         expect(EarlyAllocation.last.outcome).to eq('ineligible')
         expect(hmpps_audit_events).to have_recorded_event('SUBMIT_EARLY_ALLOCATION_DISCRETIONARY', who: 'alice', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
-        expect(hmpps_audit_events.last[:details]).to eq('assessmentCreated' => true, 'entityId' => EarlyAllocation.last.id)
+        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison, 'assessmentCreated' => true, 'entityId' => EarlyAllocation.last.id)
       end
 
       it 'displays the reason form and audits progression without saving' do
@@ -311,7 +311,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
 
         expect(response).to render_template(:confirm_with_reason)
         expect(hmpps_audit_events).to have_recorded_event('SUBMIT_EARLY_ALLOCATION_DISCRETIONARY', subject_id: nomis_offender_id)
-        expect(hmpps_audit_events.last[:details]).to eq('assessmentCreated' => false)
+        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison, 'assessmentCreated' => false)
       end
 
       it 'renders validation errors without saving' do
@@ -378,7 +378,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
       expect(response).to render_template(:landing_discretionary)
       expect(CommunityEarlyAllocationEmailJob).to have_received(:perform_later).with(have_attributes(code: prison), nomis_offender_id, a_kind_of(String))
       expect(hmpps_audit_events).to have_recorded_event('CREATE_EARLY_ALLOCATION_ASSESSMENT', who: 'alice', subject_type: 'PRISONER_ID', subject_id: nomis_offender_id)
-      expect(hmpps_audit_events.last[:details]).to eq('assessmentCreated' => true, 'entityId' => EarlyAllocation.last.id)
+      expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison, 'assessmentCreated' => true, 'entityId' => EarlyAllocation.last.id)
     end
 
     it 'records the saved assessment even when email enqueueing fails' do
@@ -391,7 +391,7 @@ RSpec.describe EarlyAllocationsController, type: :controller do
       expect(EarlyAllocation.where(nomis_offender_id:).count).to eq(1)
       expect(hmpps_audit_events).to have_recorded_event('CREATE_EARLY_ALLOCATION_ASSESSMENT', outcome: 'FAILURE', subject_id: nomis_offender_id)
       expect(hmpps_audit_events.last[:details]).to eq(
-        'assessmentCreated' => true, 'entityId' => EarlyAllocation.last.id,
+        'prisonId' => prison, 'assessmentCreated' => true, 'entityId' => EarlyAllocation.last.id,
         'failureReason' => 'Application failed to complete the operation: RuntimeError'
       )
     end

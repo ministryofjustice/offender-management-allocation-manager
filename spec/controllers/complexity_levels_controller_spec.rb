@@ -56,7 +56,7 @@ RSpec.describe ComplexityLevelsController, type: :controller do
           expect(assigns(:prisoner).first_name).to eq('Sally')
           expect(assigns(:prisoner).last_name).to eq('Albright')
           expect(hmpps_audit_events).to have_recorded_event('EDIT_COMPLEXITY_LEVEL', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-          expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
+          expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => womens_prison.code))
 
           expect(HmppsApi::ComplexityApi).to have_received(:save).with(
             offender_no,

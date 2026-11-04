@@ -47,7 +47,7 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
       expect(response.body).to include('Allocate to someone else')
       expect(response.body).to include('Choose all that apply')
       expect(hmpps_audit_events).to have_recorded_event('VIEW_NEW_REALLOCATION_OVERRIDE_FORM', who: 'spo-user', subject_type: 'PRISONER_ID', subject_id: override_offender_no)
-      expected_details = { 'queryParams' => { 'nomisStaffId' => old_pom.staffId.to_s, 'newPom' => new_pom.staffId.to_s } }
+      expected_details = { 'prisonId' => prison.code, 'queryParams' => { 'nomisStaffId' => old_pom.staffId.to_s, 'newPom' => new_pom.staffId.to_s } }
       expect(hmpps_audit_events.pluck(:details)).to all(eq(expected_details))
     end
   end

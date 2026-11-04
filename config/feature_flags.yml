@@ -9,3 +9,4 @@ feature_flags:
     preprod: true
   hmpps_audit:
     staging: true
+    preprod: true

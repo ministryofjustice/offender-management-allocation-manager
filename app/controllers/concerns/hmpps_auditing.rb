@@ -47,7 +47,7 @@ private
       subject_type: config.fetch(:subject_type),
       subject_id: audit_param(config[:subject_id]),
       correlation_id: request.request_id,
-      details: audit_query_params(config.fetch(:query_params)),
+      details: audit_details(config.fetch(:query_params)),
     )
     @audit_interaction.record do
       begin
@@ -75,6 +75,10 @@ private
   def audit_param(key)
     value = params[key] if key
     value.squish.presence if value.is_a?(String)
+  end
+
+  def audit_details(query_param_keys)
+    { 'prisonId' => request.path_parameters[:prison_id] }.compact.merge(audit_query_params(query_param_keys))
   end
 
   def audit_query_params(keys)

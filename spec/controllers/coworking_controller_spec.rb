@@ -63,7 +63,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
       expect(session[:latest_allocation_details][:additional_notes]).to eq(message)
       expect(session[:latest_allocation_details]).to include(prisoner_number: offender_no)
       expect(hmpps_audit_events).to have_recorded_event('CREATE_COWORKING_ALLOCATION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-      expect(hmpps_audit_events.pluck(:details)).to all(eq('queryParams' => { 'secondaryPomNomisId' => new_secondary_pom.staffId.to_s }))
+      expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison, 'queryParams' => { 'secondaryPomNomisId' => new_secondary_pom.staffId.to_s }))
     end
   end
 
@@ -88,7 +88,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
     it 'returns success' do
       expect(response.code).to eq('200')
       expect(hmpps_audit_events).to have_recorded_event('VIEW_NEW_COWORKING_ALLOCATION_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-      expect(hmpps_audit_events.pluck(:details)).to all(eq('queryParams' => { 'secondaryPomNomisId' => new_secondary_pom.staffId.to_s }))
+      expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison, 'queryParams' => { 'secondaryPomNomisId' => new_secondary_pom.staffId.to_s }))
     end
 
     it 'does not leave offender details in the session' do
@@ -131,7 +131,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
         expect(flash[:notice]).to include(secondary_pom_name)
         expect(flash[:notice]).to include('removed as co-working POM')
         expect(hmpps_audit_events).to have_recorded_event('DELETE_COWORKING_ALLOCATION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-        expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
+        expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison))
       end
     end
 
@@ -140,7 +140,7 @@ RSpec.describe CoworkingController, :allocation, type: :controller do
 
       expect(response).to render_template(:confirm_removal)
       expect(hmpps_audit_events).to have_recorded_event('VIEW_REMOVE_COWORKING_ALLOCATION_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-      expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
+      expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison))
     end
 
     context 'when the secondary pom name is missing' do

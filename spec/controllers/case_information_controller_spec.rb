@@ -50,7 +50,7 @@ RSpec.describe CaseInformationController, type: :controller do
         expect(case_information.rosh_level).to eq('HIGH')
         expect(case_information.enhanced_resourcing).to be(true)
         expect(hmpps_audit_events).to have_recorded_event('CREATE_CASE_INFORMATION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-        expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
+        expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison.code))
       end
     end
 
@@ -383,7 +383,7 @@ RSpec.describe CaseInformationController, type: :controller do
           expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
           expect(case_information.reload.rosh_level).to eq('HIGH')
           expect(hmpps_audit_events).to have_recorded_event('EDIT_CASE_INFORMATION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-          expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
+          expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison.code))
         end
       end
 

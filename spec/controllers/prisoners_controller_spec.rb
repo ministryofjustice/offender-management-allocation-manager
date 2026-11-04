@@ -689,7 +689,7 @@ RSpec.describe PrisonersController, type: :controller do
             it 'audits the requested results page' do
               get :search, params: { prison_id: prison, q: 'Blog', page: '2' }
 
-              expect(hmpps_audit_events.map { it[:details]['queryParams'] }).to all(eq('prisonId' => prison, 'page' => '2'))
+              expect(hmpps_audit_events.map { it[:details]['queryParams'] }).to all(eq('page' => '2'))
             end
 
             it 'audits the search term, prison and every returned prisoner' do
@@ -700,9 +700,9 @@ RSpec.describe PrisonersController, type: :controller do
               expect(hmpps_audit_events).to have_recorded_event('SEARCH_PRISONER', subject_type: 'SEARCH_TERM', subject_id: 'Blog')
               expect(hmpps_audit_events.map { it[:details] }).to eq(
                 [
-                  { 'queryParams' => { 'prisonId' => prison } },
+                  { 'prisonId' => prison },
                   {
-                    'queryParams' => { 'prisonId' => prison },
+                    'prisonId' => prison,
                     'results' => { 'resultCount' => 3, 'returnedSubjectIds' => returned_ids },
                   },
                 ]
@@ -906,7 +906,7 @@ RSpec.describe PrisonersController, type: :controller do
       expect(assigns(:coworking)).to be(false)
       expect(response.body).not_to include('Primary POM:')
       expect(hmpps_audit_events).to have_recorded_event('VIEW_CASE_DETAILS', subject_type: 'PRISONER_ID', subject_id: offender_id)
-      expect(hmpps_audit_events.pluck(:details)).to all(eq('queryParams' => { 'coworking' => 'true' }))
+      expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison.code, 'queryParams' => { 'coworking' => 'true' }))
     end
 
     describe 'remembering where the allocation journey started' do
@@ -1056,7 +1056,7 @@ RSpec.describe PrisonersController, type: :controller do
         expect(response.body).to eq(image.data)
         expect(response.media_type).to eq('image/jpg')
         expect(hmpps_audit_events).to have_recorded_event('VIEW_PRISONER_PHOTO', outcome: 'FAILURE', subject_id: 'A1234BC')
-        expect(hmpps_audit_events.last[:details]).to eq('failureReason' => 'Prisoner photo not available')
+        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'failureReason' => 'Prisoner photo not available')
       end
     end
 

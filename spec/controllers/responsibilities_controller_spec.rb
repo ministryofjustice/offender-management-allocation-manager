@@ -126,7 +126,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
 
         expect(response).to render_template(:confirm)
         expect(hmpps_audit_events).to have_recorded_event('SUBMIT_RESPONSIBILITY_OVERRIDE_REASON', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-        expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
+        expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison.code))
       end
 
       it 'renders validation errors when no reason is selected' do
@@ -151,7 +151,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
 
       expect(response).to render_template(:confirm_removal)
       expect(hmpps_audit_events).to have_recorded_event('VIEW_REMOVE_RESPONSIBILITY_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-      expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
+      expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison.code))
     end
   end
 
@@ -193,8 +193,8 @@ RSpec.describe ResponsibilitiesController, type: :controller do
         expect(response).to redirect_to(prison_prisoner_review_case_details_path(prison_id: prison.code, prisoner_id: offender_no))
         expect_override_emails(sso_email_address, offender.ldu_email_address)
         expect(hmpps_audit_events).to have_recorded_event('CREATE_RESPONSIBILITY_OVERRIDE', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-        expect(hmpps_audit_events.first[:details]).to eq({})
-        expect(hmpps_audit_events.last[:details]).to eq('entityId' => responsibility.id, 'responsibilityCreated' => true)
+        expect(hmpps_audit_events.first[:details]).to eq('prisonId' => prison.code)
+        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'entityId' => responsibility.id, 'responsibilityCreated' => true)
       end
     end
 
@@ -226,7 +226,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
         expect(PomMailer).not_to have_received(:with)
         expect(responsibility_override_mailer).not_to have_received(:deliver_later)
         expect(hmpps_audit_events).to have_recorded_event('CREATE_RESPONSIBILITY_OVERRIDE', outcome: 'FAILURE', subject_id: offender_no)
-        expect(hmpps_audit_events.last[:details]).to eq('entityId' => responsibility.id, 'failureReason' => 'Responsibility override already exists')
+        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'entityId' => responsibility.id, 'failureReason' => 'Responsibility override already exists')
       end
     end
 
@@ -248,7 +248,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
         expect(PomMailer).not_to have_received(:with)
         expect(responsibility_override_mailer).not_to have_received(:deliver_later)
         expect(hmpps_audit_events).to have_recorded_event('CREATE_RESPONSIBILITY_OVERRIDE', outcome: 'FAILURE', subject_id: offender_no)
-        expect(hmpps_audit_events.last[:details]).to eq('entityId' => existing_responsibility.id, 'failureReason' => 'Responsibility override already exists')
+        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'entityId' => existing_responsibility.id, 'failureReason' => 'Responsibility override already exists')
       end
     end
   end
@@ -299,8 +299,8 @@ RSpec.describe ResponsibilitiesController, type: :controller do
             emails: [sso_email_address, offender.ldu_email_address]
           )
           expect(hmpps_audit_events).to have_recorded_event('DELETE_RESPONSIBILITY_OVERRIDE', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-          expect(hmpps_audit_events.first[:details]).to eq({})
-          expect(hmpps_audit_events.last[:details]).to eq('entityId' => deleted_id, 'responsibilityDeleted' => true)
+          expect(hmpps_audit_events.first[:details]).to eq('prisonId' => prison.code)
+          expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'entityId' => deleted_id, 'responsibilityDeleted' => true)
         end
       end
 

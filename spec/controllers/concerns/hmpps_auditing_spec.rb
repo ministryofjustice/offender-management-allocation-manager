@@ -115,6 +115,31 @@ RSpec.describe HmppsAuditing, type: :controller do
   end
 
   describe 'details' do
+    it 'includes the route prison on both events alongside query params and outcome details' do
+      routes.draw { patch '/prisons/:prison_id/allocation/:id' => 'anonymous#update' }
+
+      patch :update, params: { prison_id: 'LEI', id: 'Smith', page: '2', saved: true }
+
+      expect(hmpps_audit_events.pluck(:details)).to eq([
+        { 'prisonId' => 'LEI', 'queryParams' => { 'page' => '2' } },
+        { 'prisonId' => 'LEI', 'queryParams' => { 'page' => '2' }, 'saved' => true },
+      ])
+    end
+
+    it 'includes the route prison when a callback denies access' do
+      routes.draw { get '/prisons/:prison_id/allocation/:id' => 'anonymous#show' }
+
+      get :show, params: { prison_id: 'LEI', id: 'A1234BC', denied: true }
+
+      expect(hmpps_audit_events).to all(include(details: hash_including('prisonId' => 'LEI')))
+    end
+
+    it 'does not infer a prison from query parameters on an unscoped route' do
+      get :show, params: { id: 'A1234BC', prison_id: 'LEI' }
+
+      expect(hmpps_audit_events.pluck(:details)).to eq([{}, {}])
+    end
+
     it 'captures flat string arrays without including blank values or nested structures' do
       patch :update, params: { id: 'Smith', pom_ids: [' 123 ', '', '456', { private: 'notes' }, ['789']] }
 
@@ -162,11 +187,13 @@ RSpec.describe HmppsAuditing, type: :controller do
   end
 
   it 'records rendering failures as failures, not successes' do
+    routes.draw { get '/prisons/:prison_id/allocation/:id' => 'anonymous#show' }
     allow(controller).to receive(:render).and_raise(RuntimeError, 'rendering failed')
 
-    expect { get :show, params: { id: 'A1234BC' } }.to raise_error(RuntimeError, 'rendering failed')
+    expect { get :show, params: { prison_id: 'LEI', id: 'A1234BC' } }.to raise_error(RuntimeError, 'rendering failed')
 
     expect(hmpps_audit_events.map { it[:what] }).to eq(%w[VIEW_ALLOCATION_ATTEMPT VIEW_ALLOCATION_FAILURE])
+    expect(hmpps_audit_events).to all(include(details: hash_including('prisonId' => 'LEI')))
   end
 
   it 'treats a completed action redirect as success without an explicit signal' do
