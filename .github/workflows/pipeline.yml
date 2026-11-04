@@ -143,7 +143,7 @@ jobs:
           dropdb -U schemaspy -h localhost --if-exists mpc_schemaspy && \
           createdb -U schemaspy -h localhost mpc_schemaspy && \
           psql -U schemaspy -h localhost -d mpc_schemaspy < db/structure.sql
-      - uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/database_schema_report@38a8e31c789777d02669f8b2de309d66ebf00f55 # v1.1.8
+      - uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/database_schema_report@aff6180015ac5ddbec7eff2e1f63266ce97462c4 # v1.1.9
         with:
           database_name: mpc_schemaspy
           user: schemaspy
@@ -158,6 +158,7 @@ jobs:
     with:
       environment: 'staging'
       app_version: '${{ needs.build.outputs.app_version }}'
+      helm_timeout: '8m'
 
   deploy_preprod:
     name: Deploy to preprod
@@ -169,15 +170,18 @@ jobs:
     with:
       environment: 'preprod'
       app_version: '${{ needs.build.outputs.app_version }}'
+      helm_timeout: '8m'
 
   deploy_production:
     name: Deploy to production
     needs:
       - build
+      - deploy_staging
       - deploy_preprod
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
     with:
       environment: 'production'
       app_version: '${{ needs.build.outputs.app_version }}'
+      helm_timeout: '8m'
       slack_notification: 'true'
