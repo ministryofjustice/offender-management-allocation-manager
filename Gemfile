@@ -3,7 +3,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby file: '.ruby-version'
 
-gem 'rails', '~> 8.1.0'
+gem 'rails', '~> 8.1.4'
 
 # Need AWS S3 SDK for processing PPUD exports
 gem 'aws-sdk-s3'
@@ -27,7 +27,7 @@ gem 'lograge'
 gem 'logstash-event'
 gem 'logstash-logger'
 gem 'omniauth-oauth2'
-gem 'omniauth', '~> 2.1.4'
+gem 'omniauth', '~> 2.3.1'
 gem 'omniauth-rails_csrf_protection'
 gem 'ostruct'
 gem 'paper_trail', '~> 17.0'
