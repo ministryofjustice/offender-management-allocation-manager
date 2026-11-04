@@ -47,12 +47,12 @@ Rails.application.routes.draw do
         get :working_pattern
         post :working_pattern
         get :check_answers
-        post :check_answers
+        post :check_answers, action: :create
         get :confirmation
       end
 
       collection do
-        get :search
+        get :search, action: :search_form
         post :search
         get :error
       end

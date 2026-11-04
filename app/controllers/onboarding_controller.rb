@@ -4,36 +4,40 @@ class OnboardingController < PrisonsApplicationController
   before_action :ensure_spo_user
 
   # track answers across steps
-  before_action :setup_form, only: [:search, :position, :working_pattern, :check_answers]
+  before_action :setup_form, except: [:confirmation, :error]
 
-  before_action :set_staff_id_being_onboarded, except: [:search, :error]
-  before_action :set_pom_details, only: [:position, :working_pattern, :check_answers]
+  before_action :set_staff_id_being_onboarded, except: [:search_form, :search, :error]
+  before_action :set_pom_details, only: [:position, :working_pattern, :check_answers, :create]
 
   rescue_from StandardError do |e|
     Rails.error.report(e, severity: :error, source: 'onboarding')
-    render :error
+    render :error, status: :internal_server_error
+  end
+
+  def search_form
+    @total_results = 0
+    @onboarding_form.search_query = nil
+    render :search
   end
 
   def search
     @total_results = 0
-
-    if request.post?
-      @onboarding_form.assign_attributes(
-        pom_onboarding_form_params.permit(:search_query).merge(
-          # reset other steps after a new search
-          position: nil, schedule_type: nil, working_pattern: nil
-        )
+    @onboarding_form.assign_attributes(
+      params.slice(:search_query).permit(:search_query).merge(
+        # reset other steps after a new search
+        position: nil, schedule_type: nil, working_pattern: nil
       )
+    )
 
-      if @onboarding_form.valid?(:search)
-        save_to_session(@onboarding_form)
+    if @onboarding_form.valid?(:search)
+      save_to_session(@onboarding_form)
 
-        @results, @total_results = NomisUserRolesService.search_staff(
-          @prison, @onboarding_form.search_query
-        )
-      end
+      @results, @total_results = NomisUserRolesService.search_staff(
+        @prison, @onboarding_form.search_query
+      )
+      audit(results: @results.map { it.fetch('staffId').to_s })
     else
-      @onboarding_form.search_query = nil
+      render :search, status: :unprocessable_entity
     end
   end
 
@@ -63,17 +67,21 @@ class OnboardingController < PrisonsApplicationController
     end
   end
 
-  def check_answers
-    if request.post?
-      NomisUserRolesService.add_pom(
-        @prison, @staff_id, sso_identity.current_user,
-        @onboarding_form.slice(:position, :schedule_type, :hours_per_week)
-      )
+  def check_answers; end
 
-      save_to_session(PomOnboardingForm.new) # reset session data
+  def create
+    audit(details: {
+      'position' => @onboarding_form.position,
+      'workingPattern' => @onboarding_form.working_pattern_ratio
+    })
 
-      redirect_to confirmation_prison_onboarding_path
-    end
+    NomisUserRolesService.add_pom(
+      @prison, @staff_id, sso_identity.current_user,
+      @onboarding_form.slice(:position, :schedule_type, :hours_per_week)
+    )
+
+    save_to_session(PomOnboardingForm.new) # reset session data
+    redirect_to confirmation_prison_onboarding_path
   end
 
   def confirmation

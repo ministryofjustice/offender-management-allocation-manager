@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 feature 'POM onboarding' do
+  include_context 'with HMPPS audit event capture'
+
   let!(:prison) { Prison.find_by(code: 'LEI') || create(:prison, code: 'LEI') }
   let(:existing_poms) { [build(:pom, staffId: 111_222)] }
   let(:staff_id) { 123_456 }
@@ -28,6 +30,7 @@ feature 'POM onboarding' do
       expect(page).to have_title('Find a staff member – Digital Prison Services')
       expect(page).to have_css('label.govuk-label--l', text: 'Find a staff member')
       expect(page).to have_text('Use name, email address or username')
+      expect(hmpps_audit_events).to be_empty
       expect(page).to have_css(
         '.govuk-hint', text: 'Search people who have not been added to the service yet'
       )
@@ -48,6 +51,8 @@ feature 'POM onboarding' do
           expect(page).to have_title('Find a staff member – Digital Prison Services')
           expect(page).to have_css('label.govuk-label--l', text: 'Find a staff member')
           expect(page).to have_css('p.govuk-error-message', text: 'Enter at least 3 characters')
+          expect(page.status_code).to eq(422)
+          expect(hmpps_audit_events).to have_recorded_event('SEARCH_POM_ONBOARDING_STAFF', outcome: 'FAILURE', subject_id: 'a')
         end
       end
 
@@ -69,6 +74,7 @@ feature 'POM onboarding' do
             expect(page).to have_title('No results – Digital Prison Services')
             expect(page).to have_css('label.govuk-label--l', text: 'No results for foobar')
             expect(page).to have_text('Search again or ask a local systems administrator')
+            expect(hmpps_audit_events.last[:details]).to include('results' => { 'resultCount' => 0, 'returnedSubjectIds' => [] })
           end
         end
 
@@ -99,6 +105,57 @@ feature 'POM onboarding' do
             expect(page).to have_css('td.govuk-table__cell[data-sort-value="Joe Bloggs"]')
             expect(page).to have_text('joe.bloggs@example.com')
             expect(page).to have_text('TEST_USER')
+
+            stub_pom(build(:pom, staffId: staff_id))
+            click_link 'Joe Bloggs'
+            click_button 'Back'
+
+            expect(page).to have_title('Search results – Digital Prison Services')
+            expect(page).to have_link('Joe Bloggs')
+          end
+
+          it 'preserves navigation and session answers through cancellation and onboarding' do
+            pom = build(:pom, :probation_officer, staffId: staff_id, firstName: 'Joe', lastName: 'Bloggs')
+            stub_pom(pom)
+            stub_inexistent_filtered_pom(prison.code, staff_id)
+            allow(NomisUserRolesService).to receive(:add_pom).with(
+              prison, staff_id, 'MOIC_POM', { position: 'PO', schedule_type: 'PT', hours_per_week: 18.75 }
+            ) { stub_onboarded_poms(prison, [pom]) }
+
+            click_link 'Joe Bloggs'
+            choose 'Probation POM'
+            click_button 'Continue'
+            choose 'Part time'
+            choose '2.5 days'
+            click_button 'Continue'
+            expect(page).to have_text('Check your answers')
+
+            click_link 'Back'
+            expect(page).to have_checked_field('Part time')
+            expect(page).to have_checked_field('2.5 days')
+            click_link 'Back'
+            expect(page).to have_checked_field('Probation POM')
+            click_button 'Continue'
+            click_button 'Continue'
+            click_button 'Cancel'
+            expect(page).to have_field('search_query', with: 'bloggs')
+            expect(page).to have_link('Joe Bloggs')
+            expect(NomisUserRolesService).not_to have_received(:add_pom)
+
+            click_link 'Joe Bloggs'
+            expect(page).not_to have_checked_field('Probation POM')
+            choose 'Probation POM'
+            click_button 'Continue'
+            expect(page).not_to have_checked_field('Part time')
+            choose 'Part time'
+            choose '2.5 days'
+            click_button 'Continue'
+            click_button 'Add POM'
+
+            expect(page).to have_text('Joe Bloggs added as a probation POM')
+            expect(NomisUserRolesService).to have_received(:add_pom).once
+            click_link 'Add another POM'
+            expect(find_field('search_query').value).to be_blank
           end
         end
       end
@@ -141,7 +198,25 @@ feature 'POM onboarding' do
         expect(page).to have_link('Jane Bloggs', href: position_prison_onboarding_path(prison.code, 321_555))
         expect(page).to have_text('jane.bloggs@example.com')
         expect(page).to have_text('ANOTHER_USER')
+        expect(hmpps_audit_events).to have_recorded_event(
+          'SEARCH_POM_ONBOARDING_STAFF', subject_type: 'SEARCH_TERM', subject_id: 'bloggs'
+        )
+        expect(hmpps_audit_events.last[:details]).to eq(
+          'queryParams' => { 'prisonId' => prison.code },
+          'results' => { 'resultCount' => 1, 'returnedSubjectIds' => ['321555'] }
+        )
       end
+    end
+
+    it 'records a failed search when the staff service is unavailable' do
+      allow(NomisUserRolesService).to receive(:search_staff).and_raise(IOError, 'Staff service unavailable')
+
+      fill_in(id: 'pom-onboarding-form-search-query-field', with: 'bloggs')
+      click_button 'Search'
+
+      expect(page.status_code).to eq(500)
+      expect(page).to have_title('There is a problem – Digital Prison Services')
+      expect(hmpps_audit_events).to have_recorded_event('SEARCH_POM_ONBOARDING_STAFF', outcome: 'FAILURE', subject_id: 'bloggs')
     end
   end
 
@@ -164,6 +239,7 @@ feature 'POM onboarding' do
       expect(page).to have_css(
         'legend.govuk-fieldset__legend', text: 'Select one option'
       )
+      expect(hmpps_audit_events).to be_empty
     end
 
     it 'gives an error if no radio option is selected' do
@@ -288,6 +364,25 @@ feature 'POM onboarding' do
         expect(page).to have_text('POM added')
         expect(page).to have_text('John Doe added as a probation POM')
         expect(page).to have_text('You can now allocate cases to probation POM John Doe.')
+        expect(hmpps_audit_events).to have_recorded_event(
+          'CREATE_POM_POSITION', subject_type: 'USER_ID', subject_id: staff_id.to_s
+        )
+        expect(hmpps_audit_events).to include(a_hash_including(
+                                                what: 'CREATE_POM_POSITION_SUCCESS',
+                                                details: { 'queryParams' => { 'prisonId' => prison.code }, 'position' => 'PO', 'workingPattern' => 1.0 }
+                                              ))
+      end
+
+      it 'audits a failed onboarding without showing confirmation' do
+        allow(NomisUserRolesService).to receive(:add_pom).and_raise(IOError, 'Staff service unavailable')
+
+        click_button 'Add POM'
+
+        expect(page.status_code).to eq(500)
+        expect(page).to have_title('There is a problem – Digital Prison Services')
+        expect(hmpps_audit_events).to have_recorded_event(
+          'CREATE_POM_POSITION', outcome: 'FAILURE', subject_type: 'USER_ID', subject_id: staff_id.to_s
+        )
       end
     end
   end

@@ -178,6 +178,42 @@ reallocations/journey#override:
   subject_id: nomis_offender_id
   query_params: [nomis_staff_id, new_pom]
 
+onboarding#search:
+  what: SEARCH_POM_ONBOARDING_STAFF
+  subject_type: SEARCH_TERM
+  subject_id: search_query
+  query_params: [prison_id]
+onboarding#create:
+  what: CREATE_POM_POSITION
+  subject_type: USER_ID
+  subject_id: staff_id
+  query_params: [prison_id]
+
+poms#index:
+  what: VIEW_PRISON_POMS
+  subject_type: NOT_APPLICABLE
+  query_params: [prison_id]
+poms#show:
+  what: VIEW_POM_PROFILE
+  subject_type: USER_ID
+  subject_id: nomis_staff_id
+poms#edit:
+  what: VIEW_POM_PROFILE_FORM
+  subject_type: USER_ID
+  subject_id: nomis_staff_id
+poms#update:
+  what: EDIT_POM_PROFILE
+  subject_type: USER_ID
+  subject_id: nomis_staff_id
+poms#destroy:
+  what: DELETE_POM_PROFILE
+  subject_type: USER_ID
+  subject_id: nomis_staff_id
+poms#reallocate:
+  what: VIEW_POM_REALLOCATION_SUMMARY
+  subject_type: USER_ID
+  subject_id: nomis_staff_id
+
 responsibilities#new:
   what: VIEW_NEW_RESPONSIBILITY_FORM
   subject_type: PRISONER_ID
@@ -234,6 +270,21 @@ errors#internal_server_error:
 
 onboarding#error:
   exempt: Static error page with no prisoner or staff data
+onboarding#search_form:
+  exempt: Empty search form with no prisoner or staff data
+onboarding#position:
+  exempt: Intermediate step part of wizard
+onboarding#working_pattern:
+  exempt: Intermediate step part of wizard
+onboarding#check_answers:
+  exempt: Intermediate step part of wizard
+onboarding#confirmation:
+  exempt: Confirmation of an already audited create operation
+
+handovers/email_preferences#edit:
+  exempt: Signed-in user's own email notification preferences
+handovers/email_preferences#update:
+  exempt: Signed-in user's own email notification preferences
 
 reallocations/selection#error:
   exempt: Static error page with no prisoner or staff data
@@ -338,39 +389,10 @@ handovers#overdue_tasks:
 handovers#upcoming:
   todo: true
 
-handovers/email_preferences#edit:
-  todo: true
-handovers/email_preferences#update:
-  todo: true
-
 manage/audit_events#index:
   todo: true
 
-onboarding#check_answers:
-  todo: true
-onboarding#confirmation:
-  todo: true
-onboarding#position:
-  todo: true
-onboarding#search:
-  todo: true
-onboarding#working_pattern:
-  todo: true
-
 parole_cases#index:
-  todo: true
-
-poms#destroy:
-  todo: true
-poms#edit:
-  todo: true
-poms#index:
-  todo: true
-poms#reallocate:
-  todo: true
-poms#show:
-  todo: true
-poms#update:
   todo: true
 
 prisoners#allocated:

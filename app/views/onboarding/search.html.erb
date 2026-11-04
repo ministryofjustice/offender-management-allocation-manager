@@ -27,7 +27,7 @@
 
         <%= hidden_field_tag :from, params[:from] %>
 
-        <%= f.govuk_text_field :search_query, type: :search, class: 'moj-search__input',
+        <%= f.govuk_text_field :search_query, name: :search_query, type: :search, class: 'moj-search__input',
                                autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', spellcheck: false,
                                label: { text: heading_text, tag: 'h1', size: 'l', class: 'moj-search__label' },
                                hint: { text: 'Search people who have not been added to the service yet.', size: 's' },
