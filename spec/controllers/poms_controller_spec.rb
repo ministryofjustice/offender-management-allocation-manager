@@ -64,7 +64,7 @@ RSpec.describe PomsController, type: :controller do
       get :index, params: { prison_id: prison.code }
       expect(response).to be_successful
       expect(hmpps_audit_events).to have_recorded_event(
-        'VIEW_PRISON_POMS', subject_type: 'NOT_APPLICABLE', subject_id: nil, details: { 'queryParams' => { 'prisonId' => prison.code } }
+        'VIEW_PRISON_POMS', subject_type: 'NOT_APPLICABLE', subject_id: nil, details: { 'prisonId' => prison.code }
       )
 
       expect(inactive_poms.count).to eq(1)
@@ -153,7 +153,7 @@ RSpec.describe PomsController, type: :controller do
 
       expect(response).to redirect_to(prison_pom_path(prison.code, nomis_staff_id: staff_id))
       expect(hmpps_audit_events).to have_recorded_event('VIEW_POM_REALLOCATION_SUMMARY', outcome: 'FAILURE', subject_id: staff_id.to_s)
-      expect(hmpps_audit_events.last[:details]).to eq('failureReason' => 'POM is not eligible for bulk case reallocation')
+      expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'failureReason' => 'POM is not eligible for bulk case reallocation')
     end
   end
 
@@ -189,7 +189,7 @@ RSpec.describe PomsController, type: :controller do
         expect(flash[:notice]).to eq('Profile updated for Mateo Example')
         expect(PomDetail.find_by!(nomis_staff_id: updated_staff_id)).to have_attributes(status: 'active', working_pattern: 0.8)
         expect(hmpps_audit_events).to have_recorded_event('EDIT_POM_PROFILE', subject_type: 'USER_ID', subject_id: updated_staff_id.to_s)
-        expect(hmpps_audit_events.last[:details]).to eq('workingPattern' => '0.8', 'status' => 'active')
+        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'workingPattern' => '0.8', 'status' => 'active')
       end
     end
 
@@ -203,7 +203,7 @@ RSpec.describe PomsController, type: :controller do
 
         expect(response).to redirect_to(confirm_delete_prison_pom_path(prison.code, updated_staff_id))
         expect(PomDetail.find_by(nomis_staff_id: updated_staff_id).status).to eq('active')
-        expect(hmpps_audit_events.last[:details]).to eq('workingPattern' => '1.0', 'status' => 'deleted')
+        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'workingPattern' => '1.0', 'status' => 'deleted')
       end
     end
   end
@@ -346,7 +346,7 @@ RSpec.describe PomsController, type: :controller do
           expect(NomisUserRolesService).not_to have_received(:remove_pom)
           expect(response).to redirect_to(edit_prison_pom_path(prison.code, removed_staff_id))
           expect(hmpps_audit_events).to have_recorded_event('DELETE_POM_PROFILE', outcome: 'FAILURE')
-          expect(hmpps_audit_events.last[:details]).to eq('failureReason' => HmppsAuditing::USER_CANCELLED)
+          expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'failureReason' => HmppsAuditing::USER_CANCELLED)
         end
       end
 

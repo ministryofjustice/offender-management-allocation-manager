@@ -27,7 +27,7 @@ RSpec.describe HmppsAudit::Actions do
   describe '.find' do
     it 'returns the audit declared for a controller action' do
       expect(described_class.find('prisoners', 'search')).to eq(
-        what: 'SEARCH_PRISONER', subject_type: 'SEARCH_TERM', subject_id: 'q', query_params: %w[prison_id page]
+        what: 'SEARCH_PRISONER', subject_type: 'SEARCH_TERM', subject_id: 'q', query_params: %w[page]
       )
     end
 

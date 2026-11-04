@@ -72,7 +72,7 @@ RSpec.describe FemaleMissingInfosController, type: :controller do
           expect(session["female_missing_info_complexity_saved_#{offender_no}"]).to eq(true)
           expect(response).to redirect_to(new_prison_prisoner_case_information_path(prison.code, prisoner_id: offender_no, sort: 'last_name', page: '2'))
           expect(hmpps_audit_events).to have_recorded_event('CREATE_COMPLEXITY_LEVEL', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-          expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
+          expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison.code))
         end
       end
     end

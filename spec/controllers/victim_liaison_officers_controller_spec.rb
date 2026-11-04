@@ -33,8 +33,8 @@ RSpec.describe VictimLiaisonOfficersController, type: :controller do
       expect(response).to have_http_status(:ok)
       expect(assigns(:vlo)).to eq(vlo)
       expect(hmpps_audit_events).to have_recorded_event('VIEW_VLO_DETAILS_FORM', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-      expect(hmpps_audit_events.first[:details]).to eq('queryParams' => { 'id' => vlo.id.to_s })
-      expect(hmpps_audit_events.last[:details]).to eq('queryParams' => { 'id' => vlo.id.to_s }, 'entityId' => vlo.id)
+      expect(hmpps_audit_events.first[:details]).to eq('prisonId' => prison.code, 'queryParams' => { 'id' => vlo.id.to_s })
+      expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'queryParams' => { 'id' => vlo.id.to_s }, 'entityId' => vlo.id)
     end
   end
 
@@ -60,7 +60,7 @@ RSpec.describe VictimLiaisonOfficersController, type: :controller do
 
       expect(response).to redirect_to(root_path)
       expect(hmpps_audit_events).to have_recorded_event('CREATE_VLO_DETAILS', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-      expect(hmpps_audit_events.last[:details]).to eq('entityId' => assigns(:vlo).id)
+      expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'entityId' => assigns(:vlo).id)
     end
 
     it 'renders validation errors without creating a VLO' do
@@ -89,8 +89,8 @@ RSpec.describe VictimLiaisonOfficersController, type: :controller do
       expect(vlo.reload.first_name).to eq('Updated')
       expect(response).to redirect_to(root_path)
       expect(hmpps_audit_events).to have_recorded_event('EDIT_VLO_DETAILS', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-      expect(hmpps_audit_events.first[:details]).to eq('queryParams' => { 'id' => vlo.id.to_s })
-      expect(hmpps_audit_events.last[:details]).to eq('queryParams' => { 'id' => vlo.id.to_s }, 'entityId' => vlo.id)
+      expect(hmpps_audit_events.first[:details]).to eq('prisonId' => prison.code, 'queryParams' => { 'id' => vlo.id.to_s })
+      expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'queryParams' => { 'id' => vlo.id.to_s }, 'entityId' => vlo.id)
     end
 
     it 'renders validation errors without changing the VLO' do
@@ -118,8 +118,8 @@ RSpec.describe VictimLiaisonOfficersController, type: :controller do
 
       expect(response).to redirect_to(root_path)
       expect(hmpps_audit_events).to have_recorded_event('DELETE_VLO_DETAILS', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-      expect(hmpps_audit_events.first[:details]).to eq('queryParams' => { 'id' => vlo.id.to_s })
-      expect(hmpps_audit_events.last[:details]).to eq('queryParams' => { 'id' => vlo.id.to_s }, 'entityId' => vlo.id)
+      expect(hmpps_audit_events.first[:details]).to eq('prisonId' => prison.code, 'queryParams' => { 'id' => vlo.id.to_s })
+      expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'queryParams' => { 'id' => vlo.id.to_s }, 'entityId' => vlo.id)
     end
 
     it 'keeps the VLO and audits failure when deletion is not confirmed' do
@@ -131,7 +131,7 @@ RSpec.describe VictimLiaisonOfficersController, type: :controller do
 
       expect(response).to redirect_to(root_path)
       expect(hmpps_audit_events).to have_recorded_event('DELETE_VLO_DETAILS', outcome: 'FAILURE', subject_id: offender_no)
-      expect(hmpps_audit_events.last[:details]).to eq('queryParams' => { 'id' => vlo.id.to_s }, 'entityId' => vlo.id, 'failureReason' => 'User cancelled the action')
+      expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'queryParams' => { 'id' => vlo.id.to_s }, 'entityId' => vlo.id, 'failureReason' => 'User cancelled the action')
     end
   end
 end

@@ -76,7 +76,7 @@ RSpec.describe AllocationRetentionsController, type: :controller do
     expect(response).to redirect_to(review_allocations_prison_prisoners_path(prison))
     expect(flash[:notice]).to eq('Smith, John still allocated to Jones, Jane')
     expect(hmpps_audit_events).to have_recorded_event('CREATE_ALLOCATION_RETENTION', who: 'user', subject_type: 'PRISONER_ID', subject_id: offender_no)
-    expect(hmpps_audit_events.pluck(:details)).to all(eq({}))
+    expect(hmpps_audit_events.pluck(:details)).to all(eq('prisonId' => prison.code))
   end
 
   [:new, :create].each do |action|
