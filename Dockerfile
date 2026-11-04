@@ -1,4 +1,4 @@
-FROM ruby:4.0.7-alpine3.24 AS base
+FROM ruby:4.0.9-alpine3.24 AS base
 
 # Increment to refresh OS packages and CA trust in both build stages
 ENV DOCKER_CACHE_BUSTER=2
