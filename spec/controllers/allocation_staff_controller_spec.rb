@@ -89,7 +89,7 @@ RSpec.describe AllocationStaffController, type: :controller do
         expect(response).to redirect_to(prison_prisoner_staff_index_path(prison_code, offender_no, coworking: false))
         expect(flash[:alert]).to eq('Choose POMs from the available list to compare workloads')
         expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_POM_COMPARISON', outcome: 'FAILURE', subject_id: offender_no)
-        expect(hmpps_audit_events.last[:details]).to include('failureReason' => 'Invalid POM selection')
+        expect(hmpps_audit_events.last[:details]).to include('failureReason' => HmppsAuditing::VALIDATION_FAILED)
       end
 
       it 'renders the shared comparison rows and allocation-specific actions for available POMs' do

@@ -55,6 +55,22 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
   describe '#update_override' do
     include_context 'with an override case in the reallocation journey'
 
+    after do
+      expect(hmpps_audit_events).to be_empty
+    end
+
+    it 're-renders invalid answers with 422 without changing the saved overrides' do
+      saved_journey = session[:bulk_reallocation].deep_dup
+
+      put :update_override, params: override_route_params.merge(
+        override_form: { override_reasons: [''] }
+      )
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.body).to include('Select at least one reason')
+      expect(session[:bulk_reallocation]).to eq(saved_journey)
+    end
+
     it 'stores the override and moves to the summary step' do
       put :update_override, params: override_route_params.merge(
         override_form: {

@@ -153,7 +153,7 @@ RSpec.describe PomsController, type: :controller do
 
       expect(response).to redirect_to(prison_pom_path(prison.code, nomis_staff_id: staff_id))
       expect(hmpps_audit_events).to have_recorded_event('VIEW_POM_REALLOCATION_SUMMARY', outcome: 'FAILURE', subject_id: staff_id.to_s)
-      expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'failureReason' => 'POM is not eligible for bulk case reallocation')
+      expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'failureReason' => HmppsAuditing::VALIDATION_FAILED)
     end
   end
 

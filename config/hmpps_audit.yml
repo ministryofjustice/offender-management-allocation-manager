@@ -37,6 +37,22 @@ allocations#history:
   subject_type: PRISONER_ID
   subject_id: prisoner_id
 
+build_allocations#show:
+  what: VIEW_PRIMARY_POM_ALLOCATION_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+  query_params: [staff_id]
+build_allocations#override:
+  what: VIEW_NEW_ALLOCATION_OVERRIDE_FORM
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+  query_params: [staff_id]
+build_allocations#update:
+  what: CREATE_PRIMARY_POM_ALLOCATION
+  subject_type: PRISONER_ID
+  subject_id: prisoner_id
+  query_params: [staff_id]
+
 case_information#edit:
   what: VIEW_CASE_INFORMATION_FORM
   subject_type: PRISONER_ID
@@ -178,6 +194,16 @@ reallocations/journey#override:
   subject_id: nomis_offender_id
   query_params: [nomis_staff_id, new_pom]
 
+reallocations/selection#index:
+  what: VIEW_REALLOCATION_POM_SELECTION
+  subject_type: USER_ID
+  subject_id: nomis_staff_id
+reallocations/selection#compare_poms:
+  what: VIEW_REALLOCATION_POM_COMPARISON
+  subject_type: USER_ID
+  subject_id: nomis_staff_id
+  query_params: [pom_ids]
+
 onboarding#search:
   what: SEARCH_POM_ONBOARDING_STAFF
   subject_type: SEARCH_TERM
@@ -283,11 +309,20 @@ handovers/email_preferences#edit:
 handovers/email_preferences#update:
   exempt: Signed-in user's own email notification preferences
 
-reallocations/selection#error:
-  exempt: Static error page with no prisoner or staff data
+build_allocations#new:
+  exempt: Initialises allocation form state and redirects
+build_allocations#update_override:
+  exempt: Intermediate step to store answers for the actual allocation operation
+reallocations/journey#update_override:
+  exempt: Intermediate step to store answers for the actual allocation operation
 
 allocation_staff#check_compare_list:
   exempt: Validation checks and redirect
+
+reallocations/selection#check_compare_list:
+  exempt: Validation checks and redirect
+reallocations/selection#error:
+  exempt: Static error page with no prisoner or staff data
 
 poms#show_non_pom:
   exempt: Static troubleshooting page with no prisoner or staff data
@@ -351,13 +386,6 @@ root#handovers_email_preferences:
 # TODO actions: not yet evaluated.
 # Replace each with an audit, or an exemption with a real reason.
 
-build_allocations#new:
-  todo: true
-build_allocations#show:
-  todo: true
-build_allocations#update:
-  todo: true
-
 caseload#cases:
   todo: true
 caseload#index:
@@ -407,16 +435,8 @@ reallocations/journey#confirmation:
   todo: true
 reallocations/journey#summary:
   todo: true
-reallocations/journey#update_override:
-  todo: true
 
 reallocations/selection#caseload:
   todo: true
-reallocations/selection#check_compare_list:
-  todo: true
-reallocations/selection#compare_poms:
-  todo: true
 reallocations/selection#create:
-  todo: true
-reallocations/selection#index:
   todo: true

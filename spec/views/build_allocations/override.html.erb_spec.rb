@@ -26,7 +26,7 @@ RSpec.describe 'build_allocations/override', type: :view do
     assign(:override, override)
     assign(:pom, pom)
     assign(:prisoner, prisoner)
-    view.define_singleton_method(:wizard_path) { '/wizard/override' }
+    controller.request.path_parameters.merge!(prison_id: 'LEI', prisoner_id: 'G4198UW', staff_id: '1234')
   end
 
   it 'uses the shared override markup' do
@@ -34,7 +34,7 @@ RSpec.describe 'build_allocations/override', type: :view do
 
     expect(page).to have_css('.govuk-grid-column-two-thirds')
     expect(page).to have_css('.govuk-error-summary')
-    expect(page).to have_css('form[action="/wizard/override"]')
+    expect(page).to have_css('form[action="/prisons/LEI/prisoners/G4198UW/staff/1234/build_allocations/override"]')
     expect(page).to have_css('h1.govuk-heading-l', text: 'Why are you allocating a probation POM to Christopher Hamilton (G4198UW)?')
     expect(page).to have_css('.govuk-hint', text: 'Choose all that apply')
     expect(page).to have_text('Other reason')

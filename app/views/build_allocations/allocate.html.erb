@@ -3,7 +3,7 @@
 <%= link_to "Back", 'javascript:history.back()', class: "govuk-back-link govuk-!-margin-top-0 govuk-!-margin-bottom-6" %>
 
 <%= form_for(@allocation,
-              url: wizard_path,
+              url: allocate_prison_prisoner_staff_build_allocations_path,
               builder: GOVUKDesignSystemFormBuilder::FormBuilder,
               method: :put) do |form| %>
   <div class="govuk-grid-row">

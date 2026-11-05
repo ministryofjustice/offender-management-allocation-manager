@@ -226,7 +226,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
         expect(PomMailer).not_to have_received(:with)
         expect(responsibility_override_mailer).not_to have_received(:deliver_later)
         expect(hmpps_audit_events).to have_recorded_event('CREATE_RESPONSIBILITY_OVERRIDE', outcome: 'FAILURE', subject_id: offender_no)
-        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'entityId' => responsibility.id, 'failureReason' => 'Responsibility override already exists')
+        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'entityId' => responsibility.id, 'failureReason' => HmppsAuditing::VALIDATION_FAILED)
       end
     end
 
@@ -248,7 +248,7 @@ RSpec.describe ResponsibilitiesController, type: :controller do
         expect(PomMailer).not_to have_received(:with)
         expect(responsibility_override_mailer).not_to have_received(:deliver_later)
         expect(hmpps_audit_events).to have_recorded_event('CREATE_RESPONSIBILITY_OVERRIDE', outcome: 'FAILURE', subject_id: offender_no)
-        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'entityId' => existing_responsibility.id, 'failureReason' => 'Responsibility override already exists')
+        expect(hmpps_audit_events.last[:details]).to eq('prisonId' => prison.code, 'entityId' => existing_responsibility.id, 'failureReason' => HmppsAuditing::VALIDATION_FAILED)
       end
     end
   end

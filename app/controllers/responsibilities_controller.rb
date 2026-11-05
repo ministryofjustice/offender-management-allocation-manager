@@ -33,7 +33,7 @@ class ResponsibilitiesController < PrisonsApplicationController
 
     # Treat repeated submits as a no-op so we don't create duplicate overrides or emails.
     unless @responsibility.new_record?
-      audit(failure: 'Responsibility override already exists')
+      audit(failure: HmppsAuditing::VALIDATION_FAILED)
       return redirect_back_to_origin
     end
 
@@ -57,7 +57,7 @@ class ResponsibilitiesController < PrisonsApplicationController
     @responsibility = @responsibility_record = Responsibility.find_by(nomis_offender_id:)
     raise unless @responsibility
 
-    audit(failure: 'Responsibility override already exists')
+    audit(failure: HmppsAuditing::VALIDATION_FAILED)
     redirect_back_to_origin
   end
 

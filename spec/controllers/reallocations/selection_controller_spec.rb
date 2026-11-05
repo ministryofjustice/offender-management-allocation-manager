@@ -6,6 +6,7 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
   render_views
 
   include_context 'with reallocation controller defaults'
+  include_context 'with HMPPS audit event capture'
 
   let(:route_params) do
     {
@@ -42,6 +43,10 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
       expect(response_body).to include('Select POMs')
       expect(response_body).to include('Compare workloads')
       expect(response_body).to include('Unavailable POMs')
+      expect(hmpps_audit_events).to have_recorded_event(
+        'VIEW_REALLOCATION_POM_SELECTION', subject_type: 'USER_ID', subject_id: old_pom.staffId.to_s,
+                                           details: { 'prisonId' => prison.code }
+      )
     end
 
     context 'when the source POM is not inactive or in limbo' do
@@ -73,6 +78,10 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
       expect(response.body).to include('Current workload')
       expect(response.body).to include('Select this POM')
       expect(response.body).not_to include('current-pom')
+      expect(hmpps_audit_events).to have_recorded_event(
+        'VIEW_REALLOCATION_POM_COMPARISON', subject_type: 'USER_ID', subject_id: old_pom.staffId.to_s,
+                                            details: { 'prisonId' => prison.code, 'queryParams' => { 'pomIds' => pom_ids.map(&:to_s) } }
+      )
     end
 
     context 'when the submitted compare list includes an unavailable POM' do
@@ -88,6 +97,8 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
 
         expect(response).to redirect_to(prison_reallocation_path(prison.code, old_pom.staffId))
         expect(flash[:alert]).to eq('Choose POMs from the available list to compare workloads')
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_REALLOCATION_POM_COMPARISON', outcome: 'FAILURE', subject_id: old_pom.staffId.to_s)
+        expect(hmpps_audit_events.last[:details]).to include('failureReason' => HmppsAuditing::VALIDATION_FAILED)
       end
     end
   end
@@ -100,6 +111,7 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
 
       expect(response).to redirect_to(compare_poms_prison_reallocation_path(prison.code, old_pom.staffId, pom_ids:))
       expect(flash[:alert]).to be_nil
+      expect(hmpps_audit_events).to be_empty
     end
   end
 
