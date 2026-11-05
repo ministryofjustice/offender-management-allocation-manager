@@ -72,7 +72,7 @@ bundle install
 yarn install
 ```
 
-4. Create a `.env` file in the project root and add any necessary [environment variables](#environment-variables), or copy them from `.env.example`. If you need to customise the environment further, you can add a `.env.local` file that takes precedence over the default values in `.env.development`.
+4. Create a `.env` file in the project root and add any necessary [environment variables](#environment-variables), or copy them from `.env.example`. For development-only overrides, copy `.env.local.example` to `.env.local`. For example, it sets `ALLOCATION_MANAGER_HOST` to `http://localhost:3000` for local OAuth callbacks, overriding the shared `.env.development` value. Dotenv does not load `.env.local` in tests, so keep shared test settings in `.env` and `.env.development`.
 
 5. Create and seed the database.
 

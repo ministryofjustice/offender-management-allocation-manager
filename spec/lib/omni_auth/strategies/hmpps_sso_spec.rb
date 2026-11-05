@@ -49,4 +49,31 @@ describe OmniAuth::Strategies::HmppsSso do
       end
     end
   end
+
+  describe 'callback URL host' do
+    %w[http://www.example.com http://127.0.0.1:49123].each do |origin|
+      it "keeps mocked sign-in callbacks on #{origin}" do
+        env = Rack::MockRequest.env_for("#{origin}/auth/hmpps_sso").merge('rack.session' => {})
+        response = strategy.call!(env)
+
+        expect(response[1].fetch('Location')).to eq("#{origin}/auth/hmpps_sso/callback")
+      end
+    end
+
+    it 'uses the configured application host instead of the request host' do
+      allow(OmniAuth.config).to receive(:test_mode).and_return(false)
+      allow(OmniAuth.config).to receive(:logger).and_return(Logger.new(nil))
+
+      env = Rack::MockRequest.env_for(
+        '/auth/hmpps_sso',
+        'HTTP_HOST' => 'attacker.example'
+      ).merge('SCRIPT_NAME' => '/mounted', 'rack.session' => {})
+
+      response = strategy.call!(env)
+      authorization_uri = URI.parse(response[1].fetch('Location'))
+      callback_url = URI.decode_www_form(authorization_uri.query).to_h.fetch('redirect_uri')
+
+      expect(callback_url).to eq("#{Rails.configuration.allocation_manager_host}/mounted/auth/hmpps_sso/callback")
+    end
+  end
 end

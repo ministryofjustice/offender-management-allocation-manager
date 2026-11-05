@@ -32,6 +32,12 @@ rescue ActiveRecord::PendingMigrationError => e
 end
 
 OmniAuth.config.test_mode = true
+
+# Keep mocked callbacks on the test browser's origin
+OmniAuth.config.full_host = lambda do |env|
+  OmniAuth.config.test_mode ? Rack::Request.new(env).base_url : Rails.configuration.allocation_manager_host
+end
+
 WebMock.disable_net_connect!(allow_localhost: true)
 
 RSpec.configure do |config|
