@@ -3,17 +3,18 @@
 class SessionsController < ApplicationController
   def create
     identity = SignonIdentity.from_omniauth(request.env['omniauth.auth'])
+    return redirect_to root_url unless identity
 
-    if identity
-      save_to_session(:sso_data, identity)
-      redirect_to session.delete(:redirect_path) || root_url
-    else
-      redirect_to root_url
-    end
+    redirect_path = session[:redirect_path] || root_url
+
+    reset_session_preserving_flash
+    save_to_session(:sso_data, identity)
+
+    redirect_to redirect_path
   end
 
   def destroy
-    session.delete(:sso_data)
+    reset_session
     redirect_to sso_signout_url, allow_other_host: true
   end
 
@@ -22,6 +23,12 @@ class SessionsController < ApplicationController
   end
 
 private
+
+  def reset_session_preserving_flash
+    messages = flash.to_hash
+    reset_session
+    flash.update(messages)
+  end
 
   def sso_signout_url
     url = URI.parse("#{Rails.configuration.nomis_oauth_host}/auth/logout")

@@ -35,7 +35,7 @@ module CaseHistoryTimelineHelper
   def find_timeline_section(heading)
     section = TIMELINE_SECTION_SELECTORS
       .flat_map { |selector| all(selector) }
-      .find { |candidate| candidate.has_css?('.govuk-heading-m', text: heading) }
+      .find { |candidate| candidate.has_css?('.govuk-heading-m', text: heading, wait: 0) }
 
     raise "Could not find timeline section for #{heading}" unless section
 
