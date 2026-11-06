@@ -30,8 +30,13 @@ RSpec.describe SessionsController, type: :controller do
       end
 
       it 'sets the identity data in the session' do
+        session['allocation_override:LEI:G1234AB:456'] = { override_reasons: ['continuity'] }
+        session['flash'] = { 'discard' => [], 'flashes' => { 'notice' => 'Leeds (HMP) selected' } }
         create
+
         expect(session[:sso_data]).to eq(sso_data)
+        expect(session['allocation_override:LEI:G1234AB:456']).to be_nil
+        expect(flash[:notice]).to eq('Leeds (HMP) selected')
       end
 
       context 'with a redirect_path set on the session' do
@@ -59,6 +64,7 @@ RSpec.describe SessionsController, type: :controller do
     before do
       allow(SignonIdentity).to receive(:from_omniauth).and_return(signon_identity)
       session[:sso_data] = sso_data
+      session['allocation_override:LEI:G1234AB:456'] = { override_reasons: ['continuity'] }
     end
 
     it 'deletes the session and redirects to Nomis Single Sign On' do
@@ -74,6 +80,7 @@ RSpec.describe SessionsController, type: :controller do
 
       expect(delete :destroy).to redirect_to(nomis_oauth_sign_out_url)
       expect(session[:sso_data]).to be_nil
+      expect(session['allocation_override:LEI:G1234AB:456']).to be_nil
     end
   end
 

@@ -24,7 +24,7 @@ Rails.application.configure do
     }
 
     # Store sessions in the cache (as is done in production)
-    config.session_store :cache_store, key: 'manage_pom_cases_session'
+    config.session_store :cache_store, key: 'manage_pom_cases_session', expire_after: 24.hours
   else
     config.action_controller.perform_caching = false
 

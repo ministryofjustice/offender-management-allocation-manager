@@ -51,7 +51,7 @@ Rails.application.configure do
   # (the cookie store implicitly serializes objects, where the cache store doesn't)
   # Since cache store is used in production, tests should really be running against the same session store
   # to replicate a production-like environment (especially important for feature tests)
-  config.session_store :cache_store, key: 'manage_pom_cases_session'
+  config.session_store :cache_store, key: 'manage_pom_cases_session', expire_after: 24.hours
 
   # ...which means we also need to use a proper cache store, rather than the default null store
   # To avoid leaking global state between tests, we clear this cache after every spec in rails_helper.rb

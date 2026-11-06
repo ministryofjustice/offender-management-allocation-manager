@@ -193,6 +193,8 @@ feature 'Case History' do
           MovementService.process_transfer build(:movement, :transfer, offenderNo: nomis_offender_id, toAgency: open_prison.code)
           perform_enqueued_jobs { RecalculateHandoverDateJob.perform_now nomis_offender_id }
         end
+        # Browser cookie expiry uses real time, not the historical timeline above
+        Timecop.return
         visit history_prison_prisoner_allocation_path(open_prison.code, nomis_offender_id)
       end
 
@@ -268,7 +270,7 @@ feature 'Case History' do
           expect(page).to have_css('.govuk-heading-m', text: first_prison.name)
 
           within find_timeline_item("#{formatted_deallocate_date} by System") { |item|
-                   item.has_css?('.moj-timeline__title', text: 'Prisoner unallocated')
+                   item.has_css?('.moj-timeline__title', text: 'Prisoner unallocated', wait: 0)
                  } do
             [
               ['.moj-timeline__title', "Prisoner unallocated"],
@@ -303,7 +305,7 @@ feature 'Case History' do
       it 'links to previous Early Allocation assessments' do
         eligible_assessment = within_timeline_section(second_prison.name) do
           find_timeline_item('Early allocation assessment form completed') do |item|
-            item.has_css?('.moj-timeline__description', text: 'Assessment outcome: eligible.')
+            item.has_css?('.moj-timeline__description', text: 'Assessment outcome: eligible.', wait: 0)
           end
         end
 
