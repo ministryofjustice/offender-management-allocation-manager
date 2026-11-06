@@ -24,8 +24,7 @@
 
 ## Project-specific conventions
 - Do not put complex objects in session. Use `ApplicationController#save_to_session` so only `.attributes` hashes are stored; this matters because dev/test use cache-backed sessions to match production (`app/controllers/application_controller.rb`, `config/environments/development.rb`, `config/environments/test.rb`).
-- Existing multi-step journeys often use `Wicked::Wizard` plus small `ActiveModel` form objects rather than giant AR forms. See `BuildAllocationsController` and `FemaleMissingInfosController`; `OnboardingController` is a plain controller/action flow that still uses a small `PomOnboardingForm` plus session-backed state in `app/forms/`.
-- For new journeys, or when significantly refactoring an existing wizard, prefer a simpler native Rails design over adding more `Wicked::Wizard` usage. Treat Wicked as legacy/project history, not the default pattern to extend.
+- Multi-step journeys use native Rails actions and small `ActiveModel` form objects with session-backed state. See `BuildAllocationsController`, `FemaleMissingInfosController`, and `OnboardingController`; do not introduce any wizard gems.
 - Allocation and handover history rely on PaperTrail plus explicit audit rows. If you change tracked models, check both `has_paper_trail` behaviour and `AuditEvent.publish` side effects.
 - Structured logs are intentional: many jobs/handlers log `event=...` key/value messages. Preserve that style when extending background flows.
 - `Prison#get_list_of_poms` intentionally de-duplicates NOMIS role results and merges local `PomDetail`; use it instead of calling NOMIS directly from controllers (`app/models/prison.rb`).

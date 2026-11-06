@@ -82,7 +82,7 @@ class PomsController < PrisonStaffApplicationController
 
   def reallocate
     unless @pom.inactive? || @pom.in_limbo?
-      audit(failure: 'POM is not eligible for bulk case reallocation')
+      audit(failure: HmppsAuditing::VALIDATION_FAILED)
       redirect_to prison_pom_path, notice: 'Only inactive POMs are eligible for bulk case reallocation.'
       return
     end

@@ -130,7 +130,14 @@ Rails.application.routes.draw do
       end
 
       resources :staff, only: %i[index], controller: 'allocation_staff' do
-        resources :build_allocations, only: %i[new show update], controller: 'build_allocations'
+        resources :build_allocations, only: :new do
+          collection do
+            get :override
+            match :override, via: %i[put patch], action: :update_override
+            get :allocate, action: :show
+            match :allocate, via: %i[put patch], action: :update
+          end
+        end
       end
 
       resource :allocation, only: %i[show] do

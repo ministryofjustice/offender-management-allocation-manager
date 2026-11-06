@@ -45,7 +45,7 @@ class AllocationStaffController < PrisonsApplicationController
     pom_ids = selected_compare_pom_ids
 
     if compare_selection_contains_unavailable_poms?
-      audit(failure: 'Invalid POM selection')
+      audit(failure: HmppsAuditing::VALIDATION_FAILED)
       redirect_to(check_compare_error_route, alert: 'Choose POMs from the available list to compare workloads') and return
     end
 

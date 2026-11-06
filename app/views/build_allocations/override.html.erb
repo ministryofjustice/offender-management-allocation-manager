@@ -5,7 +5,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <%= form_for(@override,
-                 url: wizard_path,
+                 url: override_prison_prisoner_staff_build_allocations_path,
                  builder: GOVUKDesignSystemFormBuilder::FormBuilder,
                  method: :put) do |form| %>
       <%= form.govuk_error_summary %>

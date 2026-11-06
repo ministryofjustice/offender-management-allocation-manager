@@ -32,6 +32,8 @@ describe 'HOMD allocates cases to POMS' do
                                                 to_case: "Offender, Allocatable",
                                                 with_override_reason: :continuity
 
+    expect(AllocationHistory.find_by!(nomis_offender_id: 'G1234AB').override_reasons).to include('continuity')
+
     visit unallocated_prison_prisoners_path(prison)
     expect(page).not_to have_content('Offender, Allocatable')
 

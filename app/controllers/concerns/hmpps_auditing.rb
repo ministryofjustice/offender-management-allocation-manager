@@ -12,6 +12,7 @@ module HmppsAuditing
   extend ActiveSupport::Concern
 
   USER_CANCELLED = 'User cancelled the action'
+  VALIDATION_FAILED = 'Request failed validation'
 
   included do
     # Wraps authorisation and loading callbacks as well as the action and rendering
