@@ -193,6 +193,21 @@ reallocations/journey#override:
   subject_type: PRISONER_ID
   subject_id: nomis_offender_id
   query_params: [nomis_staff_id, new_pom]
+reallocations/journey#complete:
+  what: CREATE_BULK_REALLOCATION
+  subject_type: USER_ID
+  subject_id: nomis_staff_id
+  query_params: [new_pom]
+reallocations/journey#summary:
+  what: VIEW_BULK_REALLOCATION_SUMMARY
+  subject_type: USER_ID
+  subject_id: nomis_staff_id
+  query_params: [new_pom]
+reallocations/journey#confirmation:
+  what: VIEW_BULK_REALLOCATION_CONFIRMATION
+  subject_type: USER_ID
+  subject_id: nomis_staff_id
+  query_params: [new_pom]
 
 reallocations/selection#index:
   what: VIEW_REALLOCATION_POM_SELECTION
@@ -203,6 +218,11 @@ reallocations/selection#compare_poms:
   subject_type: USER_ID
   subject_id: nomis_staff_id
   query_params: [pom_ids]
+reallocations/selection#caseload:
+  what: VIEW_BULK_REALLOCATION_CASELOAD
+  subject_type: USER_ID
+  subject_id: nomis_staff_id
+  query_params: [new_pom]
 
 onboarding#search:
   what: SEARCH_POM_ONBOARDING_STAFF
@@ -315,6 +335,8 @@ build_allocations#update_override:
   exempt: Intermediate step to store answers for the actual allocation operation
 reallocations/journey#update_override:
   exempt: Intermediate step to store answers for the actual allocation operation
+reallocations/selection#create:
+  exempt: Validates selection and stores the session-only reallocation batch
 
 allocation_staff#check_compare_list:
   exempt: Validation checks and redirect
@@ -427,16 +449,4 @@ prisoners#missing_information:
 prisoners#review_allocations:
   todo: true
 prisoners#unallocated:
-  todo: true
-
-reallocations/journey#complete:
-  todo: true
-reallocations/journey#confirmation:
-  todo: true
-reallocations/journey#summary:
-  todo: true
-
-reallocations/selection#caseload:
-  todo: true
-reallocations/selection#create:
   todo: true

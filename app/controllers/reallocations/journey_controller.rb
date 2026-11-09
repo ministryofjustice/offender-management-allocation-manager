@@ -39,6 +39,7 @@ module Reallocations
 
     def summary
       prepare_summary_page(AllocationForm.new)
+      audit(details: { 'selectedPrisonerIds' => @selected_cases.map(&:nomis_offender_id) })
     end
 
     def complete
@@ -53,7 +54,13 @@ module Reallocations
         current_user: current_user,
       )
 
-      result = service.call(@selected_cases, message:)
+      audit(details: { 'selectedPrisonerIds' => @selected_cases.map(&:nomis_offender_id) })
+
+      begin
+        result = service.call(@selected_cases, message:)
+      ensure
+        audit_reallocation_results(service)
+      end
 
       store_bulk_reallocation_confirmation!(result)
       clear_bulk_reallocation_journey!
@@ -65,8 +72,10 @@ module Reallocations
       confirmation = session[BULK_REALLOCATION_CONFIRMATION_SESSION_KEY]&.with_indifferent_access
 
       unless confirmation.present? &&
-        confirmation[:source_pom_id].to_i == @pom.staff_id &&
-        confirmation[:target_pom_id].to_i == @new_pom.staff_id
+             confirmation[:source_pom_id].to_i == @pom.staff_id &&
+             confirmation[:target_pom_id].to_i == @new_pom.staff_id
+        audit(failure: HmppsAuditing::VALIDATION_FAILED)
+
         redirect_to caseload_path, alert: 'Complete a reallocation to view the confirmation page.'
         return
       end
@@ -75,9 +84,24 @@ module Reallocations
       @selected_cases = Array(confirmation[:selected_cases]).map(&:with_indifferent_access)
       @failed_cases = Array(confirmation[:failed_cases]).map(&:with_indifferent_access)
       @remaining_cases_count = confirmation[:remaining_cases_count].to_i
+
+      audit(details: {
+        'reallocatedPrisonerIds' => @selected_cases.map { it.fetch(:nomis_offender_id) },
+        'failedPrisonerIds' => @failed_cases.map { it.fetch(:nomis_offender_id) },
+      })
     end
 
   private
+
+    def audit_reallocation_results(service)
+      audit(
+        details: {
+          'reallocatedPrisonerIds' => service.reallocated_cases.map { it.selected_case.nomis_offender_id },
+          'failedPrisonerIds' => service.failed_cases.map { it.selected_case.nomis_offender_id },
+        },
+        failure: ('Some cases failed reallocation' if service.failed_cases.any?),
+      )
+    end
 
     def caseload_path
       caseload_prison_reallocation_path(**reallocation_route_params)

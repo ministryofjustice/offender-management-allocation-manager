@@ -2,7 +2,8 @@
 
 module Reallocation
   class BulkReallocationService
-    attr_reader :prison, :source_pom, :target_pom, :journey, :current_user, :email_context_builder
+    attr_reader :prison, :source_pom, :target_pom, :journey, :current_user, :email_context_builder,
+                :reallocated_cases, :failed_cases
 
     def initialize(prison:, source_pom:, target_pom:, journey:, current_user:,
                    email_context_builder: EmailContextBuilder.new)
@@ -42,8 +43,8 @@ module Reallocation
   private
 
     def reallocate_each(selected_cases, message)
-      reallocated_cases = []
-      failed_cases = []
+      @reallocated_cases = []
+      @failed_cases = []
 
       selected_cases.each do |selected_case|
         reallocated_cases << build_reallocation_result_for(selected_case, message)
