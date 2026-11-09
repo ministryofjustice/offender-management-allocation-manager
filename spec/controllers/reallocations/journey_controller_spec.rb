@@ -20,6 +20,10 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
     route_params.merge(nomis_offender_id: override_offender_no)
   end
 
+  let(:audit_context) do
+    { 'prisonId' => prison.code, 'queryParams' => { 'newPom' => new_pom.staffId.to_s } }
+  end
+
   shared_context 'with an override case in the reallocation journey' do
     let(:offenders_in_prison) { [offender, override_offender] }
     let(:selected_offender_ids) { [override_offender_no] }
@@ -120,6 +124,25 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
       get :summary, params: route_params
 
       expect(response).to be_successful
+      expect(hmpps_audit_events).to have_recorded_event(
+        'VIEW_BULK_REALLOCATION_SUMMARY', subject_type: 'USER_ID', subject_id: old_pom.staffId.to_s
+      )
+      expect(hmpps_audit_events.first[:details]).to eq(audit_context)
+      expect(hmpps_audit_events.last[:details]).to eq(
+        audit_context.merge('selectedPrisonerIds' => selected_offender_ids)
+      )
+    end
+
+    it 'audits rejection of a missing journey without reporting prisoner IDs' do
+      session.delete(:bulk_reallocation)
+
+      get :summary, params: route_params
+
+      expect(response).to redirect_to(caseload_prison_reallocation_path(prison.code, old_pom.staffId, new_pom.staffId))
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_BULK_REALLOCATION_SUMMARY', outcome: 'FAILURE')
+      expect(hmpps_audit_events.last[:details]).to eq(
+        audit_context.merge('failureReason' => 'Request redirected before completing the operation')
+      )
     end
   end
 
@@ -152,9 +175,77 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
       expect(session[:bulk_reallocation_confirmation][:message]).to eq('Bulk move')
       expect(session[:bulk_reallocation_confirmation][:selected_cases].map { |selected_case| selected_case[:nomis_offender_id] })
         .to eq([offender_no, override_offender_no])
+      expect(hmpps_audit_events).to have_recorded_event(
+        'CREATE_BULK_REALLOCATION', who: 'spo-user', subject_type: 'USER_ID', subject_id: old_pom.staffId.to_s
+      )
+      expect(hmpps_audit_events.first[:details]).to eq(audit_context)
+      expect(hmpps_audit_events.last[:details]).to eq(
+        audit_context.merge(
+          'selectedPrisonerIds' => selected_offender_ids,
+          'reallocatedPrisonerIds' => selected_offender_ids,
+          'failedPrisonerIds' => [],
+        )
+      )
     end
 
-    context 'when a case was skipped during override' do
+    [false, true].each do |all_fail|
+      it "audits #{all_fail ? 'total' : 'partial'} case failure without changing the confirmation flow" do
+        allow(AllocationService).to receive(:create_or_update) do |attributes, _context, **|
+          raise 'Sensitive exception text' if all_fail || attributes[:nomis_offender_id] == override_offender_no
+
+          persisted_allocation
+        end
+
+        put :complete, params: route_params.merge(allocation_form: { message: 'Private note' })
+
+        failed_ids = all_fail ? selected_offender_ids : [override_offender_no]
+        successful_ids = all_fail ? [] : [offender_no]
+        expect(response).to redirect_to(confirmation_prison_reallocation_path(prison.code, old_pom.staffId, new_pom.staffId))
+        expect(hmpps_audit_events).to have_recorded_event('CREATE_BULK_REALLOCATION', outcome: 'FAILURE', subject_id: old_pom.staffId.to_s)
+        expect(hmpps_audit_events.last[:details]).to eq(
+          audit_context.merge(
+            'selectedPrisonerIds' => selected_offender_ids,
+            'reallocatedPrisonerIds' => successful_ids,
+            'failedPrisonerIds' => failed_ids,
+            'failureReason' => 'Some cases failed reallocation',
+          )
+        )
+      end
+    end
+
+    it 'retains case results in the failure audit when notifications raise after reallocation' do
+      allow_any_instance_of(Reallocation::BulkReallocationNotifier).to receive(:call).and_raise('Notification failed')
+
+      expect {
+        put :complete, params: route_params.merge(allocation_form: { message: 'Private note' })
+      }.to raise_error(RuntimeError, 'Notification failed')
+
+      expect(hmpps_audit_events).to have_recorded_event('CREATE_BULK_REALLOCATION', outcome: 'FAILURE', subject_id: old_pom.staffId.to_s)
+      expect(hmpps_audit_events.last[:details]).to eq(
+        audit_context.merge(
+          'selectedPrisonerIds' => selected_offender_ids,
+          'reallocatedPrisonerIds' => selected_offender_ids,
+          'failedPrisonerIds' => [],
+          'failureReason' => 'Application failed to complete the operation: RuntimeError',
+        )
+      )
+      expect(session[:bulk_reallocation]).to be_present
+    end
+
+    it 'audits rejection of a missing journey without reporting case results' do
+      session.delete(:bulk_reallocation)
+
+      put :complete, params: route_params.merge(allocation_form: { message: 'Private note' })
+
+      expect(response).to redirect_to(caseload_prison_reallocation_path(prison.code, old_pom.staffId, new_pom.staffId))
+      expect(AllocationService).not_to have_received(:create_or_update)
+      expect(hmpps_audit_events).to have_recorded_event('CREATE_BULK_REALLOCATION', outcome: 'FAILURE')
+      expect(hmpps_audit_events.last[:details]).to eq(
+        audit_context.merge('failureReason' => 'Request redirected before completing the operation')
+      )
+    end
+
+    context 'when the journey contains only the remaining case after an override skip' do
       let(:selected_offender_ids) { [offender_no] }
       let(:override_offender_ids) { [] }
       let(:overrides) { {} }
@@ -165,22 +256,32 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
         expect(AllocationService).to have_received(:create_or_update).once
         expect(session[:bulk_reallocation_confirmation][:selected_cases].map { |selected_case| selected_case[:nomis_offender_id] })
           .to eq([offender_no])
+        expect(hmpps_audit_events.last[:details]).to include(
+          'selectedPrisonerIds' => [offender_no],
+          'reallocatedPrisonerIds' => [offender_no],
+          'failedPrisonerIds' => [],
+        )
       end
     end
   end
 
   describe '#confirmation' do
     context 'when the session contains valid confirmation data' do
+      let(:confirmed_cases) do
+        [
+          { full_name: 'Zephyr, Alice', nomis_offender_id: offender_no, allocated_pom_role: 'Responsible' },
+          { full_name: 'Amber, Bob', nomis_offender_id: override_offender_no, allocated_pom_role: 'Supporting' }
+        ]
+      end
+      let(:failed_cases) { [] }
+
       before do
         session[:bulk_reallocation_confirmation] = {
           source_pom_id: old_pom.staffId,
           target_pom_id: new_pom.staffId,
           message: 'Bulk move',
-          selected_cases: [
-            { full_name: 'Zephyr, Alice', nomis_offender_id: offender_no, allocated_pom_role: 'Responsible' },
-            { full_name: 'Amber, Bob', nomis_offender_id: override_offender_no, allocated_pom_role: 'Supporting' }
-          ],
-          failed_cases: [],
+          selected_cases: confirmed_cases,
+          failed_cases:,
           remaining_cases_count: 3,
         }
       end
@@ -189,6 +290,36 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
         get :confirmation, params: route_params
 
         expect(response).to be_successful
+        expect(hmpps_audit_events).to have_recorded_event(
+          'VIEW_BULK_REALLOCATION_CONFIRMATION', subject_type: 'USER_ID', subject_id: old_pom.staffId.to_s
+        )
+        expect(hmpps_audit_events.first[:details]).to eq(audit_context)
+        expect(hmpps_audit_events.last[:details]).to eq(
+          audit_context.merge(
+            'reallocatedPrisonerIds' => [offender_no, override_offender_no],
+            'failedPrisonerIds' => [],
+          )
+        )
+      end
+
+      context 'when the confirmation includes a failed reallocation' do
+        let(:confirmed_cases) { [super().first] }
+        let(:failed_cases) do
+          [{ full_name: 'Private name', nomis_offender_id: override_offender_no, error_message: 'Sensitive error' }]
+        end
+
+        it 'audits a successful view with both displayed outcome lists' do
+          get :confirmation, params: route_params
+
+          expect(response).to be_successful
+          expect(hmpps_audit_events).to have_recorded_event('VIEW_BULK_REALLOCATION_CONFIRMATION')
+          expect(hmpps_audit_events.last[:details]).to eq(
+            audit_context.merge(
+              'reallocatedPrisonerIds' => [offender_no],
+              'failedPrisonerIds' => [override_offender_no],
+            )
+          )
+        end
       end
     end
 
@@ -198,6 +329,10 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
 
         expect(response).to redirect_to(caseload_prison_reallocation_path(prison.code, old_pom.staffId, new_pom.staffId))
         expect(flash[:alert]).to eq('Complete a reallocation to view the confirmation page.')
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_BULK_REALLOCATION_CONFIRMATION', outcome: 'FAILURE')
+        expect(hmpps_audit_events.last[:details]).to eq(
+          audit_context.merge('failureReason' => HmppsAuditing::VALIDATION_FAILED)
+        )
       end
     end
 
@@ -218,6 +353,10 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
 
         expect(response).to redirect_to(caseload_prison_reallocation_path(prison.code, old_pom.staffId, new_pom.staffId))
         expect(flash[:alert]).to eq('Complete a reallocation to view the confirmation page.')
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_BULK_REALLOCATION_CONFIRMATION', outcome: 'FAILURE')
+        expect(hmpps_audit_events.last[:details]).to eq(
+          audit_context.merge('failureReason' => HmppsAuditing::VALIDATION_FAILED)
+        )
       end
     end
   end

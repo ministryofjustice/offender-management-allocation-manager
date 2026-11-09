@@ -17,8 +17,11 @@ feature 'admin urls' do
   end
 
   context 'when pom' do
+    let(:prison_code) { create(:prison, code: 'RSI').code }
+
     before do
-      signin_pom_user
+      signin_pom_user(%w[LEI RSI], staff_id)
+      stub_poms(prison_code, [build(:pom, staffId: staff_id)])
     end
 
     it 'is unauthorised', :aggregate_failures do

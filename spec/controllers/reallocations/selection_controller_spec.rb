@@ -144,6 +144,14 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
       expect(earliest_release_date_cell['data-sort-value']).to eq('2028-04-01')
       expect(response_body).to include('Recommended POM')
       expect(response_body).to include('Additional')
+      expect(hmpps_audit_events).to have_recorded_event(
+        'VIEW_BULK_REALLOCATION_CASELOAD', subject_type: 'USER_ID', subject_id: old_pom.staffId.to_s
+      )
+      audit_context = { 'prisonId' => prison.code, 'queryParams' => { 'newPom' => new_pom.staffId.to_s } }
+      expect(hmpps_audit_events.first[:details]).to eq(audit_context)
+      expect(hmpps_audit_events.last[:details]).to eq(
+        audit_context.merge('displayedPrisonerIds' => [offender_no])
+      )
     end
 
     it 'renders select-all checkboxes at both top and bottom of the table' do
@@ -166,6 +174,12 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
         perform_request
 
         expect(response).to redirect_to(error_prison_reallocation_path(prison.code, old_pom.staffId))
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_BULK_REALLOCATION_CASELOAD', outcome: 'FAILURE')
+        expect(hmpps_audit_events.last[:details]).to eq(
+          'prisonId' => prison.code,
+          'queryParams' => { 'newPom' => new_pom.staffId.to_s },
+          'failureReason' => 'Request redirected before completing the operation',
+        )
       end
     end
 
@@ -271,6 +285,9 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
         expect(conflicting_checkbox['disabled']).to eq('disabled')
         expect(normal_checkbox).not_to be_nil
         expect(normal_checkbox['disabled']).to be_nil
+        expect(hmpps_audit_events.last[:details].fetch('displayedPrisonerIds')).to contain_exactly(
+          offender_no, coworker_offender_no
+        )
       end
 
       it 'shows neutral-highlighted recommendation with "already allocated as co-working POM"' do
@@ -316,6 +333,10 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
   end
 
   describe '#create' do
+    after do
+      expect(hmpps_audit_events).to be_empty
+    end
+
     let(:params) do
       target_pom_route_params.merge(nomis_offender_ids: nomis_offender_ids)
     end
