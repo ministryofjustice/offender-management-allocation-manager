@@ -10,7 +10,7 @@
           <dd class="govuk-summary-list__value"><%= case_information.ldu_name || "Unknown" %></dd>
         </div>
         <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">Local divisional unit (LDU) email address</dt>
+          <dt class="govuk-summary-list__key">LDU email address</dt>
           <dd class="govuk-summary-list__value">
             <% if case_information.ldu_email_address.present? %>
               <%= mail_to(case_information.ldu_email_address, case_information.ldu_email_address) %>
@@ -18,6 +18,10 @@
               Unknown
             <% end %>
           </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">LDU code</dt>
+          <dd class="govuk-summary-list__value"><%= case_information.ldu_code || "Unknown" %></dd>
         </div>
         <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">Team</dt>
@@ -36,12 +40,12 @@
           <dd class="govuk-summary-list__value"><%= case_information.probation_service || "Unknown" %></dd>
         </div>
         <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">MAPPA Level</dt>
-          <dd class="govuk-summary-list__value"><%= case_information.mappa_level || "Unknown" %></dd>
-        </div>
-        <div class="govuk-summary-list__row">
           <dt class="govuk-summary-list__key">Manual Entry?</dt>
           <dd class="govuk-summary-list__value"><%= case_information.manual_entry ? 'Yes' : 'No' %></dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Last updated at</dt>
+          <dd class="govuk-summary-list__value"><%= case_information.updated_at.strftime('%d/%m/%Y %H:%M:%S') %></dd>
         </div>
       </dl>
     <% else %>
