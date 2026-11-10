@@ -39,7 +39,22 @@ module HmppsAudit::Actions
       raise ArgumentError, "Unsupported audit subject type `#{subject_type}` for #{key}"
     end
 
-    { what:, subject_type:, subject_id: declaration['subject_id'], query_params: Array(declaration['query_params']) }
+    audit = { what:, subject_type:, subject_id: declaration['subject_id'], query_params: Array(declaration['query_params']) }
+    audit[:results] = parse_results(key, declaration['results']) if declaration.key?('results')
+    audit
   end
-  private_class_method :parse_declaration
+
+  def self.parse_results(key, results)
+    raise ArgumentError, "Invalid audit `results` for #{key}: expected a mapping" unless results.is_a?(Hash)
+
+    %w[collections id].to_h { |name|
+      values = results[name]
+      unless values.is_a?(Array) && values.any? && values.all? { it.is_a?(String) && it.present? }
+        raise ArgumentError, "Invalid audit `results.#{name}` for #{key}: expected a non-empty array of names"
+      end
+
+      [name.to_sym, values.freeze]
+    }.freeze
+  end
+  private_class_method :parse_declaration, :parse_results
 end

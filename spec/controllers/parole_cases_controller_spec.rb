@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe ParoleCasesController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let(:prison) { create(:prison).code }
 
   before { stub_sso_data(prison) }
@@ -110,6 +112,11 @@ RSpec.describe ParoleCasesController, type: :controller do
       it 'returns the relevant offenders' do
         get :index, params: { prison_id: prison }
         expect(assigns(:offenders).map(&:offender_no)).to eq(%w[G1234VV G7514GW])
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_PAROLE_CASES_LIST', subject_type: 'NOT_APPLICABLE', subject_id: nil)
+        expect(hmpps_audit_events.last[:details]).to eq(
+          'prisonId' => prison,
+          'results' => { 'resultCount' => 2, 'returnedSubjectIds' => %w[G1234VV G7514GW] }
+        )
       end
 
       describe 'with sorting' do

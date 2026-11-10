@@ -9,12 +9,8 @@ class CaseloadController < PrisonStaffApplicationController
 
   def parole_cases; end
 
-  def new_cases
-    @new_cases = sort_allocations(@pom.allocations.select(&:new_case?))
-  end
-
   def updates_required
-    sorted_tasks = @current_user.pom_tasks.map { |pom_task| PomTaskPresenter.for(pom_task) }
-    @pom_tasks = paginate_array(sorted_tasks)
+    tasks = @pom.pom_tasks.map { PomTaskPresenter.for(it) }
+    @pom_tasks = paginate_array(tasks)
   end
 end

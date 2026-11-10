@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class PomsController < PrisonStaffApplicationController
-  # TODO: list-tab auditing is deferred pending clarification
-  skip_around_action :audit_request, if: -> { action_name == 'show' && %w[caseload handover parole].include?(params[:tab]) }
-
   before_action :ensure_spo_user
 
   before_action :load_pom_staff_member, except: [:index, :show_non_pom]
@@ -17,6 +14,7 @@ class PomsController < PrisonStaffApplicationController
   def show
     @tab = params[:tab] || 'overview'
     @prison_id = @prison.code
+    @pom_view = false
     pom_allocations_summary
 
     if @tab == 'handover'
@@ -31,7 +29,8 @@ class PomsController < PrisonStaffApplicationController
       @overdue_com_allocations = @handover_cases.com_allocation_overdue
     end
 
-    @pom_view = false
+    render :show
+    audit_tab_results
   end
 
   # This is for the situation where the user is no longer a POM
@@ -121,6 +120,21 @@ class PomsController < PrisonStaffApplicationController
   end
 
 private
+
+  def audit_tab_results
+    ids = case @tab
+          when 'caseload'
+            (@allocations + @recent_allocations + @upcoming_releases).map(&:nomis_offender_id)
+          when 'handover'
+            (@upcoming_handovers + @in_progress_handovers + @overdue_tasks + @overdue_com_allocations).map { it.offender.offender_no }
+          when 'parole'
+            @parole_cases.map(&:nomis_offender_id)
+          else
+            return
+          end
+
+    audit(results: ids)
+  end
 
   def ensure_pom_is_editable
     unless @pom.editable?

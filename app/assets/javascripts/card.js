@@ -1,7 +1,11 @@
-document.addEventListener("turbolinks:load", function() {
-    document.querySelectorAll(".card--clickable").forEach(function(e) {
-        null !== e.querySelector("a") && e.addEventListener("click", function() {
-            e.querySelector("a").click();
-        });
-    });
+document.addEventListener("click", function(event) {
+  if (event.defaultPrevented || event.target.closest("a")) {
+    return;
+  }
+
+  const card = event.target.closest(".card--clickable");
+  const link = card && card.querySelector("a");
+  if (link) {
+    link.click();
+  }
 });

@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe CaseloadController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let(:staff_id) { 456_987 }
   let(:not_signed_in) { 123_456 }
   let(:unknown_staff_id) { 999_999 }
@@ -100,6 +102,7 @@ RSpec.describe CaseloadController, type: :controller do
           it 'is allowed' do
             get :index, params: { prison_id: prison.code, staff_id: staff_id }
             expect(response).to be_successful
+            expect(hmpps_audit_events).to be_empty
           end
 
           it 'cannot see the caseload when the requested staff member is not a POM' do
@@ -127,6 +130,11 @@ RSpec.describe CaseloadController, type: :controller do
           it 'cant see the caseload' do
             get :cases, params: { prison_id: prison.code, staff_id: not_signed_in }
             expect(response).to redirect_to('/401')
+            expect(hmpps_audit_events).to have_recorded_event('VIEW_CASELOAD_LIST', outcome: 'FAILURE', subject_type: 'USER_ID', subject_id: not_signed_in.to_s)
+            expect(hmpps_audit_events.last[:details]).to eq(
+              'prisonId' => prison.code,
+              'failureReason' => 'User does not have access to this data'
+            )
           end
         end
 
@@ -145,6 +153,23 @@ RSpec.describe CaseloadController, type: :controller do
           it 'returns the caseload' do
             get :cases, params: { prison_id: prison.code, staff_id: staff_id }
             expect(assigns(:allocations).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:prisonerNumber) })
+            expect(hmpps_audit_events).to have_recorded_event('VIEW_CASELOAD_LIST', subject_type: 'USER_ID', subject_id: staff_id.to_s)
+            expect(hmpps_audit_events.last[:details]['results']).to eq(
+              'resultCount' => 3, 'returnedSubjectIds' => assigns(:allocations).map(&:nomis_offender_id)
+            )
+          end
+
+          it 'audits the union of the rendered tab pages without duplicates or undisplayed cases' do
+            allow(Kaminari.config).to receive(:default_per_page).and_return(1)
+
+            get :cases, params: { prison_id: prison.code, staff_id:, sort: 'tier desc' }
+
+            expect(assigns(:allocations).map(&:nomis_offender_id)).to eq([offenders.last.fetch(:prisonerNumber)])
+            expect(assigns(:recent_allocations).map(&:nomis_offender_id)).to eq([offenders.first.fetch(:prisonerNumber)])
+            expect(hmpps_audit_events.last[:details]['results']).to eq(
+              'resultCount' => 2,
+              'returnedSubjectIds' => [offenders.last.fetch(:prisonerNumber), offenders.first.fetch(:prisonerNumber)]
+            )
           end
 
           it 'returns the caseload with recent allocations' do
@@ -175,30 +200,37 @@ RSpec.describe CaseloadController, type: :controller do
           expect(response).to be_successful
         end
 
-        it 'maps outstanding tasks to presenters for the view' do
+        it 'shows and audits the requested POM tasks when viewed by an SPO' do
           pom_task = instance_double(PomTask)
-          presenter = instance_double(PomTaskPresenter)
+          presenter = instance_double(PomTaskPresenter, offender_number: offenders.first.fetch(:prisonerNumber))
 
-          allow_any_instance_of(StaffMember).to receive(:pom_tasks).and_return([pom_task])
+          allow_any_instance_of(StaffMember).to receive(:pom_tasks) { |staff| staff.staff_id == staff_id ? [pom_task] : [] }
           allow(PomTaskPresenter).to receive(:for).with(pom_task).and_return(presenter)
 
           get :updates_required, params: { prison_id: prison.code, staff_id: staff_id }
 
           expect(response).to be_successful
+          expect(assigns(:current_user).staff_id).not_to eq(staff_id)
+          expect(assigns(:summary)[:pending_task_count]).to eq(1)
           expect(assigns(:pom_tasks)).to eq([presenter])
+          expect(hmpps_audit_events).to have_recorded_event('VIEW_CASE_UPDATES_REQUIRED_LIST', subject_type: 'USER_ID', subject_id: staff_id.to_s)
+          expect(hmpps_audit_events.last[:details]['results']).to eq(
+            'resultCount' => 1, 'returnedSubjectIds' => [offenders.first.fetch(:prisonerNumber)]
+          )
         end
       end
 
-      describe '#new_cases' do
-        before do
-          stub_sso_data(prison.code)
-        end
+      describe '#parole_cases' do
+        it 'audits the allocated cases approaching parole' do
+          allow_any_instance_of(AllocatedOffender).to receive(:approaching_parole?).and_return(true)
 
-        it 'returns the caseload' do
-          get :new_cases, params: { prison_id: prison.code, staff_id: staff_id }
-          expect(response).to be_successful
+          get :parole_cases, params: { prison_id: prison.code, staff_id: }
 
-          expect(assigns(:new_cases).map(&:nomis_offender_id)).to match_array(offenders.map { |o| o.fetch(:prisonerNumber) })
+          expect(hmpps_audit_events).to have_recorded_event('VIEW_CASELOAD_PAROLE_CASES_LIST', subject_type: 'USER_ID', subject_id: staff_id.to_s)
+          expect(assigns(:parole_cases).size).to eq(3)
+          expect(hmpps_audit_events.last[:details]['results']).to eq(
+            'resultCount' => 3, 'returnedSubjectIds' => assigns(:parole_cases).map(&:nomis_offender_id)
+          )
         end
       end
     end

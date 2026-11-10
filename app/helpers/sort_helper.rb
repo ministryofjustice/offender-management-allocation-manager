@@ -18,7 +18,7 @@ module SortHelper
 
     uri = URI.parse(request.original_url)
     query = Rack::Utils.parse_query(uri.query)
-    direction = sort_direction_for(field_name, query['sort'])
+    direction = sort_direction_for(field_name, query['sort'].presence || params['sort'])
     direction ? send("#{direction}_tag") : ''
   end
 
@@ -33,7 +33,7 @@ private
 
   def link_for_field(field_name, uri)
     query = Rack::Utils.parse_query(uri.query)
-    current_sort_field = query['sort']
+    current_sort_field = query['sort'].presence || params['sort']
 
     query['sort'] = if current_sort_field.present? && current_sort_field.start_with?(field_name)
                       # Check if name is already in query, and invert the search if it is

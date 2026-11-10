@@ -150,7 +150,7 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
       audit_context = { 'prisonId' => prison.code, 'queryParams' => { 'newPom' => new_pom.staffId.to_s } }
       expect(hmpps_audit_events.first[:details]).to eq(audit_context)
       expect(hmpps_audit_events.last[:details]).to eq(
-        audit_context.merge('displayedPrisonerIds' => [offender_no])
+        audit_context.merge('results' => { 'resultCount' => 1, 'returnedSubjectIds' => [offender_no] })
       )
     end
 
@@ -285,7 +285,7 @@ RSpec.describe Reallocations::SelectionController, type: :controller do
         expect(conflicting_checkbox['disabled']).to eq('disabled')
         expect(normal_checkbox).not_to be_nil
         expect(normal_checkbox['disabled']).to be_nil
-        expect(hmpps_audit_events.last[:details].fetch('displayedPrisonerIds')).to contain_exactly(
+        expect(hmpps_audit_events.last[:details].fetch('results').fetch('returnedSubjectIds')).to contain_exactly(
           offender_no, coworker_offender_no
         )
       end

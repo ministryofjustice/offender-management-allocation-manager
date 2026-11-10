@@ -4,7 +4,7 @@ class HandoversController < PrisonsApplicationController
   layout 'handovers'
 
   before_action :ensure_spo_or_pom_user
-  before_action :ensure_sort_specified
+  before_action :set_default_sort
   before_action :set_prison_id
   before_action :set_current_handovers_url
   before_action :set_handover_cases
@@ -28,10 +28,6 @@ class HandoversController < PrisonsApplicationController
 
 private
 
-  def permitted_params
-    params.permit(:prison_id, :pom, :sort)
-  end
-
   def set_handover_cases
     @handover_cases = helpers.handover_cases_view(
       current_user: @current_user,
@@ -54,10 +50,8 @@ private
     @pom_view = !(current_user_is_spo? && params[:pom].blank?)
   end
 
-  def ensure_sort_specified
-    if params[:sort].blank?
-      redirect_to permitted_params.merge(sort: 'handover_date asc')
-    end
+  def set_default_sort
+    params[:sort] = 'handover_date asc' if params[:sort].blank?
   end
 
   def ensure_spo_or_pom_user

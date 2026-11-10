@@ -64,7 +64,7 @@ RSpec.describe PomsController, type: :controller do
       get :index, params: { prison_id: prison.code }
       expect(response).to be_successful
       expect(hmpps_audit_events).to have_recorded_event(
-        'VIEW_PRISON_POMS', subject_type: 'NOT_APPLICABLE', subject_id: nil, details: { 'prisonId' => prison.code }
+        'VIEW_PRISON_POMS_LIST', subject_type: 'NOT_APPLICABLE', subject_id: nil, details: { 'prisonId' => prison.code }
       )
 
       expect(inactive_poms.count).to eq(1)
@@ -109,13 +109,121 @@ RSpec.describe PomsController, type: :controller do
                                                                 "C",
                                                                 "D"])
       expect(hmpps_audit_events).to have_recorded_event('VIEW_POM_PROFILE', who: 'user', subject_type: 'USER_ID', subject_id: active_staff_id.to_s)
+      expect(hmpps_audit_events.last[:details]).not_to have_key('results')
     end
 
-    it 'does not audit the caseload tab while list auditing is deferred' do
+    it 'audits unique displayed offenders across all caseload panels' do
       get :show, params: { prison_id: prison.code, nomis_staff_id: active_staff_id, tab: 'caseload' }
 
       expect(response).to be_successful
-      expect(hmpps_audit_events).to be_empty
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_POM_PROFILE', subject_type: 'USER_ID', subject_id: active_staff_id.to_s)
+      expect(hmpps_audit_events.first[:details]).not_to have_key('results')
+      expect(hmpps_audit_events.last[:details]).to match(
+        'prisonId' => prison.code,
+        'queryParams' => { 'tab' => 'caseload' },
+        'results' => { 'resultCount' => 10, 'returnedSubjectIds' => match_array((a_offenders + b_offenders + c_offenders + d_offenders).map { it.fetch(:prisonerNumber) }) }
+      )
+    end
+
+    it 'audits only the requested caseload page across the rendered panels' do
+      allow(Kaminari.config).to receive(:default_per_page).and_return(1)
+
+      get :show, params: { prison_id: prison.code, nomis_staff_id: active_staff_id, tab: 'caseload', page: '2' }
+
+      expect(response).to be_successful
+      displayed_ids = %i[allocations recent_allocations upcoming_releases].flat_map { assigns(it).map(&:nomis_offender_id) }.uniq
+      expect(displayed_ids.size).to be_between(1, 3)
+      expect(hmpps_audit_events.last[:details]['results']).to eq(
+        'resultCount' => displayed_ids.size, 'returnedSubjectIds' => displayed_ids
+      )
+    end
+
+    it 'audits the parole tab without including other allocated offenders' do
+      parole_id = a_offenders.first.fetch(:prisonerNumber)
+      allow_any_instance_of(AllocatedOffender).to receive(:approaching_parole?) { |offender| offender.nomis_offender_id == parole_id }
+
+      get :show, params: { prison_id: prison.code, nomis_staff_id: active_staff_id, tab: 'parole' }
+
+      expect(response).to be_successful
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_POM_PROFILE', subject_id: active_staff_id.to_s)
+      expect(hmpps_audit_events.last[:details]['queryParams']).to eq('tab' => 'parole')
+      expect(hmpps_audit_events.last[:details]['results']).to eq(
+        'resultCount' => 1, 'returnedSubjectIds' => [parole_id]
+      )
+    end
+
+    it 'audits empty offender tabs' do
+      allow_any_instance_of(AllocatedOffender).to receive(:approaching_parole?).and_return(false)
+
+      get :show, params: { prison_id: prison.code, nomis_staff_id: active_staff_id, tab: 'parole' }
+
+      expect(response).to be_successful
+      expect(hmpps_audit_events.last[:details]['results']).to eq('resultCount' => 0, 'returnedSubjectIds' => [])
+    end
+
+    it 'audits only the displayed handover pages' do
+      a_offenders.each do |offender|
+        create(:calculated_handover_date, :upcoming_handover, nomis_offender_id: offender.fetch(:prisonerNumber))
+      end
+      allow(Kaminari.config).to receive(:default_per_page).and_return(1)
+
+      get :show, params: { prison_id: prison.code, nomis_staff_id: active_staff_id, tab: 'handover', page: '2' }
+
+      expect(response).to be_successful
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_POM_PROFILE', subject_id: active_staff_id.to_s)
+      displayed_ids = %i[upcoming_handovers in_progress_handovers overdue_tasks overdue_com_allocations].flat_map {
+        assigns(it).map { |handover| handover.offender.offender_no }
+      }.uniq
+      expect(displayed_ids.size).to eq(1)
+      expect(hmpps_audit_events.last[:details]['queryParams']).to eq('tab' => 'handover', 'page' => '2')
+      expect(hmpps_audit_events.last[:details]['results']).to eq(
+        'resultCount' => 1, 'returnedSubjectIds' => displayed_ids
+      )
+    end
+
+    it 'deduplicates offenders displayed in multiple handover panels' do
+      offender_id = a_offenders.first.fetch(:prisonerNumber)
+      create(:calculated_handover_date, :handover_in_progress, nomis_offender_id: offender_id)
+
+      get :show, params: { prison_id: prison.code, nomis_staff_id: active_staff_id, tab: 'handover' }
+
+      expect(response).to be_successful
+      expect(assigns(:in_progress_handovers).map(&:offender_no)).to include(offender_id)
+      expect(assigns(:overdue_tasks).map(&:offender_no)).to include(offender_id)
+      expect(hmpps_audit_events.last[:details]['results']).to eq(
+        'resultCount' => 1, 'returnedSubjectIds' => [offender_id]
+      )
+    end
+
+    %w[overview unknown].push(' caseload ').each do |tab|
+      it "keeps #{tab.inspect} as an overview visit without offender results" do
+        get :show, params: { prison_id: prison.code, nomis_staff_id: active_staff_id, tab: }
+
+        expect(response).to be_successful
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_POM_PROFILE')
+        expect(hmpps_audit_events.last[:details]).not_to have_key('results')
+      end
+    end
+
+    it 'audits denied tab visits without collecting offender results' do
+      stub_sso_data(prison.code, roles: [SsoIdentity::POM_ROLE])
+
+      get :show, params: { prison_id: prison.code, nomis_staff_id: active_staff_id, tab: 'caseload' }
+
+      expect(response).to redirect_to('/401')
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_POM_PROFILE', outcome: 'FAILURE')
+      expect(hmpps_audit_events.last[:details]).not_to have_key('results')
+    end
+
+    it 'does not audit displayed IDs when tab rendering fails' do
+      allow(controller).to receive(:render).and_raise(RuntimeError, 'rendering failed')
+
+      expect {
+        get :show, params: { prison_id: prison.code, nomis_staff_id: active_staff_id, tab: 'caseload' }
+      }.to raise_error(RuntimeError, 'rendering failed')
+
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_POM_PROFILE', outcome: 'FAILURE')
+      expect(hmpps_audit_events.last[:details]).not_to have_key('results')
     end
   end
 

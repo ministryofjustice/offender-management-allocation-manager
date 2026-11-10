@@ -10,7 +10,7 @@ class CaseloadGlobalController < PrisonStaffApplicationController
 
     @recent_allocations = paginate_array(sort_allocations(recent_allocations))
     @upcoming_releases = paginate_array(sort_allocations(upcoming_releases))
-    @all_other_allocations = paginate_array(sort_allocations(filtered_allocations))
+    @all_other_allocations = paginate_array(sort_allocations(caseload_allocations))
 
     @summary = {
       all_prison_cases: @allocated.count,
@@ -25,22 +25,10 @@ class CaseloadGlobalController < PrisonStaffApplicationController
 
 private
 
-  def filter_allocations(allocations)
-    if params['q'].present?
-      query = params['q'].upcase
-      allocations = allocations.select do |a|
-        a.full_name.upcase.include?(query) || a.offender_no.include?(query)
-      end
-    end
-    allocations
-  end
-
-  def filtered_allocations
-    @filtered_allocations ||= filter_allocations(@allocated)
-  end
+  def caseload_allocations = @allocated
 
   def recent_allocations
-    filtered_allocations.filter do |a|
+    caseload_allocations.filter do |a|
       a.allocation_date >= 7.days.ago
     end
   end

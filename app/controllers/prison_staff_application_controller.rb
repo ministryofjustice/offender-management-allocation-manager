@@ -75,7 +75,7 @@ private
     @recent_allocations = paginate_array(sort_allocations(recent_allocations))
     @upcoming_releases = paginate_array(sort_allocations(upcoming_releases))
     @parole_cases = paginate_array(sort_allocations(parole_allocations))
-    @allocations = paginate_array(sort_allocations(filtered_allocations))
+    @allocations = paginate_array(sort_allocations(caseload_allocations))
 
     @handover_cases = helpers.handover_cases_view_for_pom(@pom)
 
@@ -95,34 +95,16 @@ private
     }
   end
 
-  def filter_allocations(allocations)
-    if params['q'].present?
-      @q = params['q']
-      query = @q.upcase
-      allocations = allocations.select do |a|
-        a.full_name.upcase.include?(query) || a.nomis_offender_id.include?(query)
-      end
-    end
-    if params['role'].present?
-      allocations = allocations.select do |a|
-        view_context.pom_responsibility_label(a) == params['role']
-      end
-    end
-    allocations
-  end
-
-  def filtered_allocations
-    @filtered_allocations ||= filter_allocations(@pom.allocations)
-  end
+  def caseload_allocations = @pom.allocations
 
   def recent_allocations
-    filtered_allocations.filter do |a|
+    caseload_allocations.filter do |a|
       a.primary_pom_allocated_at.to_date >= 7.days.ago
     end
   end
 
   def upcoming_releases
-    filtered_allocations.filter { |a| release_next_four_weeks?(a) }
+    caseload_allocations.filter { |a| release_next_four_weeks?(a) }
   end
 
   def release_next_four_weeks?(allocation)
@@ -130,6 +112,6 @@ private
   end
 
   def parole_allocations
-    filtered_allocations.select(&:approaching_parole?)
+    caseload_allocations.select(&:approaching_parole?)
   end
 end
