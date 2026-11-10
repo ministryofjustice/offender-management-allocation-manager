@@ -25,9 +25,11 @@ private
   def auditable_entity = nil
 
   # `details` are sent on the outcome event
-  # `results` are the displayed subject IDs, sent with their count on the outcome event
+  # `results` are deduplicated displayed subject IDs, sent with their count on the outcome event
   # `failure` makes the outcome a failure with that reason
   def audit(details: nil, results: nil, failure: nil)
+    results = results.uniq if results
+
     @audit_interaction&.add_details(details) if details
     @audit_interaction&.add_details('results' => { 'resultCount' => results.size, 'returnedSubjectIds' => results }) if results
     @audit_failure_reason = failure if failure
@@ -56,8 +58,30 @@ private
       ensure
         audit_entity_details
       end
+
+      if response.successful? && !@audit_callback_halted && !@audit_failure_reason
+        audit_configured_results(config[:results])
+      end
+
       @audit_failure_reason || generic_audit_failure_reason
     end
+  end
+
+  def audit_configured_results(config)
+    return unless config
+
+    ids = config.fetch(:collections).flat_map do |name|
+      variable = "@#{name}"
+      unless instance_variable_defined?(variable) && (collection = instance_variable_get(variable))
+        raise KeyError, "Missing audit results collection #{variable} for #{controller_path}##{action_name}"
+      end
+
+      collection.map do |item|
+        config.fetch(:id).reduce(item) { |value, method| value.public_send(method) }
+      end
+    end
+
+    audit(results: ids)
   end
 
   # Rails calls this when a before-action response prevents the action from running

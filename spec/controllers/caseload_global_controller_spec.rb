@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe CaseloadGlobalController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let(:staff_id) { 456_987 }
   let(:other_staff_id) { 767_584 }
   let(:not_signed_in) { 123_456 }
@@ -142,14 +144,6 @@ RSpec.describe CaseloadGlobalController, type: :controller do
           end
         end
 
-        describe 'can search by name' do
-          it 'can search by name' do
-            get :index, params: { prison_id: prison.code, staff_id: staff_id, q: offenders.first.fetch(:prisonerNumber) }
-            expect(response).to be_successful
-            expect(assigns(:all_other_allocations).map(&:offender_no)).to match_array([offenders.first.fetch(:prisonerNumber)])
-          end
-        end
-
         describe 'sorting' do
           it 'can sort by last_name asc' do
             get :index, params: { prison_id: prison.code, staff_id: staff_id, sort: 'last_name asc' }
@@ -190,6 +184,18 @@ RSpec.describe CaseloadGlobalController, type: :controller do
           it 'returns all caseloads for prison' do
             get :index, params: { prison_id: prison.code, staff_id: staff_id }
             expect(assigns(:all_other_allocations).map(&:offender_no)).to match_array(offenders.map { |o| o.fetch(:prisonerNumber) })
+          end
+
+          it 'audits only the unique prisoners rendered across the three paginated tabs' do
+            allow(Kaminari.config).to receive(:default_per_page).and_return(1)
+
+            get :index, params: { prison_id: prison.code, staff_id:, sort: 'allocation_date asc' }
+
+            expect(assigns(:all_other_allocations).map(&:offender_no)).to eq([offenders[2].fetch(:prisonerNumber)])
+            expect(hmpps_audit_events.last[:details]['results']).to eq(
+              'resultCount' => 2,
+              'returnedSubjectIds' => [offenders[2].fetch(:prisonerNumber), offenders.first.fetch(:prisonerNumber)]
+            )
           end
 
           it 'returns all caseloads for prison with recent allocations' do

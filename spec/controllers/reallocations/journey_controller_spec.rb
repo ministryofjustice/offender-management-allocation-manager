@@ -129,7 +129,7 @@ RSpec.describe Reallocations::JourneyController, type: :controller do
       )
       expect(hmpps_audit_events.first[:details]).to eq(audit_context)
       expect(hmpps_audit_events.last[:details]).to eq(
-        audit_context.merge('selectedPrisonerIds' => selected_offender_ids)
+        audit_context.merge('results' => { 'resultCount' => selected_offender_ids.size, 'returnedSubjectIds' => selected_offender_ids })
       )
     end
 

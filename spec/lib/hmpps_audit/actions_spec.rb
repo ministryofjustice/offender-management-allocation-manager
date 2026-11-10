@@ -27,7 +27,8 @@ RSpec.describe HmppsAudit::Actions do
   describe '.find' do
     it 'returns the audit declared for a controller action' do
       expect(described_class.find('prisoners', 'search')).to eq(
-        what: 'SEARCH_PRISONER', subject_type: 'SEARCH_TERM', subject_id: 'q', query_params: %w[page]
+        what: 'SEARCH_PRISONER', subject_type: 'SEARCH_TERM', subject_id: 'q', query_params: %w[page],
+        results: { collections: %w[user_allocations offenders], id: %w[offender_no] }
       )
     end
 
@@ -49,6 +50,37 @@ RSpec.describe HmppsAudit::Actions do
   end
 
   describe '.parse' do
+    let(:audit) { { 'what' => 'VIEW_A', 'subject_type' => 'NOT_APPLICABLE' } }
+
+    it 'accepts configured collections and a nested ID method path' do
+      config = audit.merge('results' => { 'collections' => %w[cases recent_cases], 'id' => %w[offender offender_no] })
+
+      expect(described_class.parse('a#b' => config).fetch('a#b')[:results]).to eq(
+        collections: %w[cases recent_cases], id: %w[offender offender_no]
+      )
+    end
+
+    it 'rejects results that are not a mapping' do
+      [nil, 'offenders'].each do |results|
+        expect { described_class.parse('a#b' => audit.merge('results' => results)) }
+          .to raise_error(ArgumentError, /Invalid audit `results` for a#b/)
+      end
+    end
+
+    it 'requires non-empty arrays of names for collections and id' do
+      [
+        {},
+        { 'collections' => [], 'id' => ['id'] },
+        { 'collections' => ['offenders'], 'id' => [] },
+        { 'collections' => 'offenders', 'id' => ['id'] },
+        { 'collections' => ['offenders'], 'id' => [nil] },
+        { 'collections' => [' '], 'id' => ['id'] },
+      ].each do |results|
+        expect { described_class.parse('a#b' => audit.merge('results' => results)) }
+          .to raise_error(ArgumentError, /Invalid audit `results\.(collections|id)` for a#b/)
+      end
+    end
+
     it 'defaults optional settings' do
       expect(described_class.parse('a#b' => { 'what' => 'VIEW_A', 'subject_type' => 'NOT_APPLICABLE' })).to eq(
         'a#b' => { what: 'VIEW_A', subject_type: 'NOT_APPLICABLE', subject_id: nil, query_params: [] }

@@ -39,7 +39,6 @@ module Reallocations
 
     def summary
       prepare_summary_page(AllocationForm.new)
-      audit(details: { 'selectedPrisonerIds' => @selected_cases.map(&:nomis_offender_id) })
     end
 
     def complete

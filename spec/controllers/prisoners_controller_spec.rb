@@ -54,6 +54,11 @@ RSpec.describe PrisonersController, type: :controller do
         get :missing_information, params: { prison_id: prison.code }
         expect(response).to be_successful
         expect(assigns(:offenders).map(&:offender_no)).to match_array(missing_info_offenders.map { |o| o.fetch(:prisonerNumber) })
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_PRISONERS_MISSING_INFORMATION_LIST', subject_type: 'NOT_APPLICABLE', subject_id: nil)
+        expect(hmpps_audit_events.last[:details]).to eq(
+          'prisonId' => prison.code,
+          'results' => { 'resultCount' => 3, 'returnedSubjectIds' => assigns(:offenders).map(&:offender_no) }
+        )
         check_bucket_counts
       end
 
@@ -62,6 +67,10 @@ RSpec.describe PrisonersController, type: :controller do
         expect(response).to be_successful
 
         expect(assigns(:offenders).map(&:offender_no)).to match_array(allocated_offenders.map { |o| o.fetch(:prisonerNumber) })
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATED_PRISONERS_LIST', subject_type: 'NOT_APPLICABLE', subject_id: nil)
+        expect(hmpps_audit_events.last[:details]['results']).to eq(
+          'resultCount' => 2, 'returnedSubjectIds' => assigns(:offenders).map(&:offender_no)
+        )
         check_bucket_counts
       end
 
@@ -70,6 +79,10 @@ RSpec.describe PrisonersController, type: :controller do
         expect(response).to be_successful
 
         expect(assigns(:offenders).map(&:offender_no)).to match_array(unallocated_offenders.map { |o| o.fetch(:prisonerNumber) })
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_UNALLOCATED_PRISONERS_LIST', subject_type: 'NOT_APPLICABLE', subject_id: nil)
+        expect(hmpps_audit_events.last[:details]['results']).to eq(
+          'resultCount' => 1, 'returnedSubjectIds' => assigns(:offenders).map(&:offender_no)
+        )
         check_bucket_counts
       end
 
@@ -101,6 +114,10 @@ RSpec.describe PrisonersController, type: :controller do
 
           expect(assigns(:offenders).map(&:offender_no)).to eq([allocated_offender_one.fetch(:prisonerNumber)])
           expect(assigns(:offenders)).not_to respond_to(:total_pages)
+          expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_REVIEWS_LIST', subject_type: 'NOT_APPLICABLE', subject_id: nil)
+          expect(hmpps_audit_events.last[:details]['results']).to eq(
+            'resultCount' => 1, 'returnedSubjectIds' => [allocated_offender_one.fetch(:prisonerNumber)]
+          )
           check_bucket_counts
         end
 
@@ -130,6 +147,7 @@ RSpec.describe PrisonersController, type: :controller do
             expect(tab).to have_text('Review allocations (0)', normalize_ws: true, exact: true)
             expect(page).to have_no_css('#review-allocations-cases')
             expect(page).to have_css('p.govuk-body', text: 'No allocations to review', exact_text: true)
+            expect(hmpps_audit_events.last[:details]['results']).to eq('resultCount' => 0, 'returnedSubjectIds' => [])
           end
 
           it 'shows the latest allocation once, after returning from a reallocation' do
@@ -489,6 +507,10 @@ RSpec.describe PrisonersController, type: :controller do
       it 'is not visible' do
         get :missing_information, params: { prison_id: prison }
         expect(response).to redirect_to('/401')
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_PRISONERS_MISSING_INFORMATION_LIST', outcome: 'FAILURE')
+        expect(hmpps_audit_events.last[:details]).to eq(
+          'prisonId' => prison, 'failureReason' => 'User does not have access to this data'
+        )
       end
     end
 
@@ -530,6 +552,11 @@ RSpec.describe PrisonersController, type: :controller do
         expect(summary_offenders.size).to eq(20)
         expect(summary_offenders.current_page).to eq(3)
         expect(summary_offenders.total_pages).to eq(3)
+        expect(hmpps_audit_events.last[:details]).to eq(
+          'prisonId' => prison,
+          'queryParams' => { 'page' => '3' },
+          'results' => { 'resultCount' => 20, 'returnedSubjectIds' => summary_offenders.map(&:offender_no) }
+        )
       end
     end
 

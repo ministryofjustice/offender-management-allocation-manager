@@ -115,6 +115,19 @@ RSpec.describe HmppsAuditing, type: :controller do
   end
 
   describe 'details' do
+    it 'always deduplicates explicitly provided subject IDs' do
+      allow(controller).to receive(:audit).and_wrap_original do |method, **options|
+        options[:results] *= 2 if options[:results]
+        method.call(**options)
+      end
+
+      patch :update, params: { id: 'Smith' }
+
+      expect(hmpps_audit_events.last[:details]['results']).to eq(
+        'resultCount' => 1, 'returnedSubjectIds' => ['A1234BC']
+      )
+    end
+
     it 'includes the route prison on both events alongside query params and outcome details' do
       routes.draw { patch '/prisons/:prison_id/allocation/:id' => 'anonymous#update' }
 
@@ -124,6 +137,116 @@ RSpec.describe HmppsAuditing, type: :controller do
         { 'prisonId' => 'LEI', 'queryParams' => { 'page' => '2' } },
         { 'prisonId' => 'LEI', 'queryParams' => { 'page' => '2' }, 'saved' => true },
       ])
+    end
+
+    describe 'configured results' do
+      let(:items) { [double(offender: double(offender_no: 'A1234BC'))] }
+
+      before do
+        routes.draw { get '/list' => 'anonymous#show' }
+        config = HmppsAudit::Actions.parse(
+          'anonymous#show' => {
+            'what' => 'VIEW_ALLOCATION_LIST',
+            'subject_type' => 'NOT_APPLICABLE',
+            'results' => { 'collections' => %w[cases recent_cases], 'id' => %w[offender offender_no] }
+          }
+        ).fetch('anonymous#show')
+        allow(HmppsAudit::Actions).to receive(:find).with('anonymous', 'show').and_return(config)
+        allow(controller).to receive(:render).and_wrap_original do |method, **options|
+          controller.instance_variable_set(:@cases, items)
+          controller.instance_variable_set(:@recent_cases, items)
+          method.call(**options)
+        end
+      end
+
+      it 'collects unique IDs across rendered collections only on the outcome' do
+        get :show
+
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_LIST')
+        expect(hmpps_audit_events.first[:details]).to eq({})
+        expect(hmpps_audit_events.last[:details]['results']).to eq(
+          'resultCount' => 1, 'returnedSubjectIds' => ['A1234BC']
+        )
+      end
+
+      context 'with empty collections' do
+        let(:items) { [] }
+
+        it 'records zero results' do
+          get :show
+
+          expect(hmpps_audit_events.last[:details]['results']).to eq(
+            'resultCount' => 0, 'returnedSubjectIds' => []
+          )
+        end
+      end
+
+      it 'does not collect results for denied or redirected requests' do
+        get :show, params: { denied: true }
+
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_LIST', outcome: 'FAILURE')
+        expect(hmpps_audit_events.last[:details]).not_to have_key('results')
+      end
+
+      it 'does not collect results for an explicitly failed alternate page' do
+        get :show, params: { alternate: true }
+
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_LIST', outcome: 'FAILURE')
+        expect(hmpps_audit_events.last[:details]).not_to have_key('results')
+      end
+
+      it 'does not collect results when rendering fails' do
+        allow(controller).to receive(:render).and_raise(RuntimeError, 'rendering failed')
+
+        expect { get :show }.to raise_error(RuntimeError, 'rendering failed')
+
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_LIST', outcome: 'FAILURE')
+        expect(hmpps_audit_events.last[:details]).not_to have_key('results')
+      end
+
+      it 'does not collect results for a completed action redirect' do
+        allow(controller).to receive(:render) { controller.redirect_to('/completed') }
+
+        get :show
+
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_LIST')
+        expect(hmpps_audit_events.last[:details]).not_to have_key('results')
+      end
+
+      it 'does not collect results for error responses' do
+        allow(controller).to receive(:render) { controller.head(:unprocessable_entity) }
+
+        get :show
+
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_LIST', outcome: 'FAILURE')
+        expect(hmpps_audit_events.last[:details]).not_to have_key('results')
+      end
+
+      it 'does not collect results when auditing is disabled' do
+        stub_feature_flag(:hmpps_audit, enabled: false)
+        allow(controller).to receive(:render).and_call_original
+
+        get :show
+
+        expect(response).to be_successful
+        expect(hmpps_audit_events).to be_empty
+      end
+
+      it 'raises for a missing configured collection instead of reporting an empty list' do
+        allow(controller).to receive(:render).and_call_original
+
+        expect { get :show }.to raise_error(KeyError, /Missing audit results collection @cases/)
+
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_LIST', outcome: 'FAILURE')
+      end
+
+      it 'raises for a misconfigured ID method' do
+        allow(items.first).to receive(:offender).and_return(Object.new)
+
+        expect { get :show }.to raise_error(NoMethodError, /offender_no/)
+
+        expect(hmpps_audit_events).to have_recorded_event('VIEW_ALLOCATION_LIST', outcome: 'FAILURE')
+      end
     end
 
     it 'includes the route prison when a callback denies access' do

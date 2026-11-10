@@ -27,7 +27,6 @@ module Reallocations
 
     def caseload
       @allocations = primary_allocations
-      audit(details: { 'displayedPrisonerIds' => @allocations.map(&:nomis_offender_id) })
     end
 
     def create
