@@ -24,6 +24,11 @@ describe SignonIdentity, model: true do
     expect(signon_identity).to be_a(described_class)
   end
 
+  it 'exposes the username and active caseload' do
+    expect(signon_identity.username).to eq('MOIC_POM')
+    expect(signon_identity.active_caseload).to eq('LEI')
+  end
+
   it 'does not crash if from_omniauth fails' do
     ident = described_class.from_omniauth(nil)
     expect(ident).to be_nil

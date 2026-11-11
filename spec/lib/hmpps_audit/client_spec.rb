@@ -107,6 +107,30 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
     expect(sqs_client.api_requests.size).to eq(2)
   end
 
+  it 'shares one AWS client across concurrent publications without mixing messages' do
+    transport = sqs_client
+    messages = Queue.new
+    allow(Aws::SQS::Client).to receive(:new).with(**described_class::SQS_CONFIG).and_return(transport)
+    allow(transport).to receive(:send_message) do |**attributes|
+      messages << JSON.parse(attributes.fetch(:message_body))
+      Aws::SQS::Types::SendMessageResult.new(message_id: 'message-123')
+    end
+    shared_client = described_class.new
+
+    threads = Array.new(10) do |index|
+      Thread.new do
+        shared_client.publish(**event.merge(who: "user-#{index}", correlation_id: "request-#{index}"))
+      end
+    end
+    threads.each(&:value)
+
+    expect(Aws::SQS::Client).to have_received(:new).with(**described_class::SQS_CONFIG).once
+    expect(messages.size).to eq(10)
+    expect(Array.new(10) { messages.pop.slice('who', 'correlationId') }).to match_array(
+      Array.new(10) { |index| { 'who' => "user-#{index}", 'correlationId' => "request-#{index}" } }
+    )
+  end
+
   context 'when running locally' do
     before do
       allow(HostEnv).to receive(:env_name).and_return(HostEnv::LOCAL)
