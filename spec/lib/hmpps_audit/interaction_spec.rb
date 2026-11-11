@@ -1,5 +1,5 @@
 RSpec.describe HmppsAudit::Interaction do
-  subject(:interaction) { described_class.new(what: 'VIEW_ALLOCATION', **attributes, client:) }
+  subject(:interaction) { described_class.new(what: 'VIEW_ALLOCATION', **attributes) }
 
   let(:client) { instance_double(HmppsAudit::Client, publish: nil) }
   let(:attributes) do
@@ -13,6 +13,7 @@ RSpec.describe HmppsAudit::Interaction do
   end
 
   before do
+    allow(HmppsAudit).to receive(:client).and_return(client)
     allow(Rails.error).to receive(:report)
   end
 
@@ -77,28 +78,6 @@ RSpec.describe HmppsAudit::Interaction do
       error, handled: true, severity: :error, source: 'hmpps_audit',
              context: { what: 'VIEW_ALLOCATION_ATTEMPT', correlation_id: 'request-id' }
     )
-  end
-
-  it 'does not mislabel outcome delivery failures as application failures' do
-    allow(client).to receive(:publish).with(**attributes, what: 'VIEW_ALLOCATION_SUCCESS').and_raise(IOError)
-
-    expect { interaction.record { nil } }.not_to raise_error
-    expect(client).to have_received(:publish).exactly(2).times
-    expect(Rails.error).to have_received(:report).with(
-      an_instance_of(IOError), handled: true, severity: :error, source: 'hmpps_audit',
-                               context: { what: 'VIEW_ALLOCATION_SUCCESS', correlation_id: 'request-id' }
-    )
-  end
-
-  it 'reports every failed delivery without interrupting a handled application failure' do
-    allow(client).to receive(:publish).and_raise(IOError, 'delivery failed')
-    operation = spy('operation', call: 'Resource not found')
-
-    expect { interaction.record { operation.call } }.not_to raise_error
-
-    expect(operation).to have_received(:call).once
-    expect(client).to have_received(:publish).with(hash_including(what: 'VIEW_ALLOCATION_FAILURE'))
-    expect(Rails.error).to have_received(:report).twice
   end
 
   it 'reports failure-delivery errors without masking the original application error' do

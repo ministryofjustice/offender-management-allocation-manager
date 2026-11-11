@@ -7,10 +7,9 @@ class HmppsAudit::Interaction
     FAILURE = 'FAILURE'
   end
 
-  def initialize(what:, who:, subject_type:, subject_id:, correlation_id:, details: {}, client: HmppsAudit::Client.new)
+  def initialize(what:, who:, subject_type:, subject_id:, correlation_id:, details: {})
     @what = what
     @attributes = { who:, subject_type:, subject_id:, correlation_id:, details: }
-    @client = client
   end
 
   # Adds details only known once the operation completes, such as search results
@@ -49,13 +48,8 @@ private
     details = @attributes.fetch(:details)
     details = details.merge('failureReason' => failure_reason) if failure_reason
 
-    @client.publish(
+    HmppsAudit.publish(
       **@attributes, what: "#{@what}_#{outcome}", details:
-    )
-  rescue StandardError => e
-    Rails.error.report(
-      e, handled: true, severity: :error, source: 'hmpps_audit',
-         context: { what: "#{@what}_#{outcome}", correlation_id: @attributes[:correlation_id] }
     )
   end
 end

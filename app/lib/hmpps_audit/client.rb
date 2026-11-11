@@ -2,8 +2,13 @@
 
 # See: https://github.com/ministryofjustice/hmpps-typescript-lib/tree/main/packages/audit-client
 class HmppsAudit::Client
+  SQS_CONFIG = {
+    http_open_timeout: 3, http_read_timeout: 3, retry_mode: 'standard', max_attempts: 2,
+  }.freeze
+
   def initialize(sqs_client: nil)
     @sqs_client = sqs_client
+    @sqs_client_mutex = Mutex.new
   end
 
   def publish(what:, who:, subject_type:, subject_id: nil, correlation_id: nil, details: nil)
@@ -41,12 +46,9 @@ class HmppsAudit::Client
 private
 
   def sqs_client
-    @sqs_client ||= Aws::SQS::Client.new(
-      http_open_timeout: 3,
-      http_read_timeout: 3,
-      retry_mode: 'standard',
-      max_attempts: 2,
-    )
+    @sqs_client_mutex.synchronize do
+      @sqs_client ||= Aws::SQS::Client.new(**SQS_CONFIG)
+    end
   end
 
   def queue_url

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class SignonIdentity
+  attr_reader :username, :active_caseload
+
   class << self
     def from_omniauth(omniauth_data)
       return nil if omniauth_data.blank?
