@@ -39,7 +39,7 @@ RSpec.describe NomisUserRolesService do
 
       results, total = described_class.search_staff(prison, filter)
 
-      expect(results).to contain_exactly({ 'staffId' => 111 }, { 'staffId' => 333 })
+      expect(results.map(&:staff_id)).to contain_exactly('111', '333')
       expect(total).to eq(2)
     end
 
@@ -49,7 +49,7 @@ RSpec.describe NomisUserRolesService do
 
         results, total = described_class.search_staff(prison, filter)
 
-        expect(results).to contain_exactly({ 'staffId' => 111 }, { 'staffId' => 333 })
+        expect(results.map(&:staff_id)).to contain_exactly('111', '333')
         expect(total).to eq(2)
       end
     end
@@ -60,7 +60,7 @@ RSpec.describe NomisUserRolesService do
 
         results, total = described_class.search_staff(prison, filter)
 
-        expect(results).to contain_exactly({ 'staffId' => 111 }, { 'staffId' => 222 })
+        expect(results.map(&:staff_id)).to contain_exactly('111', '222')
         expect(total).to eq(2)
       end
     end
@@ -71,9 +71,7 @@ RSpec.describe NomisUserRolesService do
 
         results, total = described_class.search_staff(prison, filter)
 
-        expect(results).to contain_exactly(
-          { 'staffId' => 111 }, { 'staffId' => 222 }, { 'staffId' => 333 }
-        )
+        expect(results.map(&:staff_id)).to contain_exactly('111', '222', '333')
         expect(total).to eq(3)
       end
     end
@@ -87,7 +85,7 @@ RSpec.describe NomisUserRolesService do
         results, total = described_class.search_staff(prison, filter)
 
         # 111 excluded (active), 222 included (deleted), 333 excluded (inactive)
-        expect(results).to contain_exactly({ 'staffId' => 222 })
+        expect(results.map(&:staff_id)).to contain_exactly('222')
         expect(total).to eq(1)
       end
     end

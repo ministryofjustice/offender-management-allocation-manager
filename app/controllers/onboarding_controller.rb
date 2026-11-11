@@ -35,7 +35,6 @@ class OnboardingController < PrisonsApplicationController
       @results, @total_results = NomisUserRolesService.search_staff(
         @prison, @onboarding_form.search_query
       )
-      audit(results: @results.map { it.fetch('staffId').to_s })
     else
       render :search, status: :unprocessable_entity
     end

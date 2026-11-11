@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class NomisUserRolesService
+  StaffSearchResult = Data.define(:staff_id, :first_name, :last_name, :email, :username)
+
   # @param [Prison] prison
   # @param [String] filter
   def self.search_staff(prison, filter)
@@ -19,7 +21,17 @@ class NomisUserRolesService
 
     total_elements -= (results.size - filtered_results.size)
 
-    [filtered_results, total_elements]
+    staff = filtered_results.map do |result|
+      StaffSearchResult.new(
+        staff_id: result.fetch('staffId').to_s,
+        first_name: result['firstName'],
+        last_name: result['lastName'],
+        email: result['email'],
+        username: result['username'],
+      )
+    end
+
+    [staff, total_elements]
   end
 
   # @param [Prison] prison

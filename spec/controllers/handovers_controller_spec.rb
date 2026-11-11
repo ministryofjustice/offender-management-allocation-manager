@@ -10,7 +10,7 @@ describe HandoversController do
                             overdue_tasks: [handover_case],
                             com_allocation_overdue: [handover_case]
   end
-  let(:handover_case) { double(offender: double(offender_no: 'A1234BC')) }
+  let(:handover_case) { double(offender_no: 'A1234BC') }
   let(:for_pom) { 'user' }
   let(:current_user_is_pom) { double :current_user_is_pom }
   let(:current_user_is_spo) { double :current_user_is_spo }
@@ -114,8 +114,8 @@ describe HandoversController do
       end
 
       context 'when sorting and paginating the cases' do
-        let(:earlier_case) { double(handover_date: Date.new(2026, 11, 1), offender: double(offender_no: 'B1234CD')) }
-        let(:later_case) { double(handover_date: Date.new(2026, 12, 1), offender: double(offender_no: 'C1234DE')) }
+        let(:earlier_case) { double(handover_date: Date.new(2026, 11, 1), offender_no: 'B1234CD') }
+        let(:later_case) { double(handover_date: Date.new(2026, 12, 1), offender_no: 'C1234DE') }
         let(:params) { default_params.except(:sort).merge(page: '2') }
 
         before do
@@ -177,8 +177,8 @@ describe HandoversController do
 
   it 'audits the requested handover page rather than the whole list' do
     cases = [
-      double(offender_last_name: 'Alpha', offender: double(offender_no: 'A1234BC')),
-      double(offender_last_name: 'Bravo', offender: double(offender_no: 'B1234CD')),
+      double(offender_last_name: 'Alpha', offender_no: 'A1234BC'),
+      double(offender_last_name: 'Bravo', offender_no: 'B1234CD'),
     ]
     allow(handover_cases).to receive(:upcoming).and_return(cases)
     allow(controller).to receive(:sort_and_paginate).and_call_original

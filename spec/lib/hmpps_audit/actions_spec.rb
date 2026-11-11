@@ -28,7 +28,7 @@ RSpec.describe HmppsAudit::Actions do
     it 'returns the audit declared for a controller action' do
       expect(described_class.find('prisoners', 'search')).to eq(
         what: 'SEARCH_PRISONER', subject_type: 'SEARCH_TERM', subject_id: 'q', query_params: %w[page],
-        results: { collections: %w[user_allocations offenders], id: %w[offender_no] }
+        results: { collections: %w[user_allocations offenders], id: 'offender_no' }
       )
     end
 
@@ -52,11 +52,11 @@ RSpec.describe HmppsAudit::Actions do
   describe '.parse' do
     let(:audit) { { 'what' => 'VIEW_A', 'subject_type' => 'NOT_APPLICABLE' } }
 
-    it 'accepts configured collections and a nested ID method path' do
-      config = audit.merge('results' => { 'collections' => %w[cases recent_cases], 'id' => %w[offender offender_no] })
+    it 'accepts configured collections and an ID method name' do
+      config = audit.merge('results' => { 'collections' => %w[cases recent_cases], 'id' => 'offender_no' })
 
       expect(described_class.parse('a#b' => config).fetch('a#b')[:results]).to eq(
-        collections: %w[cases recent_cases], id: %w[offender offender_no]
+        collections: %w[cases recent_cases], id: 'offender_no'
       )
     end
 
@@ -67,14 +67,16 @@ RSpec.describe HmppsAudit::Actions do
       end
     end
 
-    it 'requires non-empty arrays of names for collections and id' do
+    it 'requires collection names and a single ID method name' do
       [
         {},
-        { 'collections' => [], 'id' => ['id'] },
+        { 'collections' => [], 'id' => 'id' },
         { 'collections' => ['offenders'], 'id' => [] },
-        { 'collections' => 'offenders', 'id' => ['id'] },
+        { 'collections' => 'offenders', 'id' => 'id' },
         { 'collections' => ['offenders'], 'id' => [nil] },
-        { 'collections' => [' '], 'id' => ['id'] },
+        { 'collections' => [' '], 'id' => 'id' },
+        { 'collections' => ['offenders'], 'id' => ' ' },
+        { 'collections' => ['offenders'], 'id' => %w[offender offender_no] },
       ].each do |results|
         expect { described_class.parse('a#b' => audit.merge('results' => results)) }
           .to raise_error(ArgumentError, /Invalid audit `results\.(collections|id)` for a#b/)

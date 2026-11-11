@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe DebuggingController, type: :controller do
+  include_context 'with HMPPS audit event capture'
+
   let(:prison) { create(:prison) }
   let(:prison_id) { prison.code }
   let(:offender_no) { 'G7806VO' }
@@ -11,23 +13,34 @@ RSpec.describe DebuggingController, type: :controller do
     stub_sso_data(prison_id, roles: [SsoIdentity::SPO_ROLE, SsoIdentity::ADMIN_ROLE])
   end
 
+  it 'does not audit the debugging form with a blank prisoner number' do
+    get :debugging, params: { prison_id:, offender_no: ' ' }
+
+    expect(response).to be_successful
+    expect(hmpps_audit_events).to be_empty
+  end
+
   context 'when the offender is not known to the system' do
     render_views
 
     it 'shows a warning message on the debugging page' do
       get :debugging, params: { prison_id: prison_id, offender_no: offender_no }
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(:not_found)
       expect(response.body).to include('not known to our system')
       expect(assigns(:offender)).to be_nil
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_PRISONER_DEBUGGING_INFORMATION', outcome: 'FAILURE', subject_type: 'PRISONER_ID', subject_id: offender_no)
+      expect(hmpps_audit_events.last[:details]).to include('failureReason' => 'Resource not found')
     end
 
     it 'shows a warning message on the timeline page' do
       get :timeline, params: { prison_id: prison_id, offender_no: offender_no }
 
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(:not_found)
       expect(response.body).to include('not known to our system')
-      expect(assigns(:log)).to be_nil
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_PRISONER_DEBUGGING_TIMELINE', outcome: 'FAILURE', subject_type: 'PRISONER_ID', subject_id: offender_no)
+      expect(hmpps_audit_events.last[:details]).to include('failureReason' => 'Resource not found')
+      expect(hmpps_audit_events.last[:details]).not_to have_key('results')
     end
   end
 
@@ -56,6 +69,8 @@ RSpec.describe DebuggingController, type: :controller do
       expect(response.status).to eq(200)
       expect(response).to be_successful
       expect(response).to render_template("debugging/debugging")
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_PRISONER_DEBUGGING_INFORMATION', subject_type: 'PRISONER_ID', subject_id: offender_no)
+      expect(hmpps_audit_events).to all(include(details: { 'prisonId' => prison_id }))
 
       offender = assigns(:offender)
       expect(offender.indeterminate_sentence?).to be true
@@ -158,6 +173,8 @@ RSpec.describe DebuggingController, type: :controller do
       expect(log_items[0].then { [it.class, it.tags] }).to eq([AuditEvent, %w[event tag three]])
       expect(log_items[1].then { [it.class, it.tags] }).to eq([AuditEvent, %w[event tag two]])
       expect(log_items[2].then { [it.class, it.tags] }).to eq([AuditEvent, %w[event tag one]])
+      expect(hmpps_audit_events).to have_recorded_event('VIEW_PRISONER_DEBUGGING_TIMELINE', subject_type: 'PRISONER_ID', subject_id: offender_no)
+      expect(hmpps_audit_events).to all(include(details: { 'prisonId' => prison_id }))
     end
 
     it 'includes predecessor NOMIS ID audit events for merged offenders' do
@@ -194,6 +211,13 @@ RSpec.describe DebuggingController, type: :controller do
 
         expect(response.body).to include('govuk-tag govuk-tag--yellow')
         expect(response.body).to include('probation_case_merge')
+      end
+
+      it 'does not audit opening the timeline without a prisoner number' do
+        get :timeline, params: { prison_id: }
+
+        expect(response).to be_successful
+        expect(hmpps_audit_events).to be_empty
       end
     end
   end

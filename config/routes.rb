@@ -217,7 +217,9 @@ Rails.application.routes.draw do
 
   # '/admin' was taken by ActiveAdmin in the past
   namespace :manage do
-    resources :audit_events, only: %i[index]
+    resources :audit_events, only: %i[index] do
+      get :search, on: :collection
+    end
   end
 
   mount Rswag::Ui::Engine => '/api-docs'

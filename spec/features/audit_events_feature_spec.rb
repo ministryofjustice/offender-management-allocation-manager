@@ -18,8 +18,8 @@ RSpec.describe 'Audit events' do
       expect(page).to have_content(:all, 'event_data')
     end
 
-    it 'can filter by tag', aggregate_failures: true do
-      FactoryBot.create_list :audit_event, 3, :system,
+    it 'submits a search and preserves the filters through pagination', aggregate_failures: true do
+      FactoryBot.create_list :audit_event, 26, :system,
                              nomis_offender_id: 'X1111XX',
                              tags: ['test', 'tag1'],
                              data: {}
@@ -35,30 +35,20 @@ RSpec.describe 'Audit events' do
       expect(page).not_to have_content 'X1111YY'
       expect(page).to have_content 'tag1'
       expect(page).not_to have_content 'tag2'
-    end
-  end
 
-  describe 'when delivering email' do
-    let(:test_email) do
-      TestOnlyMailer.with(
-        to: 'test@example.org', template: 'test-template-x', personalisation: { 'test' => 'value' }
-      ).test_mail
-    end
+      click_link 'Next', match: :first
+      expect(page).to have_current_path(search_manage_audit_events_path, ignore_query: true)
+      expect(page).to have_content 'X1111XX'
+      expect(page).not_to have_content 'X1111YY'
+      expect(page).to have_field('tags', with: 'test tag1')
 
-    let(:audit_event) { AuditEvent.first }
-
-    before do
-      test_email.deliver_now
-    end
-
-    it 'is tagged and contains the govuk notify details' do
-      expect(audit_event.tags).to eq(%w[email test_only test_mail perform_deliveries_false])
-
-      expect(audit_event.data['govuk_notify_message']).to eq({
-        'to' => ['test@example.org'],
-        'template' => 'test-template-x',
-        'personalisation' => { 'test' => 'value' }
-      })
+      click_link 'Reset filters'
+      expect(page).to have_current_path(manage_audit_events_path)
+      expect(page).to have_field('nomis_offender_id', with: '')
+      expect(page).to have_field('tags', with: '')
+      expect(page).to have_field('whodunnit', with: '')
+      expect(page).to have_content 'Most recent events'
+      expect(page).to have_content 'X1111YY'
     end
   end
 end

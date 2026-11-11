@@ -7,7 +7,7 @@
 # subject_type:  one of HmppsAudit::Message::SUBJECT_TYPES
 # subject_id:    request param holding the subject (path or query string), optional
 # query_params:  request params sent as details.queryParams when present, optional
-# results:       final rendered collection instance-variable names and an ID method path, optional
+# results:       final rendered collection instance-variable names and a single ID method name, optional
 #
 allocation_staff#index:
   what: VIEW_ALLOCATION_POM_SELECTION
@@ -190,7 +190,7 @@ prisoners#search:
   query_params: [page]
   results:
     collections: [user_allocations, offenders]
-    id: [offender_no]
+    id: offender_no
 
 reallocations/journey#override:
   what: VIEW_NEW_REALLOCATION_OVERRIDE_FORM
@@ -209,7 +209,7 @@ reallocations/journey#summary:
   query_params: [new_pom]
   results:
     collections: [selected_cases]
-    id: [nomis_offender_id]
+    id: nomis_offender_id
 reallocations/journey#confirmation:
   what: VIEW_BULK_REALLOCATION_CONFIRMATION
   subject_type: USER_ID
@@ -232,12 +232,15 @@ reallocations/selection#caseload:
   query_params: [new_pom]
   results:
     collections: [allocations]
-    id: [nomis_offender_id]
+    id: nomis_offender_id
 
 onboarding#search:
   what: SEARCH_POM_ONBOARDING_STAFF
   subject_type: SEARCH_TERM
   subject_id: search_query
+  results:
+    collections: [results]
+    id: staff_id
 onboarding#create:
   what: CREATE_POM_POSITION
   subject_type: USER_ID
@@ -320,7 +323,7 @@ caseload#cases:
   query_params: [page, sort]
   results:
     collections: [allocations, recent_allocations, upcoming_releases]
-    id: [nomis_offender_id]
+    id: nomis_offender_id
 caseload#parole_cases:
   what: VIEW_CASELOAD_PAROLE_CASES_LIST
   subject_type: USER_ID
@@ -328,7 +331,7 @@ caseload#parole_cases:
   query_params: [page, sort]
   results:
     collections: [parole_cases]
-    id: [nomis_offender_id]
+    id: nomis_offender_id
 caseload#updates_required:
   what: VIEW_CASE_UPDATES_REQUIRED_LIST
   subject_type: USER_ID
@@ -336,7 +339,7 @@ caseload#updates_required:
   query_params: [page]
   results:
     collections: [pom_tasks]
-    id: [offender_number]
+    id: offender_number
 
 caseload_global#index:
   what: VIEW_PRISON_CASELOAD_LIST
@@ -344,7 +347,7 @@ caseload_global#index:
   query_params: [staff_id, page, sort]
   results:
     collections: [all_other_allocations, recent_allocations, upcoming_releases]
-    id: [offender_no]
+    id: offender_no
 
 handovers#com_allocation_overdue:
   what: VIEW_COM_ALLOCATION_OVERDUE_LIST
@@ -352,28 +355,28 @@ handovers#com_allocation_overdue:
   query_params: [pom, page, sort]
   results:
     collections: [filtered_handover_cases]
-    id: [offender, offender_no]
+    id: offender_no
 handovers#in_progress:
   what: VIEW_HANDOVERS_IN_PROGRESS_LIST
   subject_type: NOT_APPLICABLE
   query_params: [pom, page, sort]
   results:
     collections: [filtered_handover_cases]
-    id: [offender, offender_no]
+    id: offender_no
 handovers#overdue_tasks:
   what: VIEW_HANDOVER_OVERDUE_TASKS_LIST
   subject_type: NOT_APPLICABLE
   query_params: [pom, page, sort]
   results:
     collections: [filtered_handover_cases]
-    id: [offender, offender_no]
+    id: offender_no
 handovers#upcoming:
   what: VIEW_UPCOMING_HANDOVERS_LIST
   subject_type: NOT_APPLICABLE
   query_params: [pom, page, sort]
   results:
     collections: [filtered_handover_cases]
-    id: [offender, offender_no]
+    id: offender_no
 
 parole_cases#index:
   what: VIEW_PAROLE_CASES_LIST
@@ -381,7 +384,7 @@ parole_cases#index:
   query_params: [page, sort]
   results:
     collections: [offenders]
-    id: [offender_no]
+    id: offender_no
 
 prisoners#unallocated:
   what: VIEW_UNALLOCATED_PRISONERS_LIST
@@ -389,27 +392,50 @@ prisoners#unallocated:
   query_params: [page, sort]
   results:
     collections: [offenders]
-    id: [offender_no]
+    id: offender_no
 prisoners#missing_information:
   what: VIEW_PRISONERS_MISSING_INFORMATION_LIST
   subject_type: NOT_APPLICABLE
   query_params: [page, sort]
   results:
     collections: [offenders]
-    id: [offender_no]
+    id: offender_no
 prisoners#allocated:
   what: VIEW_ALLOCATED_PRISONERS_LIST
   subject_type: NOT_APPLICABLE
   query_params: [page, sort]
   results:
     collections: [offenders]
-    id: [offender_no]
+    id: offender_no
 prisoners#review_allocations:
   what: VIEW_ALLOCATION_REVIEWS_LIST
   subject_type: NOT_APPLICABLE
   results:
     collections: [offenders]
-    id: [offender_no]
+    id: offender_no
+
+debugging#debugging:
+  what: VIEW_PRISONER_DEBUGGING_INFORMATION
+  subject_type: PRISONER_ID
+  subject_id: offender_no
+debugging#timeline:
+  what: VIEW_PRISONER_DEBUGGING_TIMELINE
+  subject_type: PRISONER_ID
+  subject_id: offender_no
+manage/audit_events#index:
+  what: VIEW_AUDIT_EVENTS_SEARCH
+  subject_type: NOT_APPLICABLE
+  query_params: [page]
+  results:
+    collections: [audit_events]
+    id: id # Returned IDs identify AuditEvent records
+manage/audit_events#search:
+  what: SEARCH_AUDIT_EVENTS
+  subject_type: SEARCH_TERM
+  query_params: [nomis_offender_id, whodunnit, tags, page]
+  results:
+    collections: [audit_events]
+    id: id # Returned IDs identify AuditEvent records
 
 # Exempted actions
 
@@ -516,13 +542,3 @@ root#index:
   exempt: Redirect to the default prison dashboard
 root#handovers_email_preferences:
   exempt: Redirect from email links to the email preferences page
-
-# TODO actions: not yet evaluated.
-# Replace each with an audit, or an exemption with a real reason.
-
-debugging#debugging:
-  todo: true
-debugging#timeline:
-  todo: true
-manage/audit_events#index:
-  todo: true
