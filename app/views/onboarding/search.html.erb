@@ -63,17 +63,17 @@
         </thead>
         <tbody class="govuk-table__body">
           <% @results.each do |user| %>
-          <% full_name = "#{user['firstName']} #{user['lastName']}" %>
+          <% full_name = "#{user.first_name} #{user.last_name}" %>
           <tr class="govuk-table__row">
             <td class="govuk-table__cell" data-sort-value="<%= full_name %>">
-              <%= link_to full_name, position_prison_onboarding_path(@prison.code, user['staffId']),
+              <%= link_to full_name, position_prison_onboarding_path(@prison.code, user.staff_id),
                           class: 'govuk-link govuk-link--no-visited-state' %>
             </td>
             <td class="govuk-table__cell">
-              <%= user['email'].presence || 'N/A' %>
+              <%= user.email.presence || 'N/A' %>
             </td>
             <td class="govuk-table__cell">
-              <%= user['username'] %>
+              <%= user.username %>
             </td>
           </tr>
           <% end %>

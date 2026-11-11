@@ -77,7 +77,7 @@ private
       end
 
       collection.map do |item|
-        config.fetch(:id).reduce(item) { |value, method| value.public_send(method) }
+        item.public_send(config.fetch(:id))
       end
     end
 

@@ -1,5 +1,9 @@
 RSpec.describe ApplicationMailer do
   describe 'when setting tags' do
+    after do
+      TestOnlyMailer.set_mailer_tag nil
+    end
+
     it 'uses default tags based on mailer name' do
       TestOnlyMailer.set_mailer_tag nil
       mail = TestOnlyMailer.with(template: 'x', personalisation: {}).test_mail

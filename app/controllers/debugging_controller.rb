@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 class DebuggingController < PrisonsApplicationController
+  # A blank prisoner number leaves us without a subject ID to audit
+  skip_around_action :audit_request, if: -> { %w[debugging timeline].include?(action_name) && params[:offender_no].blank? }
+
   before_action :ensure_admin_user
   before_action :set_nomis_id
   before_action :ensure_known_offender, if: -> { @nomis_id.present? }
 
   def debugging
     return unless @nomis_id
-    return unless @known_offender
 
     @offender = OffenderService.get_offender(@nomis_id, ignore_legal_status: true)
 
@@ -33,7 +35,6 @@ class DebuggingController < PrisonsApplicationController
 
   def timeline
     return unless @nomis_id
-    return unless @known_offender
 
     @log = AuditEvent.where(nomis_offender_id: timeline_nomis_ids).order(created_at: :desc)
   end
@@ -41,11 +42,12 @@ class DebuggingController < PrisonsApplicationController
 private
 
   def set_nomis_id
-    @nomis_id = params[:offender_no]&.strip
+    @nomis_id = params[:offender_no]&.strip.presence
   end
 
   def ensure_known_offender
     @known_offender = Offender.exists?(nomis_offender_id: @nomis_id)
+    render action_name, status: :not_found unless @known_offender
   end
 
   def timeline_nomis_ids

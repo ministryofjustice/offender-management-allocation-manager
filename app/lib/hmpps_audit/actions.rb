@@ -47,14 +47,17 @@ module HmppsAudit::Actions
   def self.parse_results(key, results)
     raise ArgumentError, "Invalid audit `results` for #{key}: expected a mapping" unless results.is_a?(Hash)
 
-    %w[collections id].to_h { |name|
-      values = results[name]
-      unless values.is_a?(Array) && values.any? && values.all? { it.is_a?(String) && it.present? }
-        raise ArgumentError, "Invalid audit `results.#{name}` for #{key}: expected a non-empty array of names"
-      end
+    collections = results['collections']
+    unless collections.is_a?(Array) && collections.any? && collections.all? { it.is_a?(String) && it.present? }
+      raise ArgumentError, "Invalid audit `results.collections` for #{key}: expected a non-empty array of names"
+    end
 
-      [name.to_sym, values.freeze]
-    }.freeze
+    id = results['id']
+    unless id.is_a?(String) && id.present?
+      raise ArgumentError, "Invalid audit `results.id` for #{key}: expected a method name"
+    end
+
+    { collections: collections.freeze, id: id.freeze }.freeze
   end
   private_class_method :parse_declaration, :parse_results
 end

@@ -140,7 +140,7 @@ RSpec.describe HmppsAuditing, type: :controller do
     end
 
     describe 'configured results' do
-      let(:items) { [double(offender: double(offender_no: 'A1234BC'))] }
+      let(:items) { [double(offender_no: 'A1234BC')] }
 
       before do
         routes.draw { get '/list' => 'anonymous#show' }
@@ -148,7 +148,7 @@ RSpec.describe HmppsAuditing, type: :controller do
           'anonymous#show' => {
             'what' => 'VIEW_ALLOCATION_LIST',
             'subject_type' => 'NOT_APPLICABLE',
-            'results' => { 'collections' => %w[cases recent_cases], 'id' => %w[offender offender_no] }
+            'results' => { 'collections' => %w[cases recent_cases], 'id' => 'offender_no' }
           }
         ).fetch('anonymous#show')
         allow(HmppsAudit::Actions).to receive(:find).with('anonymous', 'show').and_return(config)
@@ -241,7 +241,7 @@ RSpec.describe HmppsAuditing, type: :controller do
       end
 
       it 'raises for a misconfigured ID method' do
-        allow(items.first).to receive(:offender).and_return(Object.new)
+        items.replace([Object.new])
 
         expect { get :show }.to raise_error(NoMethodError, /offender_no/)
 
