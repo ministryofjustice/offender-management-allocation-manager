@@ -228,6 +228,8 @@ Mark specs as flaky by adding the `flaky: true` flag to them.
 
 ## Further documentation
 
+- [HMPPS Audit](docs/hmpps-audit.md) - architecture, delivery behaviour and a guide to auditing new controller actions.
+
 ### Domain concepts
 
 - [Allocation, Responsibility, and Handover](docs/allocation-handover-domain.md) — explains POM/COM roles, the three responsibility states, how handover dates are calculated, and which domain events are published.

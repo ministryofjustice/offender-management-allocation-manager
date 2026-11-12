@@ -97,7 +97,7 @@ RSpec.describe HmppsAudit::Client, :enable_hmpps_audit_publish do
   end
 
   it 'creates and reuses an AWS client with custom timeout and retry config' do
-    options = { http_open_timeout: 3, http_read_timeout: 3, retry_mode: 'standard', max_attempts: 2 }
+    options = { http_open_timeout: 3, http_read_timeout: 3, http_idle_timeout: 10, max_attempts: 3 }
     allow(Aws::SQS::Client).to receive(:new).with(**options).and_return(sqs_client)
     default_client = described_class.new
 

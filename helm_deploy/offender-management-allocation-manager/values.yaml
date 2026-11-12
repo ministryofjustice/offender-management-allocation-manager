@@ -177,6 +177,8 @@ generic-service:
     RAILS_SERVE_STATIC_FILES: on
     PROMETHEUS_METRICS: "on" # do not remove quotes!
     PROMETHEUS_EXPORTER_HOST: offender-management-prometheus-exporter
+    # https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html
+    AWS_NEW_RETRIES_2026: "true"
     # Service identifier used for AppInsights and HMPPS Audit
     # This should match the name of the component on the Developer Portal
     AUDIT_SERVICE_NAME: offender-management-allocation-manager

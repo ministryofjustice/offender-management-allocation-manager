@@ -3,7 +3,7 @@
 # See: https://github.com/ministryofjustice/hmpps-typescript-lib/tree/main/packages/audit-client
 class HmppsAudit::Client
   SQS_CONFIG = {
-    http_open_timeout: 3, http_read_timeout: 3, retry_mode: 'standard', max_attempts: 2,
+    http_open_timeout: 3, http_read_timeout: 3, http_idle_timeout: 10, max_attempts: 3,
   }.freeze
 
   def initialize(sqs_client: nil)

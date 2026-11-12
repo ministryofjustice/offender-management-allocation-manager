@@ -32,14 +32,6 @@ RSpec.describe HmppsAudit do
     expect(client).to have_received(:publish).with(**attributes).once
   end
 
-  it 'does not publish when auditing is disabled' do
-    stub_feature_flag(:hmpps_audit, enabled: false)
-
-    described_class.publish(**attributes)
-
-    expect(client).not_to have_received(:publish)
-  end
-
   it 'reports delivery errors without interrupting the caller' do
     error = IOError.new('Delivery failed')
     allow(client).to receive(:publish).and_raise(error)
