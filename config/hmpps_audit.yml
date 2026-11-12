@@ -414,10 +414,6 @@ prisoners#review_allocations:
     collections: [offenders]
     id: offender_no
 
-sessions#destroy:
-  what: AUTH_USER_SIGN_OUT
-  subject_type: NOT_APPLICABLE
-
 debugging#debugging:
   what: VIEW_PRISONER_DEBUGGING_INFORMATION
   subject_type: PRISONER_ID
@@ -526,9 +522,11 @@ sre_swagger_docs#open_api_json:
   exempt: API documentation
 
 sessions#create:
-  exempt: Local sign-in lifecycle audited explicitly in SessionsController
+  exempt: Authentication auditing is the responsibility of HMPPS Auth
 sessions#failure:
-  exempt: Sign-in handled by HMPPS Auth, failures will lack a valid session to audit
+  exempt: Authentication auditing is the responsibility of HMPPS Auth
+sessions#destroy:
+  exempt: Authentication auditing is the responsibility of HMPPS Auth
 
 help#dashboard:
   exempt: Static help page with no prisoner or staff data
