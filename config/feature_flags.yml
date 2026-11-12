@@ -10,3 +10,4 @@ feature_flags:
   hmpps_audit:
     staging: true
     preprod: true
+    production: true

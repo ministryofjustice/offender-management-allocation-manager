@@ -8,8 +8,6 @@ module HmppsAudit
   end
 
   def self.publish(what:, who:, subject_type:, correlation_id: nil, **attributes)
-    return unless FeatureFlags.hmpps_audit.enabled?
-
     client.publish(
       what:, who:, subject_type:, correlation_id:, **attributes
     )
