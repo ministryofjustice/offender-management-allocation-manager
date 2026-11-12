@@ -6,7 +6,7 @@ RSpec.describe HmppsAudit do
   let(:client) { instance_double(HmppsAudit::Client, publish: nil) }
   let(:attributes) do
     {
-      what: 'AUTH_USER_SIGN_IN_SUCCESS',
+      what: 'VIEW_ALLOCATION_SUCCESS',
       who: 'test-user',
       subject_type: 'NOT_APPLICABLE',
       correlation_id: 'request-id'
@@ -48,7 +48,7 @@ RSpec.describe HmppsAudit do
     expect { described_class.publish(**attributes) }.not_to raise_error
     expect(Rails.error).to have_received(:report).with(
       error, handled: true, severity: :error, source: 'hmpps_audit',
-             context: { what: 'AUTH_USER_SIGN_IN_SUCCESS', correlation_id: 'request-id' }
+             context: { what: 'VIEW_ALLOCATION_SUCCESS', correlation_id: 'request-id' }
     )
   end
 end
