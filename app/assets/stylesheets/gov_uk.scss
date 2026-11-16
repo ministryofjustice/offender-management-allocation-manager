@@ -1,5 +1,6 @@
 @forward "govuk-frontend/dist/govuk" with (
-  $govuk-global-styles: true
+  $govuk-global-styles: true,
+  $govuk-assets-path: "govuk-frontend/dist/govuk/assets/"
 );
 
 @forward "@ministryofjustice/frontend/moj/all";
