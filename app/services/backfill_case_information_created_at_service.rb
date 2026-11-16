@@ -3,6 +3,8 @@
 class BackfillCaseInformationCreatedAtService
   CASE_INFORMATION_INTRODUCED_AT = Time.utc(2019, 2, 14).freeze
   TIMESTAMPS_CUTOFF_DATE = Time.utc(2019, 8, 13).freeze
+  ALLOCATION_ESTIMATE_CUTOFF_DATE = Time.utc(2020, 1, 1).freeze
+  FALLBACK_CREATED_AT = Time.utc(2019, 8, 12, 23, 59, 59, 999_999).freeze
   BATCH_SIZE = 200
 
   def initialize(dry_run:)
@@ -15,16 +17,16 @@ class BackfillCaseInformationCreatedAtService
       paper_trail_changes: 0,
       allocation_created_at: 0,
       allocation_date: 0,
+      fallback_date: 0,
       no_allocation: 0,
       no_usable_date: 0,
       before_case_information_introduced: 0,
-      after_timestamps_introduced: 0,
       after_case_updated_at: 0,
-      changed_concurrently: 0,
+      estimated_after_timestamps_cutoff: 0,
     }
     if dry_run
       @counts[:estimated_by_year] = Hash.new(0)
-      @counts[:merge_cases] = []
+      @counts[:fallback_allocation_by_year] = Hash.new(0)
     end
   end
 
@@ -35,17 +37,8 @@ class BackfillCaseInformationCreatedAtService
                                      .select(:id, :nomis_offender_id, :created_at, :primary_pom_allocated_at)
                                      .index_by(&:nomis_offender_id)
       candidates = allocation_candidates(allocations.values)
-      merge_ids = merged_nomis_ids(cases) if @dry_run
-
       cases.each do |case_information|
-        candidate = process_case(case_information, allocations[case_information.nomis_offender_id], candidates)
-        next unless @dry_run && merge_ids.include?(case_information.nomis_offender_id)
-
-        @counts[:merge_cases] << {
-          case_information_id: case_information.id,
-          estimated_created_at: candidate&.first,
-          source: candidate&.last,
-        }
+        process_case(case_information, allocations[case_information.nomis_offender_id], candidates)
       end
     end
 
@@ -53,12 +46,6 @@ class BackfillCaseInformationCreatedAtService
   end
 
 private
-
-  def merged_nomis_ids(cases)
-    ids = cases.map(&:nomis_offender_id)
-    NomisIdMerge.where(old_nomis_id: ids).or(NomisIdMerge.where(new_nomis_id: ids))
-                .pluck(:old_nomis_id, :new_nomis_id).flatten.to_set
-  end
 
   def allocation_candidates(allocations)
     candidates = Hash.new { |hash, key| hash[key] = [] }
@@ -105,8 +92,6 @@ private
 
   def process_case(case_information, allocation, candidates)
     @counts[:missing_created_at] += 1
-    raise "Missing updated_at for CaseInformation #{case_information.id}" if case_information.updated_at.nil?
-
     unless allocation
       @counts[:no_allocation] += 1
       return
@@ -118,36 +103,28 @@ private
       return
     end
 
-    dates.select! { |date, _source| date >= CASE_INFORMATION_INTRODUCED_AT }
-    if dates.empty?
+    date, source = dates.min_by(&:first)
+    if date < CASE_INFORMATION_INTRODUCED_AT
       @counts[:before_case_information_introduced] += 1
       return
     end
 
-    dates.select! { |date, _source| date < TIMESTAMPS_CUTOFF_DATE }
-    if dates.empty?
-      @counts[:after_timestamps_introduced] += 1
-      return
+    if date >= ALLOCATION_ESTIMATE_CUTOFF_DATE
+      allocation_year = date.utc.year
+      date = FALLBACK_CREATED_AT
+      source = :fallback_date
     end
 
-    candidate = dates.select { |date, _source| date <= case_information.updated_at }.min_by(&:first)
-    unless candidate
+    if date > case_information.updated_at
       @counts[:after_case_updated_at] += 1
       return
     end
 
-    date, source = candidate
-    if @dry_run
-      @counts[source] += 1
-      @counts[:estimated_by_year][date.utc.year] += 1
-      candidate
     # update_all bypasses callbacks and does not touch updated_at.
-    elsif CaseInformation.where(id: case_information.id, nomis_offender_id: case_information.nomis_offender_id, created_at: nil)
-                         .where('updated_at >= ?', date)
-                         .update_all(created_at: date) == 1
-      @counts[source] += 1
-    else
-      @counts[:changed_concurrently] += 1
-    end
+    CaseInformation.where(id: case_information.id).update_all(created_at: date) unless @dry_run
+    @counts[source] += 1
+    @counts[:estimated_after_timestamps_cutoff] += 1 if date >= TIMESTAMPS_CUTOFF_DATE
+    @counts[:estimated_by_year][date.utc.year] += 1 if @dry_run
+    @counts[:fallback_allocation_by_year][allocation_year] += 1 if @dry_run && source == :fallback_date
   end
 end
