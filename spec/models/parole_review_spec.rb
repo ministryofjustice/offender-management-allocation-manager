@@ -5,6 +5,24 @@ RSpec.describe ParoleReview, type: :model do
     expect(build(:parole_review).offender).not_to be_nil
   end
 
+  describe 'required identifiers' do
+    %i[review_id nomis_offender_id].each do |attribute|
+      it "rejects a missing #{attribute} with a validation error" do
+        review = build(:parole_review)
+        review.public_send("#{attribute}=", nil)
+
+        expect(review.save).to be(false)
+        expect(review.errors.of_kind?(attribute, :blank)).to be(true)
+      end
+    end
+
+    it 'allows an offender identifier without a matching local offender' do
+      review = build(:parole_review, offender: nil, nomis_offender_id: 'Z9999ZZ')
+
+      expect(review.save).to be(true)
+    end
+  end
+
   describe '#hearing_outcome_as_current' do
     context 'when the hearing outcome is present' do
       it 'returns that outcome' do

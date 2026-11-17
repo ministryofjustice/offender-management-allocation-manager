@@ -33,6 +33,7 @@ class ParoleReview < ApplicationRecord
 
   scope :completed, -> { ordered_by_sortable_date.with_hearing_outcome }
 
+  validates :review_id, :nomis_offender_id, presence: true
   validate :hearing_outcome_received_on_must_be_in_past, on: :manual_update
 
   # Used when POM manually enters this date

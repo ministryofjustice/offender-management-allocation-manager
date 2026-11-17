@@ -197,8 +197,8 @@ CREATE TABLE public.case_information (
     crn character varying,
     mappa_level integer,
     manual_entry boolean NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     probation_service character varying,
     com_name character varying,
     team_name character varying,
@@ -361,8 +361,8 @@ CREATE TABLE public.handover_progress_checklists (
     reviewed_oasys boolean DEFAULT false NOT NULL,
     contacted_com boolean DEFAULT false NOT NULL,
     attended_handover_meeting boolean DEFAULT false NOT NULL,
-    created_at timestamp(6) without time zone,
-    updated_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
     sent_handover_report boolean DEFAULT false NOT NULL
 );
 
@@ -600,8 +600,8 @@ ALTER SEQUENCE public.parole_review_imports_id_seq OWNED BY public.parole_review
 
 CREATE TABLE public.parole_reviews (
     id bigint NOT NULL,
-    review_id integer,
-    nomis_offender_id character varying,
+    review_id integer NOT NULL,
+    nomis_offender_id character varying NOT NULL,
     target_hearing_date date,
     custody_report_due date,
     review_status character varying,
@@ -638,12 +638,12 @@ ALTER SEQUENCE public.parole_reviews_id_seq OWNED BY public.parole_reviews.id;
 
 CREATE TABLE public.pom_details (
     id bigint NOT NULL,
-    nomis_staff_id integer,
-    working_pattern double precision,
-    status character varying,
+    nomis_staff_id integer NOT NULL,
+    working_pattern double precision NOT NULL,
+    status character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    prison_code character varying,
+    prison_code character varying NOT NULL,
     created_by character varying
 );
 
@@ -1510,6 +1510,7 @@ ALTER TABLE ONLY public.offender_email_sent
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261117111500'),
 ('20261015091500'),
 ('20261008101520'),
 ('20261002152102'),

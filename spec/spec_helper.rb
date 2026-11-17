@@ -19,7 +19,6 @@ SimpleCov.formatter = SimpleCov::Formatter::MergedFormatter
 if ENV['DISABLE_COVERAGE'].blank?
   SimpleCov.start 'rails' do
     add_filter 'app/services/hmpps_api/error/'
-    add_filter 'lib/allocation_validation.rb'
     add_filter 'app/jobs/custom_stats_logging_job.rb'
     add_group "Services", "app/services"
 
