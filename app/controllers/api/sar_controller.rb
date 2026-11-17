@@ -7,9 +7,13 @@ module Api
     end
 
     def show
-      return render_error('PRN and CRN parameters passed', 2, 400) if parameter_conflict?
-      return render_error('CRN parameter not allowed', 3, 209) if only_crn?
-      return render_error('Invalid date format', 4, 210) unless parse_dates
+      return render_error('PRN and CRN parameters must be strings', 10, 400) unless valid_identifier_types?
+      return render_error('PRN and CRN parameters passed', 11, 400) if parameter_conflict?
+      return render_error('PRN or CRN parameter required', 12, 400) if offender_number.blank? && crn.blank?
+      return render_error('Invalid date format', 20, 400) unless parse_dates
+      return render_error('fromDate and toDate must be provided together', 21, 400) if @from_date.nil? != @to_date.nil?
+      return render_error('fromDate must be on or before toDate', 22, 400) if @from_date && @from_date > @to_date
+      return head 209 if only_crn?
 
       result = SarOffenderDataService.new(offender_number, @from_date, @to_date).find
       return not_found if result.nil?
@@ -57,22 +61,29 @@ module Api
       crn.present? && offender_number.present?
     end
 
+    def valid_identifier_types?
+      [offender_number, crn].all? { |identifier| identifier.nil? || identifier.is_a?(String) }
+    end
+
     def only_crn?
       crn.present? && offender_number.blank?
     end
 
     def parse_dates
-      if params[:fromDate].blank? || params[:toDate].blank?
-        @from_date = nil
-        @to_date = nil
-      else
-        @from_date = Date.parse(params[:fromDate].to_s)
-        @to_date = Date.parse(params[:toDate].to_s)
-      end
+      @from_date = parse_date(params[:fromDate])
+      @to_date = parse_date(params[:toDate])
 
       true
     rescue Date::Error
       false
+    end
+
+    def parse_date(value)
+      return nil if value.nil? || value == ''
+
+      raise Date::Error unless value.is_a?(String) && value.match?(/\A[0-9]{4}-[0-9]{2}-[0-9]{2}\z/)
+
+      Date.iso8601(value)
     end
   end
 end

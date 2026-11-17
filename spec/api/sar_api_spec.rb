@@ -12,10 +12,13 @@ describe 'SAR API' do
         [
           '* A valid Bearer token must be supplied in the Authorization header.',
           '* NOMIS Prison Number (PRN) must be provided as part of the request.',
+          '* Requests with neither identifier, or with both PRN and CRN, return HTTP code 400.',
+          '* Dates must be valid calendar dates in YYYY-MM-DD format; invalid dates or a reversed range return HTTP code 400.',
+          '* Provide both fromDate and toDate, or neither. An incomplete date range returns HTTP code 400.',
           '* The role ROLE_SAR_DATA_ACCESS is required',
           '* If the product uses the identifier type transmitted in the request, it can respond with its data and HTTP code 200',
           '* If the product uses the identifier type transmitted in the request but has no data to respond with, it should respond with HTTP code 204',
-          '* If the product does not use the identifier type transmitted in the request, it should respond with HTTP code 209'
+          '* If only a CRN is supplied, the endpoint returns HTTP code 209 with an empty response body.'
         ].join("\n")
       )
 
@@ -32,11 +35,11 @@ describe 'SAR API' do
                 description: 'nDelius Case Reference Number. **Do not use this parameter for this endpoint**'
       parameter name: :fromDate,
                 in: :query,
-                type: :string,
+                schema: { type: :string, format: :date },
                 description: 'Optional parameter denoting minimum date of event occurrence which should be returned in the response (if used, both dates must be provided)'
       parameter name: :toDate,
                 in: :query,
-                type: :string,
+                schema: { type: :string, format: :date },
                 description: 'Optional parameter denoting maximum date of event occurrence which should be returned in the response (if used, both dates must be provided)'
 
       describe 'when not authorised' do
@@ -90,58 +93,177 @@ describe 'SAR API' do
           allow_any_instance_of(Api::SarController).to receive(:verify_token)
         end
 
-        response '400', 'PRN and CRN parameters passed' do
+        response '400', 'Invalid request parameters' do
           schema '$ref' => '#/components/schemas/SarError'
 
-          example 'application/json', :error_example, {
+          example 'application/json', :conflicting_identifiers, {
             developerMessage: 'PRN and CRN parameters passed',
-            errorCode: 2,
+            errorCode: 11,
             status: 400,
             userMessage: 'PRN and CRN parameters passed',
           }
 
-          let(:crn) { '123456' }
-          let(:prn) { 'A1111AA' }
+          example 'application/json', :missing_identifiers, {
+            developerMessage: 'PRN or CRN parameter required',
+            errorCode: 12,
+            status: 400,
+            userMessage: 'PRN or CRN parameter required',
+          }
+
+          example 'application/json', :invalid_date, {
+            developerMessage: 'Invalid date format',
+            errorCode: 20,
+            status: 400,
+            userMessage: 'Invalid date format',
+          }
+
+          example 'application/json', :reversed_date_range, {
+            developerMessage: 'fromDate must be on or before toDate',
+            errorCode: 22,
+            status: 400,
+            userMessage: 'fromDate must be on or before toDate',
+          }
+
+          example 'application/json', :invalid_identifier_type, {
+            developerMessage: 'PRN and CRN parameters must be strings',
+            errorCode: 10,
+            status: 400,
+            userMessage: 'PRN and CRN parameters must be strings',
+          }
+
+          example 'application/json', :incomplete_date_range, {
+            developerMessage: 'fromDate and toDate must be provided together',
+            errorCode: 21,
+            status: 400,
+            userMessage: 'fromDate and toDate must be provided together',
+          }
+
+          let(:crn) { nil }
+          let(:prn) { nil }
           let(:fromDate) { nil }
           let(:toDate) { nil }
 
-          run_test!
+          before do
+            expect(SarOffenderDataService).not_to receive(:new)
+          end
+
+          context 'with both identifiers' do
+            let(:crn) { '123456' }
+            let(:prn) { 'A1111AA' }
+
+            run_test! do |response|
+              expect(JSON.parse(response.body)).to include('errorCode' => 11)
+            end
+          end
+
+          context 'with neither identifier' do
+            run_test! do |response|
+              expect(JSON.parse(response.body)).to include('errorCode' => 12)
+            end
+          end
+
+          context 'with empty identifiers' do
+            let(:crn) { '' }
+            let(:prn) { '' }
+
+            run_test! do |response|
+              expect(JSON.parse(response.body)).to include('errorCode' => 12)
+            end
+          end
+
+          context 'with whitespace-only identifiers' do
+            let(:crn) { ' ' }
+            let(:prn) { ' ' }
+
+            run_test! do |response|
+              expect(JSON.parse(response.body)).to include('errorCode' => 12)
+            end
+          end
+
+          %i[fromDate toDate].each do |date_parameter|
+            ['apples',
+             '17 Nov 2026',
+             '2026-1-01',
+             '2026-02-29',
+             '2026-13-01',
+             '2026-11-17T00:00:00Z',
+             ' '].each do |value|
+              context "with invalid #{date_parameter}: #{value.inspect}" do
+                let(:prn) { 'A1111AA' }
+                let(date_parameter) { value }
+
+                run_test! do |response|
+                  expect(JSON.parse(response.body)).to include('errorCode' => 20)
+                end
+              end
+            end
+          end
+
+          context 'with an invalid date and an unsupported identifier' do
+            let(:crn) { '123456' }
+            let(:fromDate) { 'apples' }
+
+            run_test! do |response|
+              expect(JSON.parse(response.body)).to include('errorCode' => 20)
+            end
+          end
+
+          context 'with a reversed date range' do
+            let(:prn) { 'A1111AA' }
+            let(:fromDate) { '2026-11-18' }
+            let(:toDate) { '2026-11-17' }
+
+            run_test! do |response|
+              expect(JSON.parse(response.body)).to include('errorCode' => 22)
+            end
+          end
+
+          {
+            'only a start date' => ['2026-11-17', nil],
+            'only an end date' => [nil, '2026-11-17'],
+            'an empty end date' => ['2026-11-17', ''],
+            'an empty start date' => ['', '2026-11-17'],
+          }.each do |description, (from_date, to_date)|
+            context "with #{description}" do
+              let(:prn) { 'A1111AA' }
+              let(:fromDate) { from_date }
+              let(:toDate) { to_date }
+
+              run_test! do |response|
+                expect(JSON.parse(response.body)).to include('errorCode' => 21, 'status' => 400)
+              end
+            end
+          end
         end
 
-        response '209', 'CRN parameter not allowed' do
-          schema '$ref' => '#/components/schemas/SarError'
+        describe 'structured query parameters' do
+          { prn: 10, crn: 10, fromDate: 20, toDate: 20 }.each do |parameter, error_code|
+            [['2026-11-17'], { value: '2026-11-17' }].each do |value|
+              it "rejects #{parameter} supplied as #{value.class}" do
+                expect(SarOffenderDataService).not_to receive(:new)
 
-          example 'application/json', :error_example, {
-            developerMessage: 'CRN parameter not allowed',
-            errorCode: 3,
-            status: 209,
-            userMessage: 'CRN parameter not allowed',
-          }
+                get '/subject-access-request', params: { prn: 'A1111AA' }.merge(parameter => value)
 
+                expect(response).to have_http_status(:bad_request)
+                expect(JSON.parse(response.body)).to include('errorCode' => error_code, 'status' => 400)
+              end
+            end
+          end
+        end
+
+        response '209', 'Unsupported identifier type (CRN); empty response body' do
           let(:crn) { '123456' }
           let(:prn) { nil }
           let(:fromDate) { nil }
           let(:toDate) { nil }
 
-          run_test!
-        end
+          before do
+            expect(SarOffenderDataService).not_to receive(:new)
+          end
 
-        response '210', 'Invalid date format' do
-          schema '$ref' => '#/components/schemas/SarError'
-
-          example 'application/json', :error_example, {
-            developerMessage: 'Invalid date format',
-            errorCode: 4,
-            status: 210,
-            userMessage: 'Invalid date format',
-          }
-
-          let(:crn) { nil }
-          let(:prn) { 'A1111AA' }
-          let(:fromDate) { 'apples' }
-          let(:toDate) { 'pears' }
-
-          run_test!
+          run_test! do |response|
+            expect(response.body).to be_empty
+          end
         end
 
         response '204', 'Offender not found' do
@@ -150,7 +272,34 @@ describe 'SAR API' do
           let(:fromDate) { nil }
           let(:toDate) { nil }
 
-          run_test!
+          {
+            'no dates' => [nil, nil],
+            'empty dates' => ['', ''],
+            'the same start and end date' => ['2026-11-17', '2026-11-17'],
+            'a valid leap day' => ['2024-02-29', '2024-03-01'],
+          }.each do |description, (from_date, to_date)|
+            context "with #{description}" do
+              let(:fromDate) { from_date }
+              let(:toDate) { to_date }
+
+              before do
+                service = instance_double(SarOffenderDataService, find: nil)
+                expect(SarOffenderDataService).to receive(:new)
+                  .with(prn, from_date.presence && Date.iso8601(from_date), to_date.presence && Date.iso8601(to_date))
+                  .and_return(service)
+              end
+
+              run_test! do |response|
+                expect(response.body).to be_empty
+              end
+            end
+          end
+
+          context 'with no stored offender data' do
+            run_test! do |response|
+              expect(response.body).to be_empty
+            end
+          end
         end
 
         response '200', 'Offender found' do
