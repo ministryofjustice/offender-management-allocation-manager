@@ -575,10 +575,13 @@ paths:
       description: |-
         * A valid Bearer token must be supplied in the Authorization header.
         * NOMIS Prison Number (PRN) must be provided as part of the request.
+        * Requests with neither identifier, or with both PRN and CRN, return HTTP code 400.
+        * Dates must be valid calendar dates in YYYY-MM-DD format; invalid dates or a reversed range return HTTP code 400.
+        * Provide both fromDate and toDate, or neither. An incomplete date range returns HTTP code 400.
         * The role ROLE_SAR_DATA_ACCESS is required
         * If the product uses the identifier type transmitted in the request, it can respond with its data and HTTP code 200
         * If the product uses the identifier type transmitted in the request but has no data to respond with, it should respond with HTTP code 204
-        * If the product does not use the identifier type transmitted in the request, it should respond with HTTP code 209
+        * If only a CRN is supplied, the endpoint returns HTTP code 209 with an empty response body.
       parameters:
       - name: prn
         in: query
@@ -593,16 +596,18 @@ paths:
           type: string
       - name: fromDate
         in: query
+        schema:
+          type: string
+          format: date
         description: Optional parameter denoting minimum date of event occurrence
           which should be returned in the response (if used, both dates must be provided)
-        schema:
-          type: string
       - name: toDate
         in: query
-        description: Optional parameter denoting maximum date of event occurrence
-          which should be returned in the response (if used, both dates must be provided)
         schema:
           type: string
+          format: date
+        description: Optional parameter denoting maximum date of event occurrence
+          which should be returned in the response (if used, both dates must be provided)
       responses:
         '401':
           description: Request is not authorised
@@ -631,44 +636,50 @@ paths:
               schema:
                 "$ref": "#/components/schemas/SarError"
         '400':
-          description: PRN and CRN parameters passed
+          description: Invalid request parameters
           content:
             application/json:
               examples:
-                error_example:
+                conflicting_identifiers:
                   value:
                     developerMessage: PRN and CRN parameters passed
-                    errorCode: 2
+                    errorCode: 11
                     status: 400
                     userMessage: PRN and CRN parameters passed
+                missing_identifiers:
+                  value:
+                    developerMessage: PRN or CRN parameter required
+                    errorCode: 12
+                    status: 400
+                    userMessage: PRN or CRN parameter required
+                invalid_date:
+                  value:
+                    developerMessage: Invalid date format
+                    errorCode: 20
+                    status: 400
+                    userMessage: Invalid date format
+                reversed_date_range:
+                  value:
+                    developerMessage: fromDate must be on or before toDate
+                    errorCode: 22
+                    status: 400
+                    userMessage: fromDate must be on or before toDate
+                invalid_identifier_type:
+                  value:
+                    developerMessage: PRN and CRN parameters must be strings
+                    errorCode: 10
+                    status: 400
+                    userMessage: PRN and CRN parameters must be strings
+                incomplete_date_range:
+                  value:
+                    developerMessage: fromDate and toDate must be provided together
+                    errorCode: 21
+                    status: 400
+                    userMessage: fromDate and toDate must be provided together
               schema:
                 "$ref": "#/components/schemas/SarError"
         '209':
-          description: CRN parameter not allowed
-          content:
-            application/json:
-              examples:
-                error_example:
-                  value:
-                    developerMessage: CRN parameter not allowed
-                    errorCode: 3
-                    status: 209
-                    userMessage: CRN parameter not allowed
-              schema:
-                "$ref": "#/components/schemas/SarError"
-        '210':
-          description: Invalid date format
-          content:
-            application/json:
-              examples:
-                error_example:
-                  value:
-                    developerMessage: Invalid date format
-                    errorCode: 4
-                    status: 210
-                    userMessage: Invalid date format
-              schema:
-                "$ref": "#/components/schemas/SarError"
+          description: Unsupported identifier type (CRN); empty response body
         '204':
           description: Offender not found
         '200':
