@@ -8,8 +8,7 @@ class SarOffenderDataService
   end
 
   def find
-    offender = by_offender_id(Offender, :state).first
-    return nil if offender.nil?
+    return nil unless Offender.exists?(nomis_offender_id:)
 
     offender_data
   end
@@ -32,28 +31,42 @@ private
     allocation = AllocationHistory.find_by(nomis_offender_id:)
     return [] if allocation.nil?
 
-    transform_data(by_date([allocation] + allocation.get_old_versions, :state))
+    # Each reified allocation state takes effect at its `updated_at` timestamp
+    transform_data(
+      by_date([allocation] + allocation.get_old_versions, :state, timestamp_attribute: :updated_at)
+        .sort_by(&:updated_at)
+        .reverse
+    )
   end
 
   def by_offender_id(klass, algorithm)
     collection = klass.where(nomis_offender_id:)
-    transform_data(by_date(collection, algorithm))
+    dated_collection = by_date(collection, algorithm)
+    dated_collection = dated_collection.sort_by(&:created_at).reverse if algorithm == :event
+
+    transform_data(dated_collection)
   end
 
   # @param items [Array, ActiveRecord_Relation]
-  def by_date(items, algorithm)
+  def by_date(items, algorithm, timestamp_attribute: :created_at)
     return items.sort_by(&:created_at) if start_date.blank? || end_date.blank?
 
     start_time = start_date.to_time
     end_time = (end_date + 1.day).to_time
 
     last_before_range = if algorithm == :state
-                          [items.select { |i| i.created_at.present? && i.created_at < start_time }.max_by(&:created_at)]
+                          [items.select {
+                            timestamp = it.public_send(timestamp_attribute)
+                            timestamp.present? && timestamp < start_time
+                          }.max_by { it.public_send(timestamp_attribute) }]
                         else
                           []
                         end
 
-    within_range = items.select { |i| i.created_at.present? && i.created_at >= start_time && i.created_at <= end_time }.sort_by(&:created_at)
+    within_range = items.select {
+      timestamp = it.public_send(timestamp_attribute)
+      timestamp.present? && timestamp >= start_time && timestamp < end_time
+    }.sort_by { it.public_send(timestamp_attribute) }
 
     (last_before_range + within_range).compact
   end
@@ -63,9 +76,7 @@ private
 
     presenter = presenter_for(collection)
 
-    collection.map do |item|
-      presenter.new(item).as_json
-    end
+    collection.map { presenter.new(it).as_json }
   end
 
   def presenter_for(collection)
