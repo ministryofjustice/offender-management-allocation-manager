@@ -145,6 +145,7 @@ describe 'SAR API' do
 
           before do
             expect(SarOffenderDataService).not_to receive(:new)
+            expect(Rails.logger).not_to receive(:info).with(include('event=subject_access_request_success'))
           end
 
           context 'with both identifiers' do
@@ -233,6 +234,32 @@ describe 'SAR API' do
                 expect(JSON.parse(response.body)).to include('errorCode' => 21, 'status' => 400)
               end
             end
+          end
+        end
+
+        describe 'successful request logging' do
+          before do
+            allow(Rails.logger).to receive(:info)
+            service = instance_double(SarOffenderDataService, find: { nomsNumber: 'A1111AA' })
+            allow(SarOffenderDataService).to receive(:new).and_return(service)
+          end
+
+          it 'logs the status, PRN and date range' do
+            get '/subject-access-request', params: { prn: 'A1111AA', fromDate: '2026-11-01', toDate: '2026-11-17' }
+
+            expect(response).to have_http_status(:ok)
+            expect(Rails.logger).to have_received(:info).with(
+              'event=subject_access_request_success,status=200,prn=A1111AA,from_date=2026-11-01,to_date=2026-11-17'
+            ).once
+          end
+
+          it 'logs empty date fields when no date range is supplied' do
+            get '/subject-access-request', params: { prn: 'A1111AA' }
+
+            expect(response).to have_http_status(:ok)
+            expect(Rails.logger).to have_received(:info).with(
+              'event=subject_access_request_success,status=200,prn=A1111AA,from_date=,to_date='
+            ).once
           end
         end
 

@@ -2,6 +2,8 @@ module Api
   class SarController < Api::ApiController
     SAR_ROLE = 'ROLE_SAR_DATA_ACCESS'.freeze
 
+    after_action :log_successful_request, only: :show
+
     def template
       render plain: SubjectAccessRequestTemplateService.content, content_type: 'text/plain'
     end
@@ -16,7 +18,7 @@ module Api
       return head 209 if only_crn?
 
       result = SarOffenderDataService.new(offender_number, @from_date, @to_date).find
-      return not_found if result.nil?
+      return head :no_content if result.nil?
 
       render json: { content: result }
     end
@@ -36,7 +38,9 @@ module Api
 
     # Overrides parent due to endpoint-specific error schema
     def render_error(msg, error_code, status)
-      Rails.logger.warn("event=subject_access_request_error|status=#{status}|error_code=#{error_code}|message=#{msg}")
+      Rails.logger.warn(
+        "event=subject_access_request_error,status=#{status},error_code=#{error_code},message=#{msg}"
+      )
 
       render json: {
         developerMessage: msg,
@@ -45,8 +49,13 @@ module Api
         userMessage: msg }, status: status.to_s
     end
 
-    def not_found
-      head :no_content
+    def log_successful_request
+      return unless response.successful?
+
+      Rails.logger.info(
+        "event=subject_access_request_success,status=#{response.status},prn=#{offender_number}," \
+          "from_date=#{@from_date},to_date=#{@to_date}"
+      )
     end
 
     def offender_number
