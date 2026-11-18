@@ -64,6 +64,16 @@ RSpec.describe SarOffenderDataService do
           expect(result[:earlyAllocations].size).to eq(HISTORY_SIZE)
         end
 
+        it 'returns allocation history newest first by effective timestamp' do
+          timestamps = result[:allocationHistory].map { Time.zone.parse(it.fetch('updatedAt')) }
+          expect(timestamps).to eq(timestamps.sort.reverse)
+        end
+
+        it 'returns early allocations newest first' do
+          timestamps = result[:earlyAllocations].map { Time.zone.parse(it.fetch('createdAt')) }
+          expect(timestamps).to eq(timestamps.sort.reverse)
+        end
+
         it 'omits the primary POM review timestamp from current and historic allocations' do
           expect(result[:allocationHistory]).to all(satisfy { |entry| !entry.key?('primaryPomReviewedAt') })
         end
@@ -80,35 +90,6 @@ RSpec.describe SarOffenderDataService do
         let(:start_date) { (REFERENCE_TIME - 5.days).to_date }
         let(:end_date) { (REFERENCE_TIME - 3.days).to_date }
 
-        describe 'offender record' do
-          context "with date range before creation" do
-            let(:start_date) { (REFERENCE_TIME - 9.days).to_date }
-            let(:end_date) { (REFERENCE_TIME - 8.days).to_date }
-
-            it 'returns nil' do
-              expect(result).to eq(nil)
-            end
-          end
-
-          context "with date range straddling creation" do
-            let(:start_date) { (REFERENCE_TIME - 3.days).to_date }
-            let(:end_date) { (REFERENCE_TIME + 3.days).to_date }
-
-            it 'returns record' do
-              expect(result).not_to eq(nil)
-            end
-          end
-
-          context "with date range after creation" do
-            let(:start_date) { (REFERENCE_TIME + 3.days).to_date }
-            let(:end_date) { (REFERENCE_TIME + 6.days).to_date }
-
-            it 'returns record' do
-              expect(result).not_to eq(nil)
-            end
-          end
-        end
-
         # State-based: The record's influence extends beyond it's creation time until
         # it is superceded by the next record
         # Algorithm: Return last created before the date range, and any created within the range
@@ -122,7 +103,7 @@ RSpec.describe SarOffenderDataService do
             ].each do |key|
               it "returns records within the range and the last previous for #{key}" do
                 expect(result[key].size).to eq(4)
-                expect(result[key].first['createdAt'].to_date).to eq((REFERENCE_TIME - 6.days).to_date)
+                expect(result[key].first['createdAt'].to_date).to eq((REFERENCE_TIME - 3.days).to_date)
               end
             end
           end
@@ -176,7 +157,12 @@ RSpec.describe SarOffenderDataService do
           ].each do |key|
             it "returns records within the range for #{key}" do
               expect(result[key].size).to eq(3)
-              expect(result[key].first['createdAt'].to_date).to eq((REFERENCE_TIME - 5.days).to_date)
+              expect(result[key].last['createdAt'].to_date).to eq((REFERENCE_TIME - 5.days).to_date)
+            end
+
+            it "returns records newest first for #{key}" do
+              timestamps = result[key].map { Time.zone.parse(it.fetch('createdAt')) }
+              expect(timestamps).to eq(timestamps.sort.reverse)
             end
           end
         end
@@ -184,7 +170,7 @@ RSpec.describe SarOffenderDataService do
 
       context 'when returned data require transformations' do
         context 'with allocation history' do
-          let(:presented_allocation) { result[:allocationHistory].last }
+          let(:presented_allocation) { result[:allocationHistory].first }
 
           it 'omits some attributes' do
             expect(presented_allocation.keys).not_to include('id')
@@ -274,6 +260,48 @@ RSpec.describe SarOffenderDataService do
             expect(responsibility['reason']).to eq('Less than 10 months to serve')
           end
         end
+      end
+    end
+  end
+
+  describe 'allocation history date filtering' do
+    let(:nomis_offender_id) { 'A1111AA' }
+    let(:start_date) { Date.new(2020, 1, 8) }
+    let(:end_date) { Date.new(2020, 1, 12) }
+    let(:initial_time) { Time.zone.local(2020, 1, 1, 12) }
+    let(:first_update_time) { Time.zone.local(2020, 1, 10, 12) }
+    let(:second_update_time) { Time.zone.local(2020, 1, 20, 12) }
+
+    before do
+      Timecop.travel(initial_time) do
+        offender = create(:offender, nomis_offender_id:, created_at: initial_time, updated_at: initial_time)
+        allocation = create(
+          :allocation_history,
+          offender:,
+          nomis_offender_id:,
+          prison: 'LEI',
+          created_at: initial_time,
+          updated_at: initial_time
+        )
+
+        Timecop.travel(first_update_time) { allocation.update!(event_trigger: AllocationHistory::MANUAL_CHANGE) }
+        Timecop.travel(second_update_time) { allocation.update!(event_trigger: AllocationHistory::LEGAL_STATUS_CHANGED) }
+      end
+    end
+
+    it 'filters historical states by when each state became effective' do
+      history = result[:allocationHistory]
+      expect(history.map { Time.zone.parse(it.fetch('updatedAt')).to_date }).to eq([first_update_time.to_date, initial_time.to_date])
+    end
+
+    context 'when the offender tracking record was created after the requested range' do
+      before do
+        tracking_record = Offender.find_by!(nomis_offender_id:)
+        tracking_record.update_columns(created_at: Time.zone.local(2020, 2, 1), updated_at: Time.zone.local(2020, 2, 1))
+      end
+
+      it 'still returns allocation history from the requested range' do
+        expect(result[:allocationHistory].size).to eq(2)
       end
     end
   end
