@@ -577,7 +577,8 @@ paths:
         * NOMIS Prison Number (PRN) must be provided as part of the request.
         * Requests with neither identifier, or with both PRN and CRN, return HTTP code 400.
         * Dates must be valid calendar dates in YYYY-MM-DD format; invalid dates or a reversed range return HTTP code 400.
-        * Provide both fromDate and toDate, or neither. An incomplete date range returns HTTP code 400.
+        * Date bounds are optional and inclusive. If fromDate is omitted, there is no lower bound. If toDate is omitted, it defaults to today (UK time).
+        * Some sections can include the most recent state before fromDate to show what was in effect at the start of the period.
         * The role ROLE_SAR_DATA_ACCESS is required
         * If the product uses the identifier type transmitted in the request, it can respond with its data and HTTP code 200
         * If the product uses the identifier type transmitted in the request but has no data to respond with, it should respond with HTTP code 204
@@ -599,15 +600,14 @@ paths:
         schema:
           type: string
           format: date
-        description: Optional parameter denoting minimum date of event occurrence
-          which should be returned in the response (if used, both dates must be provided)
+        description: Optional inclusive start date. If omitted, there is no lower
+          date bound.
       - name: toDate
         in: query
         schema:
           type: string
           format: date
-        description: Optional parameter denoting maximum date of event occurrence
-          which should be returned in the response (if used, both dates must be provided)
+        description: Optional inclusive end date. Defaults to today (UK time).
       responses:
         '401':
           description: Request is not authorised
@@ -670,12 +670,6 @@ paths:
                     errorCode: 10
                     status: 400
                     userMessage: PRN and CRN parameters must be strings
-                incomplete_date_range:
-                  value:
-                    developerMessage: fromDate and toDate must be provided together
-                    errorCode: 21
-                    status: 400
-                    userMessage: fromDate and toDate must be provided together
               schema:
                 "$ref": "#/components/schemas/SarError"
         '209':

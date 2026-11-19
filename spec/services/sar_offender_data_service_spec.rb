@@ -192,6 +192,24 @@ RSpec.describe SarOffenderDataService do
             expect(presented_allocation['overrideReasons']).to eq('Suitability')
           end
 
+          it 'includes every override reason in the same field' do
+            allocation.update!(override_reasons: %w[suitability no_staff].to_json)
+
+            expect(presented_allocation['overrideReasons']).to eq('Suitability, No staff')
+          end
+
+          it 'returns nil for an empty list of override reasons' do
+            allocation.update!(override_reasons: [].to_json)
+
+            expect(presented_allocation['overrideReasons']).to be_nil
+          end
+
+          it 'still reports valid reasons when a stored list contains a null entry' do
+            allocation.update!(override_reasons: ['suitability', nil, 'no_staff'].to_json)
+
+            expect(presented_allocation['overrideReasons']).to eq('Suitability, No staff')
+          end
+
           it 'returns the creator last name' do
             expect(presented_allocation['createdByLastname']).to eq('DOE')
           end
@@ -292,6 +310,16 @@ RSpec.describe SarOffenderDataService do
     it 'filters historical states by when each state became effective' do
       history = result[:allocationHistory]
       expect(history.map { Time.zone.parse(it.fetch('updatedAt')).to_date }).to eq([first_update_time.to_date, initial_time.to_date])
+    end
+
+    context 'with only an end date' do
+      let(:start_date) { nil }
+      let(:end_date) { first_update_time.to_date }
+
+      it 'returns every allocation state effective through the end date, newest first' do
+        timestamps = result[:allocationHistory].map { Time.zone.iso8601(it.fetch('updatedAt')) }
+        expect(timestamps).to eq([first_update_time, initial_time])
+      end
     end
 
     context 'when the offender tracking record was created after the requested range' do
