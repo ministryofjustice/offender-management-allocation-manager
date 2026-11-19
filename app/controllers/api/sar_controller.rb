@@ -13,7 +13,6 @@ module Api
       return render_error('PRN and CRN parameters passed', 11, 400) if parameter_conflict?
       return render_error('PRN or CRN parameter required', 12, 400) if offender_number.blank? && crn.blank?
       return render_error('Invalid date format', 20, 400) unless parse_dates
-      return render_error('fromDate and toDate must be provided together', 21, 400) if @from_date.nil? != @to_date.nil?
       return render_error('fromDate must be on or before toDate', 22, 400) if @from_date && @from_date > @to_date
       return head 209 if only_crn?
 
@@ -80,7 +79,7 @@ module Api
 
     def parse_dates
       @from_date = parse_date(params[:fromDate])
-      @to_date = parse_date(params[:toDate])
+      @to_date = parse_date(params[:toDate]) || Time.zone.today
 
       true
     rescue Date::Error

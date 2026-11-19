@@ -30,7 +30,10 @@ module Sar
     end
 
     def override_reasons
-      super.first.try(:humanize) if super.is_a?(Array)
+      reasons = super
+      return unless reasons.is_a?(Array)
+
+      reasons.filter_map { it.try(:humanize).presence }.join(', ').presence
     end
   end
 end

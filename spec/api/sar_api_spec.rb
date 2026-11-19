@@ -14,7 +14,8 @@ describe 'SAR API' do
           '* NOMIS Prison Number (PRN) must be provided as part of the request.',
           '* Requests with neither identifier, or with both PRN and CRN, return HTTP code 400.',
           '* Dates must be valid calendar dates in YYYY-MM-DD format; invalid dates or a reversed range return HTTP code 400.',
-          '* Provide both fromDate and toDate, or neither. An incomplete date range returns HTTP code 400.',
+          '* Date bounds are optional and inclusive. If fromDate is omitted, there is no lower bound. If toDate is omitted, it defaults to today (UK time).',
+          '* Some sections can include the most recent state before fromDate to show what was in effect at the start of the period.',
           '* The role ROLE_SAR_DATA_ACCESS is required',
           '* If the product uses the identifier type transmitted in the request, it can respond with its data and HTTP code 200',
           '* If the product uses the identifier type transmitted in the request but has no data to respond with, it should respond with HTTP code 204',
@@ -36,11 +37,11 @@ describe 'SAR API' do
       parameter name: :fromDate,
                 in: :query,
                 schema: { type: :string, format: :date },
-                description: 'Optional parameter denoting minimum date of event occurrence which should be returned in the response (if used, both dates must be provided)'
+                description: 'Optional inclusive start date. If omitted, there is no lower date bound.'
       parameter name: :toDate,
                 in: :query,
                 schema: { type: :string, format: :date },
-                description: 'Optional parameter denoting maximum date of event occurrence which should be returned in the response (if used, both dates must be provided)'
+                description: 'Optional inclusive end date. Defaults to today (UK time).'
 
       describe 'when not authorised' do
         let(:Authorization) { nil }
@@ -131,13 +132,6 @@ describe 'SAR API' do
             userMessage: 'PRN and CRN parameters must be strings',
           }
 
-          example 'application/json', :incomplete_date_range, {
-            developerMessage: 'fromDate and toDate must be provided together',
-            errorCode: 21,
-            status: 400,
-            userMessage: 'fromDate and toDate must be provided together',
-          }
-
           let(:crn) { nil }
           let(:prn) { nil }
           let(:fromDate) { nil }
@@ -219,20 +213,12 @@ describe 'SAR API' do
             end
           end
 
-          {
-            'only a start date' => ['2026-11-17', nil],
-            'only an end date' => [nil, '2026-11-17'],
-            'an empty end date' => ['2026-11-17', ''],
-            'an empty start date' => ['', '2026-11-17'],
-          }.each do |description, (from_date, to_date)|
-            context "with #{description}" do
-              let(:prn) { 'A1111AA' }
-              let(:fromDate) { from_date }
-              let(:toDate) { to_date }
+          context 'with a future start date and no end date' do
+            let(:prn) { 'A1111AA' }
+            let(:fromDate) { Time.zone.tomorrow.iso8601 }
 
-              run_test! do |response|
-                expect(JSON.parse(response.body)).to include('errorCode' => 21, 'status' => 400)
-              end
+            run_test! do |response|
+              expect(JSON.parse(response.body)).to include('errorCode' => 22)
             end
           end
         end
@@ -253,12 +239,12 @@ describe 'SAR API' do
             ).once
           end
 
-          it 'logs empty date fields when no date range is supplied' do
+          it 'logs the effective end date when neither date is supplied' do
             get '/subject-access-request', params: { prn: 'A1111AA' }
 
             expect(response).to have_http_status(:ok)
             expect(Rails.logger).to have_received(:info).with(
-              'event=subject_access_request_success,status=200,prn=A1111AA,from_date=,to_date='
+              "event=subject_access_request_success,status=200,prn=A1111AA,from_date=,to_date=#{Time.zone.today}"
             ).once
           end
         end
@@ -302,6 +288,8 @@ describe 'SAR API' do
           {
             'no dates' => [nil, nil],
             'empty dates' => ['', ''],
+            'only a start date' => ['2024-02-29', nil],
+            'only an end date' => [nil, '2024-02-29'],
             'the same start and end date' => ['2026-11-17', '2026-11-17'],
             'a valid leap day' => ['2024-02-29', '2024-03-01'],
           }.each do |description, (from_date, to_date)|
@@ -312,7 +300,7 @@ describe 'SAR API' do
               before do
                 service = instance_double(SarOffenderDataService, find: nil)
                 expect(SarOffenderDataService).to receive(:new)
-                  .with(prn, from_date.presence && Date.iso8601(from_date), to_date.presence && Date.iso8601(to_date))
+                  .with(prn, from_date.presence && Date.iso8601(from_date), to_date.present? ? Date.iso8601(to_date) : Time.zone.today)
                   .and_return(service)
               end
 
@@ -325,6 +313,30 @@ describe 'SAR API' do
           context 'with no stored offender data' do
             run_test! do |response|
               expect(response.body).to be_empty
+            end
+          end
+        end
+
+        describe 'open-ended date ranges' do
+          {
+            'neither date' => [{}, [18, 16]],
+            'only a start date' => [{ fromDate: '2026-07-18' }, [18]],
+            'only an end date' => [{ toDate: '2026-07-17' }, [16]],
+          }.each do |description, (dates, expected_days)|
+            it "returns the right records in London time with #{description}" do
+              Timecop.freeze(Time.zone.local(2026, 7, 18, 0, 30)) do
+                prn = 'A1111AA'
+                create(:offender, nomis_offender_id: prn)
+                create(:early_allocation, nomis_offender_id: prn, created_at: Time.zone.local(2026, 7, 16, 12))
+                create(:early_allocation, nomis_offender_id: prn, created_at: Time.zone.local(2026, 7, 18, 23, 59))
+                create(:early_allocation, nomis_offender_id: prn, created_at: Time.zone.local(2026, 7, 19))
+
+                get '/subject-access-request', params: { prn:, **dates }
+
+                expect(response).to have_http_status(:ok)
+                timestamps = response.parsed_body.fetch('content').fetch('earlyAllocations').pluck('createdAt')
+                expect(timestamps.map { Time.zone.iso8601(it).day }).to eq(expected_days)
+              end
             end
           end
         end

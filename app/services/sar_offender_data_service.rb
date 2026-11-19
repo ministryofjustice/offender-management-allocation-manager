@@ -49,12 +49,12 @@ private
 
   # @param items [Array, ActiveRecord_Relation]
   def by_date(items, algorithm, timestamp_attribute: :created_at)
-    return items.sort_by(&:created_at) if start_date.blank? || end_date.blank?
+    return items.sort_by(&:created_at) unless start_date || end_date
 
-    start_time = start_date.to_time
-    end_time = (end_date + 1.day).to_time
+    start_time = start_date&.in_time_zone
+    end_time = (end_date + 1.day).in_time_zone if end_date
 
-    last_before_range = if algorithm == :state
+    last_before_range = if algorithm == :state && start_time
                           [items.select {
                             timestamp = it.public_send(timestamp_attribute)
                             timestamp.present? && timestamp < start_time
@@ -65,7 +65,7 @@ private
 
     within_range = items.select {
       timestamp = it.public_send(timestamp_attribute)
-      timestamp.present? && timestamp >= start_time && timestamp < end_time
+      timestamp.present? && (!start_time || timestamp >= start_time) && (!end_time || timestamp < end_time)
     }.sort_by { it.public_send(timestamp_attribute) }
 
     (last_before_range + within_range).compact
