@@ -329,7 +329,7 @@ components:
           type: string
         updatedAt:
           type: string
-    SarOffenderData:
+    SarOffenderDataV1:
       required:
       - content
       type: object
@@ -681,7 +681,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/SarOffenderData"
+                "$ref": "#/components/schemas/SarOffenderDataV1"
   "/subject-access-request/template":
     get:
       summary: Retrieves the SAR Mustache template for this service

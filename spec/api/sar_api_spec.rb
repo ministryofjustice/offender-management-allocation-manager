@@ -1,6 +1,10 @@
 require 'swagger_helper'
 
 describe 'SAR API' do
+  before do
+    allow(Rails.application.config.x).to receive(:sar_report_version).and_return('v1-r1')
+  end
+
   let(:Authorization) { 'Bearer TEST_TOKEN' }
 
   path '/subject-access-request' do
@@ -138,7 +142,7 @@ describe 'SAR API' do
           let(:toDate) { nil }
 
           before do
-            expect(SarOffenderDataService).not_to receive(:new)
+            expect(SarOffenderDataServiceV1).not_to receive(:new)
             expect(Rails.logger).not_to receive(:info).with(include('event=subject_access_request_success'))
           end
 
@@ -226,16 +230,16 @@ describe 'SAR API' do
         describe 'successful request logging' do
           before do
             allow(Rails.logger).to receive(:info)
-            service = instance_double(SarOffenderDataService, find: { nomsNumber: 'A1111AA' })
-            allow(SarOffenderDataService).to receive(:new).and_return(service)
+            service = instance_double(SarOffenderDataServiceV1, find: { nomsNumber: 'A1111AA' })
+            allow(SarOffenderDataServiceV1).to receive(:new).and_return(service)
           end
 
-          it 'logs the status, PRN and date range' do
+          it 'logs the status, PRN, date range and report revision' do
             get '/subject-access-request', params: { prn: 'A1111AA', fromDate: '2026-11-01', toDate: '2026-11-17' }
 
             expect(response).to have_http_status(:ok)
             expect(Rails.logger).to have_received(:info).with(
-              'event=subject_access_request_success,status=200,prn=A1111AA,from_date=2026-11-01,to_date=2026-11-17'
+              'event=subject_access_request_success,status=200,prn=A1111AA,from_date=2026-11-01,to_date=2026-11-17,version=v1-r1'
             ).once
           end
 
@@ -244,7 +248,7 @@ describe 'SAR API' do
 
             expect(response).to have_http_status(:ok)
             expect(Rails.logger).to have_received(:info).with(
-              "event=subject_access_request_success,status=200,prn=A1111AA,from_date=,to_date=#{Time.zone.today}"
+              "event=subject_access_request_success,status=200,prn=A1111AA,from_date=,to_date=#{Time.zone.today},version=v1-r1"
             ).once
           end
         end
@@ -253,7 +257,7 @@ describe 'SAR API' do
           { prn: 10, crn: 10, fromDate: 20, toDate: 20 }.each do |parameter, error_code|
             [['2026-11-17'], { value: '2026-11-17' }].each do |value|
               it "rejects #{parameter} supplied as #{value.class}" do
-                expect(SarOffenderDataService).not_to receive(:new)
+                expect(SarOffenderDataServiceV1).not_to receive(:new)
 
                 get '/subject-access-request', params: { prn: 'A1111AA' }.merge(parameter => value)
 
@@ -271,7 +275,7 @@ describe 'SAR API' do
           let(:toDate) { nil }
 
           before do
-            expect(SarOffenderDataService).not_to receive(:new)
+            expect(SarOffenderDataServiceV1).not_to receive(:new)
           end
 
           run_test! do |response|
@@ -298,8 +302,8 @@ describe 'SAR API' do
               let(:toDate) { to_date }
 
               before do
-                service = instance_double(SarOffenderDataService, find: nil)
-                expect(SarOffenderDataService).to receive(:new)
+                service = instance_double(SarOffenderDataServiceV1, find: nil)
+                expect(SarOffenderDataServiceV1).to receive(:new)
                   .with(prn, from_date.presence && Date.iso8601(from_date), to_date.present? ? Date.iso8601(to_date) : Time.zone.today)
                   .and_return(service)
               end
@@ -342,7 +346,7 @@ describe 'SAR API' do
         end
 
         response '200', 'Offender found' do
-          schema '$ref' => '#/components/schemas/SarOffenderData'
+          schema '$ref' => '#/components/schemas/SarOffenderDataV1'
 
           before do
             create(:offender, nomis_offender_id: prn)
