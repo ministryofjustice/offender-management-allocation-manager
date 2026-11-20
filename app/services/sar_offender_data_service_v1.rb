@@ -1,4 +1,4 @@
-class SarOffenderDataService
+class SarOffenderDataServiceV1
   attr_reader :nomis_offender_id, :start_date, :end_date
 
   def initialize(nomis_offender_id, start_date = nil, end_date = nil)

@@ -5,7 +5,7 @@ module Api
     after_action :log_successful_request, only: :show
 
     def template
-      render plain: SubjectAccessRequestTemplateService.content, content_type: 'text/plain'
+      render plain: SubjectAccessRequestReport.template_content, content_type: 'text/plain'
     end
 
     def show
@@ -16,7 +16,7 @@ module Api
       return render_error('fromDate must be on or before toDate', 22, 400) if @from_date && @from_date > @to_date
       return head 209 if only_crn?
 
-      result = SarOffenderDataService.new(offender_number, @from_date, @to_date).find
+      result = SubjectAccessRequestReport.find(offender_number, @from_date, @to_date)
       return head :no_content if result.nil?
 
       render json: { content: result }
@@ -53,7 +53,7 @@ module Api
 
       Rails.logger.info(
         "event=subject_access_request_success,status=#{response.status},prn=#{offender_number}," \
-          "from_date=#{@from_date},to_date=#{@to_date}"
+          "from_date=#{@from_date},to_date=#{@to_date},version=#{SubjectAccessRequestReport.version}"
       )
     end
 

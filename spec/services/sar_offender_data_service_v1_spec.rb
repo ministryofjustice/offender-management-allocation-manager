@@ -1,7 +1,7 @@
 HISTORY_SIZE = 10
 REFERENCE_TIME = Time.zone.local(2020, 1, 2, 3, 4, 5)
 
-RSpec.describe SarOffenderDataService do
+RSpec.describe SarOffenderDataServiceV1 do
   subject(:result) do
     described_class.new(nomis_offender_id, start_date, end_date).find
   end
