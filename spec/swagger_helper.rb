@@ -257,7 +257,7 @@ RSpec.configure do |config|
               updatedAt: { type: :string },
             }
           },
-          SarOffenderData: {
+          SarOffenderDataV1: {
             required: %w[content],
             type: :object,
             additionalProperties: false,

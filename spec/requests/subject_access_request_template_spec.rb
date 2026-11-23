@@ -6,11 +6,12 @@ RSpec.describe 'Subject access request template' do
   let(:endpoint) { '/subject-access-request/template' }
   let(:token) { 'Bearer TEST_TOKEN' }
   let(:headers) { { 'AUTHORIZATION' => token } }
-  let(:template_path) { SubjectAccessRequestTemplateService.template_path }
+  let(:template_path) { Rails.root.join('config/templates/v1-r1_sar_template.mustache') }
 
   describe 'GET /subject-access-request/template' do
     context 'when the client has the ROLE_SAR_DATA_ACCESS role' do
       before do
+        allow(Rails.application.config.x).to receive(:sar_report_version).and_return('v1-r1')
         stub_decoded_token(authorities: %w[ROLE_SAR_DATA_ACCESS])
         get endpoint, headers: headers
       end

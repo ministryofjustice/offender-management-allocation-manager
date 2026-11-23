@@ -4,7 +4,11 @@ require 'swagger_helper'
 
 describe 'SAR template API' do
   let(:Authorization) { 'Bearer TEST_TOKEN' }
-  let(:template_path) { SubjectAccessRequestTemplateService.template_path }
+  let(:template_path) { Rails.root.join('config/templates/v1-r1_sar_template.mustache') }
+
+  before do
+    allow(Rails.application.config.x).to receive(:sar_report_version).and_return('v1-r1')
+  end
 
   path '/subject-access-request/template' do
     get 'Retrieves the SAR Mustache template for this service' do
