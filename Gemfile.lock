@@ -198,6 +198,7 @@ GEM
     faraday-patron (1.0.0)
     faraday-rack (1.0.0)
     faraday-retry (1.0.4)
+    ffi (1.17.4)
     ffi (1.17.4-aarch64-linux-musl)
     ffi (1.17.4-arm64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
@@ -272,6 +273,7 @@ GEM
     marcel (1.2.1)
     matrix (0.4.3)
     mini_mime (1.1.5)
+    mini_portile2 (2.8.9)
     minitest (6.1.0)
       drb (~> 2.0)
       prism (>= 1.5, < 3)
@@ -289,6 +291,9 @@ GEM
     net-smtp (0.5.2)
       net-protocol
     nio4r (2.7.5)
+    nokogiri (1.19.7)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.19.7-aarch64-linux-musl)
       racc (~> 1.4)
     nokogiri (1.19.7-arm64-darwin)
@@ -309,7 +314,7 @@ GEM
       rack (>= 1.2, < 4)
       snaky_hash (~> 2.0, >= 2.0.9)
       version_gem (~> 1.1, >= 1.1.17)
-    omniauth (2.3.1)
+    omniauth (2.4.1)
       hashie (>= 3.5.2)
       logger
       rack (>= 2.2.8)
@@ -329,6 +334,7 @@ GEM
       ast (~> 2.4.1)
       racc
     pdf-core (0.10.0)
+    pg (1.7.0)
     pg (1.7.0-aarch64-linux-musl)
     pg (1.7.0-arm64-darwin)
     pg (1.7.0-x86_64-linux)
@@ -354,7 +360,7 @@ GEM
     puma (8.1.1)
       nio4r (~> 2.0)
     racc (1.8.1)
-    rack (2.2.25)
+    rack (2.2.26)
     rack-accept (0.4.5)
       rack (>= 0.4)
     rack-protection (3.2.0)
@@ -624,7 +630,7 @@ DEPENDENCIES
   lograge
   logstash-event
   logstash-logger
-  omniauth (~> 2.3.1)
+  omniauth (~> 2.4.1)
   omniauth-oauth2 (~> 1.10.0)
   omniauth-rails_csrf_protection
   ostruct
