@@ -371,6 +371,27 @@ describe 'SAR API' do
             run_test!
           end
 
+          context 'with v1-r2 selected and review data' do
+            let(:crn) { nil }
+            let(:prn) { 'G7266VD' }
+            let(:fromDate) { nil }
+            let(:toDate) { nil }
+
+            before do
+              allow(Rails.application.config.x).to receive(:sar_report_version).and_return('v1-r2')
+              AllocationHistory.find_by!(nomis_offender_id: prn).update!(
+                primary_pom_reviewed_at: Time.zone.local(2020, 1, 2, 3, 4, 5),
+                reviewed_recommended_pom_type: 'probation'
+              )
+            end
+
+            run_test! do |response|
+              allocation = response.parsed_body.fetch('content').fetch('allocationHistory').first
+              expect(Time.zone.parse(allocation.fetch('primaryPomReviewedAt'))).to eq(Time.zone.local(2020, 1, 2, 3, 4, 5))
+              expect(allocation.fetch('reviewedRecommendedPomType')).to eq('Probation POM')
+            end
+          end
+
           context 'with date range' do
             let(:crn) { nil }
             let(:prn) { 'G7266VD' }

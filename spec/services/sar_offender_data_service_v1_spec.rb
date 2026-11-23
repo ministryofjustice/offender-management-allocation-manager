@@ -74,10 +74,6 @@ RSpec.describe SarOffenderDataServiceV1 do
           expect(timestamps).to eq(timestamps.sort.reverse)
         end
 
-        it 'omits the primary POM review timestamp from current and historic allocations' do
-          expect(result[:allocationHistory]).to all(satisfy { |entry| !entry.key?('primaryPomReviewedAt') })
-        end
-
         it 'returns all has_one data' do
           expect(result[:calculatedHandoverDate].keys).to include('handoverDate')
           expect(result[:caseInformation].keys).to include('tier')
@@ -331,6 +327,31 @@ RSpec.describe SarOffenderDataServiceV1 do
       it 'still returns allocation history from the requested range' do
         expect(result[:allocationHistory].size).to eq(2)
       end
+    end
+  end
+
+  describe 'review details in persisted allocation history' do
+    let(:first_review) { Time.zone.local(2020, 1, 2, 12) }
+    let(:second_review) { Time.zone.local(2020, 1, 3, 12) }
+
+    before do
+      Timecop.travel(Time.zone.local(2020, 1, 1, 12)) do
+        offender = create(:offender, nomis_offender_id:)
+        allocation = create(:allocation_history, offender:, nomis_offender_id:, prison: 'LEI')
+        Timecop.travel(first_review) do
+          allocation.update!(primary_pom_reviewed_at: first_review, reviewed_recommended_pom_type: 'prison')
+        end
+        Timecop.travel(second_review) do
+          allocation.update!(primary_pom_reviewed_at: second_review, reviewed_recommended_pom_type: 'probation')
+        end
+      end
+    end
+
+    it 'returns current, previous and unreviewed states with their own review details' do
+      history = result.fetch(:allocationHistory)
+      expect(history.map { it.fetch('reviewedRecommendedPomType') }).to eq(['Probation POM', 'Prison POM', nil])
+      expect(history.map { |entry| entry['primaryPomReviewedAt'] && Time.zone.parse(entry['primaryPomReviewedAt']) })
+        .to eq([second_review, first_review, nil])
     end
   end
 

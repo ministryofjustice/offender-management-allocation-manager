@@ -62,34 +62,34 @@ RSpec.describe SubjectAccessRequestReport do
     end
   end
 
-  describe '.template_content' do
-    subject(:content) { described_class.template_content }
+  describe 'registered revisions' do
+    expected_services = {
+      'v1-r1' => SarOffenderDataServiceV1,
+      'v1-r2' => SarOffenderDataServiceV1,
+    }.freeze
 
-    let(:expected_content) { Rails.root.join('config/templates/v1-r1_sar_template.mustache').read(encoding: 'UTF-8') }
-
-    it 'returns the v1-r1 template body' do
-      expect(content).to eq(expected_content)
-    end
-  end
-
-  context 'with a registered minor revision' do
-    before do
-      data_services = described_class::DATA_SERVICES
-      stub_const('SubjectAccessRequestReport::DATA_SERVICES', data_services.merge('v1-r2' => data_services.fetch('v1-r1')).freeze)
+    it 'registers the intended data service for every supported revision' do
+      expect(described_class::DATA_SERVICES).to eq(expected_services)
     end
 
-    it 'selects a different template while reusing the v1 data service' do
-      payload = { nomsNumber: 'A1111AA' }
-      service = instance_double(SarOffenderDataServiceV1, find: payload)
-      allow(SarOffenderDataServiceV1).to receive(:new).with('A1111AA', nil, nil).and_return(service)
+    expected_services.each do |revision, data_service|
+      context "with #{revision}" do
+        before do
+          allow(Rails.application.config.x).to receive(:sar_report_version).and_return(revision)
+        end
 
-      expect(described_class.template_path).to eq(Rails.root.join('config/templates/v1-r1_sar_template.mustache'))
-      expect(described_class.find('A1111AA', nil, nil)).to eq(payload)
+        it 'validates the template and dispatches to the matching data service' do
+          from_date = Date.new(2020, 1, 1)
+          to_date = Date.new(2020, 1, 31)
+          payload = { nomsNumber: 'A1111AA' }
+          service = instance_double(data_service, find: payload)
+          expect(data_service).to receive(:new).with('A1111AA', from_date, to_date).and_return(service)
 
-      allow(Rails.application.config.x).to receive(:sar_report_version).and_return('v1-r2')
-
-      expect(described_class.template_path).to eq(Rails.root.join('config/templates/v1-r2_sar_template.mustache'))
-      expect(described_class.find('A1111AA', nil, nil)).to eq(payload)
+          expect(described_class.template_path).to eq(Rails.root.join("config/templates/#{revision}_sar_template.mustache"))
+          expect { described_class.validate_configuration! }.not_to raise_error
+          expect(described_class.find('A1111AA', from_date, to_date)).to eq(payload)
+        end
+      end
     end
   end
 end

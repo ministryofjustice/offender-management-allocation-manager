@@ -79,8 +79,10 @@ components:
       - overrideDetail
       - overrideReasons
       - primaryPomAllocatedAt
+      - primaryPomReviewedAt
       - prison
       - recommendedPomType
+      - reviewedRecommendedPomType
       - suitabilityDetail
       - updatedAt
       properties:
@@ -113,10 +115,16 @@ components:
         primaryPomAllocatedAt:
           type: string
           nullable: true
+        primaryPomReviewedAt:
+          type: string
+          nullable: true
         prison:
           type: string
           nullable: true
         recommendedPomType:
+          type: string
+          nullable: true
+        reviewedRecommendedPomType:
           type: string
           nullable: true
         suitabilityDetail:
