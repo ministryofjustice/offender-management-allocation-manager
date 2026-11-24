@@ -17,6 +17,7 @@ gem 'shoryuken', '~> 7.0'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'csv'
 gem 'date_validator'
+gem 'ethon', '0.18.0', require: false # Temporary pin to investigate increased outbound API timeouts
 gem 'faraday', '~> 1.10.3'
 gem 'govuk_notify_rails', '~> 3.0.0'
 gem 'govuk_design_system_formbuilder', '~> 6.5'
@@ -44,7 +45,7 @@ gem 'sentry-rails'
 gem 'sentry-sidekiq'
 gem 'turbolinks', '~> 5'
 gem 'turnout'
-gem 'typhoeus'
+gem 'typhoeus', '1.6.0' # Temporary pin to investigate increased outbound API timeouts
 
 # Assets pipeline
 gem 'cssbundling-rails'
