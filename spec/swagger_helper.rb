@@ -89,8 +89,10 @@ RSpec.configure do |config|
               overrideDetail
               overrideReasons
               primaryPomAllocatedAt
+              primaryPomReviewedAt
               prison
               recommendedPomType
+              reviewedRecommendedPomType
               suitabilityDetail
               updatedAt
             ],
@@ -105,8 +107,10 @@ RSpec.configure do |config|
               overrideDetail: { type: :string, nullable: true },
               overrideReasons: { type: :string, nullable: true },
               primaryPomAllocatedAt: { type: :string, nullable: true },
+              primaryPomReviewedAt: { type: :string, nullable: true },
               prison: { type: :string, nullable: true },
               recommendedPomType: { type: :string, nullable: true },
+              reviewedRecommendedPomType: { type: :string, nullable: true },
               suitabilityDetail: { type: :string, nullable: true },
               updatedAt: { type: :string },
             }

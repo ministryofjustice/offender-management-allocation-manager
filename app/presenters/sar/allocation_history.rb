@@ -10,13 +10,11 @@ module Sar
           :primary_pom_nomis_id,
           :secondary_pom_nomis_id,
           :created_by_name,
-          :primary_pom_reviewed_at,
-          :reviewed_recommended_pom_type,
         ]
       end
 
       def humanized_attributes
-        [:event, :event_trigger, :recommended_pom_type]
+        [:event, :event_trigger, :recommended_pom_type, :reviewed_recommended_pom_type]
       end
 
       def additional_methods

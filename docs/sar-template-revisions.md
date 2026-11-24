@@ -51,12 +51,15 @@ the new template before activating it in an environment.
    filename, make the edits there, and add an entry to `DATA_SERVICES`.
    Check that the selected builder supplies everything the new template uses
    and that any shared builder still supports the older registered templates.
-2. Update the [payload specs](../spec/services/sar_offender_data_service_v1_spec.rb)
-   and [API specs](../spec/api/sar_api_spec.rb) as needed, and cover new
-   template selection in the [report selector specs](../spec/services/subject_access_request_report_spec.rb)
-   and [template API specs](../spec/api/sar_template_api_spec.rb).
-   Pin revisions explicitly in specs so CI covers all supported revisions,
-   regardless of which one is deployed. If the payload contract changes,
+2. Update the revision-to-builder mapping in the
+   [report selector specs](../spec/services/subject_access_request_report_spec.rb).
+   The [template request specs](../spec/requests/subject_access_request_template_spec.rb)
+   check every registered revision automatically; add assertions there for
+   the new template's expressions. Test shared payload behaviour once in the
+   relevant [builder specs](../spec/services/sar_offender_data_service_v1_spec.rb).
+   For a new payload format, add builder and [API](../spec/api/sar_api_spec.rb)
+   coverage for its response and schema. These specs explicitly select revisions
+   rather than relying on the deployed setting. If the payload contract changes,
    update the schema in [`spec/swagger_helper.rb`](../spec/swagger_helper.rb)
    and regenerate [`public/openapi.yml`](../public/openapi.yml).
 3. Try the revision locally with `SAR_REPORT_VERSION=<revision>` and restart
@@ -92,6 +95,7 @@ Revision numbers start with the first template served by this app.
 | --- | --- | --- |
 | `v1-r0` | Retired | [#2832](https://github.com/ministryofjustice/offender-management-allocation-manager/pull/2832) moved the template from the SAR HTML renderer into this service. |
 | `v1-r1` | Active | [#2942](https://github.com/ministryofjustice/offender-management-allocation-manager/pull/2942) removed the calculated early allocation status section, its payload field and its database table. |
+| [`v1-r2`](../config/templates/v1-r2_sar_template.mustache) | Staging | Adds a review indicator, primary POM review date and recommendation at review to allocation history. The indicator is based on whether the review date is present. It shares the v1 payload with `v1-r1`. |
 
 The retired template is not selectable via `SAR_REPORT_VERSION` and should not
 be paired with the current payload.

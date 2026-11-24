@@ -3,6 +3,7 @@
 class SubjectAccessRequestReport
   DATA_SERVICES = {
     'v1-r1' => SarOffenderDataServiceV1,
+    'v1-r2' => SarOffenderDataServiceV1,
   }.freeze
 
   class ConfigurationError < StandardError; end

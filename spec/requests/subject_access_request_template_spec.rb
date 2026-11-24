@@ -6,24 +6,29 @@ RSpec.describe 'Subject access request template' do
   let(:endpoint) { '/subject-access-request/template' }
   let(:token) { 'Bearer TEST_TOKEN' }
   let(:headers) { { 'AUTHORIZATION' => token } }
-  let(:template_path) { Rails.root.join('config/templates/v1-r1_sar_template.mustache') }
 
   describe 'GET /subject-access-request/template' do
-    context 'when the client has the ROLE_SAR_DATA_ACCESS role' do
-      before do
-        allow(Rails.application.config.x).to receive(:sar_report_version).and_return('v1-r1')
-        stub_decoded_token(authorities: %w[ROLE_SAR_DATA_ACCESS])
-        get endpoint, headers: headers
-      end
+    SubjectAccessRequestReport::DATA_SERVICES.each_key do |revision|
+      context "when #{revision} is configured" do
+        before do
+          allow(Rails.application.config.x).to receive(:sar_report_version).and_return(revision)
+          stub_decoded_token(authorities: %w[ROLE_SAR_DATA_ACCESS])
+          get endpoint, headers: headers
+        end
 
-      it 'returns status OK' do
-        expect(response).to have_http_status(:ok)
+        it 'returns the configured template as plain text' do
+          expect(response).to have_http_status(:ok)
+          expect(response.media_type).to eq('text/plain')
+          expect(response.body).to eq(Rails.root.join("config/templates/#{revision}_sar_template.mustache").read(encoding: 'UTF-8'))
+        end
       end
+    end
 
-      it 'returns the template body as plain text' do
-        expect(response.media_type).to eq('text/plain')
-        expect(response.body).to eq(File.read(template_path, encoding: 'UTF-8'))
-      end
+    it 'includes the review fields in the v1-r2 template' do
+      template = Rails.root.join('config/templates/v1-r2_sar_template.mustache').read(encoding: 'UTF-8')
+      expect(template).to include('{{#if primaryPomReviewedAt}}Yes{{else}}No{{/if}}',
+                                  '{{ optionalValue (formatDate primaryPomReviewedAt) }}',
+                                  '{{ optionalValue reviewedRecommendedPomType }}')
     end
 
     context 'when the client lacks an allowed role' do

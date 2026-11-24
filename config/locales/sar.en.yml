@@ -15,3 +15,6 @@ en:
     recommended_pom_type:
       prison: Prison POM
       probation: Probation POM
+    reviewed_recommended_pom_type:
+      prison: Prison POM
+      probation: Probation POM
