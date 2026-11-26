@@ -18,7 +18,9 @@ gem 'bootsnap', '>= 1.1.0', require: false
 gem 'csv'
 gem 'date_validator'
 gem 'ethon', '0.18.0', require: false # Temporary pin to investigate increased outbound API timeouts
-gem 'faraday', '~> 1.10.3'
+gem 'faraday', '~> 2.15'
+gem 'faraday-retry', '~> 2.4'
+gem 'faraday-typhoeus', '~> 2.0'
 gem 'govuk_notify_rails', '~> 3.0.0'
 gem 'govuk_design_system_formbuilder', '~> 6.5'
 gem 'json-schema', '~> 6.2'

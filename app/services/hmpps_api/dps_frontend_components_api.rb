@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'faraday'
-require 'typhoeus/adapters/faraday'
+require 'faraday/typhoeus'
 
 module HmppsApi
   class DpsFrontendComponentsApi

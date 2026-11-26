@@ -48,7 +48,7 @@ describe HmppsApi::Client do
 
       it 'raises a HmppsApi::Error::Unauthorized error' do
         expect { client.get(route) }
-          .to raise_error(HmppsApi::Error::Unauthorized, "the server responded with status #{status}")
+          .to raise_error(HmppsApi::Error::Unauthorized)
       end
 
       context 'when a refreshed token resolves the request' do
@@ -66,7 +66,7 @@ describe HmppsApi::Client do
           expect(client.get(route)).to eq({})
           expect(token_service).to have_received(:refresh_token!).once
           expect(Rails.logger).to have_received(:warn).with(
-            'event=hmpps_api_retry_refresh_token,method=GET,route=/api/endpoint,retries_remaining=2'
+            'event=hmpps_api_retry_refresh_token,method=GET,route=/api/endpoint,retry_count=0'
           ).once
           expect(WebMock).to have_requested(:get, api_host + route)
             .with(headers: { 'Authorization' => "Bearer #{access_token}" }).once
@@ -81,7 +81,8 @@ describe HmppsApi::Client do
 
       it 'raises a Faraday::ClientError error' do
         expect { client.get(route) }
-          .to raise_error(Faraday::ClientError, "the server responded with status #{status}")
+          .to raise_error(Faraday::ClientError)
+        expect(WebMock).to have_requested(:get, api_host + route).once
       end
     end
 
@@ -90,7 +91,7 @@ describe HmppsApi::Client do
 
       it 'raises a Faraday::ResourceNotFound error' do
         expect { client.get(route) }
-          .to raise_error(Faraday::ResourceNotFound, "the server responded with status #{status}")
+          .to raise_error(Faraday::ResourceNotFound)
       end
     end
 
@@ -99,7 +100,7 @@ describe HmppsApi::Client do
 
       it 'raises the correct error' do
         expect { client.get(route) }
-          .to raise_error(Faraday::ServerError, "the server responded with status #{status}")
+          .to raise_error(Faraday::ServerError)
       end
     end
   end
@@ -112,16 +113,8 @@ describe HmppsApi::Client do
         .to_timeout
     end
 
-    it 'raises a Faraday::TimeoutError' do
-      expect { client.get(route) }
-        .to raise_error(Faraday::TimeoutError, 'request timed out')
-    end
-
     it 'logs the failed request details after retries are exhausted' do
-      allow(Rails.logger).to receive(:warn)
-
-      expect { client.get(route) }.to raise_error(Faraday::TimeoutError, 'request timed out')
-
+      expect { client.get(route) }.to raise_error(Faraday::TimeoutError)
       expect(Rails.logger).to have_received(:warn)
         .with(include('event=hmpps_api_request_failed,reason=Faraday::TimeoutError,method=GET,route=/api/endpoint'))
         .once
@@ -138,8 +131,6 @@ describe HmppsApi::Client do
     end
 
     it 'retries and logs the retry event' do
-      allow(Rails.logger).to receive(:warn)
-
       expect(client.get(route)).to eq({})
       expect(WebMock).to have_requested(:get, api_host + route).twice
       expect(Rails.logger).to have_received(:warn)
@@ -148,12 +139,159 @@ describe HmppsApi::Client do
     end
   end
 
-  describe 'timeout configuration' do
+  describe 'request logging' do
+    let(:route) { '/api/endpoint?access_token=route-secret' }
+
+    before do
+      allow(Rails.logger).to receive(:info)
+      allow(Rails.logger).to receive(:error)
+    end
+
+    [403, 502].each do |status|
+      it "omits query strings and bodies from explicit logs for HTTP #{status} errors" do
+        stub_request(:post, api_host + route).with(body: '{"password":"body-secret"}').to_return(status:)
+
+        expect { client.post(route, { password: 'body-secret' }) }.to raise_error(Faraday::Error)
+        [:info, :warn, :error].each do |level|
+          expect(Rails.logger).not_to have_received(level).with(include('route-secret'))
+          expect(Rails.logger).not_to have_received(level).with(include('body-secret'))
+        end
+      end
+    end
+
+    it 'omits query strings from cache and instrumentation logs on success' do
+      stub_request(:get, api_host + route).to_return(body: '{"found":true}')
+
+      2.times { expect(client.get(route)).to eq('found' => true) }
+
+      expect(Rails.logger).to have_received(:info).with(include('route=/api/endpoint,event=cache_hit')).once
+      expect(Rails.logger).to have_received(:info).with(match(/\] GET \/api\/endpoint \(/)).once
+      expect(Rails.logger).not_to have_received(:info).with(include('route-secret'))
+    end
+
+    it 'omits query strings from the final unauthorized log' do
+      stub_request(:get, api_host + route).to_return(status: 401)
+
+      expect { client.get(route) }.to raise_error(HmppsApi::Error::Unauthorized)
+      expect(Rails.logger).to have_received(:error).with(include('route=/api/endpoint')).once
+      expect(Rails.logger).not_to have_received(:error).with(include('route-secret'))
+    end
+
+    it 'omits query strings from final timeout logs' do
+      stub_request(:get, api_host + route).to_timeout
+
+      expect { client.get(route) }.to raise_error(Faraday::TimeoutError)
+      expect(Rails.logger).not_to have_received(:warn).with(include('route-secret'))
+    end
+  end
+
+  describe 'configuration' do
     it 'uses the shared HMPPS API timeout settings' do
       connection = client.instance_variable_get(:@connection)
 
       expect(connection.options.open_timeout).to eq(Rails.configuration.hmpps_api_open_timeout_seconds)
       expect(connection.options.timeout).to eq(Rails.configuration.hmpps_api_timeout_seconds)
+    end
+
+    [[], [:post]].each do |extra_methods|
+      it "configures the retry policy with extra methods #{extra_methods.inspect}" do
+        expect(Faraday::Retry::Middleware).to receive(:new).with(
+          anything,
+          hash_including(
+            max: 3, interval: 0.05, interval_randomness: 0.5, backoff_factor: 2, max_interval: 5,
+            retry_statuses: [502],
+            methods: Faraday::Retry::Middleware::IDEMPOTENT_METHODS + extra_methods,
+            exceptions: Faraday::Retry::Middleware::DEFAULT_EXCEPTIONS +
+              [Faraday::ConnectionFailed, Faraday::UnauthorizedError]
+          )
+        ).and_call_original
+        stub_request(:get, "#{api_host}/api/endpoint").to_return(body: '{}')
+
+        described_class.new(api_host, extra_retry_methods: extra_methods).get('/api/endpoint')
+      end
+    end
+  end
+
+  describe 'retry policy' do
+    let(:route) { '/api/endpoint' }
+    let(:body) { { prisonerNumbers: ['A1234BC'] } }
+
+    it 'retries a transient 502 response' do
+      stub_request(:get, api_host + route).to_return(status: 502).then.to_return(body: '{"found":true}')
+
+      expect(client.get(route)).to eq('found' => true)
+      expect(WebMock).to have_requested(:get, api_host + route).twice
+      expect(Rails.logger).to have_received(:warn).with(
+        "event=hmpps_api_retry,reason=Faraday::RetriableResponse,method=GET,route=#{route}," \
+        "status=502,retry_count=0,open_timeout_seconds=#{Rails.configuration.hmpps_api_open_timeout_seconds}," \
+        "timeout_seconds=#{Rails.configuration.hmpps_api_timeout_seconds}"
+      ).once
+      expect(Rails.logger).not_to have_received(:warn).with(include('event=hmpps_api_request_failed,'))
+    end
+
+    it 'propagates and logs a final 502 without caching the failure' do
+      stub_request(:get, api_host + route).to_return(status: 502, body: '{"error":"bad gateway"}')
+
+      expect { client.get(route) }.to raise_error(Faraday::ServerError) { |e| expect(e.response_status).to eq(502) }
+      expect(Rails.logger).to have_received(:warn).with(
+        include('event=hmpps_api_request_failed,reason=Faraday::ServerError,method=GET,route=/api/endpoint,status=502,')
+      ).once
+      stub_request(:get, api_host + route).to_return(body: '{"found":true}')
+      expect(client.get(route)).to eq('found' => true)
+    end
+
+    it 'does not retry a 502 response for POST by default' do
+      stub_request(:post, api_host + route).to_return(status: 502)
+
+      expect { client.post(route, body) }.to raise_error(Faraday::ServerError)
+      expect(WebMock).to have_requested(:post, api_host + route).once
+    end
+
+    it 'preserves the body when retrying an explicitly enabled POST after a 502' do
+      client = described_class.new(api_host, extra_retry_methods: [:post])
+      stub_request(:post, api_host + route).with(body: body.to_json)
+        .to_return(status: 502, body: '{"error":"bad gateway"}').then.to_return(body: '{"found":true}')
+
+      expect(client.post(route, body)).to eq('found' => true)
+      expect(WebMock).to have_requested(:post, api_host + route).with(body: body.to_json).twice
+    end
+
+    it 'preserves the JSON body and query parameters when explicitly retrying POST requests' do
+      client = described_class.new(api_host, extra_retry_methods: [:post])
+      url = "#{api_host}#{route}?movementTypes=ADM&movementTypes=TRN"
+      stub_request(:post, url).with(body: body.to_json)
+        .to_timeout.then.to_return(status: 200, body: '{"found":true}')
+
+      expect(client.post(route, body, queryparams: { movementTypes: %w[ADM TRN] })).to eq('found' => true)
+      expect(WebMock).to have_requested(:post, url).with(body: body.to_json).twice
+    end
+
+    it 'keeps repeated query parameters and caller-supplied headers' do
+      url = "#{api_host}#{route}?movementTypes=ADM&movementTypes=TRN"
+      stub_request(:get, url).with(headers: { 'Page-Limit' => '100' }).to_return(body: '{}')
+
+      expect(client.get(route, queryparams: { movementTypes: %w[ADM TRN] },
+                               extra_headers: { 'Page-Limit' => 100 })).to eq({})
+    end
+
+    {
+      429 => Faraday::ClientError,
+      500 => Faraday::ServerError,
+    }.each do |status, error|
+      it "raises #{error} for HTTP #{status} without adding retries" do
+        stub_request(:get, api_host + route).to_return(status:)
+
+        expect { client.get(route) }.to raise_error(error) { |e| expect(e.response_status).to eq(status) }
+        expect(WebMock).to have_requested(:get, api_host + route).once
+      end
+    end
+  end
+
+  describe '#raw_get' do
+    it 'returns non-JSON response bodies unchanged' do
+      stub_request(:get, "#{api_host}/document").to_return(body: 'plain text')
+
+      expect(client.raw_get('/document')).to eq('plain text')
     end
   end
 
