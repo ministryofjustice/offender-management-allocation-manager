@@ -17,7 +17,7 @@ gem 'shoryuken', '~> 7.0'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'csv'
 gem 'date_validator'
-gem 'ethon', '0.18.0', require: false # Temporary pin to investigate increased outbound API timeouts
+gem 'ethon', '0.19.2', require: false # Temporary pin to investigate increased outbound API timeouts
 gem 'faraday', '~> 2.15'
 gem 'faraday-retry', '~> 2.4'
 gem 'faraday-typhoeus', '~> 2.0'
@@ -30,14 +30,14 @@ gem 'lograge'
 gem 'logstash-event'
 gem 'logstash-logger'
 gem 'omniauth-oauth2', '~> 1.10.0'
-gem 'omniauth', '~> 2.3.1'
+gem 'omniauth', '~> 2.4.2'
 gem 'omniauth-rails_csrf_protection'
 gem 'ostruct'
 gem 'paper_trail', '~> 17.0'
 gem 'pg'
 gem 'prawn-rails'
 gem 'prometheus_exporter'
-gem 'puma', '~> 8.0'
+gem 'puma', '~> 8.1'
 gem 'redis'
 gem 'rswag-api' # api-documentation
 gem 'rswag-ui'  # api-documentation interface
@@ -47,7 +47,7 @@ gem 'sentry-rails'
 gem 'sentry-sidekiq'
 gem 'turbolinks', '~> 5'
 gem 'turnout'
-gem 'typhoeus', '1.6.0' # Temporary pin to investigate increased outbound API timeouts
+gem 'typhoeus', '1.7.1' # Temporary pin to investigate increased outbound API timeouts
 
 # Assets pipeline
 gem 'cssbundling-rails'
